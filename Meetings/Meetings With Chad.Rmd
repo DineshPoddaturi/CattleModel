@@ -1,0 +1,14 @@
+10/12/2020:
+Regarding the adjustment factor, instead of using a constant (in our case Median or Mean) use the previous year adjustment factor. When it comes to projecting into the future we use the entire factors to get a rough estimate. This is just another trial. Note that this is not our final trial. 
+
+10/16/2020:
+The estimates are consistently over estimating or under estimating. Move Fed Cattle Prices & Holding Costs and keep cull prices as constant and force the supply and disappearance of meat to be equal. 
+
+10/27/2020:
+Use the data of slaughtered animals to find the disappearance of meat and plot them, the supply we have and the disappearance from WASDE. By doing this we can get a better understanding of what to do next. 
+
+11/06/2020:
+
+* Try to see the prices by adjusting the supply. It should go up. Because the supply is going down rite now.
+
+* Carry on without the adjustment factor and then estimate the prices and stuff.

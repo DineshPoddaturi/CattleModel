@@ -1,0 +1,35 @@
+10/13/2020:
+
+* Beef Demand is a function of prices and other stuff. Use the word beef disappearance. 
+* Need to have micro details. Not just the NASS. NASS gets data from USDA reports. So we need to record the actual source of the data. 
+* We have to know where exactly the data comes from. So make sure you find that. 
+* Dressed weights and prices should have same units. Make sure the prices are matched with the weight i.e., are the prices for live weight or for dressed weights.
+* The data needs to be transparant and crystal clear. Basically build a database (a loose word). 
+
+* For Third year paper: Develop a regional model. The settings could change from the national model. Note that things would change for regional models. Think about this more clearly. 
+
+* Drop by and knock the door if closed or just talk with them. Make sure to meet them very frequently i.e., once a week. Even if I don't make a major progress just let them know you are working and keeping at it. 
+
+* He might be harsh on you but it's for the best. They are here to help you and make sure you get the best out of grad school. 
+
+10/20/2020:
+
+* I sent an email to Lee regarding research updates. Dropped by at his office. The door was closed.
+
+11/05/2020:
+
+* Gave him updates on what happened in my presentation. He said it's okay if people find it complicated. Report the comments you get to Lee and Chad. Do not bog down on the comments and try to work it out by yourself. 
+
+* AAEA: Try to get a draft done and send them to Lee and Chad. Try to add Rational Exceptations and/or policy analysis in the existing model. And maybe the regional model as well. 
+
+* For third year paper research proposal I can use the grant proposal. 
+
+
+
+12/02/2020:
+
+* Gave updates and how the prediction is going.
+
+* Told me to remember that we need to show how our dynamic model works better than the static EDMs. Doesn't need to be the perfect or something that exacatly repplicates the observed data. When looking at policy analysis we apply our model and compute the prices and the welfare for producer and consumer.
+
+
