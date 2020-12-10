@@ -545,7 +545,7 @@ demand_predict <- NULL
 
 (exp((muTilde - ((MasterPricesCosts$ps_hat - MasterPricesCosts$pc_hat))/phi)/sTilde))
 
-
+#test comment
 
 for(i in 1:nrow(predict_df)){
   # K_t <- predict_df$K[i]
