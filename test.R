@@ -409,7 +409,9 @@ sysEqs_9 <- function(p){
 }
 
 
-masterData <- left_join(prices_costs,merge(supp_sl_new,merge(supp_cl_new,demand_new)))
+masterData <- left_join(prices_costs,merge(supp_sl_new,merge(supp_cl_new,demand_new))) %>% filter(Year>1993)
+
+
 
 # err <- 2
 # while (err>0.1) {
@@ -433,19 +435,24 @@ masterData <- left_join(prices_costs,merge(supp_sl_new,merge(supp_cl_new,demand_
 #   err <- abs( (sl   - sl_est ) )
 # }
 
+
+
+
+
+
 len <- nrow(masterData)
 
-out_optim <- data.frame(Year=masterData$Year,ps_hat=numeric(len),pc_hat=numeric(len),hc_hat=numeric(len))
-out_bb <- data.frame(Year=masterData$Year,ps_hat=numeric(len),pc_hat=numeric(len),hc_hat=numeric(len))
-out_nl <- data.frame(Year=masterData$Year,ps_hat=numeric(len),pc_hat=numeric(len),hc_hat=numeric(len))
+out_optim <- data.frame(Year=masterData$Year+1,ps_hat=numeric(len),pc_hat=numeric(len),hc_hat=numeric(len))
+out_bb <- data.frame(Year=masterData$Year+1,ps_hat=numeric(len),pc_hat=numeric(len),hc_hat=numeric(len))
+out_nl <- data.frame(Year=masterData$Year+1,ps_hat=numeric(len),pc_hat=numeric(len),hc_hat=numeric(len))
 
 for(i in 1:len){
   
-  A <- masterData$Demand[i]
+  A <- masterData$Demand[i+1]
   
   
-  sl <- masterData$Bill_meatLb_sl[i]
-  cl <- masterData$Bill_meatLb_cl[i]
+  sl <- masterData$Bill_meatLb_sl[i+1]
+  cl <- masterData$Bill_meatLb_cl[i+1]
   
   ps <- masterData$ps[i]
   pc <- masterData$pc[i]
@@ -457,32 +464,28 @@ for(i in 1:len){
   
   ## Here we use three different functions to solve the equations. Eventually we use BBoptim results
   
-  est_optim <- optim(par=p, fn = sysEqs_9)$par
-  est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
-  est_nl <- nlm(p = p, f = sysEqs_9)$estimate
+  # est_optim <- optim(par=p, fn = sysEqs_9)$par
   
   
-  
-  out_optim$ps_hat[i] <- est_optim[1]
-  out_optim$pc_hat[i] <- est_optim[2]
-  out_optim$hc_hat[i] <- est_optim[3]
-  
-  if(out_optim$pc_hat[i] > out_optim$ps_hat[i]){
-    ps 
+  if(!is.na(A)){
+    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
   }
   
+  # est_nl <- nlm(p = p, f = sysEqs_9)$estimate
   
   
   
-  
+  # out_optim$ps_hat[i] <- est_optim[1]
+  # out_optim$pc_hat[i] <- est_optim[2]
+  # out_optim$hc_hat[i] <- est_optim[3]
   
   out_bb$ps_hat[i] <- est_bb[1]
   out_bb$pc_hat[i] <- est_bb[2]
   out_bb$hc_hat[i] <- est_bb[3]
   
-  out_nl$ps_hat[i] <- est_nl[1]
-  out_nl$pc_hat[i] <- est_nl[2]
-  out_nl$hc_hat[i] <- est_nl[3]
+  # out_nl$ps_hat[i] <- est_nl[1]
+  # out_nl$pc_hat[i] <- est_nl[2]
+  # out_nl$hc_hat[i] <- est_nl[3]
   
 }
 
@@ -543,9 +546,9 @@ names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "ps_hat", "pc_hat", "dres
 demand_predict <- NULL
 
 
-(exp((muTilde - ((MasterPricesCosts$ps_hat - MasterPricesCosts$pc_hat))/phi)/sTilde))
+(exp((muTilde - ((predict_df$ps_hat - predict_df$pc_hat)/phi))/sTilde))
 
-#test comment
+
 
 for(i in 1:nrow(predict_df)){
   # K_t <- predict_df$K[i]
@@ -571,21 +574,21 @@ for(i in 1:nrow(predict_df)){
 demand_predict <- demand_predict %>% as.data.frame() %>% drop_na()
 names(demand_predict) <- "Demand_hat"
 demand_predict <- demand_predict %>% mutate(Year = predict_df$Year+1) %>% select(Year, Demand_hat)
-cullMeat <- totalDisappeared %>% select(Year, cull_meat_bill)
-demandMerge <- merge(round(cullMeat,4), round(demand_predict,4))
+
+demandMerge <- merge(round(demand_new%>%filter(Year>1995),4), round(demand_predict,4))
 demandMerge$Year <- as.numeric(demandMerge$Year)
 
 
 
 
-demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=cull_meat_bill,color="Observed"))+geom_point(aes(y=cull_meat_bill,color="Observed"))+geom_line(aes(y=Demand_hat, color="Predicted"))+geom_point(aes(y=Demand_hat,color="Predicted")) + 
-  labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1996,2018))) 
+demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Predicted"))+geom_point(aes(y=Demand_hat,color="Predicted")) + 
+  labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1996,2017))) 
 
 
 
 ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2017))) %>% select(Year, everything())
 
-ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimate"))+geom_point(aes(y=Demand_hat,color="Estimate")) + 
+ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=cull_meat_bill,color="Observed"))+geom_point(aes(y=cull_meat_bill,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimate"))+geom_point(aes(y=Demand_hat,color="Estimate")) + 
   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2017))) 
 
 
@@ -848,6 +851,10 @@ sCON_sINT <-  round((1+beta^2) * (1-eta^2)*( (M_nt_con * (2 * Mt - M_nt_con)) - 
 # case 2: +5.8
 # case 3: -17.5
 # case 4: -17.5
+
+
+
+
 
 
 
