@@ -30,6 +30,11 @@
 
 * Gave updates and how the prediction is going.
 
-* Told me to remember that we need to show how our dynamic model works better than the static EDMs. Doesn't need to be the perfect or something that exacatly repplicates the observed data. When looking at policy analysis we apply our model and compute the prices and the welfare for producer and consumer.
+* Told me to remember that we need to show how our dynamic model works better than the static EDMs. Doesn't need to be the perfect or something that exacatly replicates the observed data. When looking at policy analysis we apply our model and compute the prices and the welfare for producer and consumer.
+
+12/14/2020:
+
+* Gave updates about the model and what I discussed with Chad.
+* Told me not to bogdown by perfecting the model. Also asked me to look at the papers for policy analysis, which is tracebality. There are some papers on tracebality issues. We should then be able to compute the consumer and producer surplus. Since there are already some papers we can show our model does better than others and this can be used for policy analysis. 
 
 

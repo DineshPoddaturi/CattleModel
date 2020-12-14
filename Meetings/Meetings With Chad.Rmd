@@ -12,3 +12,8 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 * Try to see the prices by adjusting the supply. It should go up. Because the supply is going down rite now.
 
 * Carry on without the adjustment factor and then estimate the prices and stuff.
+
+12/14/2020:
+
+* Showed the new estimates of prices and the meat. They are looking good. Also showed the demand prediction which are very noisy. 
+* Plan is to use the predicted demand to estimate the future price. Use that price to estimate the future demand and loop around. Hopefully this will collapse the noise. 
