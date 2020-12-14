@@ -493,8 +493,8 @@ for(i in 1:len){
 
 #### now we calculate the estimated prices, costs, slaughtered meat, culled meat from the model 
 
-
-A <- masterData %>% select(Demand)
+out_bb <- out_bb %>% filter(Year<2018)
+A <- masterData %>% filter(Year>1994) %>% select(Demand)
 est_sl_cl <- cbind(out_bb,A)
 
 est_sl_cl <- est_sl_cl %>% mutate(sl_hat = Demand * ((exp((muTilde - ((ps_hat/phi) - (pc_hat/phi)))/sTilde))/(1 + (exp((muTilde - ((ps_hat/phi) - (pc_hat/phi)))/sTilde)))), 
@@ -515,6 +515,21 @@ cull_plot <- MasterPricesCosts %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color=
 
 holding_plot <- MasterPricesCosts %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,color="Observed"))+geom_point(aes(y=hc,color="Observed")) +geom_line(aes(y=hc_hat, color="Estimate")) + geom_point(aes(y=hc_hat,color="Estimate")) + 
   labs(x="Year", y="Holding Costs (\\$/cwt)", colour="") + theme_classic()+ scale_x_continuous(name="Year", breaks=c(seq(1994,2017))) 
+
+
+
+Master_sl_cl <- merge(est_sl_cl,merge(supp_sl_new,supp_cl_new)) %>% as.data.frame()  %>% select(Year,Bill_meatLb_sl, sl_hat, Bill_meatLb_cl, cl_hat)
+names(Master_sl_cl) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
+Master_sl_cl[,-1] <- round(Master_sl_cl[,-1],2) 
+Master_sl_cl$Year <- as.numeric(Master_sl_cl$Year)
+
+stock_slaughter <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_hat, color="Estimate")) + geom_point(aes(y=sl_hat,color="Estimate")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ scale_x_continuous(name="Year", breaks=c(seq(1994,2017)))
+
+stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +geom_line(aes(y=cl_hat, color="Estimate")) + geom_point(aes(y=cl_hat,color="Estimate")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ scale_x_continuous(name="Year", breaks=c(seq(1994,2017)))
+
+
 
 
 
@@ -546,7 +561,7 @@ names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "ps_hat", "pc_hat", "dres
 demand_predict <- NULL
 
 
-(exp((muTilde - ((predict_df$ps_hat - predict_df$pc_hat)/phi))/sTilde))
+(exp((muTilde - ((predict_df$ps_hat/100 - predict_df$pc_hat/100)/phi))/sTilde))
 
 
 
@@ -559,8 +574,8 @@ for(i in 1:nrow(predict_df)){
   k7_t <- predict_df$k7[i]
   k8_t <- predict_df$k8[i]
   k9_t <- predict_df$k9[i]
-  ps_hat_t1 <- predict_df$ps_hat[i]
-  pc_hat_t1 <- predict_df$pc_hat[i]
+  ps_hat_t1 <- predict_df$ps_hat[i]/100
+  pc_hat_t1 <- predict_df$pc_hat[i]/100
   dressed_t <- predict_df$dressedWeight[i]
   # clShare <- predict_df$cullShare[i]
   share <- (exp((muTilde - ((ps_hat_t1 - pc_hat_t1))/phi)/sTilde))
@@ -581,14 +596,14 @@ demandMerge$Year <- as.numeric(demandMerge$Year)
 
 
 
-demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Predicted"))+geom_point(aes(y=Demand_hat,color="Predicted")) + 
+demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimated"))+geom_point(aes(y=Demand_hat,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1996,2017))) 
 
 
 
-ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2017))) %>% select(Year, everything())
+ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1996,2017))) %>% select(Year, everything())
 
-ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=cull_meat_bill,color="Observed"))+geom_point(aes(y=cull_meat_bill,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimate"))+geom_point(aes(y=Demand_hat,color="Estimate")) + 
+ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimate"))+geom_point(aes(y=Demand_hat,color="Estimate")) + 
   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2017))) 
 
 
@@ -618,8 +633,8 @@ for(i in 1:nrow(predict_df)){
   K_t <- predict_df$K[i]
   k3_t2 <- predict_df$k3[i+2]
   imports_t1 <- predict_df$imports[i+1]
-  ps_hat_t1 <- predict_df$ps_hat[i]
-  pc_hat_t1 <- predict_df$pc_hat[i]
+  ps_hat_t1 <- predict_df$ps_hat[i]/100
+  pc_hat_t1 <- predict_df$pc_hat[i]/100
   dressed_t <- predict_df$dressedWeight[i]
   slShare_t <- (exp((muTilde - ((ps_hat_t1 - pc_hat_t1))/phi)/sTilde))
   
@@ -628,11 +643,11 @@ for(i in 1:nrow(predict_df)){
 
 demand_predict <- demand_predict %>% as.data.frame() %>% drop_na()
 names(demand_predict) <- "Demand_hat"
-demand_predict <- demand_predict %>% mutate(Year =seq(from=1995, to = 2016)) %>% select(Year, Demand_hat)
+demand_predict <- demand_predict %>% mutate(Year =seq(from=1996, to = 2016)) %>% select(Year, Demand_hat)
 demandMerge <- merge(demand_new, demand_predict)
 demandMerge$Year <- as.numeric(demandMerge$Year)
 
-demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Predicted"))+geom_point(aes(y=Demand_hat,color="Predicted")) + 
+demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimated"))+geom_point(aes(y=Demand_hat,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2016))) 
 
 ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2016))) %>% select(Year, everything())
