@@ -552,6 +552,8 @@ holding_plot <- ssl %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,color="Observed")
 
 
 
+
+
 ################## Here I am predicting the demand for meat using the estimated prices and costs and also the estimated parameters mu_tilde and s_tilde #####
 Stock_temp <- Stock%>% filter(Year>1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
