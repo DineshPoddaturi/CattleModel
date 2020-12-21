@@ -566,7 +566,6 @@ names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "ps_hat", "pc_hat", "dres
 demand_predict <- NULL
 
 
-(exp((muTilde - ((predict_df$ps_hat/100 - predict_df$pc_hat/100)/phi))/sTilde))
 
 
 
@@ -588,7 +587,7 @@ for(i in 1:nrow(predict_df)){
   #   share <- 0
   # }
   
-  demand_predict[i+1] <- delta * (k8_t + (2-delta) * k7_t - delta * k6_t) * (dressed_t/1000000000) * (1 + share)
+  demand_predict[i+1] <- delta * (k8_t + (1-delta) * (k7_t + k6_t) )* (dressed_t/1000000000) * (1 + share)
 }
 
 demand_predict <- demand_predict %>% as.data.frame() %>% drop_na()
@@ -628,6 +627,7 @@ predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$
                     MasterPricesCosts$pc_hat, dressedWeights_sl_cl %>% filter(Year>1994)%>% select(Slaughter_avg)) %>% as.data.frame()
 names(predict_df) <- c("Year", "K", "k3", "imports", "ps_hat", "pc_hat", "dressedWeight")
 
+
 demand_predict <- NULL
 
 for(i in 1:nrow(predict_df)){
@@ -659,14 +659,6 @@ ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.f
 
 ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Predicted"))+geom_point(aes(y=Demand_hat,color="Predicted")) + 
   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2016))) 
-
-
-
-
-
-
-
-
 
 
 
@@ -704,183 +696,73 @@ stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Obs
 ############################################################################################################
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###########################
-
-
-steers_onFeed$Period <- str_remove(steers_onFeed$Period,"FIRST OF ")
-steers_onFeed <- steers_onFeed %>% group_by(Period,Year) %>% mutate(totalSteers = sum(Value)) %>% 
-  select(Year,Period, totalSteers) %>% group_by(Year,Period) %>% distinct() %>% ungroup() %>% as.data.frame()
-
-
-heifers_onFeed$Period <- str_remove(heifers_onFeed$Period,"FIRST OF ")
-heifers_onFeed <- heifers_onFeed %>% group_by(Period,Year) %>% mutate(totalHeifers = sum(Value)) %>% 
-  select(Year,Period, totalHeifers) %>% group_by(Year,Period) %>% distinct() %>% ungroup() %>% as.data.frame()
-
-
-cattle_onFeed$Period <- str_remove(cattle_onFeed$Period, "FIRST OF ")
-cattle_onFeed <- cattle_onFeed %>% filter(Period %in% c("JAN", "APR", "JUL", "OCT"))
-cattle_onFeed <- cattle_onFeed %>% group_by(Period,Year) %>% mutate(totalCattle = sum(Value)) %>% 
-  select(Year,Period, totalCattle) %>% group_by(Year,Period) %>% distinct() %>% ungroup() %>% as.data.frame()
-
-dressed_weights <- dressed_weights %>% filter(Period %in% c("JAN", "APR", "JUL", "OCT"))
-dressed_weights <- dressed_weights %>% filter(Year >= 1994) %>% select(Year, Period, Cattle, Steers, Heifers, Cows)
-
-
-
-beef_demand <- beef_demand %>% separate(col= Quarter, into=c("Quarter","Period", "PeriodEnd")) %>% filter(Quarter != "Yr")
-beef_demand <- beef_demand %>% select(Year, Period, Commercial, Farm, `Beginning stocks`, Imports, Exports, `Ending stocks`, `Total supply`, `Total disappearance`) %>% filter(Year>=1994)
-#converting the meet into billion pounds
-beef_demand[,-1:-2] <- (beef_demand[,-1:-2])/1000
-
-
-beef_demand <- beef_demand %>% filter(Year>=1994 & Year <=2019) %>% arrange(desc(Year))
-
-cattle_onFeed <- cattle_onFeed %>% filter(Year>=1994 & Year<=2019)
-heifers_onFeed <- heifers_onFeed %>% filter(Year>=1994 & Year<=2019)
-steers_onFeed <- steers_onFeed %>% filter(Year>=1994 & Year<=2019)
-
-cows_prices <- cows_prices %>% filter(Year >= 1994 & Year<=2019)
-steersHeifers_Prices <- steersHeifers_Prices %>% filter(Year >= 1994 & Year<2019)
-
-dressed_weights <- dressed_weights %>% filter(Year>=1994 & Year<=2019)
-monthsQ <- c("JAN", "APR", "JUL", "OCT")
-dressed_weights <- dressed_weights[order(match(dressed_weights$Period, monthsQ)), ] %>% arrange(desc(Year))
-
-
-tmp <- dressed_weights %>% select(Year, Period)
-tmp <- tmp %>% mutate(heiferMeat = heifers_onFeed$totalHeifers * dressed_weights$Heifers, steerMeat = steers_onFeed$totalSteers * dressed_weights$Steers, 
-               cattleMeat = cattle_onFeed$totalCattle * dressed_weights$Cows)
-tmp[,-1:-2] <- tmp[,-1:-2]/1000000000
-
-beef_demand$Commercial + beef_demand$Farm + beef_demand$`Beginning stocks` + beef_demand$Imports
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###
-eta <- 1/2
-beta <- 0.97
-
-Gt <- 8
-G_nt_con <- 4
-
-Mt <- 8
-M_nt_int <- 6
-M_nt_con <- 4
-
-
-i_g_con_1 <- ( (1-eta) * Gt + eta*G_nt_con )^2 
-i_g_con_2 <- round(( beta * (1-eta) * Gt + beta * eta*G_nt_con)^2, 1)
-
-i_p_con_1 <- (eta * Mt + (1-eta)*M_nt_con)^2 
-i_p_con_2 <- round((beta * eta * Mt + beta * (1-eta)*M_nt_con)^2 , 1)
-
-
-i_g_int_1 <- ( (1-eta) * Gt)^2 
-i_g_int_2 <- round( (beta^2)*( (1-eta) * Gt)^2 , 1)
-
-i_p_int_1 <- (eta * Mt + (1-eta)*M_nt_int)^2 
-i_p_int_2 <- round( ( beta * eta * Mt + beta * (1-eta)*M_nt_int)^2 ,1)
-
-
-
-i_g_fb_1 <- (Gt)^2
-i_g_fb_2 <- round((beta * Gt)^2,1)
-
-i_p_fb_1 <- (Mt)^2
-i_p_fb_2 <- round((beta * Mt)^2,1)
-
-
-
-sCON_sINT <-  round((1+beta^2) * (1-eta^2)*( (M_nt_con * (2 * Mt - M_nt_con)) - (M_nt_int * (2 * Mt - M_nt_int)) ) + (1+beta^2) * eta^2 * G_nt_con * (2 * Gt - G_nt_con) , 1)
-
-
-# case 1 : +17.5
-# case 2: +5.8
-# case 3: -17.5
-# case 4: -17.5
-
-
-
-
-
-
-
-
-
-
+#### This is using cull animals
+predict_df <- cbind(Stock_temp$Year, Stock_temp$k9  ,Stock_temp$k8, Stock_temp$k7, Stock_temp$k6, prices_costs %>% filter(Year>=1995) %>% select(ps), 
+                    prices_costs %>% filter(Year>=1995) %>% select(pc), prices_costs %>% filter(Year>=1995) %>% select(hc), dressedWeights_sl_cl %>% filter(Year>1994)%>% select(Cull_avg),
+                    masterData %>% filter(Year>=1995) %>% select(Bill_meatLb_sl), masterData %>% filter(Year>=1995) %>% select(Bill_meatLb_cl)) %>% as.data.frame()
+names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "ps", "pc", "hc", "dressedWeight", "sl", "cl")
+
+k6_t <- predict_df %>% select(Year, k6)
+k7_t <- predict_df %>% select(Year, k7)
+k8_t <- predict_df %>% select(Year, k8)
+dressed_t <- predict_df %>% select(Year, dressedWeight)
+pricesCosts_t <- prices_costs %>% filter(Year>=1995)
+
+demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+
+
+# for(i in 1:nrow(predict_df)){
+  # K_t <- predict_df$K[i]
+  # k_3_t2 <- predict_df$k3[i+2]
+  # imports_t1 <- predict_df$imports[i+1]
+  i=5
+  k6_t <- predict_df$k6[i]
+  k7_t <- predict_df$k7[i]
+  k8_t <- predict_df$k8[i]
+  k9_t <- predict_df$k9[i]
+
+  if(i<=1){
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
+  }
+  
+  dressed_t <- predict_df$dressedWeight[i]
+  sl_t <- predict_df$sl[i+1]
+  cl_t <- predict_df$cl[i+1]
+  
+  share <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  
+  demand_t1 <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share)
+  
+  p <- c(ps_t, pc_t, hc_t)
+  sl <- sl_t
+  cl <- cl_t
+  A <- demand_t1
+  
+  est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+  ps_hat_t1 <- est_bb[1]
+  pc_hat_t1 <- est_bb[2]
+  hc_hat_t1 <- est_bb[3]
+  
+  ps_t <- ps_hat_t1
+  pc_t <- pc_hat_t1
+  hc_t <- hc_hat_t1
+  
+  prices_predict$ps_hat[i] <- ps_t
+  prices_predict$pc_hat[i] <- pc_t
+  prices_predict$hc_hat[i] <- hc_t
+  demand_predict$demand_est[i] <- demand_t1
+  
+  
+  
+# }
+
+  
+  
+######################################################
+  ## Here we use the slaughter animals numbers
 
 
 
