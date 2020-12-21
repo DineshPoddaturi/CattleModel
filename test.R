@@ -534,7 +534,7 @@ stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Obs
 
 
 
-ssl <- detrend(as.matrix(MasterPricesCosts%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1994,2017))) %>% select(Year, everything())
+ssl <- detrend(as.matrix(MasterPricesCosts%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2017))) %>% select(Year, everything())
 
 slaughter_plot <- ssl %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Observed"))+geom_point(aes(y=ps,color="Observed"))+geom_line(aes(y=ps_hat, color="Estimate"))+geom_point(aes(y=ps_hat,color="Estimate")) + 
   labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1994,2017))) 
@@ -637,13 +637,13 @@ for(i in 1:nrow(predict_df)){
   
   K_t <- predict_df$K[i]
   k3_t2 <- predict_df$k3[i+2]
-  imports_t1 <- predict_df$imports[i+1]
+  imports_t1 <- predict_df$imports[i]
   ps_hat_t1 <- predict_df$ps_hat[i]/100
   pc_hat_t1 <- predict_df$pc_hat[i]/100
   dressed_t <- predict_df$dressedWeight[i]
   slShare_t <- (exp((muTilde - ((ps_hat_t1 - pc_hat_t1))/phi)/sTilde))
   
-  demand_predict[i+1] <- (g * K_t - k3_t2) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  demand_predict[i+1] <- (g * K_t - k3_t2 + imports_t1) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
 }
 
 demand_predict <- demand_predict %>% as.data.frame() %>% drop_na()
@@ -655,7 +655,7 @@ demandMerge$Year <- as.numeric(demandMerge$Year)
 demand_plot <- demandMerge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Estimated"))+geom_point(aes(y=Demand_hat,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2016))) 
 
-ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2016))) %>% select(Year, everything())
+ddl <- detrend(as.matrix(demandMerge%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1996,2016))) %>% select(Year, everything())
 
 ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=Demand_hat, color="Predicted"))+geom_point(aes(y=Demand_hat,color="Predicted")) + 
   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2016))) 
