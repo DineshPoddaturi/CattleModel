@@ -8,7 +8,7 @@ require(Metrics)
 require(pracma)
 
 
-  
+
 
 
 
@@ -260,7 +260,7 @@ dressedWeights_sl_cl <- dressedWeights_sl_cl %>% filter(Year<=2017)
 
 supp_sl <- supp_sl %>% mutate(Bill_meatLb_sl = (Slaughter*(dressedWeights_sl_cl$Slaughter_avg))/1000000000)
 supp_cl <- supp_cl %>% mutate(Bill_meatLb_cl = (Cull*(dressedWeights_sl_cl$Cull_avg))/1000000000)
-  
+
 
 
 ############## here we simply add the slaughtered and cull meat for each year to find the total supply ######
@@ -712,61 +712,74 @@ k8_t <- predict_df %>% select(Year, k8)
 dressed_t <- predict_df %>% select(Year, dressedWeight)
 pricesCosts_t <- prices_costs %>% filter(Year>=1995)
 
-demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
 
-# for(i in 1:nrow(predict_df)){
-  # K_t <- predict_df$K[i]
-  # k_3_t2 <- predict_df$k3[i+2]
-  # imports_t1 <- predict_df$imports[i+1]
-  i=5
-  k6_t <- predict_df$k6[i]
-  k7_t <- predict_df$k7[i]
-  k8_t <- predict_df$k8[i]
-  k9_t <- predict_df$k9[i]
+for(i in 1:nrow(predict_df)){
+# K_t <- predict_df$K[i]
+# k_3_t2 <- predict_df$k3[i+2]
+# imports_t1 <- predict_df$imports[i+1]
 
-  if(i<=1){
-    ps_t <- predict_df$ps[i]
-    pc_t <- predict_df$pc[i]
-    hc_t <- predict_df$hc[i]
-  }
-  
-  dressed_t <- predict_df$dressedWeight[i]
-  sl_t <- predict_df$sl[i+1]
-  cl_t <- predict_df$cl[i+1]
-  
-  share <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
-  
-  demand_t1 <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share)
-  
-  p <- c(ps_t, pc_t, hc_t)
-  sl <- sl_t
-  cl <- cl_t
-  A <- demand_t1
-  
-  est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
-  ps_hat_t1 <- est_bb[1]
-  pc_hat_t1 <- est_bb[2]
-  hc_hat_t1 <- est_bb[3]
-  
-  ps_t <- ps_hat_t1
-  pc_t <- pc_hat_t1
-  hc_t <- hc_hat_t1
-  
-  prices_predict$ps_hat[i] <- ps_t
-  prices_predict$pc_hat[i] <- pc_t
-  prices_predict$hc_hat[i] <- hc_t
-  demand_predict$demand_est[i] <- demand_t1
-  
-  
-  
-# }
+# i=4
+    k6_t <- predict_df$k6[i]
+    k7_t <- predict_df$k7[i]
+    k8_t <- predict_df$k8[i]
+    k9_t <- predict_df$k9[i]
+    
+    if(i<=1){
+      ps_t <- predict_df$ps[i]
+      pc_t <- predict_df$pc[i]
+      hc_t <- predict_df$hc[i]
+    }
+    
+    dressed_t <- predict_df$dressedWeight[i]
+    # sl_t <- predict_df$sl[i+1]
+    # cl_t <- predict_df$cl[i+1]
+    
+    share <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    
+    demand_t1 <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share)
+    
+    sl_t1 <- demand_t1 * ((share)/(1 + share))
+    cl_t1 <- demand_t1 * 1/(1+share)
+    
+    
+    
+    p <- c(ps_t, pc_t, hc_t)
+    sl <- sl_t1
+    cl <- cl_t1
+    A <- demand_t1
+    
+    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    ps_hat_t1 <- est_bb[1]
+    pc_hat_t1 <- est_bb[2]
+    hc_hat_t1 <- est_bb[3]
+    
+    ps_t <- ps_hat_t1
+    pc_t <- pc_hat_t1
+    hc_t <- hc_hat_t1
+    
+    prices_predict$ps_hat[i] <- ps_t
+    prices_predict$pc_hat[i] <- pc_t
+    prices_predict$hc_hat[i] <- hc_t
+    demand_predict$demand_est[i] <- demand_t1
+    demand_predict$sl_est[i] <- sl_t1
+    demand_predict$cl_est[i] <- cl_t1
 
-  
-  
+}
+
+
+
 ######################################################
-  ## Here we use the slaughter animals numbers
+## Here we use the slaughter animals numbers
+
+
+
+
+
+
+
 
 
 
