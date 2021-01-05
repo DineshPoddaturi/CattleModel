@@ -701,10 +701,16 @@ stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Obs
 
 
 #### This is using cull animals
-predict_df <- cbind(Stock_temp$Year, Stock_temp$k9  ,Stock_temp$k8, Stock_temp$k7, Stock_temp$k6, prices_costs %>% filter(Year>=1995) %>% select(ps), 
-                    prices_costs %>% filter(Year>=1995) %>% select(pc), prices_costs %>% filter(Year>=1995) %>% select(hc), dressedWeights_sl_cl %>% filter(Year>1994)%>% select(Cull_avg),
-                    masterData %>% filter(Year>=1995) %>% select(Bill_meatLb_sl), masterData %>% filter(Year>=1995) %>% select(Bill_meatLb_cl)) %>% as.data.frame()
-names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "ps", "pc", "hc", "dressedWeight", "sl", "cl")
+predict_df <- cbind(Stock_temp$Year, Stock_temp$k9  ,Stock_temp$k8, Stock_temp$k7, Stock_temp$k6, Stock_temp$k5,
+                    Stock_temp$k4, Stock_temp$k3,
+                    prices_costs %>% filter(Year>=1995) %>% select(ps), 
+                    prices_costs %>% filter(Year>=1995) %>% select(pc), 
+                    prices_costs %>% filter(Year>=1995) %>% select(hc), 
+                    dressedWeights_sl_cl %>% filter(Year>1994)%>% select(Cull_avg),
+                    masterData %>% filter(Year>=1995) %>% select(Bill_meatLb_sl), 
+                    masterData %>% filter(Year>=1995) %>% select(Bill_meatLb_cl)) %>% as.data.frame()
+names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "k5", "k4", "k3" ,"ps", "pc", "hc", 
+                       "dressedWeight", "sl", "cl")
 
 k6_t <- predict_df %>% select(Year, k6)
 k7_t <- predict_df %>% select(Year, k7)
@@ -713,19 +719,27 @@ dressed_t <- predict_df %>% select(Year, dressedWeight)
 pricesCosts_t <- prices_costs %>% filter(Year>=1995)
 
 demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
 
 for(i in 1:nrow(predict_df)){
-# K_t <- predict_df$K[i]
-# k_3_t2 <- predict_df$k3[i+2]
-# imports_t1 <- predict_df$imports[i+1]
-
-# i=4
+    # K_t <- predict_df$K[i]
+    # k_3_t2 <- predict_df$k3[i+2]
+    # imports_t1 <- predict_df$imports[i+1]
+  
+    #### We use the current data to estimate the future demand first and use that demand to estimate 
+    #### the future prices
     k6_t <- predict_df$k6[i]
     k7_t <- predict_df$k7[i]
     k8_t <- predict_df$k8[i]
     k9_t <- predict_df$k9[i]
+    
+    # sl_t <- predict_df$sl[i]
+    # cl_t <- predict_df$cl[i]
+    
+    
     
     if(i<=1){
       ps_t <- predict_df$ps[i]
@@ -734,8 +748,9 @@ for(i in 1:nrow(predict_df)){
     }
     
     dressed_t <- predict_df$dressedWeight[i]
-    # sl_t <- predict_df$sl[i+1]
-    # cl_t <- predict_df$cl[i+1]
+    
+    
+   
     
     share <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
     
@@ -773,13 +788,68 @@ for(i in 1:nrow(predict_df)){
 
 ######################################################
 ## Here we use the slaughter animals numbers
+Stock_temp <- Stock%>% filter(Year>1994 & Year<=2017)
+imports_temp <- imports %>% filter(Year>1994 & Year<=2017)
+
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, dressedWeights_sl_cl %>% filter(Year>1994)%>% select(Slaughter_avg),
+                    prices_costs%>%filter(Year>1994)%>% select(ps), prices_costs%>%filter(Year>1994)%>% select(pc),
+                    prices_costs%>%filter(Year>1994)%>% select(hc), masterData %>% filter(Year>1994) %>% select(Bill_meatLb_sl), 
+                    masterData %>% filter(Year>1994) %>% select(Bill_meatLb_cl)) %>% as.data.frame()
+names(predict_df) <- c("Year", "K", "k3", "imports", "dressedWeight", "ps", "pc", "hc", "sl", "cl")
+
+
+demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+
+prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
 
 
 
+    i <-  3
+    K_t <- predict_df$K[i]
+    k3_t2 <- predict_df$k3[i+2]
+    imports_t <- predict_df$imports[i]
+    
+    # if(i<=1){
+      ps_t <- predict_df$ps[i]
+      pc_t <- predict_df$pc[i]
+      hc_t <- predict_df$hc[i]
+    # }
+    
+    dressed_t <- predict_df$dressedWeight[i]
+    
+    
+    slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    
+    demand_t1 <- (g * K_t - k3_t2) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
 
-
-
+    sl_t1 <- demand_t1 * ((slShare_t)/(1 + slShare_t))
+    cl_t1 <- demand_t1 * 1/(1+slShare_t)
+    
+    
+    
+    p <- c(ps_t, pc_t, hc_t)
+    sl <- sl_t1
+    cl <- cl_t1
+    A <- demand_t1
+    
+    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    ps_hat_t1 <- est_bb[1]
+    pc_hat_t1 <- est_bb[2]
+    hc_hat_t1 <- est_bb[3]
+    
+    # ps_t <- ps_hat_t1
+    # pc_t <- pc_hat_t1
+    # hc_t <- hc_hat_t1
+    
+    prices_predict$ps_hat[i] <- ps_hat_t1
+    prices_predict$pc_hat[i] <- pc_hat_t1
+    prices_predict$hc_hat[i] <- hc_hat_t1
+    demand_predict$demand_est[i] <- demand_t1
+    demand_predict$sl_est[i] <- sl_t1
+    demand_predict$cl_est[i] <- cl_t1
 
 
 
