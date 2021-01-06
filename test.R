@@ -728,9 +728,13 @@ for(i in 1:nrow(predict_df)){
     # K_t <- predict_df$K[i]
     # k_3_t2 <- predict_df$k3[i+2]
     # imports_t1 <- predict_df$imports[i+1]
-  
+    
+    # i <- 1
     #### We use the current data to estimate the future demand first and use that demand to estimate 
     #### the future prices
+    k3_t <- predict_df$k3[i]
+    k4_t <- predict_df$k4[i]
+    k5_t <- predict_df$k5[i]
     k6_t <- predict_df$k6[i]
     k7_t <- predict_df$k7[i]
     k8_t <- predict_df$k8[i]
@@ -745,25 +749,29 @@ for(i in 1:nrow(predict_df)){
       ps_t <- predict_df$ps[i]
       pc_t <- predict_df$pc[i]
       hc_t <- predict_df$hc[i]
+     
     }
-    
     dressed_t <- predict_df$dressedWeight[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
     
     
-   
+    # sl <- sl_t
+    # cl <- cl_t
     
-    share <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
     
-    demand_t1 <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share)
+    ### One year ahead
     
-    sl_t1 <- demand_t1 * ((share)/(1 + share))
-    cl_t1 <- demand_t1 * 1/(1+share)
+    share_t1 <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    
+    demand_t1 <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
+    
+    # sl_t1 <- demand_t1 * ((share_t1)/(1 + share_t1))
+    # cl_t1 <- demand_t1 * 1/(1+share_t1)
     
     
     
     p <- c(ps_t, pc_t, hc_t)
-    sl <- sl_t1
-    cl <- cl_t1
     A <- demand_t1
     
     est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
@@ -771,18 +779,129 @@ for(i in 1:nrow(predict_df)){
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
     
+    prices_predict$ps_hat[i] <- ps_hat_t1
+    prices_predict$pc_hat[i] <- pc_hat_t1
+    prices_predict$hc_hat[i] <- hc_hat_t1
+    demand_predict$demand_est[i] <- demand_t1
+    # demand_predict$sl_est[i] <- sl_t1
+    # demand_predict$cl_est[i] <- cl_t1
+    
     ps_t <- ps_hat_t1
-    pc_t <- pc_hat_t1
+    pc_t <- pc_hat_t1 
     hc_t <- hc_hat_t1
     
-    prices_predict$ps_hat[i] <- ps_t
-    prices_predict$pc_hat[i] <- pc_t
-    prices_predict$hc_hat[i] <- hc_t
-    demand_predict$demand_est[i] <- demand_t1
-    demand_predict$sl_est[i] <- sl_t1
-    demand_predict$cl_est[i] <- cl_t1
-
 }
+    ## Two years ahead
+    
+     
+    
+    
+    share_t2 <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    
+    demand_t2 <- (delta^2) * (k7_t + (1-delta) * (k6_t + k5_t) ) * (dressed_t/1000000000) * (1 + share_t2)
+    
+    # sl_t2 <- demand_t2 * ((share_t2)/(1 + share_t2))
+    # cl_t2 <- demand_t2 * 1/(1+share_t2)
+    
+    
+    
+    p <- c(ps_t, pc_t, hc_t)
+    # sl <- sl_t2
+    # cl <- cl_t2
+    A <- demand_t2
+    
+    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    ps_hat_t2 <- est_bb[1]
+    pc_hat_t2 <- est_bb[2]
+    hc_hat_t2 <- est_bb[3]
+    
+    ps_t <- ps_hat_t2
+    pc_t <- pc_hat_t2
+    hc_t <- hc_hat_t2
+    
+    prices_predict$ps_hat[i+1] <- ps_hat_t2
+    prices_predict$pc_hat[i+1] <- pc_hat_t2
+    prices_predict$hc_hat[i+1] <- hc_hat_t2
+    demand_predict$demand_est[i+1] <- demand_t2
+    # demand_predict$sl_est[i+1] <- sl_t2
+    # demand_predict$cl_est[i+1] <- cl_t2
+    
+    ## Three years ahead
+    
+    share_t3 <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    
+    demand_t3 <- (delta^3) * (k6_t + (1-delta) * (k5_t + k4_t) ) * (dressed_t/1000000000) * (1 + share_t3)
+    
+    # sl_t3 <- demand_t3 * ((share_t3)/(1 + share_t3))
+    # cl_t3 <- demand_t3 * 1/(1+share_t3)
+    
+    
+    
+    p <- c(ps_t, pc_t, hc_t)
+    # sl <- sl_t3
+    # cl <- cl_t3
+    A <- demand_t3
+    
+    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    ps_hat_t3 <- est_bb[1]
+    pc_hat_t3 <- est_bb[2]
+    hc_hat_t3 <- est_bb[3]
+    
+    ps_t <- ps_hat_t3
+    pc_t <- pc_hat_t3
+    hc_t <- hc_hat_t3
+    
+    prices_predict$ps_hat[i+2] <- ps_t
+    prices_predict$pc_hat[i+2] <- pc_t
+    prices_predict$hc_hat[i+2] <- hc_t
+    demand_predict$demand_est[i+2] <- demand_t3
+    # demand_predict$sl_est[i+2] <- sl_t3
+    # demand_predict$cl_est[i+2] <- cl_t3
+    
+    ## Four years ahead
+    
+    share_t4 <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    
+    demand_t4 <- (delta^4) * (k5_t + (1-delta) * (k4_t + k3_t) ) * (dressed_t/1000000000) * (1 + share_t4)
+    
+    # sl_t4 <- demand_t4 * ((share_t4)/(1 + share_t4))
+    # cl_t4 <- demand_t4 * 1/(1+share_t4)
+    
+    
+    
+    p <- c(ps_t, pc_t, hc_t)
+    # sl <- sl_t4
+    # cl <- cl_t4
+    A <- demand_t4
+    
+    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    ps_hat_t4 <- est_bb[1]
+    pc_hat_t4 <- est_bb[2]
+    hc_hat_t4 <- est_bb[3]
+    
+    ps_t <- ps_hat_t4
+    pc_t <- pc_hat_t4
+    hc_t <- hc_hat_t4
+    
+    prices_predict$ps_hat[i+3] <- ps_t
+    prices_predict$pc_hat[i+3] <- pc_t
+    prices_predict$hc_hat[i+3] <- hc_t
+    demand_predict$demand_est[i+3] <- demand_t4
+    # demand_predict$sl_est[i+3] <- sl_t4
+    # demand_predict$cl_est[i+3] <- cl_t4
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+# }
 
 
 
@@ -798,7 +917,7 @@ predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$
 names(predict_df) <- c("Year", "K", "k3", "imports", "dressedWeight", "ps", "pc", "hc", "sl", "cl")
 
 
-demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 
 # demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 
@@ -806,33 +925,36 @@ prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(pre
 
 
 
-
-    i <-  3
+for(i in 1:(nrow(predict_df)-2)){
+  
     K_t <- predict_df$K[i]
     k3_t2 <- predict_df$k3[i+2]
-    imports_t <- predict_df$imports[i]
+    # imports_t <- predict_df$imports[i]
     
-    # if(i<=1){
+    if(i<=1){
       ps_t <- predict_df$ps[i]
       pc_t <- predict_df$pc[i]
       hc_t <- predict_df$hc[i]
-    # }
+    }
     
     dressed_t <- predict_df$dressedWeight[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
+    imports_t <- predict_df$imports[i]
     
     
     slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
     
-    demand_t1 <- (g * K_t - k3_t2) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+    demand_t1 <- (g * K_t - k3_t2 + imports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
 
-    sl_t1 <- demand_t1 * ((slShare_t)/(1 + slShare_t))
-    cl_t1 <- demand_t1 * 1/(1+slShare_t)
+    # sl_t1 <- demand_t1 * ((slShare_t)/(1 + slShare_t))
+    # cl_t1 <- demand_t1 * 1/(1+slShare_t)
     
     
     
     p <- c(ps_t, pc_t, hc_t)
-    sl <- sl_t1
-    cl <- cl_t1
+    # sl <- sl_t1
+    # cl <- cl_t1
     A <- demand_t1
     
     est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
@@ -840,17 +962,17 @@ prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(pre
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
     
-    # ps_t <- ps_hat_t1
-    # pc_t <- pc_hat_t1
-    # hc_t <- hc_hat_t1
+    ps_t <- ps_hat_t1
+    pc_t <- pc_hat_t1
+    hc_t <- hc_hat_t1
     
     prices_predict$ps_hat[i] <- ps_hat_t1
     prices_predict$pc_hat[i] <- pc_hat_t1
     prices_predict$hc_hat[i] <- hc_hat_t1
     demand_predict$demand_est[i] <- demand_t1
-    demand_predict$sl_est[i] <- sl_t1
-    demand_predict$cl_est[i] <- cl_t1
-
+    # demand_predict$sl_est[i] <- sl_t1
+    # demand_predict$cl_est[i] <- cl_t1
+}
 
 
 
