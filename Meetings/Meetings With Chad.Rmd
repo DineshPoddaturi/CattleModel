@@ -17,3 +17,17 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Showed the new estimates of prices and the meat. They are looking good. Also showed the demand prediction which are very noisy. 
 * Plan is to use the predicted demand to estimate the future price. Use that price to estimate the future demand and loop around. Hopefully this will collapse the noise. 
+
+
+01/08/2021:
+
+* Showed the plots that I did. Chad said these are projections, they look the way they are suposed to look and the model is doing it's job.
+* However, inorder to estimate everything properly we need to adjust the parameters such that the model estimates the prices properly. To do that: i. we need to look at the estimated supply, demand and observed supply, demand. These need to be balanced through prices and parameters. ii. Note that the parameters $\mu$ and $s$ depend on the price, $sl,cl$ ratios (refer code for further details). Now once we have $\hat{sl}, \hat{cl}, \hat{A}$, compare them with $sl, cl, A$ and see whether they are same or not. We should expect some discrepencies. So use them to get new $\tilde{\mu},\tilde{s}$ and then use the newly computed parameters to estimate the prices. iii. Keep in mind that these parameters might need to be computed every year and at the end we might see some pattern of these parameters. For estimating future, we might take a value of these parameters or construct a formula for it. 
+* This is good. We are getting somewhere. He said model building is difficult and once we build this it will get better. 
+* For policy analysis: for instance take tracebility. If US imposes mandatory tracebality on all the beef products produced in the US, imports from foreign countries would increase which will result in high demand. By introducing this shock (we wouldn't know exactly how much the demand would increase by but we can use some number like 10% or 15%) we can see how the supply and prices would react. This policy would also increase the costs for producer so we would have to include them in the model as well. For instance the producer will add heifers to the breeding stock to get profits out of it but the costs associated with will go up. Hence a 10% or something like that increase in the hoolding costs. We might have to include them in the model to correctly estimate the prices and quantities. 
+
+
+
+
+
+
