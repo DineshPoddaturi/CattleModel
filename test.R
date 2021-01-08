@@ -779,6 +779,8 @@ for(i in 1:nrow(predict_df)){
     
     
     
+    
+    
     p <- c(ps_t, pc_t, hc_t)
     A <- demand_t1
     sl <- sl_t1
