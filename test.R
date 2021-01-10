@@ -335,12 +335,12 @@ lossfn <- function(theta,e,ps,pc){
   mu <- theta[1]
   s <- theta[2]
   
-  v <- sum((e - (( mu - ((ps-pc)/phi)))/s))^2
+  v <- sum((e - ((( mu - ((ps-pc)/phi)))/s)))^2
   
   return(v)
 }
 
-theta0 <- c(3,2)
+theta0 <- c(1,1)
 
 e <- tildes$Tildes %>% as.vector()
 ps <- pc_ps %>% filter(Year>=1995) %>% select(ps)
@@ -699,6 +699,27 @@ stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Obs
 
 ############################################################################################################
 
+#### Compute mu_tilde and s_tilde
+mu_s_tildes <- function(sl, cl, ps, pc, thetas){
+  
+  s <- sl
+  c <- cl
+  sl_share <- s/(s+c)
+  cl_share <- 1-sl_share
+  
+  # print(c(sl_share, cl_share))
+  
+  
+  tilde <- log((1-cl_share)/cl_share)
+  
+  theta0 <- thetas
+  
+  out <- BBoptim(par= theta0, fn = lossfn, e=tilde ,ps=ps,pc=pc)
+  
+  muTilde <- out$par[1]
+  sTilde <- out$par[2]
+  return(c(muTilde,sTilde))
+}
 
 #### This is using cull animals
 predict_df <- cbind(Stock_temp$Year, Stock_temp$k9  ,Stock_temp$k8, Stock_temp$k7, Stock_temp$k6, Stock_temp$k5,
@@ -724,6 +745,7 @@ demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow
 # demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
+parameters <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
 
 for(i in 1:nrow(predict_df)){
     # K_t <- predict_df$K[i]
@@ -755,6 +777,10 @@ for(i in 1:nrow(predict_df)){
       cl <- predict_df$cl[i]
       demand <- predict_df$Dissappear[i]
       adj <- demand/(sl+cl)
+      # params <- mu_s_tildes(sl=sl, cl=cl, ps = ps_t, pc = pc_t, thetas = c(1,1))
+      
+      # muTilde <- params[1]
+      # sTilde <- params[2]
     }
     
     dressed_t <- predict_df$dressedWeight[i]
@@ -763,28 +789,36 @@ for(i in 1:nrow(predict_df)){
     demand <- predict_df$Dissappear[i]
     adj <- demand/(sl+cl)
     
-    
-    # sl <- sl_t
-    # cl <- cl_t
-    
-    
     ### One year ahead
     
-    share_t1 <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+    share_t1 <- (exp(((mu * phi) - ((ps_t - pc_t))/phi)/ (pStd*sqrt(3)*phi/pi)))
     
-    demand_t1 <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
+    demand_t1_hat <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
     
-    sl_t1 <- (demand_t1 * ((share_t1)/(1 + share_t1))) * adj
-    cl_t1 <- (demand_t1 * 1/(1+share_t1)) * adj
+    sl_t1_hat <- (demand_t1_hat * ((share_t1)/(1 + share_t1))) * adj
+    cl_t1_hat <- (demand_t1_hat * 1/(1+share_t1)) * adj
+    
+    params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+    parameters$mu_tilde[i] <- params_t1[1]
+    parameters$s_tilde[i] <- params_t1[2]
+    
+    
+    
+    # predict_df$Dissappear[i+1]
+    # predict_df$sl[i+1]
+    # predict_df$cl[i+1]
+    
     
     
     
     
     
     p <- c(ps_t, pc_t, hc_t)
-    A <- demand_t1
-    sl <- sl_t1
-    cl <- cl_t1
+    A <- demand_t1_hat
+    sl <- sl_t1_hat
+    cl <- cl_t1_hat
+    muTilde <- params_t1[1]
+    sTilde <- params_t1[2]
     
     est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
     ps_hat_t1 <- est_bb[1]
@@ -795,8 +829,8 @@ for(i in 1:nrow(predict_df)){
     prices_predict$pc_hat[i] <- pc_hat_t1
     prices_predict$hc_hat[i] <- hc_hat_t1
     demand_predict$demand_est[i] <- A
-    demand_predict$sl_est[i] <- sl_t1
-    demand_predict$cl_est[i] <- cl_t1
+    demand_predict$sl_est[i] <- sl_t1_hat
+    demand_predict$cl_est[i] <- cl_t1_hat
     
     
     ps_t <- ps_hat_t1
