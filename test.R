@@ -303,9 +303,9 @@ adjFactor_Plot <- adjFactor %>% ggplot(aes(x=Year))+geom_line(aes(y=AdjFactor,co
 
 adjFactor_New <- adjFactor %>% mutate(Year = Year + 1) %>% select(Year, AdjFactor) %>% filter(Year<2018)
 
-totalSupply <- totalSupply %>% filter(Year>1994) %>% mutate(TotalSupply = TotalSupply * adjFactor_New$AdjFactor)
-supp_sl  <- supp_sl %>% filter(Year>1994) %>% mutate(Bill_meatLb_sl = Bill_meatLb_sl * adjFactor_New$AdjFactor)
-supp_cl <- supp_cl %>% filter(Year>1994) %>% mutate(Bill_meatLb_cl = Bill_meatLb_cl * adjFactor_New$AdjFactor)
+totalSupply_adj <- totalSupply %>% filter(Year>1994) %>% mutate(TotalSupply = TotalSupply * adjFactor_New$AdjFactor)
+supp_sl_adj  <- supp_sl %>% filter(Year>1994) %>% mutate(Bill_meatLb_sl = Bill_meatLb_sl * adjFactor_New$AdjFactor)
+supp_cl_adj <- supp_cl %>% filter(Year>1994) %>% mutate(Bill_meatLb_cl = Bill_meatLb_cl * adjFactor_New$AdjFactor)
 
 demand_new <- supp_diss %>% select(Year,total_meat_bill)
 
@@ -314,9 +314,9 @@ names(demand_new) <- c("Year", "Demand")
 
 ### Ratio of slaughter supply  to total supply, in the model this is exp()/(1+exp())
 
-sl_ratio <- (supp_sl %>% select(Bill_meatLb_sl)) / (totalSupply %>% select(TotalSupply))
+sl_ratio <- (supp_sl_adj %>% select(Bill_meatLb_sl)) / (totalSupply_adj %>% select(TotalSupply))
 names(sl_ratio) <- "SlaughterShare" 
-sl_ratio <- sl_ratio %>% mutate(Year = totalSupply$Year) %>% select(Year,everything())
+sl_ratio <- sl_ratio %>% mutate(Year = totalSupply_adj$Year) %>% select(Year,everything())
 
 ### Ratio of cull supply to total supply or simpley 1-slaughtersupply, in the model this is 1/(1+exp())
 cl_ratio <- sl_ratio
@@ -367,11 +367,11 @@ names(hc) <- "hc"
 prices_costs <- cbind(ps,pc,hc) %>% mutate(Year=pc_ps$Year) %>% select(Year,everything())
 
 ########################## Plotting the supply of meat and the observed prices ###############################
-sl_cl <- merge(supp_sl, supp_cl) %>% select(Year, Bill_meatLb_sl, Bill_meatLb_cl)
+sl_cl <- merge(supp_sl_adj, supp_cl_adj) %>% select(Year, Bill_meatLb_sl, Bill_meatLb_cl)
 sl_cl_supp <- sl_cl %>% ggplot(aes(x=Year)) + geom_line(aes(y=Bill_meatLb_sl, color="Fed cattle meat")) + geom_point(aes(y=Bill_meatLb_sl, color="Fed cattle meat")) + geom_line(aes(y=Bill_meatLb_cl, color="Cull cattle meat")) + 
   geom_point(aes(y=Bill_meatLb_cl, color="Cull cattle meat")) + labs(x="Year", y="Meat in billion pounds", colour="") + theme_classic() + scale_x_continuous(name="Year", breaks = c(seq(1995,2017)))
 
-supp_demand <- merge(totalSupply, demand_new) %>% select(Year, TotalSupply, Demand)
+supp_demand <- merge(totalSupply_adj, demand_new) %>% select(Year, TotalSupply, Demand)
 supp_demand_plot <- supp_demand %>% ggplot(aes(x=Year)) + geom_line(aes(y=TotalSupply, color="Total Supply"))  +geom_point(aes(y=TotalSupply, color="Total Supply")) + geom_line(aes(y=Demand, color="Total disapperance")) + 
   geom_point(aes(y=Demand, color="Total disapperance"))+ labs(x="Year", y="Meat in billion pounds", colour="") + theme_classic() + scale_x_continuous(name="Year", breaks = c(seq(1995,2017)))
 
@@ -383,8 +383,8 @@ prices_costs_plot <- prices_costs %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,col
 
 
 Stock_new <- Stock %>% filter(Year>=1994 & Year<2018)
-supp_sl_new <- supp_sl %>% select(Year, Bill_meatLb_sl)
-supp_cl_new <- supp_cl %>% select(Year, Bill_meatLb_cl)
+supp_sl_new <- supp_sl_adj %>% select(Year, Bill_meatLb_sl)
+supp_cl_new <- supp_cl_adj %>% select(Year, Bill_meatLb_cl)
 
 # demand_new <- beefDemand %>% select(Year, `Total disappearance`) %>% mutate(Demand = `Total disappearance`) %>% select(Year, Demand)
 
@@ -414,35 +414,6 @@ sysEqs_9 <- function(p){
 
 
 masterData <- left_join(prices_costs,merge(supp_sl_new,merge(supp_cl_new,demand_new))) %>% filter(Year>1993)
-
-
-
-# err <- 2
-# while (err>0.1) {
-#   
-#   
-#   p <- c(ps,hc)
-#   
-#   # lo <- c(0,0)
-#   hi <- c(1.5,0.5)
-#   
-#   out_b <- BBoptim(par=p, fn = sysEqs_9, upper = hi)$par
-#   
-#   ps <- out_b[1]+0.11
-#   # pc <- out_b[2] + 0.01
-#   hc <- out_b[2]+0.11
-#   
-#   
-#   sl_est <- A * ((exp((muTilde - ((ps/phi) - (pc/phi)))/sTilde))/(1 + (exp((muTilde - ((ps/phi) - (pc/phi)))/sTilde))))
-#   # cl_est <- A * (1/(1+ exp((muTilde - ((ps/phi) - (pc/phi)))/sTilde)))
-#   
-#   err <- abs( (sl   - sl_est ) )
-# }
-
-
-
-
-
 
 len <- nrow(masterData)
 
@@ -714,12 +685,35 @@ mu_s_tildes <- function(sl, cl, ps, pc, thetas){
   
   theta0 <- thetas
   
-  out <- BBoptim(par= theta0, fn = lossfn, e=tilde ,ps=ps,pc=pc)
+  out <- BBoptim(par= theta0, fn = lossfn, e=tilde ,ps=ps, pc=pc)
   
   muTilde <- out$par[1]
   sTilde <- out$par[2]
   return(c(muTilde,sTilde))
 }
+
+
+sysEqs_solve <- function(p){
+  ps <- p[1]
+  pc <- p[2]
+  h <- p[3]
+  
+  F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+  
+  F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+  
+  F3 <- ps * ( 1- ((g*(beta^3)) * ((1-beta^7)/(1-beta)) ) ) - (beta^7)*pc + (1+g*beta*(gamma0 + gamma1*beta))*((1-beta^7)/(1-beta))*h
+  
+  F = F1^2 + F2^2 + F3^2
+  
+  # F = F1^2 + F2^2 
+  
+  return(F)
+}
+
+
+
+
 
 #### This is using cull animals
 predict_df <- cbind(Stock_temp$Year, Stock_temp$k9  ,Stock_temp$k8, Stock_temp$k7, Stock_temp$k6, Stock_temp$k5,
@@ -752,7 +746,7 @@ for(i in 1:nrow(predict_df)){
     # k_3_t2 <- predict_df$k3[i+2]
     # imports_t1 <- predict_df$imports[i+1]
     
-    # i <- 1
+    # i <- 2
     
     #### We use the current data to estimate the future demand first and use that demand to estimate 
     #### the future prices
@@ -783,6 +777,9 @@ for(i in 1:nrow(predict_df)){
       # sTilde <- params[2]
     }
     
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
     dressed_t <- predict_df$dressedWeight[i]
     sl <- predict_df$sl[i]
     cl <- predict_df$cl[i]
@@ -791,36 +788,33 @@ for(i in 1:nrow(predict_df)){
     
     ### One year ahead
     
-    share_t1 <- (exp(((mu * phi) - ((ps_t - pc_t))/phi)/ (pStd*sqrt(3)*phi/pi)))
+    share_t1 <- (exp((muTilde - ((ps_t - pc_t)/phi))/ (sTilde)))
     
     demand_t1_hat <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
     
     sl_t1_hat <- (demand_t1_hat * ((share_t1)/(1 + share_t1))) * adj
     cl_t1_hat <- (demand_t1_hat * 1/(1+share_t1)) * adj
     
+    
+    # demand_t1_hat - (sl_t1_hat + cl_t1_hat)
+    # predict_df$Dissappear[i+1] - (predict_df$sl[i+1] * adj +  predict_df$cl[i+1] * adj)
+    
+    
+    
+    
     params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
     parameters$mu_tilde[i] <- params_t1[1]
     parameters$s_tilde[i] <- params_t1[2]
-    
-    
-    
-    # predict_df$Dissappear[i+1]
-    # predict_df$sl[i+1]
-    # predict_df$cl[i+1]
-    
-    
-    
-    
     
     
     p <- c(ps_t, pc_t, hc_t)
     A <- demand_t1_hat
     sl <- sl_t1_hat
     cl <- cl_t1_hat
-    muTilde <- params_t1[1]
-    sTilde <- params_t1[2]
+    mu_Tilde <- params_t1[1]
+    s_Tilde <- params_t1[2]
     
-    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
     ps_hat_t1 <- est_bb[1]
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
@@ -836,6 +830,7 @@ for(i in 1:nrow(predict_df)){
     ps_t <- ps_hat_t1
     pc_t <- pc_hat_t1
     hc_t <- hc_hat_t1
+    
     # demand <- A
     # adj <- demand/(sl+cl)
     
