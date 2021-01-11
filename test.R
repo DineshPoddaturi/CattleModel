@@ -746,7 +746,7 @@ for(i in 1:nrow(predict_df)){
     # k_3_t2 <- predict_df$k3[i+2]
     # imports_t1 <- predict_df$imports[i+1]
     
-    # i <- 2
+    # i <- 1
     
     #### We use the current data to estimate the future demand first and use that demand to estimate 
     #### the future prices
@@ -771,10 +771,11 @@ for(i in 1:nrow(predict_df)){
       cl <- predict_df$cl[i]
       demand <- predict_df$Dissappear[i]
       adj <- demand/(sl+cl)
-      # params <- mu_s_tildes(sl=sl, cl=cl, ps = ps_t, pc = pc_t, thetas = c(1,1))
+      params <- mu_s_tildes(sl=sl, cl=cl, ps = ps_t, pc = pc_t, thetas = c(1,1))
       
       # muTilde <- params[1]
       # sTilde <- params[2]
+      tildes <- c(params[1],params[2])
     }
     
     ps_t <- predict_df$ps[i]
@@ -806,6 +807,15 @@ for(i in 1:nrow(predict_df)){
     parameters$mu_tilde[i] <- params_t1[1]
     parameters$s_tilde[i] <- params_t1[2]
     
+    # share_t1 <- (exp((params_t1[1] - ((ps_t - pc_t)/phi))/ (params_t1[2])))
+    # 
+    # demand_t1_hat <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
+    # 
+    # sl_t1_hat <- (demand_t1_hat * ((share_t1)/(1 + share_t1))) * adj
+    # cl_t1_hat <- (demand_t1_hat * 1/(1+share_t1)) * adj
+    
+    
+    
     
     p <- c(ps_t, pc_t, hc_t)
     A <- demand_t1_hat
@@ -833,10 +843,11 @@ for(i in 1:nrow(predict_df)){
     
     # demand <- A
     # adj <- demand/(sl+cl)
+    # tildes <- c(params_t1[1], params_t1[2])
     
 }
 
-demandMerge_new <- merge(demand_new, demand_predict) %>% select(Year, Demand, demand_est)
+demandMerge_new <- merge(demand_new, demand_predict)  %>% filter(demand_est>0)%>% select(Year, Demand, demand_est)
 demandMerge_new$Year <- as.numeric(demandMerge_new$Year)
 demand_plot_new <- demandMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=demand_est, color="Estimated"))+geom_point(aes(y=demand_est,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + 
