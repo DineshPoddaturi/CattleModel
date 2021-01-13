@@ -870,6 +870,26 @@ holdingCosts_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,
   scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)])))
 
 
+
+Master_sl_cl <- merge(demand_predict,merge(supp_sl_new,supp_cl_new)) %>% filter(sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, Bill_meatLb_cl, cl_est)
+names(Master_sl_cl) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
+Master_sl_cl[,-1] <- round(Master_sl_cl[,-1],2) 
+Master_sl_cl$Year <- as.numeric(Master_sl_cl$Year)
+
+
+
+stock_slaughter <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_hat, color="Estimate")) + geom_point(aes(y=sl_hat,color="Estimate")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
+
+stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +geom_line(aes(y=cl_hat, color="Estimate")) + geom_point(aes(y=cl_hat,color="Estimate")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
+
+
+
+
+
 ## Two years ahead
     
      
@@ -1103,7 +1123,20 @@ holdingCosts_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,
   labs(x="Year", y="Holding Costs (\\$/cwt)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)])))
 
+Master_sl_cl <- merge(demand_predict,merge(supp_sl_new,supp_cl_new)) %>% filter(sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, Bill_meatLb_cl, cl_est)
+names(Master_sl_cl) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
+Master_sl_cl[,-1] <- round(Master_sl_cl[,-1],2) 
+Master_sl_cl$Year <- as.numeric(Master_sl_cl$Year)
 
+
+
+stock_slaughter <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_hat, color="Estimate")) + geom_point(aes(y=sl_hat,color="Estimate")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
+
+stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +geom_line(aes(y=cl_hat, color="Estimate")) + geom_point(aes(y=cl_hat,color="Estimate")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
 
 
 
