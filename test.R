@@ -837,9 +837,9 @@ for(i in 1:nrow(predict_df)){
     demand_predict$cl_est[i] <- cl_t1_hat
     
     
-    ps_t <- ps_hat_t1
-    pc_t <- pc_hat_t1
-    hc_t <- hc_hat_t1
+    # ps_t <- ps_hat_t1
+    # pc_t <- pc_hat_t1
+    # hc_t <- hc_hat_t1
     
     # demand <- A
     # adj <- demand/(sl+cl)
@@ -988,26 +988,28 @@ holdingCosts_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,
 ## Here we use the slaughter animals numbers
 Stock_temp <- Stock%>% filter(Year>1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>1994 & Year<=2017)
+exports_temp <- exports %>% filter(Year>1994 & Year<=2017)
 
-predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, 
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
                     dressedWeights_sl_cl %>% filter(Year>1994)%>% select(Slaughter_avg),
                     prices_costs%>%filter(Year>1994)%>% select(ps), prices_costs%>%filter(Year>1994)%>% select(pc),
                     prices_costs%>%filter(Year>1994)%>% select(hc), supp_sl %>% filter(Year>=1995) %>% select(Bill_meatLb_sl), 
                     supp_cl %>% filter(Year>=1995) %>% select(Bill_meatLb_cl),
                     totalDisappearedNew %>% filter(Year>=1995) %>% select(total_meat_bill)) %>% as.data.frame()
-names(predict_df) <- c("Year", "K", "k3", "imports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
+names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
 
 
-demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 
 # demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 
 prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
-
+parameters <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
 
 for(i in 1:(nrow(predict_df)-2)){
     
+    # i <- 2
     K_t <- predict_df$K[i]
     k3_t2 <- predict_df$k3[i+2]
     # imports_t <- predict_df$imports[i]
@@ -1021,6 +1023,9 @@ for(i in 1:(nrow(predict_df)-2)){
       demand <- predict_df$Dissappear[i]
     }
     
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
     dressed_t <- predict_df$dressedWeight[i]
     sl <- predict_df$sl[i]
     cl <- predict_df$cl[i]
@@ -1028,23 +1033,38 @@ for(i in 1:(nrow(predict_df)-2)){
     adj <- demand/(sl+cl)
     
     imports_t <- predict_df$imports[i]
+    exports_t <- predict_df$exports[i]
     
     
     slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
     
-    demand_t1 <- (g * K_t - k3_t2 + imports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+    demand_t1_hat <- (g * K_t - k3_t2 + (imports_t) - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
 
-    sl_t1 <- (demand_t1 * ((slShare_t)/(1 + slShare_t))) * adj
-    cl_t1 <- (demand_t1 * 1/(1+slShare_t)) * adj
+    sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+    cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+    
+    params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+    parameters$mu_tilde[i] <- params_t1[1]
+    parameters$s_tilde[i] <- params_t1[2]
+    
+    
+    # slShare_t <- (exp((params_t1[1] - ((ps_t - pc_t))/phi)/params_t1[2]))
+    # 
+    # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+    # 
+    # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+    # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
     
     
     
     p <- c(ps_t, pc_t, hc_t)
-    sl <- sl_t1
-    cl <- cl_t1
-    A <- demand_t1
+    sl <- sl_t1_hat
+    cl <- cl_t1_hat
+    A <- demand_t1_hat
+    mu_Tilde <- params_t1[1]
+    s_Tilde <- params_t1[2]
     
-    est_bb <- BBoptim(par=p, fn = sysEqs_9)$par
+    est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
     ps_hat_t1 <- est_bb[1]
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
@@ -1052,13 +1072,13 @@ for(i in 1:(nrow(predict_df)-2)){
     prices_predict$ps_hat[i] <- ps_hat_t1
     prices_predict$pc_hat[i] <- pc_hat_t1
     prices_predict$hc_hat[i] <- hc_hat_t1
-    demand_predict$demand_est[i] <- demand_t1
-    demand_predict$sl_est[i] <- sl_t1
-    demand_predict$cl_est[i] <- cl_t1
+    demand_predict$demand_est[i] <- demand_t1_hat
+    demand_predict$sl_est[i] <- sl_t1_hat
+    demand_predict$cl_est[i] <- cl_t1_hat
     
-    ps_t <- ps_hat_t1
-    pc_t <- pc_hat_t1
-    hc_t <- hc_hat_t1
+    # ps_t <- ps_hat_t1
+    # pc_t <- pc_hat_t1
+    # hc_t <- hc_hat_t1
     # demand <- A
 }
 
