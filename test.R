@@ -776,6 +776,8 @@ for(i in 1:nrow(predict_df)){
       # muTilde <- params[1]
       # sTilde <- params[2]
       tildes <- c(params[1],params[2])
+      
+      # share_t1 <- (exp((muTilde - ((ps_t - pc_t)/phi))/ (sTilde)))
     }
     
     ps_t <- predict_df$ps[i]
@@ -886,6 +888,15 @@ stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Obs
   labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
 
+
+parameters_new <- parameters %>% filter(mu_tilde>0)
+parameter_mu <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=mu_tilde, color="mu_tilde")) + geom_point(aes(y=mu_tilde, color="mu_tilde"))+
+  labs(x="Year", y="mu_tilde")+theme_classic()+
+  scale_x_continuous(name="Year", breaks=c(seq(parameters_new$Year[1],parameters_new$Year[nrow(parameters_new)])))
+
+parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)) + geom_point(aes(y=s_tilde))+
+  labs(x="Year", y="s_tilde")+theme_classic()+
+  scale_x_continuous(name="Year", breaks=c(seq(parameters_new$Year[1],parameters_new$Year[nrow(parameters_new)])))
 
 
 
@@ -1058,7 +1069,7 @@ for(i in 1:(nrow(predict_df)-2)){
     
     slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
     
-    demand_t1_hat <- (g * K_t - k3_t2 + (imports_t) - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+    demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
 
     sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
     cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
@@ -1138,6 +1149,14 @@ stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Obs
   labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
 
+parameters_new <- parameters %>% filter(mu_tilde>0)
+parameter_mu <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=mu_tilde, color="mu_tilde")) + geom_point(aes(y=mu_tilde, color="mu_tilde"))+
+  labs(x="Year", y="mu_tilde")+theme_classic()+
+  scale_x_continuous(name="Year", breaks=c(seq(parameters_new$Year[1],parameters_new$Year[nrow(parameters_new)])))
+
+parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)) + geom_point(aes(y=s_tilde))+
+  labs(x="Year", y="s_tilde")+theme_classic()+
+  scale_x_continuous(name="Year", breaks=c(seq(parameters_new$Year[1],parameters_new$Year[nrow(parameters_new)])))
 
 
 
