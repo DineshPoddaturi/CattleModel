@@ -27,6 +27,14 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 * For policy analysis: for instance take tracebility. If US imposes mandatory tracebality on all the beef products produced in the US, imports from foreign countries would increase which will result in high demand. By introducing this shock (we wouldn't know exactly how much the demand would increase by but we can use some number like 10% or 15%) we can see how the supply and prices would react. This policy would also increase the costs for producer so we would have to include them in the model as well. For instance the producer will add heifers to the breeding stock to get profits out of it but the costs associated with will go up. Hence a 10% or something like that increase in the hoolding costs. We might have to include them in the model to correctly estimate the prices and quantities. 
 
 
+01/26/2021:
+
+* Showed the estimates and the plots. He said these are promising. 
+* When it comes to introducing the shocks: First we introduce the cost shock. We do not know how the demands gonna look like. So we keep everything same and just introduce the cost shock. Here in our model those are holding costs. So basically we increase these holding costs by some percentage using the literature. Note that these are not fixed costs. These costs remain for every year. SSo these costs increments are for every year (keep that in mind). 
+* Now when it comes to comparing the projections with the shock: We compare it with the model estimates. We are not doing it with the observed data. The reason for this is: if the projection with the shock falls between the model estimate and the observed data, it would not be ideal for our narrative. So make sure we compare the projections with the model estimates. Adding to that, we are using the observed data to estimate until the shock and then using the model estimates to project the impacts of the shock. See the notes made in the fed cattle graph. 
+* Once we figure out the cost shock. We can introduce the demand shock to see how it goes. But for now we are sticking with the cost shock.
+
+
 
 
 
