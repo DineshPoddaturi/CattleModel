@@ -1046,3 +1046,38 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
 
 
 
+
+
+
+
+###### For our projections we are using the Fed Cattle stock and their corresponding estimates
+
+# First we need to come up with the cost increase when traceability is introduced.
+# I am using the estimates from Balsi et. al. 2010. 
+
+# Are we assuming the cow-calf producers bear all the costs? Because the animal ownership changes throughout it's life. If we assume
+# the ID installed by the cow-calf producer stays until it reaches the market we can confidently say cow-calf producer incurs all the cost.
+# Balsi et. al. 2010 estimated costs for different segments of the industry. Cow-calf, backgrounding, feedlot, auction, and packer.
+# Shall we do that here in this paper too. If that were the case we need to get data of those operations as well. With the existing things in the model
+# it would make the model very complex. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
