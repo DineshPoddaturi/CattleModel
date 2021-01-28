@@ -1061,9 +1061,8 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
 # Shall we do that here in this paper too. If that were the case we need to get data of those operations as well. With the existing things in the model
 # it would make the model very complex. 
 
-
-
-
+# We have prices per head. Need to convert them to price per pound. So basically this is same for steers, heifers, and cows. 
+# Doing this 
 
 
 
