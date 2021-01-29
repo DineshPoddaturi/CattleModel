@@ -33,8 +33,10 @@ cow and bull: Volume weighted average = $0.29
 calf: Volume weighted average = $0.36
 
 Summary of Cattle Industry Costs Under Scenario #3 (full traceability)
-Beef Cow/Calf - 4.22, Dairy- 3.43, Background- 0.70, Feedlot- 0.50, Auction Yards- 0.23, Packers- 0.10
-Industry Total - 2.07
+Beef Cow/Calf - $\$4.22$, Dairy- $\$3.43$, Background- $\$0.70$, Feedlot- $\$0.50$, Auction Yards- $\$0.23$, Packers- $\$0.10$
+Industry Total - $\$2.07$. 
+
+
 
 
 
