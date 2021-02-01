@@ -1063,7 +1063,7 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
 
 # We have prices per head. Need to convert them to price per pound. So basically this is same for steers, heifers, and cows. 
 # Doing this 
-
+prices_costs_new <- prices_costs
 
 
 

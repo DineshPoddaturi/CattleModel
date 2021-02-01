@@ -5,7 +5,7 @@ output:
 ---
 *  Evolving beef export market access requirements for age and source verification: This paper uses costs for different sectors within the beef industry from Brester et. al. 2011. Cow/calf, Dairy, Backgrounding and feedlot, and packer. 
  
-These cost estimates include source and age verification participation costs along with the tags and tagging costs.
+These cost estimates include source and age verification participation costs (2009) along with the tags and tagging costs.
 
 COW/CALF: 
 Currently Tag Cattle - Annual cost range from $\$14.51$/head (operation with less than 50 head) to $\$2.75$ (operation with more than 5000 head)
@@ -50,28 +50,28 @@ Just the tag and tagging costs excluding Dairy sector:
 
 Currently Tag Cattle - Small operations: 4.21 + 0.75 + 0.50 + 0.47= $\$5.93$/head ; 
                        Large operations: 2.40 + 0.14 + 0.12 + 0.16= $\$2.82$/head;
-                       Average Cost: $\$8.600$/head
+                       Average Cost: $\$4.375$/head
                        
 Currently Not Tagging Cattle - Small operations: 5.54 + 0.75 + 0.50 + 0.47= $\$7.26$/head ; 
                                Large operations: 5.04 + 0.14 + 0.12 + 0.16 = $\$5.46$/head;
-                               Average Cost: $\$8.600$/head
+                               Average Cost: $\$6.36$/head
 
 Total costs (includes SAV costs):
 
 Currently Tag Cattle - Small operations: 14.51 + 23.51 + 15.89 + 0.47 = $\$54.38$/head;
                         Large operations: 2.75 + 0.39 + 0.15 + 0.16 =  $\$3.45$/head;
-                        Average Cost: $\$8.600$/head
+                        Average Cost: $\$28.91$/head
                         
 Currently Not Tagging Cattle - Small operations: 15.83 + 23.51 + 15.89 + 0.47 = $\$55.7$/head ; 
                                Large operations: 5.39 + 0.39 + 0.15 + 0.16 = $\$6.09$/head;
-                               Average Cost: $\$8.600$/head
+                               Average Cost: $\$30.89$/head
 
 
 
 
 * ANIMAL IDENTIFICATION AND TRACING IN THE UNITED STATES: This paper uses the cost estimates for all the meat sectors from the report Blasi et.al.2009. Similar to the above study, they use cost estimates for different segments within the industry. Specifically, Cow/Calf, Dairy, Background and feedlot, packer, and dairy. These costs are estimated according to the size of the operation. (We have to note that in our model we just look at the cost per pound of beef.)
 
- ESTIMATED COST OF RFID FULL TRACEABILITY TECHNOLOGY ADOPTION
+ ESTIMATED COST (2007) OF RFID FULL TRACEABILITY TECHNOLOGY ADOPTION
  
 COW/CALF: 
 Operation that Currently Tags Cattle - Annual cost range from $\$5.95$/head (operation with less than 50 head) to $\$2.88$/head (operation with more than 5000 head)
@@ -118,7 +118,7 @@ Currently Not Tagging Cattle - Small operations: 7.17 + 1.7 + 1.37 + 0.23 + 0.1 
 
 
 
-How do we include these costs in the model? These costs are dollars per head, our model is dollars per pound of meat. We have to convert these into those units and include in the model. One more question, which costs should we use? AJAE paper published in 2010 (the cost estimates in this paper is taken from "B-C analysis of NAIS" 2009) or Food Policy paper published in 2013 (the cost estimates in this paper is taken from "Economic assessment of evolving red meat export market access requirements for traceability of livestock and meat" 2011)? 
+How do we include these costs in the model? These costs are dollars per head, our model is dollars per pound of meat. We have to convert these into those units and include in the model. One more question, which costs should we use? AJAE paper published in 2010 (the cost estimates in this paper is taken from "B-C analysis of NAIS" 2009) or Food Policy paper published in 2013 (the cost estimates in this paper is taken from "Economic assessment of evolving red meat export market access requirements for traceability of livestock and meat" 2011)? How about the costs in year? If we are modeling from that year then, we can use the same numbers. For instance, 2007 numbers from B-C analysis of NAIS, 2009 numbers from SAV study.
 
 
 These studies also have exogenous supply changes. Each of these percentage increases in costs represent upward shifts (reductions in supply) of the respective supply functions. Should we include these in our model?
