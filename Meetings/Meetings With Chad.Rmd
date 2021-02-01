@@ -31,15 +31,13 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Showed the estimates and the plots. He said these are promising.
 
-* When it comes to introducing the shocks: First we introduce the cost shock. We do not know how the demands gonna look like. So we keep everything same and just introduce the cost shock. Here in our model those are holding costs. So basically we increase these holding costs by some percentage using the literature. Note that these are not fixed costs. These costs remain for every year. SSo these costs increments are for every year (keep that in mind). 
+* When it comes to introducing the shocks: First we introduce the cost shock. We do not know how the demands gonna look like. So we keep everything same and just introduce the cost shock. Here in our model those are holding costs. So basically we increase these holding costs by some percentage using the literature. Note that these are not fixed costs. These costs remain for every year. SSo these costs increments are for every year (keep that in mind).
+
 * Now when it comes to comparing the projections with the shock: We compare it with the model estimates. We are not doing it with the observed data. The reason for this is: if the projection with the shock falls between the model estimate and the observed data, it would not be ideal for our narrative. So make sure we compare the projections with the model estimates. Adding to that, we are using the observed data to estimate until the shock and then using the model estimates to project the impacts of the shock. See the notes made in the fed cattle graph.
 
 * Once we figure out the cost shock. We can introduce the demand shock to see how it goes. But for now we are sticking with the cost shock.
 
 * Send him the cost increase estimates from previous studies.
-
-
-
 
 
 

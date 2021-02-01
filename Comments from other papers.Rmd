@@ -1,6 +1,12 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 *  Evolving beef export market access requirements for age and source verification: This paper uses costs for different sectors within the beef industry from Brester et. al. 2011. Cow/calf, Dairy, Backgrounding and feedlot, and packer. 
  
- These cost estimates include source and age verification participation costs along with the tags and tagging costs.
+These cost estimates include source and age verification participation costs along with the tags and tagging costs.
+
 COW/CALF: 
 Currently Tag Cattle - Annual cost range from $\$14.51$/head (operation with less than 50 head) to $\$2.75$ (operation with more than 5000 head)
 Currently not tagging cattle - Annual cost range from $\$15.83$/head (operation with less than 50 head) to $\$5.39$ (operation with more than 5000 head).
@@ -43,18 +49,22 @@ For our analysis I am following the same strategy as the study i.e., aggregating
 Just the tag and tagging costs excluding Dairy sector:
 
 Currently Tag Cattle - Small operations: 4.21 + 0.75 + 0.50 + 0.47= $\$5.93$/head ; 
-                       Large operations: 2.40 + 0.14 + 0.12 + 0.16= $\$2.82$/head
+                       Large operations: 2.40 + 0.14 + 0.12 + 0.16= $\$2.82$/head;
+                       Average Cost: $\$8.600$/head
                        
 Currently Not Tagging Cattle - Small operations: 5.54 + 0.75 + 0.50 + 0.47= $\$7.26$/head ; 
-                               Large operations: 5.04 + 0.14 + 0.12 + 0.16 = $\$5.46$/head
+                               Large operations: 5.04 + 0.14 + 0.12 + 0.16 = $\$5.46$/head;
+                               Average Cost: $\$8.600$/head
 
 Total costs (includes SAV costs):
 
 Currently Tag Cattle - Small operations: 14.51 + 23.51 + 15.89 + 0.47 = $\$54.38$/head;
-                        Large operations: 2.75 + 0.39 + 0.15 + 0.16 =  $\$3.45$/head
+                        Large operations: 2.75 + 0.39 + 0.15 + 0.16 =  $\$3.45$/head;
+                        Average Cost: $\$8.600$/head
                         
 Currently Not Tagging Cattle - Small operations: 15.83 + 23.51 + 15.89 + 0.47 = $\$55.7$/head ; 
-                               Large operations: 5.39 + 0.39 + 0.15 + 0.16 = $\$6.09$/head
+                               Large operations: 5.39 + 0.39 + 0.15 + 0.16 = $\$6.09$/head;
+                               Average Cost: $\$8.600$/head
 
 
 
@@ -87,60 +97,31 @@ cow and bull: Volume weighted average = $0.29
 calf: Volume weighted average = $0.36
 
 Summary of Cattle Industry Costs Under Scenario #3 (full traceability)
-Beef Cow/Calf - $\$4.22$, Dairy- $\$3.43$, Background- $\$0.70$, Feedlot- $\$0.50$, Auction Yards- $\$0.23$, Packers- $\$0.10$
-Industry Total - $\$2.07$. 
+Beef Cow/Calf - $\$4.22$, Dairy- $\$3.43$, Background- $\$0.70$, Feedlot- $\$0.50$, Auction Yards- $\$0.23$, Packers- $\$0.10$,
+Industry Total - $\$2.07$. (Should I use these cost numbers?)
+
 
 Similar to the above study, I am aggregating all the costs to get the total costs
 
 Just the tag and tagging costs excluding Dairy sector:
 
 Currently Tag Cattle - Small operations: 5.95 + 1.7 + 1.37 + 0.23 + 0.1 = $\$9.35$/head ; 
-                        Large operations: 2.88 + 0.56 + 0.30 + 0.23 + 0.1 = $\$4.07$/head
+                        Large operations: 2.88 + 0.56 + 0.30 + 0.23 + 0.1 = $\$4.07$/head;
+                        Average Cost: $\$6.71$/head
                         
 Currently Not Tagging Cattle - Small operations: 7.17 + 1.7 + 1.37 + 0.23 + 0.1 = $\$10.57$/head ; 
-                               Large operations: 5.44 + 0.56 + 0.30 + 0.23 + 0.1  = $\$6.63$/head
+                               Large operations: 5.44 + 0.56 + 0.30 + 0.23 + 0.1  = $\$6.63$/head;
+                               Average Cost: $\$8.600$/head
 
 
 
 
 
 
-How do we include these costs in the model? These costs are dollars per head, our model is dollars per pound of meat. We have to convert these into those units and include in the model. One more question, which costs should we use? AJAE paper published in 2010 (the cost estimates in this paper is taken from "B-C analysis of NAIS" 2009) or Food Policy paper published in 2013 (the cost estimates in this paper is taken from "Economic assessment of evolving red meat export market access requirements
-for traceability of livestock and meat" 2011)? 
+How do we include these costs in the model? These costs are dollars per head, our model is dollars per pound of meat. We have to convert these into those units and include in the model. One more question, which costs should we use? AJAE paper published in 2010 (the cost estimates in this paper is taken from "B-C analysis of NAIS" 2009) or Food Policy paper published in 2013 (the cost estimates in this paper is taken from "Economic assessment of evolving red meat export market access requirements for traceability of livestock and meat" 2011)? 
 
 
-These studies also have exogenous supply changes. Each of these percentage increases in costs represent upward shifts (reductions in supply) of the respective supply functions. Should we include these in our model? 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-* Evolving beef export market access requirements for age and source verification: 
-
-COW/CALF: The costs per operation range from $\$185$ ($\$14.51$/head sold) for cow/calf operations having less than 50 head to $\$29,012$ ($\$5.39$/head sold) for operations with more than 5000 head.
-
-DAIRY: Costs per operation range from about $\$190$ for operations with less than 50 head to $\$9900$ for operations with more than 2000 head. So for small operation this would be 190/50 = 3.8/head and for large operation this would be 
-9900/2000 = 4.95/head.
-
-
-BACKGROUNDING and FEEDLOT: Annual costs range from an average of slightly less than $\$800$ per operation for feedlots with less than 1000 head to an annual average of over $\$13,000$ for feedlots with more than 32,000 head. 
-The estimated costs per operation for backgrounding operations – range from $\$709$ for approximately 30 head to $\$1137$ for approximately 3000 head operations. FEEDLOT: small operations 800/1000 = 0.8/head, large operations 13000/32000= 0.4/head; BACKGROUNDING: small operations 709/30 = 23.6/head; large operations 1137/3000 = 0.379/head
-
-
-
-
-PACKING PLANT: Cost increases associated with ASV for steer and heifer slaughter plants ranged from a low of $\$0.16$/head for plants slaughtering 1.3 million head to a high of $\$0.47$/head for plants slaughtering 300 head per year.
+These studies also have exogenous supply changes. Each of these percentage increases in costs represent upward shifts (reductions in supply) of the respective supply functions. Should we include these in our model?
 
 
 
