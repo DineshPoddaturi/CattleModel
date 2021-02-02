@@ -1061,21 +1061,30 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
 # Shall we do that here in this paper too. If that were the case we need to get data of those operations as well. With the existing things in the model
 # it would make the model very complex. 
 
-# We have prices per head. Need to convert them to price per pound. So basically this is same for steers, heifers, and cows. 
-# Doing this 
+# We have prices per head. Need to convert them to price per pound. So basically this is same for steers, heifers, and cows.
 prices_costs_new <- prices_costs
 
+# We use tagging costs from CostEstimates_SAV.Rmd. 
+taggingCosts <- total_Costs
+
+aggCosts <- (Stock_temp[,2] * taggingCosts) %>% as.data.frame()
+names(aggCosts) <- "AggregateCosts"
+aggCosts <- aggCosts %>% mutate(Year = Stock_temp$Year, AggregateCosts_mill = AggregateCosts/1000000) %>% select(Year, everything())
+
+#Costs for each age in our data in million $
+Stock_temp_costs<-  (Stock_temp[,-1] * taggingCosts)  %>% as.data.frame()
+
+Stock_temp_costs_mill <- (Stock_temp_costs/1000000) %>% mutate(Year = Stock_temp$Year) %>% select(Year, everything())
+
+costs_cl <- supp_cl %>% mutate(costs = Cull * taggingCosts, cost_perLb = costs/(Cull * dressedWeights_sl_cl$Cull_avg))
+costs_sl <- supp_sl %>% mutate(costs = Slaughter * taggingCosts, cost_perLb = costs/(Slaughter * dressedWeights_sl_cl$Slaughter_avg))
 
 
+### Remember the culled cattle stayed longer (I think in our case 9 years). So we have to account for that. Basically costs for 9 years.
+### First work on the culled cattle. This might take some time.  
 
 
-
-
-
-
-
-
-
+### The same applies for the fed cattle. They are alive for two years. So costs for two years need to be included.
 
 
 
