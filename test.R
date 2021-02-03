@@ -942,7 +942,7 @@ for(i in 1:(nrow(predict_df)-2)){
     
     ps_t <- predict_df$ps[i]
     pc_t <- predict_df$pc[i]
-    hc_t <- predict_df$hc[i]
+    hc_t <- predict_df$hc[i] + 0.09
     dressed_t <- predict_df$dressedWeight[i]
     sl <- predict_df$sl[i]
     cl <- predict_df$cl[i]
@@ -1044,12 +1044,6 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
   labs(x="Year", y="s_tilde")+theme_classic()+
   scale_x_continuous(name="Year", breaks=c(seq(parameters_new$Year[1],parameters_new$Year[nrow(parameters_new)])))
 
-
-
-
-
-
-
 ###### For our projections we are using the Fed Cattle stock and their corresponding estimates
 
 # First we need to come up with the cost increase when traceability is introduced.
@@ -1065,7 +1059,7 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
 prices_costs_new <- prices_costs
 
 # We use tagging costs from CostEstimates_SAV.Rmd. 
-taggingCosts <- total_Costs
+taggingCosts <- round(total_Costs,3)
 
 aggCosts <- (Stock_temp[,2] * taggingCosts) %>% as.data.frame()
 names(aggCosts) <- "AggregateCosts"
@@ -1081,10 +1075,28 @@ costs_sl <- supp_sl %>% mutate(costs = Slaughter * taggingCosts, cost_perLb = co
 
 
 ### Remember the culled cattle stayed longer (I think in our case 9 years). So we have to account for that. Basically costs for 9 years.
-### First work on the culled cattle. This might take some time.  
+### First work on the culled cattle. This might take some time.
 
+# Here I am multiplying the costs by 9. This is because the cow stayed in the stock for 9 years increasing the costs.
+costs_cl_9years <- costs_cl %>% mutate(costs_9years = Cull * taggingCosts * 9, cost_Lb_9years = costs_9years/(Cull * dressedWeights_sl_cl$Cull_avg)) %>% 
+  select(Year, Cull, costs_9years, cost_Lb_9years)
 
 ### The same applies for the fed cattle. They are alive for two years. So costs for two years need to be included.
+costs_sl_2years <- costs_sl %>% mutate(costs_2years = Slaughter * taggingCosts * 2, cost_Lb_2years = costs_2years/ (Slaughter * dressedWeights_sl_cl$Slaughter_avg)) %>%
+  select(Year, Slaughter, costs_2years, cost_Lb_2years)
+
+
+# Now think about how to include these costs on the model. 
+costs_sl_cl <- merge(costs_cl_9years, costs_sl_2years) %>% select(Year, cost_Lb_9years, cost_Lb_2years) %>% 
+  mutate(cost_both = cost_Lb_9years + cost_Lb_2years)
+
+# A simple increase in cost is increasing the fed cattle and cull cow prices. I kept the supply and demand same as observed in that year. No change in it at all.
+
+
+
+
+
+
 
 
 

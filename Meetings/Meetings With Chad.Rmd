@@ -44,7 +44,7 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Showed the cost estimates from the studies. He said use the latest numbers. In our case it would be from SAV study. And use the tag and tagging costs. Do not include SAV costs. 
 
-* We know the animal numbers in any year. So we can compute the costs. Again look at the fed cattle and cow numbers to compute the costs. And use those animals to get the cost per pound of meat. Our costs are in dollars per head, if we know the animal type and number, we can get the cost per pound of meat. 
+* We know the animal numbers in any year. So we can compute the costs. Again look at the fed cattle and cow numbers to compute the costs. And use those animals to get the cost per pound of meat. The costs are in dollars per head, if we know the animal type and number, we can get the cost per pound of meat. 
 
 * Every year the animal is alive, the costs add up. Like any other cost, we are incurring these costs every year. Just remember them. 
 
