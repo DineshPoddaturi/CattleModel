@@ -942,7 +942,7 @@ for(i in 1:(nrow(predict_df)-2)){
     
     ps_t <- predict_df$ps[i]
     pc_t <- predict_df$pc[i]
-    hc_t <- predict_df$hc[i] + 0.09
+    hc_t <- predict_df$hc[i]
     dressed_t <- predict_df$dressedWeight[i]
     sl <- predict_df$sl[i]
     cl <- predict_df$cl[i]
@@ -1090,6 +1090,18 @@ costs_sl_2years <- costs_sl %>% mutate(costs_2years = Slaughter * taggingCosts *
 costs_sl_cl <- merge(costs_cl_9years, costs_sl_2years) %>% select(Year, cost_Lb_9years, cost_Lb_2years) %>% 
   mutate(cost_both = cost_Lb_9years + cost_Lb_2years)
 
-# A simple increase in cost is increasing the fed cattle and cull cow prices. I kept the supply and demand same as observed in that year. No change in it at all.
+# A simple increase in cost is increasing the fed cattle and cull cow prices. 
+# I kept the supply and demand same as observed in that year. No change in it at all.
+
+# Think about how you are going to change the quantities? 
+# Are we going to keep the observed supply and demand as it is?
+# Keep the same demand as this year but change the supply?
+# We know the share depends on ps and pc, so if it changes the sl & cl supply changes as well. Think more about these scenarios
+# 
+
+
+
+
+
 
 
