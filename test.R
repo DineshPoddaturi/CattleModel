@@ -1093,11 +1093,3 @@ costs_sl_cl <- merge(costs_cl_9years, costs_sl_2years) %>% select(Year, cost_Lb_
 # A simple increase in cost is increasing the fed cattle and cull cow prices. I kept the supply and demand same as observed in that year. No change in it at all.
 
 
-
-
-
-
-
-
-
-
