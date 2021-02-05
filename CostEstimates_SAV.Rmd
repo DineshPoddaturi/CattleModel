@@ -77,3 +77,27 @@ total_Costs <- sum(cost_CowCalf_NTag, cost_Bckg, cost_Feedlot, cost_Packers)
 
 
 
+
+
+
+
+
+
+
+
+#### Some of my concerns:
+
+How am I going to change the quantities? 
+Am I going to keep the observed supply and demand?
+Keep the demand same but change the supply?
+We know the share depends on ps & pc, so if it changes the sl and cl supply changes as well.
+
+Is it okay to increase costs for every year?
+    As soon as the costs are increased the supply should change immediately?
+      Ans: Supply of what? 
+              Fed cattle meat could decrease (if the producer expexts a high demand this would definitly happen, 
+                                                through adding more heifers to the breeding stock.)
+              Cull cow meat could increase (If we keep a cow for one more year, costs associated with that animal and 
+                                              it's progeny would increase.)
+
+
