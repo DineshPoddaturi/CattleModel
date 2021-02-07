@@ -1286,6 +1286,45 @@ parameter_s_co <- parameters_new_co %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_
   labs(x="Year", y="s_tilde")+theme_classic()+
   scale_x_continuous(name="Year", breaks=c(seq(parameters_new_co$Year[1],parameters_new_co$Year[nrow(parameters_new_co)])))
 
+#### Here we are comparing the above with the original estimated numbers (without added costs)
+demand_predict_old <- demand_predict %>% mutate(Demand = demand_est) %>% select(Year, Demand) %>% filter(Demand>0)
+demandMerge_co <- merge(demand_predict_old, demand_predict_co) %>% select(Year, Demand, demand_est) %>% filter(demand_est>0)
+demandMerge_co$Year <- as.numeric(demandMerge_co$Year)
+demand_plot_co <- demandMerge_co %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=demand_est, color="Estimated with added costs"))+geom_point(aes(y=demand_est,color="Estimated with added costs")) + 
+  labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(demandMerge_co$Year[1], demandMerge_co$Year[nrow(demandMerge_co)])))
+
+sl_cl_old <- demand_predict %>% mutate(Bill_meatLb_sl = sl_est, Bill_meatLb_cl = cl_est) %>% select(Year, Bill_meatLb_sl, Bill_meatLb_cl) %>% filter(Bill_meatLb_cl>0)
+Master_sl_cl_co <- merge(demand_predict_co,sl_cl_old) %>% filter(sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, Bill_meatLb_cl, cl_est)
+names(Master_sl_cl_co) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
+Master_sl_cl_co[,-1] <- round(Master_sl_cl_co[,-1],2) 
+Master_sl_cl_co$Year <- as.numeric(Master_sl_cl_co$Year)
+
+
+
+stock_slaughter_co <- Master_sl_cl_co %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_hat, color="Estimated with added costs")) + geom_point(aes(y=sl_hat,color="Estimated with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl_co$Year[1],Master_sl_cl_co$Year[nrow(Master_sl_cl_co)])))
+
+stock_cull_co <- Master_sl_cl_co %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +geom_line(aes(y=cl_hat, color="Estimated with added costs")) + geom_point(aes(y=cl_hat,color="Estimated with added costs")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl_co$Year[1],Master_sl_cl_co$Year[nrow(Master_sl_cl_co)])))
+
+parameters_new_co <- parameters_co %>% filter(mu_tilde>0)
+parameter_mu_co <- parameters_new_co %>% ggplot(aes(x=Year)) + geom_line(aes(y=mu_tilde, color="mu_tilde")) + geom_point(aes(y=mu_tilde, color="mu_tilde"))+
+  labs(x="Year", y="mu_tilde")+theme_classic()+
+  scale_x_continuous(name="Year", breaks=c(seq(parameters_new_co$Year[1],parameters_new_co$Year[nrow(parameters_new_co)])))
+
+parameter_s_co <- parameters_new_co %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)) + geom_point(aes(y=s_tilde))+
+  labs(x="Year", y="s_tilde")+theme_classic()+
+  scale_x_continuous(name="Year", breaks=c(seq(parameters_new_co$Year[1],parameters_new_co$Year[nrow(parameters_new_co)])))
+
+
+
+
+
+
+
 
 
 
@@ -1299,13 +1338,13 @@ Stock_temp <- Stock%>% filter(Year>1994 & Year<2017)
 imports_temp <- imports %>% filter(Year>1994 & Year<2017)
 exports_temp <- exports %>% filter(Year>1994 & Year<2017)
 
-
+demand_predict <- demand_predict %>% filter(demand_est>0)
 predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
                     dressedWeights_sl_cl %>% filter(Year>1994  & Year<2017)%>% select(Slaughter_avg),
                     cost_price_addedCosts %>% select(ps), cost_price_addedCosts%>% select(pc),
-                    cost_price_addedCosts%>% select(hc), supp_sl %>% filter(Year>1994  & Year<2017) %>% select(Bill_meatLb_sl), 
-                    supp_cl %>% filter(Year>1994  & Year<2017) %>% select(Bill_meatLb_cl),
-                    totalDisappearedNew %>% filter(Year>1994 & Year<2017) %>% select(total_meat_bill)) %>% as.data.frame()
+                    cost_price_addedCosts%>% select(hc), demand_predict %>% filter(Year>1994  & Year<2017) %>% select(sl_est), 
+                    demand_predict %>% filter(Year>1994  & Year<2017) %>% select(cl_est),
+                    demand_predict %>% filter(Year>1994  & Year<2017) %>% select(demand_est)) %>% as.data.frame()
 names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
 
 
@@ -1392,8 +1431,52 @@ for(i in 1:(nrow(predict_df)-2)){
   # demand <- A
 }
 
-prices_predict_co1 %>% filter(ps_hat>0) %>% select(ps_hat, pc_hat, hc_hat) - 
-  cost_price_addedCosts %>% filter(Year>1995 & Year<2016) %>% select(ps_hat, pc_hat, hc_hat)
+pricesMerge_co1 <- merge(prices_predict_co1,prices_predict_old) %>% filter(ps_hat>0) %>% select(Year, ps, ps_hat, pc, pc_hat, hc, hc_hat) %>% 
+  mutate(ps = ps*100, ps_hat = ps_hat*100, pc = pc*100, pc_hat = pc_hat*100, hc = hc*100, hc_hat = hc_hat*100)
+
+slaughterPrices_plot_co1 <- pricesMerge_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Estimate without added costs"))+geom_point(aes(y=ps,color="Estimate without added costs"))+geom_line(aes(y=ps_hat, color="Estimate with added costs"))+geom_point(aes(y=ps_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_co$Year[1], pricesMerge_co$Year[nrow(pricesMerge_co)]))) 
+
+cullPrices_plot_co1 <- pricesMerge_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color="Estimate without added costs"))+geom_point(aes(y=pc,color="Estimate without added costs")) + geom_line(aes(y=pc_hat, color="Estimate with added costs")) + geom_point(aes(y=pc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_co$Year[1], pricesMerge_co$Year[nrow(pricesMerge_co)]))) 
+
+holdingCosts_plot_co1 <- pricesMerge_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,color="Estimate without added costs"))+geom_point(aes(y=hc,color="Estimate without added costs")) +geom_line(aes(y=hc_hat, color="Estimate with added costs")) + geom_point(aes(y=hc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Holding Costs (\\$/cwt)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_co$Year[1], pricesMerge_co$Year[nrow(pricesMerge_co)])))
+
+
+
+demandMerge_co1 <- merge(demand_predict_old, demand_predict_co1) %>% select(Year, Demand, demand_est) %>% filter(demand_est>0)
+demandMerge_co1$Year <- as.numeric(demandMerge_co1$Year)
+demand_plot_co1 <- demandMerge_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Estimated w/o added costs"))+geom_point(aes(y=Demand,color="Estimated w/o added costs"))+geom_line(aes(y=demand_est, color="Estimated with added costs"))+geom_point(aes(y=demand_est,color="Estimated with added costs")) + 
+  labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(demandMerge_co1$Year[1], demandMerge_co$Year[nrow(demandMerge_co1)])))
+
+sl_cl_old <- demand_predict %>% mutate(Bill_meatLb_sl = sl_est, Bill_meatLb_cl = cl_est) %>% select(Year, Bill_meatLb_sl, Bill_meatLb_cl) %>% filter(Bill_meatLb_cl>0)
+Master_sl_cl_co1 <- merge(demand_predict_co1,sl_cl_old) %>% filter(sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, Bill_meatLb_cl, cl_est)
+names(Master_sl_cl_co1) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
+Master_sl_cl_co1[,-1] <- round(Master_sl_cl_co1[,-1],2) 
+Master_sl_cl_co1$Year <- as.numeric(Master_sl_cl_co1$Year)
+
+
+
+stock_slaughter_co1 <- Master_sl_cl_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Estimate without added costs"))+geom_point(aes(y=sl,color="Estimate without added costs")) +geom_line(aes(y=sl_hat, color="Estimated with added costs")) + geom_point(aes(y=sl_hat,color="Estimated with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl_co1$Year[1],Master_sl_cl_co$Year[nrow(Master_sl_cl_co1)])))
+
+stock_cull_co1 <- Master_sl_cl_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Estimate without added costs"))+geom_point(aes(y=cl,color="Estimate without added costs")) +geom_line(aes(y=cl_hat, color="Estimated with added costs")) + geom_point(aes(y=cl_hat,color="Estimated with added costs")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl_co1$Year[1],Master_sl_cl_co$Year[nrow(Master_sl_cl_co1)])))
+
+##### Do the above again. Collect your thoughts. Think carefully. You can do it
+# 1. Use observed prices with added costs and estimated sl, cl, demand
+# 2. Use estimated prices with added costs and estimated sl, sl, demand
+# 3. Use estimated prices with added costs and original sl, cl, demand
+# 4. Use observed prices with added costs and original sl, cl, demand
+
+
 
 
 
