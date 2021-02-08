@@ -99,5 +99,10 @@ Is it okay to increase costs for every year?
                                                 through adding more heifers to the breeding stock.)
               Cull cow meat could increase (If we keep a cow for one more year, costs associated with that animal and 
                                               it's progeny would increase.)
+                                              
+                                              
+                                              
+#### One thought:
+After estimating $\tilde{\mu}$ and $\tilde{s}$, compute the share, $\hat{sl}$, $\hat{cl}$, and $\hat{demand}$ again? (because I am seeing no change in $\hat{sl}$).
 
 

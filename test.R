@@ -1076,7 +1076,7 @@ costs_cl <- supp_cl %>% mutate(costs = Cull * taggingCosts, cost_perLb = costs/(
 costs_sl <- supp_sl %>% mutate(costs = Slaughter * taggingCosts, cost_perLb = costs/(Slaughter * dressedWeights_sl_cl$Slaughter_avg))
 
 
-### Remember the culled cattle stayed longer (I think in our case 9 years). So we have to account for that. Basically costs for 9 years.
+### Remember the culled cattle stayed longer (In our case 9 years). So we have to account for that. Basically costs for 9 years.
 ### First work on the culled cattle. This might take some time.
 
 # Here I am multiplying the costs by 9. This is because the cow stayed in the stock for 9 years increasing the costs.
@@ -1123,7 +1123,7 @@ cost_price_obs <- merge(prices_costs,costs_sl_cl) %>% select(Year, ps, pc, hc, c
 
 costs_TBAdded <- cost_price_obs %>% filter(Year>=2009) %>% mutate(hc = hc + cost_both) %>% select (-cost_both)
 
-cost_price_addedCosts_obs <- left_join(cost_price_obs, costs_TBAdded, by = "Year") %>% 
+cost_price_addedCosts_obs_r <- left_join(cost_price_obs, costs_TBAdded, by = "Year") %>% 
   mutate(ps = ps.x, pc = pc.x, hc = ifelse(is.na(hc.y), hc.x, hc.y)) %>% 
   select(Year, ps, pc, hc)
 
@@ -1476,10 +1476,503 @@ stock_cull_co1 <- Master_sl_cl_co1 %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,co
 # 3. Use estimated prices with added costs and original sl, cl, demand
 # 4. Use observed prices with added costs and original sl, cl, demand
 
+# Case 1: Observed prices with added costs and estimated sl, cl, demand
+
+cost_price_addedCosts_obs <- cost_price_addedCosts_obs_r %>% filter(Year>=1995 & Year<=2016)
+demand_predict <- demand_predict %>% filter(demand_est>0)
+
+Stock_temp <- Stock%>% filter(Year>1994 & Year<2017)
+imports_temp <- imports %>% filter(Year>1994 & Year<2017)
+exports_temp <- exports %>% filter(Year>1994 & Year<2017)
+
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
+                    dressedWeights_sl_cl %>% filter(Year>1994  & Year<2017)%>% select(Slaughter_avg),
+                    cost_price_addedCosts_obs %>% select(ps), cost_price_addedCosts_obs %>% select(pc),
+                    cost_price_addedCosts_obs %>% select(hc), demand_predict %>% filter(Year>1994  & Year<2017) %>% select(sl_est), 
+                    demand_predict %>% filter(Year>1994  & Year<2017) %>% select(cl_est),
+                    demand_predict %>% filter(Year>1994  & Year<2017) %>% select(demand_est)) %>% as.data.frame()
+names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
+
+
+demand_predict_co1<- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+
+prices_predict_co1 <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+
+parameters_co1 <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+
+for(i in 1:(nrow(predict_df)-2)){
+  
+  # i <- 2
+  K_t <- predict_df$K[i]
+  k3_t2 <- predict_df$k3[i+2]
+  # imports_t <- predict_df$imports[i]
+  
+  if(i<=1){
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
+    demand <- predict_df$Dissappear[i]
+  }
+  
+  ps_t <- predict_df$ps[i]
+  pc_t <- predict_df$pc[i]
+  hc_t <- predict_df$hc[i]
+  dressed_t <- predict_df$dressedWeight[i]
+  sl <- predict_df$sl[i]
+  cl <- predict_df$cl[i]
+  demand <- predict_df$Dissappear[i]
+  adj <- demand/(sl+cl)
+  
+  imports_t <- predict_df$imports[i]
+  exports_t <- predict_df$exports[i]
+  
+  
+  slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  
+  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  
+  params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+  parameters_co1$mu_tilde[i] <- params_t1[1]
+  parameters_co1$s_tilde[i] <- params_t1[2]
+  
+  
+  
+  p <- c(ps_t, pc_t, hc_t)
+  sl <- sl_t1_hat
+  cl <- cl_t1_hat
+  A <- demand_t1_hat
+  mu_Tilde <- params_t1[1]
+  s_Tilde <- params_t1[2]
+  
+  est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
+  ps_hat_t1 <- est_bb[1]
+  pc_hat_t1 <- est_bb[2]
+  hc_hat_t1 <- est_bb[3]
+  
+  prices_predict_co1$ps_hat[i] <- ps_hat_t1
+  prices_predict_co1$pc_hat[i] <- pc_hat_t1
+  prices_predict_co1$hc_hat[i] <- hc_hat_t1
+  demand_predict_co1$demand_est[i] <- demand_t1_hat
+  demand_predict_co1$sl_est[i] <- sl_t1_hat
+  demand_predict_co1$cl_est[i] <- cl_t1_hat
+}
+
+prices_predict_co1 <- prices_predict_co1 %>% filter(ps_hat>0)
+demand_predict_co1 <- demand_predict_co1 %>% filter(demand_est>0)
+
+########### Here I have estimated prices, demand, sl, and cl from the observed data. I also have the observed counterparts as well. 
+prices_predict_est <- prices_predict %>% mutate(ps = ps_hat, pc = pc_hat, hc = hc_hat) %>% filter(pc>0) %>% select(Year, ps, pc, hc)
+demand_predict_est <- demand_predict %>% mutate(Demand = demand_est, sl = sl_est, cl = cl_est) %>% filter(Demand>0) %>% select(Year, Demand, sl, cl)
+
+prices_costs_obs <- prices_costs
+demand_obs <- merge(demand_new, merge(supp_sl_new,supp_cl_new)) %>% mutate(sl = Bill_meatLb_sl, cl = Bill_meatLb_cl) %>% select(Year, Demand, sl, cl)
+
+prices_predict_co1_merge <- merge(prices_predict_co1, prices_predict_est) %>% 
+  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100)
+demand_predict_co1_merge <- merge(demand_predict_co1, demand_predict_est)
+
+prices_predict_co1_merge1 <- merge(prices_predict_co1, prices_costs_obs) %>% 
+  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100)
+demand_predict_co1_merge1 <- merge(demand_predict_co1, demand_obs)
+
+
+slaughterPrices_plot_co1 <- prices_predict_co1_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Estimate without added costs"))+geom_point(aes(y=ps,color="Estimate without added costs"))+geom_line(aes(y=ps_hat, color="Estimate with added costs"))+geom_point(aes(y=ps_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co1_merge$Year[1], prices_predict_co1_merge$Year[nrow(prices_predict_co1_merge)]))) 
+
+cullPrices_plot_co1 <- prices_predict_co1_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color="Estimate without added costs"))+geom_point(aes(y=pc,color="Estimate without added costs")) + geom_line(aes(y=pc_hat, color="Estimate with added costs")) + geom_point(aes(y=pc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co1_merge$Year[1], prices_predict_co1_merge$Year[nrow(prices_predict_co1_merge)]))) 
+
+holdingCosts_plot_co1 <- prices_predict_co1_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,color="Estimate without added costs"))+geom_point(aes(y=hc,color="Estimate without added costs")) +geom_line(aes(y=hc_hat, color="Estimate with added costs")) + geom_point(aes(y=hc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Holding Costs (\\$/cwt)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co1_merge$Year[1], prices_predict_co1_merge$Year[nrow(prices_predict_co1_merge)])))
+
+
+stock_slaughter_co1 <- demand_predict_co1_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Estimate without added costs"))+geom_point(aes(y=sl,color="Estimate without added costs")) +geom_line(aes(y=sl_est, color="Estimate with added costs")) + geom_point(aes(y=sl_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co1_merge$Year[1],demand_predict_co1_merge$Year[nrow(demand_predict_co1_merge)])))
+
+stock_cull_co1 <- demand_predict_co1_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Estimate without added costs"))+geom_point(aes(y=cl,color="Estimate without added costs")) +geom_line(aes(y=cl_est, color="Estimate with added costs")) + geom_point(aes(y=cl_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co1_merge$Year[1],demand_predict_co1_merge$Year[nrow(demand_predict_co1_merge)])))
+
+demand_co1 <- demand_predict_co1_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Estimate without added costs"))+geom_point(aes(y=Demand,color="Estimate without added costs")) +geom_line(aes(y=demand_est, color="Estimate with added costs")) + geom_point(aes(y=demand_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co1_merge$Year[1],demand_predict_co1_merge$Year[nrow(demand_predict_co1_merge)])))
+
+
+
+slaughterPrices_plot_co11 <- prices_predict_co1_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Observed"))+geom_point(aes(y=ps,color="Observed"))+geom_line(aes(y=ps_hat, color="Estimate with added costs"))+geom_point(aes(y=ps_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co1_merge1$Year[1], prices_predict_co1_merge1$Year[nrow(prices_predict_co1_merge1)]))) 
+
+cullPrices_plot_co11 <- prices_predict_co1_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color="Observed"))+geom_point(aes(y=pc,color="Observed")) + geom_line(aes(y=pc_hat, color="Estimate with added costs")) + geom_point(aes(y=pc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co1_merge1$Year[1], prices_predict_co1_merge1$Year[nrow(prices_predict_co1_merge1)]))) 
+
+holdingCosts_plot_co11 <- prices_predict_co1_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,color="Observed"))+geom_point(aes(y=hc,color="Observed")) +geom_line(aes(y=hc_hat, color="Estimate with added costs")) + geom_point(aes(y=hc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Holding Costs (\\$/cwt)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co1_merge1$Year[1], prices_predict_co1_merge1$Year[nrow(prices_predict_co1_merge1)])))
+
+
+stock_slaughter_co11 <- demand_predict_co1_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_est, color="Estimate with added costs")) + geom_point(aes(y=sl_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co1_merge1$Year[1],demand_predict_co1_merge1$Year[nrow(demand_predict_co1_merge1)])))
+
+stock_cull_co11 <- demand_predict_co1_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +geom_line(aes(y=cl_est, color="Estimate with added costs")) + geom_point(aes(y=cl_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co1_merge1$Year[1],demand_predict_co1_merge1$Year[nrow(demand_predict_co1_merge1)])))
+
+demand_co11 <- demand_predict_co1_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed")) +geom_line(aes(y=demand_est, color="Estimate with added costs")) + geom_point(aes(y=demand_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co1_merge1$Year[1],demand_predict_co1_merge1$Year[nrow(demand_predict_co1_merge1)])))
 
 
 
 
+
+
+
+
+
+# Case 2: Estimated prices with added costs and estimated sl, cl, demand
+
+cost_price_addedCosts <- cost_price_addedCosts %>% filter(Year>=1995 & Year<=2016)
+demand_predict <- demand_predict %>% filter(demand_est>0)
+
+Stock_temp <- Stock%>% filter(Year>1994 & Year<2017)
+imports_temp <- imports %>% filter(Year>1994 & Year<2017)
+exports_temp <- exports %>% filter(Year>1994 & Year<2017)
+
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
+                    dressedWeights_sl_cl %>% filter(Year>1994  & Year<2017)%>% select(Slaughter_avg),
+                    cost_price_addedCosts %>% select(ps_hat), cost_price_addedCosts %>% select(pc_hat),
+                    cost_price_addedCosts %>% select(hc_hat), demand_predict %>% filter(Year>1994  & Year<2017) %>% select(sl_est), 
+                    demand_predict %>% filter(Year>1994  & Year<2017) %>% select(cl_est),
+                    demand_predict %>% filter(Year>1994  & Year<2017) %>% select(demand_est)) %>% as.data.frame()
+names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
+
+
+demand_predict_co2<- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+
+prices_predict_co2 <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+
+parameters_co2 <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+
+for(i in 1:(nrow(predict_df)-2)){
+  
+  # i <- 2
+  K_t <- predict_df$K[i]
+  k3_t2 <- predict_df$k3[i+2]
+  # imports_t <- predict_df$imports[i]
+  
+  if(i<=1){
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
+    demand <- predict_df$Dissappear[i]
+  }
+  
+  ps_t <- predict_df$ps[i]
+  pc_t <- predict_df$pc[i]
+  hc_t <- predict_df$hc[i]
+  dressed_t <- predict_df$dressedWeight[i]
+  sl <- predict_df$sl[i]
+  cl <- predict_df$cl[i]
+  demand <- predict_df$Dissappear[i]
+  adj <- demand/(sl+cl)
+  
+  imports_t <- predict_df$imports[i]
+  exports_t <- predict_df$exports[i]
+  
+  
+  slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  
+  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  
+  params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+  parameters_co2$mu_tilde[i] <- params_t1[1]
+  parameters_co2$s_tilde[i] <- params_t1[2]
+  
+  
+  
+  p <- c(ps_t, pc_t, hc_t)
+  sl <- sl_t1_hat
+  cl <- cl_t1_hat
+  A <- demand_t1_hat
+  mu_Tilde <- params_t1[1]
+  s_Tilde <- params_t1[2]
+  
+  est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
+  ps_hat_t1 <- est_bb[1]
+  pc_hat_t1 <- est_bb[2]
+  hc_hat_t1 <- est_bb[3]
+  
+  prices_predict_co2$ps_hat[i] <- ps_hat_t1
+  prices_predict_co2$pc_hat[i] <- pc_hat_t1
+  prices_predict_co2$hc_hat[i] <- hc_hat_t1
+  demand_predict_co2$demand_est[i] <- demand_t1_hat
+  demand_predict_co2$sl_est[i] <- sl_t1_hat
+  demand_predict_co2$cl_est[i] <- cl_t1_hat
+  
+  # ps_t <- ps_hat_t1
+  # pc_t <- pc_hat_t1
+  # hc_t <- hc_hat_t1
+  # demand <- A
+}
+
+prices_predict_co2 <- prices_predict_co2 %>% filter(ps_hat>0)
+demand_predict_co2 <- demand_predict_co2 %>% filter(demand_est>0)
+
+
+prices_predict_co2_merge <- merge(prices_predict_co2, prices_predict_est) %>% 
+  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100)
+demand_predict_co2_merge <- merge(demand_predict_co2, demand_predict_est)
+
+prices_predict_co2_merge1 <- merge(prices_predict_co2, prices_costs_obs) %>% 
+  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100)
+demand_predict_co2_merge1 <- merge(demand_predict_co2, demand_obs)
+
+
+
+slaughterPrices_plot_co2 <- prices_predict_co2_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Estimate without added costs"))+geom_point(aes(y=ps,color="Estimate without added costs"))+geom_line(aes(y=ps_hat, color="Estimate with added costs"))+geom_point(aes(y=ps_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co2_merge$Year[1], prices_predict_co2_merge$Year[nrow(prices_predict_co2_merge)]))) 
+
+cullPrices_plot_co2 <- prices_predict_co2_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color="Estimate without added costs"))+geom_point(aes(y=pc,color="Estimate without added costs")) + geom_line(aes(y=pc_hat, color="Estimate with added costs")) + geom_point(aes(y=pc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co2_merge$Year[1], prices_predict_co2_merge$Year[nrow(prices_predict_co2_merge)]))) 
+
+holdingCosts_plot_co2 <- prices_predict_co2_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=hc,color="Estimate without added costs"))+geom_point(aes(y=hc,color="Estimate without added costs")) +geom_line(aes(y=hc_hat, color="Estimate with added costs")) + geom_point(aes(y=hc_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Holding Costs (\\$/cwt)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co2_merge$Year[1], prices_predict_co2_merge$Year[nrow(prices_predict_co2_merge)])))
+
+
+stock_slaughter_co2 <- demand_predict_co2_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Estimate without added costs"))+geom_point(aes(y=sl,color="Estimate without added costs")) +geom_line(aes(y=sl_est, color="Estimate with added costs")) + geom_point(aes(y=sl_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co2_merge$Year[1],demand_predict_co2_merge$Year[nrow(demand_predict_co2_merge)])))
+
+stock_cull_co2 <- demand_predict_co2_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Estimate without added costs"))+geom_point(aes(y=cl,color="Estimate without added costs")) +geom_line(aes(y=cl_est, color="Estimate with added costs")) + geom_point(aes(y=cl_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co2_merge$Year[1],demand_predict_co2_merge$Year[nrow(demand_predict_co2_merge)])))
+
+demand_co2 <- demand_predict_co2_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Estimate without added costs"))+geom_point(aes(y=Demand,color="Estimate without added costs")) +geom_line(aes(y=demand_est, color="Estimate with added costs")) + geom_point(aes(y=demand_est,color="Estimate with added costs")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co2_merge$Year[1],demand_predict_co2_merge$Year[nrow(demand_predict_co2_merge)])))
+
+
+
+
+
+
+
+# Case 3: Estimated prices with added costs and original sl, cl, demand
+
+cost_price_addedCosts <- cost_price_addedCosts %>% filter(Year>=1995 & Year<=2016)
+demand_predict <- demand_predict %>% filter(demand_est>0)
+
+Stock_temp <- Stock%>% filter(Year>1994 & Year<2017)
+imports_temp <- imports %>% filter(Year>1994 & Year<2017)
+exports_temp <- exports %>% filter(Year>1994 & Year<2017)
+
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
+                    dressedWeights_sl_cl %>% filter(Year>1994  & Year<2017)%>% select(Slaughter_avg),
+                    cost_price_addedCosts %>% select(ps_hat), cost_price_addedCosts %>% select(pc_hat),
+                    cost_price_addedCosts %>% select(hc_hat), supp_sl %>% filter(Year>1994 & Year<2017) %>% select(Bill_meatLb_sl), 
+                    supp_cl %>% filter(Year>1994 & Year<2017) %>% select(Bill_meatLb_cl),
+                    totalDisappearedNew %>% filter(Year>1994 & Year<2017) %>% select(total_meat_bill)) %>% as.data.frame()
+names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
+
+
+demand_predict_co3<- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+
+prices_predict_co3 <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+
+parameters_co3 <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+
+for(i in 1:(nrow(predict_df)-2)){
+  
+  # i <- 2
+  K_t <- predict_df$K[i]
+  k3_t2 <- predict_df$k3[i+2]
+  # imports_t <- predict_df$imports[i]
+  
+  if(i<=1){
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
+    demand <- predict_df$Dissappear[i]
+  }
+  
+  ps_t <- predict_df$ps[i]
+  pc_t <- predict_df$pc[i]
+  hc_t <- predict_df$hc[i]
+  dressed_t <- predict_df$dressedWeight[i]
+  sl <- predict_df$sl[i]
+  cl <- predict_df$cl[i]
+  demand <- predict_df$Dissappear[i]
+  adj <- demand/(sl+cl)
+  
+  imports_t <- predict_df$imports[i]
+  exports_t <- predict_df$exports[i]
+  
+  
+  slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  
+  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  
+  params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+  parameters_co3$mu_tilde[i] <- params_t1[1]
+  parameters_co3$s_tilde[i] <- params_t1[2]
+  
+  
+  
+  p <- c(ps_t, pc_t, hc_t)
+  sl <- sl_t1_hat
+  cl <- cl_t1_hat
+  A <- demand_t1_hat
+  mu_Tilde <- params_t1[1]
+  s_Tilde <- params_t1[2]
+  
+  est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
+  ps_hat_t1 <- est_bb[1]
+  pc_hat_t1 <- est_bb[2]
+  hc_hat_t1 <- est_bb[3]
+  
+  prices_predict_co3$ps_hat[i] <- ps_hat_t1
+  prices_predict_co3$pc_hat[i] <- pc_hat_t1
+  prices_predict_co3$hc_hat[i] <- hc_hat_t1
+  demand_predict_co3$demand_est[i] <- demand_t1_hat
+  demand_predict_co3$sl_est[i] <- sl_t1_hat
+  demand_predict_co3$cl_est[i] <- cl_t1_hat
+  
+  # ps_t <- ps_hat_t1
+  # pc_t <- pc_hat_t1
+  # hc_t <- hc_hat_t1
+  # demand <- A
+}
+
+prices_predict_co3 <- prices_predict_co3 %>% filter(ps_hat>0)
+demand_predict_co3 <- demand_predict_co3 %>% filter(demand_est>0)
+
+
+
+# Case 4: Observed prices with added costs and original sl, cl, demand
+
+cost_price_addedCosts_obs <- cost_price_addedCosts_obs_r
+
+Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
+imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
+exports_temp <- exports %>% filter(Year>=1994 & Year<=2017)
+
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
+                    dressedWeights_sl_cl %>% filter(Year>=1994  & Year<=2017)%>% select(Slaughter_avg),
+                    cost_price_addedCosts_obs %>% select(ps), cost_price_addedCosts_obs %>% select(pc),
+                    cost_price_addedCosts_obs %>% select(hc), supp_sl %>% filter(Year>=1994 & Year<=2017) %>% select(Bill_meatLb_sl), 
+                    supp_cl %>% filter(Year>=1994 & Year<=2017) %>% select(Bill_meatLb_cl),
+                    totalDisappearedNew %>% filter(Year>=1994 & Year<=2017) %>% select(total_meat_bill)) %>% as.data.frame()
+names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
+
+
+demand_predict_co4<- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+
+prices_predict_co4 <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+
+parameters_co4 <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+
+for(i in 1:(nrow(predict_df)-2)){
+  
+  # i <- 2
+  K_t <- predict_df$K[i]
+  k3_t2 <- predict_df$k3[i+2]
+  # imports_t <- predict_df$imports[i]
+  
+  if(i<=1){
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
+    demand <- predict_df$Dissappear[i]
+  }
+  
+  ps_t <- predict_df$ps[i]
+  pc_t <- predict_df$pc[i]
+  hc_t <- predict_df$hc[i]
+  dressed_t <- predict_df$dressedWeight[i]
+  sl <- predict_df$sl[i]
+  cl <- predict_df$cl[i]
+  demand <- predict_df$Dissappear[i]
+  adj <- demand/(sl+cl)
+  
+  imports_t <- predict_df$imports[i]
+  exports_t <- predict_df$exports[i]
+  
+  
+  slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  
+  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  
+  params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+  parameters_co4$mu_tilde[i] <- params_t1[1]
+  parameters_co4$s_tilde[i] <- params_t1[2]
+  
+  
+  
+  p <- c(ps_t, pc_t, hc_t)
+  sl <- sl_t1_hat
+  cl <- cl_t1_hat
+  A <- demand_t1_hat
+  mu_Tilde <- params_t1[1]
+  s_Tilde <- params_t1[2]
+  
+  est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
+  ps_hat_t1 <- est_bb[1]
+  pc_hat_t1 <- est_bb[2]
+  hc_hat_t1 <- est_bb[3]
+  
+  prices_predict_co4$ps_hat[i] <- ps_hat_t1
+  prices_predict_co4$pc_hat[i] <- pc_hat_t1
+  prices_predict_co4$hc_hat[i] <- hc_hat_t1
+  demand_predict_co4$demand_est[i] <- demand_t1_hat
+  demand_predict_co4$sl_est[i] <- sl_t1_hat
+  demand_predict_co4$cl_est[i] <- cl_t1_hat
+  
+  # ps_t <- ps_hat_t1
+  # pc_t <- pc_hat_t1
+  # hc_t <- hc_hat_t1
+  # demand <- A
+}
+
+prices_predict_co4 <- prices_predict_co4 %>% filter(ps_hat>0)
+demand_predict_co4 <- demand_predict_co4 %>% filter(demand_est>0)
 
 
 
