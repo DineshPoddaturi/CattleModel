@@ -105,10 +105,16 @@ Is it okay to increase costs for every year?
 #### One thought:
 After estimating $\tilde{\mu}$ and $\tilde{s}$, compute the share, $\hat{sl}$, $\hat{cl}$, and $\hat{demand}$ again? (because I am seeing no change in $\hat{sl}$).
 
+This is not working. $\hat{sl}$ remains same, $\hat{demand}, \hat{cl}$ change by a little. Not a huge difference.
+
+
+
 
 ### Some prelim results:
-* The prices and c osts are changing by a small magnitude (very small! we are speaking of single digit dollars per cwt)
+* The prices and costs are changing by a small magnitude (very small! we are speaking of single digit dollars per cwt)
 * The quantities remain same! (because the prices change by very small magnitude).
+
+
 
 
 
