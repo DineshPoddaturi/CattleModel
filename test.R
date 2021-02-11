@@ -925,7 +925,7 @@ parameters <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predi
 
 for(i in 1:(nrow(predict_df)-2)){
     
-    i <- 1
+    # i <- 1
     K_t <- predict_df$K[i]
     k3_t2 <- predict_df$k3[i+2]
     # imports_t <- predict_df$imports[i]
@@ -986,12 +986,12 @@ for(i in 1:(nrow(predict_df)-2)){
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
     
-    # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-    # 
-    # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
-    # 
-    # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-    # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+    slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+
+    demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+
+    sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+    cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
     
     
     prices_predict$ps_hat[i] <- ps_hat_t1
@@ -2049,6 +2049,16 @@ for(i in 1:(nrow(predict_df)-2)){
   pc_hat_t1 <- est_bb[2]
   hc_hat_t1 <- est_bb[3]
   
+  slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  
+  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  
+  
+  
+  
   prices_predict_co4$ps_hat[i] <- ps_hat_t1
   prices_predict_co4$pc_hat[i] <- pc_hat_t1
   prices_predict_co4$hc_hat[i] <- hc_hat_t1
@@ -2065,19 +2075,17 @@ for(i in 1:(nrow(predict_df)-2)){
 prices_predict_co4 <- prices_predict_co4 %>% filter(ps_hat>0)
 demand_predict_co4 <- demand_predict_co4 %>% filter(demand_est>0)
 
-sl_cl_Rev <- prices_predict_co4 %>% 
-  mutate(slRev = ps_hat * demand_predict_co4$sl_est, clRev = pc_hat * demand_predict_co4$cl_est) %>%
-  select(Year, slRev, clRev)
-
 
 
 
 prices_predict_co4_merge <- merge(prices_predict_co4, prices_predict_est) %>% 
-  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100)
+  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100) %>%
+  select(Year, ps, ps_hat, pc, pc_hat, hc, hc_hat)
 demand_predict_co4_merge <- merge(demand_predict_co4, demand_predict_est)
 
 prices_predict_co4_merge1 <- merge(prices_predict_co4, prices_costs_obs) %>% 
-  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100)
+  mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100) %>%
+  select(Year, ps, ps_hat, pc, pc_hat, hc, hc_hat)
 demand_predict_co4_merge1 <- merge(demand_predict_co4, demand_obs)
 
 slaughterPrices_plot_co4 <- prices_predict_co4_merge %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Estimate without added costs"))+geom_point(aes(y=ps,color="Estimate without added costs"))+geom_line(aes(y=ps_hat, color="Estimate with added costs"))+geom_point(aes(y=ps_hat,color="Estimate with added costs")) + 
@@ -2135,81 +2143,33 @@ demand_co41 <- demand_predict_co4_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y
 
 
 
+prices_predict_co4_merge
 
-###### Here I am writing the code to compute sl, cl, and demand after estimating mutilde and stilde
+
+demand_predict_co4_merge
+
+rev_sl <-  prices_predict_co4_merge %>% mutate(slRev_post = (ps_hat/100) * demand_predict_co4_merge$sl_est,
+                                               slRev_pre = (ps/100) * demand_predict_co4_merge$sl,
+                                               slRev_diff = slRev_post - slRev_pre) %>% select(Year, slRev_post, slRev_pre, slRev_diff)
+
+rev_cl <- prices_predict_co4_merge %>% mutate(clRev_post = (pc_hat/100) * demand_predict_co4_merge$cl_est,
+                                              clRev_pre = (pc/100) * demand_predict_co4_merge$cl,
+                                              clRev_diff = clRev_post - clRev_pre) %>% select(Year, clRev_post, clRev_pre, clRev_diff)
+
+rev_total <- merge(rev_sl, rev_cl) %>% mutate(totalRev_post = slRev_post + clRev_post, 
+                                              totalRev_pre = slRev_pre + clRev_pre,
+                                              totalRev_diff = totalRev_post - totalRev_pre) %>% select(Year, totalRev_post,
+                                                                                                       totalRev_pre, totalRev_diff)
+
+rev_total$totalRev_diff * 1000000000/1000000
 
 
-for(i in 1:(nrow(predict_df)-2)){
-  
-  # i <- 1
-  K_t <- predict_df$K[i]
-  k3_t2 <- predict_df$k3[i+2]
-  # imports_t <- predict_df$imports[i]
-  
-  if(i<=1){
-    ps_t <- predict_df$ps[i]
-    pc_t <- predict_df$pc[i]
-    hc_t <- predict_df$hc[i]
-    sl <- predict_df$sl[i]
-    cl <- predict_df$cl[i]
-    demand <- predict_df$Dissappear[i]
-  }
-  
-  ps_t <- predict_df$ps[i]
-  pc_t <- predict_df$pc[i]
-  hc_t <- predict_df$hc[i]
-  dressed_t <- predict_df$dressedWeight[i]
-  sl <- predict_df$sl[i]
-  cl <- predict_df$cl[i]
-  demand <- predict_df$Dissappear[i]
-  adj <- demand/(sl+cl)
-  
-  imports_t <- predict_df$imports[i]
-  exports_t <- predict_df$exports[i]
-  
-  
-  slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
-  
-  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
-  
-  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
-  
-  params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
-  parameters_co4$mu_tilde[i] <- params_t1[1]
-  parameters_co4$s_tilde[i] <- params_t1[2]
-  
-  
-  
-  
-  
-  p <- c(ps_t, pc_t, hc_t)
-  sl <- sl_t1_hat
-  cl <- cl_t1_hat
-  A <- demand_t1_hat
-  mu_Tilde <- params_t1[1]
-  s_Tilde <- params_t1[2]
-  
-  est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
-  ps_hat_t1 <- est_bb[1]
-  pc_hat_t1 <- est_bb[2]
-  hc_hat_t1 <- est_bb[3]
-  
-  slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  
-  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
-  
-  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
-  
-  
-  prices_predict_co4$ps_hat[i] <- ps_hat_t1
-  prices_predict_co4$pc_hat[i] <- pc_hat_t1
-  prices_predict_co4$hc_hat[i] <- hc_hat_t1
-  demand_predict_co4$demand_est[i] <- demand_t1_hat
-  demand_predict_co4$sl_est[i] <- sl_t1_hat
-  demand_predict_co4$cl_est[i] <- cl_t1_hat
-}
+
+
+
+costs_cl_9years
+
+costs_sl_2years
 
 
 
@@ -2217,10 +2177,9 @@ for(i in 1:(nrow(predict_df)-2)){
 
 
 
-
-
-
-
+rev_total_Plot <- rev_total %>% ggplot(aes(x=Year))+geom_line(aes(y=totalRev_pre,color="Total revenue before adding costs (in Billion $)"))+geom_point(aes(y=totalRev_pre,color="Total revenue before adding costs (in Billion $)")) +geom_line(aes(y=totalRev_post, color="Total revenue after adding costs (in Billion $)")) + geom_point(aes(y=totalRev_post,color="Total revenue after adding costs (in Billion $)")) + 
+  labs(x="Year", y="Revenue (in Billion $)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(rev_total$Year[1],rev_total$Year[nrow(rev_total)])))
 
 
 
