@@ -52,5 +52,25 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 
 
+02/12/2021:
+
+* Talked about the estimates and how the prices went up but by very little. He said we expect that. He is glad the model is reacting to our changes and it is not going bonkers or doing nothing. 
+
+* The way I computed costs were fine. So don't bother about them. 
+
+* Since the costs went up by like around 7 cents per pound, we saw some increase in prices (in cents again). It's okay if we don't see much change in the supply or demand (because all our computations are in pounds and are in aggregate level). To avoid any confusion, try to comute changes in percentages (prices, quantity, revenue, and costs). That will help with communicating properly.
+
+* Also said in equilibrium the revenue and costs should cancel out or become almost zero.
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1072,7 +1072,7 @@ prices_costs_new <- prices_costs
 
 
 
-##### Work on these again############
+##### Work on these again (I think the problem is with the cost per pound) ###########
 
 taggingCosts <- round(total_Costs,3)
 
