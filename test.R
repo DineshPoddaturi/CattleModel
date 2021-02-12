@@ -1069,6 +1069,11 @@ prices_costs_new <- prices_costs
 # We use tagging costs from CostEstimates_SAV.Rmd. These costs are sum of all the costs (which are weighted average of costs for each capacity).
 # See CostEstimates_SAV.Rmd for details.
 
+
+
+
+##### Work on these again############
+
 taggingCosts <- round(total_Costs,3)
 
 aggCosts <- (Stock_temp[,2] * taggingCosts) %>% as.data.frame()
@@ -2160,19 +2165,20 @@ rev_total <- merge(rev_sl, rev_cl) %>% mutate(totalRev_post = slRev_post + clRev
                                               totalRev_pre = slRev_pre + clRev_pre,
                                               totalRev_diff = totalRev_post - totalRev_pre) %>% select(Year, totalRev_post,
                                                                                                        totalRev_pre, totalRev_diff)
+rev_total_2009 <- rev_total %>% filter(Year>2009)
 
-rev_total$totalRev_diff * 1000000000/1000000
+costs_cl_2009 <- costs_cl %>% mutate(costs_9years = Cull * taggingCosts * 9, 
+                                     cost_Lb_9years = costs_9years/(Cull * dressedWeights_sl_cl$Cull_avg), 
+                                     cost_cl_meat = Bill_meatLb_cl * cost_Lb_9years) %>% filter(Year>2009) %>% select(Year, cost_cl_meat)
 
-
-
-
-
-costs_cl_9years
-
-costs_sl_2years
-
+costs_sl_2009 <- costs_sl %>% mutate(costs_2years = Slaughter * taggingCosts * 2, 
+                                     cost_Lb_2years = costs_2years/ (Slaughter * dressedWeights_sl_cl$Slaughter_avg), 
+                                     cost_sl_meat = Bill_meatLb_sl * cost_Lb_2years) %>% filter(Year>2009) %>% select(Year, cost_sl_meat)
 
 
+totalCosts_2009 <- merge(costs_cl_2009, costs_sl_2009) %>% mutate(costsBill_total = cost_cl_meat + cost_sl_meat)
+
+costsRev_2009 <- merge(rev_total_2009, totalCosts_2009) %>% mutate(netRev = totalRev_post - costsBill_total, netRevDiff = totalRev_pre - netRev)
 
 
 
@@ -2182,5 +2188,7 @@ rev_total_Plot <- rev_total %>% ggplot(aes(x=Year))+geom_line(aes(y=totalRev_pre
   scale_x_continuous(name="Year", breaks=c(seq(rev_total$Year[1],rev_total$Year[nrow(rev_total)])))
 
 
+
+# we are using the observed data to estimate until the shock and then using the model estimates to project the impacts of the shock.
 
 
