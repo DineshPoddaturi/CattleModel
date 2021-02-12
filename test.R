@@ -1131,6 +1131,8 @@ cost_price_addedCosts <- left_join(cost_price_addedCosts, ccc, by = "Year") %>%
 
 
 
+
+
 # I will also add the costs to the observed prices and costs. I will try the predictions with the observed first and see how things turn out.
 cost_price_obs <- merge(prices_costs,costs_sl_cl) %>% select(Year, ps, pc, hc, cost_both)
 
