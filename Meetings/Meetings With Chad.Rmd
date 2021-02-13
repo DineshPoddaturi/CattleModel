@@ -60,7 +60,7 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Since the costs went up by like around 7 cents per pound, we saw some increase in prices (in cents again). It's okay if we don't see much change in the supply or demand (because all our computations are in pounds and are in aggregate level). To avoid any confusion, try to comute changes in percentages (prices, quantity, revenue, and costs). That will help with communicating properly.
 
-* Also said in equilibrium the revenue and costs should cancel out or become almost zero.
+* Also said in equilibrium the revenue and costs should cancel out or move towards zero.
 
 
 
