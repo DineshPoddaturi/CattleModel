@@ -1128,8 +1128,6 @@ cost_price_addedCosts <- left_join(cost_price_addedCosts, ccc, by = "Year") %>%
   select(Year, ps_hat, pc_hat, hc_hat)
 
 
-
-
 # I will also add the costs to the observed prices and costs. I will try the predictions with the observed first and see how things turn out.
 cost_price_obs <- merge(prices_costs,costs_sl_cl) %>% select(Year, ps, pc, hc, cost_both)
 
@@ -1265,7 +1263,7 @@ demand_predict_co4 <- demand_predict_co4 %>% filter(demand_est>0)
 prices_predict_co4_merge <- merge(prices_predict_co4, prices_predict_est) %>% 
   mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100) %>%
   select(Year, ps, ps_hat, pc, pc_hat, hc, hc_hat)
-demand_predict_co4_merge <- merge(demand_predict_co4, demand_predict_est)
+demand_predict_co4_merge <- merge(demand_predict_co4, demand_predict_est) %>% select(Year, Demand, demand_est, sl, sl_est, cl, cl_est)
 
 prices_predict_co4_merge1 <- merge(prices_predict_co4, prices_costs_obs) %>% 
   mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100) %>%
@@ -1325,13 +1323,6 @@ demand_co41 <- demand_predict_co4_merge1 %>% ggplot(aes(x=Year))+geom_line(aes(y
   scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge1$Year[1],demand_predict_co4_merge1$Year[nrow(demand_predict_co4_merge1)])))
 
 
-
-
-prices_predict_co4_merge
-
-
-demand_predict_co4_merge
-
 rev_sl <-  prices_predict_co4_merge %>% mutate(slRev_post = (ps_hat/100) * demand_predict_co4_merge$sl_est,
                                                slRev_pre = (ps/100) * demand_predict_co4_merge$sl,
                                                slRev_diff = slRev_post - slRev_pre) %>% select(Year, slRev_post, slRev_pre, slRev_diff)
@@ -1344,27 +1335,70 @@ rev_total <- merge(rev_sl, rev_cl) %>% mutate(totalRev_post = slRev_post + clRev
                                               totalRev_pre = slRev_pre + clRev_pre,
                                               totalRev_diff = totalRev_post - totalRev_pre) %>% select(Year, totalRev_post,
                                                                                                        totalRev_pre, totalRev_diff)
-rev_total_2009 <- rev_total %>% filter(Year>2009)
+rev_total_2009 <- rev_total %>% filter(totalRev_diff>0)
 
-costs_cl_2009 <- costs_cl %>% mutate(costs_9years = Cull * taggingCosts * 9, 
-                                     cost_Lb_9years = costs_9years/(Cull * dressedWeights_sl_cl$Cull_avg), 
-                                     cost_cl_meat = Bill_meatLb_cl * cost_Lb_9years) %>% filter(Year>2009) %>% select(Year, cost_cl_meat)
-
-costs_sl_2009 <- costs_sl %>% mutate(costs_2years = Slaughter * taggingCosts * 2, 
-                                     cost_Lb_2years = costs_2years/ (Slaughter * dressedWeights_sl_cl$Slaughter_avg), 
-                                     cost_sl_meat = Bill_meatLb_sl * cost_Lb_2years) %>% filter(Year>2009) %>% select(Year, cost_sl_meat)
-
-
-totalCosts_2009 <- merge(costs_cl_2009, costs_sl_2009) %>% mutate(costsBill_total = cost_cl_meat + cost_sl_meat)
-
-costsRev_2009 <- merge(rev_total_2009, totalCosts_2009) %>% mutate(netRev = totalRev_post - costsBill_total, netRevDiff = totalRev_pre - netRev)
-
-
-
+# costs_cl_2009 <- costs_cl %>% mutate(costs_9years = Cull * taggingCosts * 9, 
+#                                      cost_Lb_9years = costs_9years/(Cull * dressedWeights_sl_cl$Cull_avg), 
+#                                      cost_cl_meat = Bill_meatLb_cl * cost_Lb_9years) %>% filter(Year>2009) %>% select(Year, cost_cl_meat)
+# 
+# costs_sl_2009 <- costs_sl %>% mutate(costs_2years = Slaughter * taggingCosts * 2, 
+#                                      cost_Lb_2years = costs_2years/ (Slaughter * dressedWeights_sl_cl$Slaughter_avg), 
+#                                      cost_sl_meat = Bill_meatLb_sl * cost_Lb_2years) %>% filter(Year>2009) %>% select(Year, cost_sl_meat)
+# 
+# 
+# totalCosts_2009 <- merge(costs_cl_2009, costs_sl_2009) %>% mutate(costsBill_total = cost_cl_meat + cost_sl_meat)
+# 
+# costsRev_2009 <- merge(rev_total_2009, totalCosts_2009) %>% mutate(netRev = totalRev_post - costsBill_total, netRevDiff = totalRev_pre - netRev)
+# 
 
 rev_total_Plot <- rev_total %>% ggplot(aes(x=Year))+geom_line(aes(y=totalRev_pre,color="Total revenue before adding costs (in Billion $)"))+geom_point(aes(y=totalRev_pre,color="Total revenue before adding costs (in Billion $)")) +geom_line(aes(y=totalRev_post, color="Total revenue after adding costs (in Billion $)")) + geom_point(aes(y=totalRev_post,color="Total revenue after adding costs (in Billion $)")) + 
   labs(x="Year", y="Revenue (in Billion $)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(rev_total$Year[1],rev_total$Year[nrow(rev_total)])))
+
+
+percentChange_price <- prices_predict_co4_merge %>% mutate(percentChange_ps = ((ps_hat - ps)/ps)*100, 
+                                                               percentChange_pc = ((pc_hat - pc)/pc)*100, 
+                                                               percentChange_hc = ((hc_hat - hc)/hc)*100) %>% select(Year, percentChange_ps, 
+                                                                                                                     percentChange_pc, percentChange_hc)
+
+percentChange_demand <- demand_predict_co4_merge %>% mutate(percentChange_demand = round(((demand_est - Demand)/Demand)*100,4),
+                                                                percentChange_sl = round(((sl_est - sl)/sl)*100,4),
+                                                                percentChange_cl = round(((cl_est - cl)/cl)*100,4)) %>% select(Year, percentChange_demand,
+                                                                                                                      percentChange_sl, percentChange_cl)
+
+percentChange_slRev <- rev_sl %>% mutate(percentChange_slRev = ((slRev_post - slRev_pre)/slRev_pre)*100) %>% select(Year, percentChange_slRev) %>% filter(percentChange_slRev>0)
+
+percentChange_clRev <- rev_cl %>% mutate(percentChange_clRev = ((clRev_post - clRev_pre)/clRev_pre)*100) %>% select(Year, percentChange_clRev) %>% filter(percentChange_clRev>0)
+
+percentChange_tRev <- rev_total %>% mutate(percentChange_tRev = ((totalRev_post - totalRev_pre)/totalRev_pre)*100) %>% select(Year, percentChange_tRev) %>% filter(percentChange_tRev>0)
+
+
+## Here we compute costs (only tagging costs not holding costs) for the supplied meat
+costs_cl <- costs_cl_9years %>% filter(Year>1994 & Year<2017) %>% select(Year, cost_Lb_9years)
+costs_sl <- costs_sl_2years %>% filter(Year>1994 & Year<2017) %>% select(Year, cost_Lb_2years)
+
+costsSupply_sl <- demand_predict_co4_merge %>% mutate(costSupply_sl = sl_est * costs_sl$cost_Lb_2years) %>% select(Year, costSupply_sl)
+costsSupply_cl <- demand_predict_co4_merge %>% mutate(costSupply_cl = cl_est * costs_cl$cost_Lb_9years) %>% select(Year, costSupply_cl)
+costsSupply_t <- merge(costsSupply_sl, costsSupply_cl) %>% mutate(costSupply_t = costSupply_sl + costSupply_cl)
+
+costsRevenues <- merge(rev_cl, merge(rev_sl, merge(rev_total,costsSupply_t))) %>% select(Year, clRev_diff, costSupply_cl, 
+                                                                                                   slRev_diff,costSupply_sl,
+                                                                                                   totalRev_diff,costSupply_t) %>% filter(Year>2009)
+
+revDiff_costs_sl <- costsRevenues %>% select(Year, slRev_diff, costSupply_sl)
+revDiff_costs_cl <- costsRevenues %>% select(Year, clRev_diff, costSupply_cl)
+revDiff_costs_t <- costsRevenues %>% select(Year, totalRev_diff, costSupply_t)
+
+revDiff_costs_sl <- revDiff_costs_sl %>% mutate(diffRevCost_sl = slRev_diff - costSupply_sl)
+revDiff_costs_cl <- revDiff_costs_cl %>% mutate(diffRevCost_cl = clRev_diff - costSupply_cl)
+revDiff_costs_t <- revDiff_costs_t %>% mutate(diffRevCost_t = totalRev_diff - costSupply_t)
+
+
+######## Compute the above again. Note sl, cl, demand are not changing at all. This is because of small changes in the prices and costs.
+####### If the changes in prices are very small the supply and demand wouldn't change much. But the costs relatively high to the revenues.
+###### Hence in aggregate the costs are greater than the revenue increment. This could be one way of explaining. 
+
+
 
 
 
@@ -1530,7 +1564,7 @@ rev_total_Plot_1 <- rev_total_1 %>% ggplot(aes(x=Year))+geom_line(aes(y=totalRev
   labs(x="Year", y="Revenue (in Billion $)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(rev_total$Year[1],rev_total$Year[nrow(rev_total)])))
 
-### Here I comopute the percent changes in prices and quantities
+### Here I compute the percent changes in prices and quantities
 percentChange_price_1 <- prices_predict_co4_merge_1 %>% mutate(percentChange_ps = ((ps_hat - ps)/ps)*100, 
                                       percentChange_pc = ((pc_hat - pc)/pc)*100, 
                                       percentChange_hc = ((hc_hat - hc)/hc)*100) %>% select(Year, percentChange_ps, 
@@ -1541,15 +1575,13 @@ percentChange_demand_1 <- demand_predict_co4_merge_1 %>% mutate(percentChange_de
                                       percentChange_cl = ((cl_est - cl)/cl)*100) %>% select(Year, percentChange_demand,
                                                                                             percentChange_sl, percentChange_cl) %>% filter(percentChange_demand>0)
 
-
-
 percentChange_slRev_1 <- rev_sl_1 %>% mutate(percentChange_slRev = ((slRev_post - slRev_pre)/slRev_pre)*100) %>% select(Year, percentChange_slRev) %>% filter(percentChange_slRev>0)
 
 percentChange_clRev_1 <- rev_cl_1 %>% mutate(percentChange_clRev = ((clRev_post - clRev_pre)/clRev_pre)*100) %>% select(Year, percentChange_clRev) %>% filter(percentChange_clRev>0)
 
-percentChange_tRev <- rev_total_1 %>% mutate(percentChange_tRev = ((totalRev_post - totalRev_pre)/totalRev_pre)*100) %>% select(Year, percentChange_tRev) %>% filter(percentChange_tRev>0)
+percentChange_tRev_1 <- rev_total_1 %>% mutate(percentChange_tRev = ((totalRev_post - totalRev_pre)/totalRev_pre)*100) %>% select(Year, percentChange_tRev) %>% filter(percentChange_tRev>0)
 
-## Here we compute costs for the supplied meat
+## Here we compute costs (only tagging costs not holding costs) for the supplied meat
 costs_cl_1 <- costs_cl_9years %>% filter(Year>1994 & Year<2015) %>% select(Year, cost_Lb_9years)
 costs_sl_1 <- costs_sl_2years %>% filter(Year>1994 & Year<2015) %>% select(Year, cost_Lb_2years)
 
@@ -1557,8 +1589,52 @@ costsSupply_sl_1 <- demand_predict_co4_merge_1 %>% mutate(costSupply_sl = sl_est
 costsSupply_cl_1 <- demand_predict_co4_merge_1 %>% mutate(costSupply_cl = cl_est * costs_cl_1$cost_Lb_9years) %>% select(Year, costSupply_cl)
 costsSupply_t_1 <- merge(costsSupply_sl_1, costsSupply_cl_1) %>% mutate(costSupply_t = costSupply_sl + costSupply_cl)
 
-merge(rev_cl_1, merge(rev_sl_1, merge(rev_total_1,costsSupply_t_1))) %>% select(Year, slRev_post, costSupply_sl, clRev_post, costSupply_cl,
-                                                                  totalRev_post, costSupply_t)
+# costsRevenues_1 %>% ggplot(aes(x=Year)) + geom_point(aes(y=clRev_diff, color="Revenue increase")) + geom_line(aes(y=clRev_diff, color="Revenue increase"))+ geom_line(aes(y=costSupply_cl, color="Additional costs")) + geom_point(aes(y=costSupply_cl, color="Additional costs"))+
+#   labs(title = "Revenue increase and additional costs for cull cows with tagging", x="Year", y="Revenue and costs (in Billion $)", colour="")  + theme_classic()+
+#   theme(plot.title = element_text(hjust = 0.5))+ scale_x_continuous(name="Year", breaks=c(seq(costsRevenues_1$Year[1],costsRevenues_1$Year[nrow(costsRevenues_1)])))
+# 
+# costsRevenues_1 %>% ggplot(aes(x=Year)) + geom_point(aes(y=slRev_diff, color="Revenue increase")) + geom_line(aes(y=slRev_diff, color="Revenue increase"))+ geom_line(aes(y=costSupply_sl, color="Additional costs")) + geom_point(aes(y=costSupply_sl, color="Additional costs"))+
+#   labs(title = "Revenue increase and additional costs for fed cattle with tagging", x="Year", y="Revenue and costs (in Billion $)", colour="")  + theme_classic()+
+#   theme(plot.title = element_text(hjust = 0.5))+ scale_x_continuous(name="Year", breaks=c(seq(costsRevenues_1$Year[1],costsRevenues_1$Year[nrow(costsRevenues_1)])))
+# 
+# costsRevenues_1 %>% ggplot(aes(x=Year)) + geom_point(aes(y=totalRev_diff, color="Revenue increase")) + geom_line(aes(y=totalRev_diff, color="Revenue increase"))+ geom_line(aes(y=costSupply_t, color="Additional costs")) + geom_point(aes(y=costSupply_t, color="Additional costs"))+
+#   labs(title = "Total Revenue increase and additional costs with tagging", x="Year", y="Revenue and costs (in Billion $)", colour="")  + theme_classic()+
+#   theme(plot.title = element_text(hjust = 0.5))+ scale_x_continuous(name="Year", breaks=c(seq(costsRevenues_1$Year[1],costsRevenues_1$Year[nrow(costsRevenues_1)])))
+
+
+# The above are additional costs, excluding holding costs. So basically we compare revenue difference and the additional costs. 
+# We do that below
+
+costsRevenues_1 <- merge(rev_cl_1, merge(rev_sl_1, merge(rev_total_1,costsSupply_t_1))) %>% select(Year, clRev_diff, costSupply_cl, 
+                                                                                                   slRev_diff,costSupply_sl,
+                                                                                                   totalRev_diff,costSupply_t) %>% filter(Year>2009)
+
+revDiff_costs_sl_1 <- costsRevenues_1 %>% select(Year, slRev_diff, costSupply_sl)
+revDiff_costs_cl_1 <- costsRevenues_1 %>% select(Year, clRev_diff, costSupply_cl)
+revDiff_costs_t_1 <- costsRevenues_1 %>% select(Year, totalRev_diff, costSupply_t)
+
+revDiff_costs_sl_1 <- revDiff_costs_sl_1 %>% mutate(diffRevCost_sl = slRev_diff - costSupply_sl)
+revDiff_costs_cl_1 <- revDiff_costs_cl_1 %>% mutate(diffRevCost_cl = clRev_diff - costSupply_cl)
+revDiff_costs_t_1 <- revDiff_costs_t_1 %>% mutate(diffRevCost_t = totalRev_diff - costSupply_t)
+
+# revDiff_costs_sl_1[,-1]*1000
+# revDiff_costs_cl_1[,-1]*1000
+# revDiff_costs_t_1[,-1]*1000
+
+######## The above computations show that the price of the sl increases and the cl decreases. The sl quantity remains same.
+####### However, the cl increases inducing total increase in demand. Since cl increase, the price of cl falls. 
+####### But with the system in place, the price for sl increases increasing total revenue for fed cattle. 
+####### Although the price of cull cow decrease, the revenue for cull cows increase. This is due to the fact that the supply of cl increase.
+####### The total revenue for fed cattle is greater than costs. The costs for cull cows are greater than the difference in revenue.
+####### In aggregate the change in revenues are greater than the costs implying the system results in greater producer surplus.
+###### We need to keep in mind that the cull cow producers are at a big loss. This is important? I dunno.
+
+
+
+
+
+
+
 ### Note that the holding costs are for both sl and cl combined. Try to include them to compute the costs. 
 ### Compute the costs again. Think carefully.
 
