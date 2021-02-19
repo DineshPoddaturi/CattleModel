@@ -62,9 +62,17 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Also said in equilibrium the revenue and costs should cancel out or move towards zero.
 
+02/19/2021:
 
+* Showed the percent changes in the prices and quantities with the introductin of costs in the observed data.
 
+* We need to plot the changes of observed, model estimate, and the estimate with the added costs. Include them in one graph. Until 2009, only observed then we need to see observed, model estimate and the estimate with added costs.
 
+* Do not round any estimates. We need to see changes in price, quantities if we change any variable. We need to see changes that makes economic sense and has economic intuition. 
+
+* I guess, try to do the above point by introducing costs in the model estimate as well. He didn't asked for it, but might come in handy.
+
+* Always remember numbers are always wrong. Do not worry much about the magnitude of the numbers. We need to worry more about the direction than the magnitude. Always keep this in mind.
 
 
 
