@@ -1081,7 +1081,7 @@ names(aggCosts) <- "AggregateCosts"
 aggCosts <- aggCosts %>% mutate(Year = Stock_temp$Year, AggregateCosts_mill = AggregateCosts/1000000) %>% select(Year, everything())
 
 #Costs for each age in our data in million $
-Stock_temp_costs<-  (Stock_temp[,-1] * taggingCosts)  %>% as.data.frame()
+Stock_temp_costs <-  (Stock_temp[,-1] * taggingCosts)  %>% as.data.frame()
 
 Stock_temp_costs_mill <- (Stock_temp_costs/1000000) %>% mutate(Year = Stock_temp$Year) %>% select(Year, everything())
 
@@ -1219,7 +1219,7 @@ for(i in 1:(nrow(predict_df)-2)){
   parameters_co4$mu_tilde[i] <- params_t1[1]
   parameters_co4$s_tilde[i] <- params_t1[2]
   
-  
+  # adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
   
   p <- c(ps_t, pc_t, hc_t)
   sl <- sl_t1_hat
@@ -1237,8 +1237,8 @@ for(i in 1:(nrow(predict_df)-2)){
   # 
   # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
   # 
-  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-  # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj1
+  # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj1
   
   
   
@@ -1487,6 +1487,14 @@ revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = totalRev
                                                 Year, diffRevCost_t_obs, diffRevCost_t_model)
 
 
+
+
+
+
+
+
+
+
 ######## Compute the above again. Note sl, cl, demand are not changing at all. This is because of small changes in the prices and costs.
 ####### If the changes in prices are very small the supply and demand wouldn't change much. But the costs are relatively high to the revenues.
 ###### Hence in aggregate the costs are greater than the change in revenue. This could be one way of explaining.
@@ -1511,10 +1519,10 @@ disappear_1 <- demand_predict_est %>% mutate(Year = Year - 1, Demand = Demand_es
 totalDisappearedNew_1 <- rbind(totalDisappearedNew_1,disappear_1)
 
 
-# Stock_temp <- Stock%>% filter(Year>=1994 & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
-# imports_temp <- imports %>% filter(Year>=1994 & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
-# exports_temp <- exports %>% filter(Year>=1994 & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
-# 
+Stock_temp <- Stock%>% filter(Year>=1994 & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
+imports_temp <- imports %>% filter(Year>=1994 & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
+exports_temp <- exports %>% filter(Year>=1994 & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
+
 # predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
 #                     dressedWeights_sl_cl %>% filter(Year>=1994  & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])%>% select(Slaughter_avg),
 #                     cost_price_addedCosts_obs_1 %>% select(ps), cost_price_addedCosts_obs_1 %>% select(pc),
@@ -1597,8 +1605,8 @@ for(i in 1:(nrow(predict_df)-2)){
   # 
   # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
   # 
-  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-  # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj1
+  # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj1
   
   prices_predict_co4_1$ps_hat[i] <- ps_hat_t1
   prices_predict_co4_1$pc_hat[i] <- pc_hat_t1
@@ -1630,7 +1638,8 @@ demand_predict_co4_merge_1 <- merge(demand_predict_co4_1, merge(demand_predict_e
 
 prices_predict_co4_merge_1_111 <- prices_predict_co4_merge_1 %>% select(Year, ps_est, ps_hat, pc_est, pc_hat, hc_est, hc_hat) %>% filter(Year>2009)
 
-prices_predict_co4_merge_1_111 <- left_join(prices_predict_co4_merge_1 %>% select(Year, ps, pc, hc), prices_predict_co4_merge_1_111)
+prices_predict_co4_merge_1_111 <- left_join(prices_predict_co4_merge_1 %>% select(Year, ps, pc, hc), prices_predict_co4_merge_1_111
+                                            ) %>% select(Year, ps, ps_est, ps_hat, pc, pc_est, pc_hat, hc, hc_est, hc_hat)
 
 slaughterPrices_plot_co4_1 <- prices_predict_co4_merge_1_111 %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est,color="Model estimate"))+
   geom_point(aes(y=ps_est,color="Model estimate"))+ geom_line(aes(y=ps_hat, color="Estimate with added costs"))+
@@ -1819,12 +1828,6 @@ revDiff_costs_t_1_pSurp <- revDiff_costs_t_1 %>% mutate(diffRevCost_t_model = to
                                                   diffRevCost_t_obs = totalRev_diff_obs - costSupply_t_obs) %>% select(Year, diffRevCost_t_obs,
                                                                                                                        diffRevCost_t_model)
 
-
-
-
-
-
- 
 
 # revDiff_costs_sl_1[,-1]*1000
 # revDiff_costs_cl_1[,-1]*1000

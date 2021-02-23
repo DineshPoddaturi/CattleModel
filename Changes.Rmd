@@ -24,6 +24,10 @@ Percentage change in quantity of fed cattle:
 6 2015           -0.7994106          -1.773940e-14
 7 2016            1.2584954           1.734328e-14
 
+Here we have percentage change from the observed data and model respectively. The fed cattle price fell compared to observed, this is reflected in the quantities. The quantities went up by a little. The fed cattle prices went up compared to the model estimates. However, the quantities changed very little. Note that the price went by a little so we expect the same change in the quantities. 
+
+
+
 Percentage change in price of cull cows:
 > percentChange_price_pc
   Year percentChange_pc_obs percentChange_pc_model
@@ -46,6 +50,11 @@ Percentage change in quantity of cull cows:
 6 2015           12.9117106           1.151384e-05
 7 2016           11.5011345           9.786865e-06
 
+Although prices fell for cull cows (compared to observed prices), the quantities remained almost same. However the prices went up when compared to the model estimates and the quantities remained same or fell by a little. 
+
+
+Just note that cattle cycles play important role too. The observed data (especially stocks), follows the expansion and contraction of the stocks so our model does the same.
+
 Aggregate producer surplus:
 > revDiff_costs_t_pSurp
   Year diffRevCost_t_obs diffRevCost_t_model
@@ -56,6 +65,9 @@ Aggregate producer surplus:
 5 2014        -6.9141243          -0.1545304
 6 2015         1.8134526          -0.1474051
 7 2016         7.5518716          -0.1561541
+
+The aggregate producer surplus is negative for the first 5 years and then positive when we compare it to the observed data. However it is negative all the way when compared to the model.
+
 
 # Changes with observed prices and quantities until 2009 and then model estimates from 2010
 
