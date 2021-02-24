@@ -1277,7 +1277,8 @@ demand_predict_co4_merge <- merge(demand_predict_co4, merge(demand_predict_est, 
 
 prices_predict_co4_merge111 <- prices_predict_co4_merge %>% select(Year, ps_est, ps_hat, pc_est, pc_hat, hc_est, hc_hat) %>% filter(Year>2009)
 
-prices_predict_co4_merge111 <- left_join(prices_predict_co4_merge %>% select(Year, ps, pc, hc), prices_predict_co4_merge111)
+prices_predict_co4_merge111 <- left_join(prices_predict_co4_merge %>% select(Year, ps, pc, hc), prices_predict_co4_merge111
+                                         ) %>% select(Year, ps, ps_est, ps_hat, pc, pc_est, pc_hat, hc, hc_est, hc_hat)
 
 # prices_predict_co4_merge111$ps_est[-16:-22] <- NA
 # prices_predict_co4_merge111$ps_hat[-16:-22] <- NA

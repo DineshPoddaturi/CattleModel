@@ -38,3 +38,16 @@
 * Told me not to bogdown by perfecting the model. Also asked me to look at the papers for policy analysis, which is tracebality. There are some papers on tracebality issues. We should then be able to compute the consumer and producer surplus. Since there are already some papers we can show our model does better than others and this can be used for policy analysis. 
 
 
+02/24/2021:
+
+* Gave brief updates about the modeling and results. He asked if we can somewhat replicate the other studies using our model. 
+* Also is there any way to backout the elasticities from the model. If we can do that it would be helpful. 
+* Asked me to keep tabs on writing and make sure do all that stuff. Intro and other sections. 
+* Told me they got one year extension for the project. They can fund me one more year. So do not worry about the funding for one year.
+
+
+
+
+
+
+
