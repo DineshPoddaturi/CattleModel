@@ -75,9 +75,17 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 * Always remember numbers are always wrong. Do not worry much about the magnitude of the numbers. We need to worry more about the direction than the magnitude. Always keep this in mind.
 
 
+02/25/2021:
 
+* Showed him the graphs and the numbers. Seeing zero change in slaughter quantities is troublesome. 
+* The fed cattle meat increment using the model estimates is huge and need to investigate that properly. Although the price changes are very little in both cases, we see the fed cattle meat change in the later (using the model estimates). That's not ideal. 
 
-
+* 09: Actual Holding costs  + Tagging Costs
+  10: Model Holding Costs + Tagging Costs
+  11: ditto.....
+  
+* I think we change only the prices and costs. Try to keep the quantities as observed. That might change the results. 
+* We need to see changes consistently. Also round the numerics to 3 to 4 digits. We are not giving precise estimates, so rounding is alright. 
 
 
 
