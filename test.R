@@ -914,6 +914,8 @@ predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$
                     totalDisappearedNew %>% filter(Year>=1994) %>% select(total_meat_bill)) %>% as.data.frame()
 names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
 
+# predict_df$pc <- predict_df$pc + 1
+# predict_df$hc <- (((g * (beta^3) * predict_df$ps) + (beta - 1) * predict_df$pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
 
 demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 
@@ -1012,6 +1014,12 @@ demandMerge_new$Year <- as.numeric(demandMerge_new$Year)
 demand_plot_new <- demandMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=demand_est, color="Estimated"))+geom_point(aes(y=demand_est,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(demandMerge_new$Year[1], demandMerge_new$Year[nrow(demandMerge_new)])))
+
+
+# prices_costs_tmp <- prices_costs
+# 
+# prices_costs_tmp$pc <- prices_costs_tmp$pc + 1
+# prices_costs_tmp$hc <- (((g * (beta^3) * prices_costs_tmp$ps) + (beta - 1) * prices_costs_tmp$pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
 
 pricesMerge_new <- merge(prices_predict,prices_costs) %>% filter(ps_hat>0) %>% select(Year, ps, ps_hat, pc, pc_hat, hc, hc_hat) %>% 
   mutate(ps = ps*100, ps_hat = ps_hat*100, pc = pc*100, pc_hat = pc_hat*100, hc = hc*100, hc_hat = hc_hat*100)
@@ -1486,15 +1494,6 @@ revDiff_costs_cl_pSurp <- revDiff_costs_cl %>% mutate(diffRevCost_cl_obs = clRev
 revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = totalRev_diff_obs - costSupply_t_obs,
                                               diffRevCost_t_model = totalRev_diff_model - costSupply_t_model) %>% select(
                                                 Year, diffRevCost_t_obs, diffRevCost_t_model)
-
-
-
-
-
-
-
-
-
 
 ######## Compute the above again. Note sl, cl, demand are not changing at all. This is because of small changes in the prices and costs.
 ####### If the changes in prices are very small the supply and demand wouldn't change much. But the costs are relatively high to the revenues.

@@ -13,9 +13,9 @@ I estimate the price and quantities with the additional costs to the observed da
 \begin{tabular}{lll}
 \hline
 Year & percentChange\_ps\_obs & percentChange\_ps\_model \\ \hline
-2010  &        -6.5766982     &         1.6306733\\
-2011  &       -14.1895916     &         1.4796200\\
-2012  &       -2.5595639      &        1.2555068\\
+2010  &        -6.5766982     &          1.6306733\\
+2011  &       -14.1895916     &          1.4796200\\
+2012  &       -2.5595639      &          1.2555068\\
 2013  &          0.7641544    &          1.1590637\\
 2014  &        -16.0369276    &          1.1186796\\
 2015  &          7.0056582    &          0.8945503\\
@@ -91,7 +91,7 @@ Just note that cattle cycles play important role too. The observed data (especia
 \begin{tabular}{lll}
 \hline
 Year & diffRevCost\_t\_obs & diffRevCost\_t\_model \\ \hline
- 2010   &     -2.1681188    &     -0.1577323 \\
+ 2010   &     -2.1681188    &      -0.1577323 \\
  2011   &     -4.4930972    &      -0.1707075 \\
  2012   &     -2.1005092    &      -0.1675756 \\
  2013   &     -0.4705478    &      -0.1437623 \\
