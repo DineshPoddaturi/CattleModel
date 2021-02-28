@@ -200,6 +200,40 @@ These studies also have exogenous supply changes. Each of these percentage incre
 
 
 
+Case 1: 
+        i# No ADJ
+        09- Actual HC + TC , Actual PC, Actual PS, Actual SL, Actual CL
+        10- Model HC + TC, Actual PC, Actual PS, Actual SL, Actual CL
+        11- ditto....
+        ii# With ADJ
+        09- Actual HC + TC , Actual PC, Actual PS, Actual SL, Actual CL
+        10- Model HC + TC, Actual PC, Actual PS, Actual SL, Actual CL
+        11- ditto....
+
+Case 2: 
+        i# No ADJ
+        09- Actual HC + TC , Actual PC, Actual PS, Actual SL, Actual CL
+        10- Model HC + TC, Model PC, Model PS, Actual SL, Actual CL
+        11- ditto....
+        ii# With ADJ
+        09- Actual HC + TC , Actual PC, Actual PS, Actual SL, Actual CL
+        10- Model HC + TC, Model PC, Model PS, Actual SL, Actual CL
+        11- ditto....
+        
+Case 3: 
+        i# No ADJ
+        09- Actual HC + TC , Actual PC, Actual PS, Actual SL, Actual CL
+        10- Model HC + TC, Model PC, Model PS, Model SL, Model CL
+        11- ditto....
+        ii# With ADJ
+        09- Actual HC + TC , Actual PC, Actual PS, Actual SL, Actual CL
+        10- Model HC + TC, Model PC, Model PS, Model SL, Model CL
+        11- ditto....
+        
+
+
+
+
 
 <!-- line 1075 in code -->
 
