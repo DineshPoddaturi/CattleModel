@@ -11,7 +11,7 @@ $2.40 5,000+
 Here we get a conservative estimate (upper bound). We take the weighted mean of the about to get one number. 
 
 ```{r}
-cost_CowCalf_Tag <- weighted.mean(x = c(4.21, 2.90, 2.73, 2.43, 2.42, 2.43, 2.40), w = c(50,99,499,999,1999,4999,5000))
+cost_CowCalf_Tag <- weighted.mean(x = c(4.21, 2.90, 2.73, 2.43, 2.42, 2.43, 2.40), w = c(49,99,499,999,1999,4999,5000))
 ```
 
 currently not tag
@@ -24,7 +24,7 @@ $5.04
 $5.04
 
 ```{r}
-cost_CowCalf_NTag <- weighted.mean(x = c(5.54, 5.29, 5.20, 5.04, 5.04, 5.04, 5.04), w = c(50,99,499,999,1999,4999,5000))
+cost_CowCalf_NTag <- weighted.mean(x = c(5.54, 5.29, 5.20, 5.04, 5.04, 5.04, 5.04), w = c(49,99,499,999,1999,4999,5000))
 ```
 
 
@@ -72,7 +72,7 @@ cost_Packers <- weighted.mean(x = c(0.47,0.16), w = c(300,1.3*1000000))
 Aggregating all the costs. I am using the upperbound from the cow/calf costs i.e., the costs from the operations that currently not tag
 
 ```{r}
-total_Costs <- sum(cost_CowCalf_NTag, cost_Bckg, cost_Feedlot, cost_Packers)
+total_Costs <- sum(cost_CowCalf_Tag,cost_CowCalf_NTag, cost_Bckg, cost_Feedlot, cost_Packers)
 ```
 
 
