@@ -88,5 +88,14 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 * We need to see changes consistently. Also round the numerics to 3 to 4 digits. We are not giving precise estimates, so rounding is alright. 
 
 
+03/04/2021:
+
+* Showed the plots of the fed cattle prices and quantities. They don't make sense at all. Prices went up, we would expect the quantities to go down to meet the demand.
+* This is similar to the cull cows as well. 
+* I did not adjust for the demand and supply. Since we did not adjust for demand, the supply is assuming the higher demand needs to meet, so the supply is jumping up. We have to adjust in order to meet the demand and the estimated prices. 
+* We will see changes once we adjust for the demand.
+
+
+
 
 

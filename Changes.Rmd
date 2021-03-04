@@ -3,106 +3,106 @@ output:
   pdf_document: default
   html_document: default
 ---
-# Changes with observed prices and quantities
+<!-- # Changes with observed prices and quantities -->
 
-I estimate the price and quantities with the additional costs to the observed data. These are compared with the model estimates and the observed data. I compute the percentage changes in the price and quantity for fed cattle, cull cows as well as the aggregate producer surplus. The results are as follows:
+<!-- I estimate the price and quantities with the additional costs to the observed data. These are compared with the model estimates and the observed data. I compute the percentage changes in the price and quantity for fed cattle, cull cows as well as the aggregate producer surplus. The results are as follows: -->
 
-\begin{table}[!ht]
-\begin{center}
-\caption{Percentage change in price of fed cattle}
-\begin{tabular}{lll}
-\hline
-Year & percentChange\_ps\_obs & percentChange\_ps\_model \\ \hline
-2010  &        -6.5766982     &          1.6306733\\
-2011  &       -14.1895916     &          1.4796200\\
-2012  &       -2.5595639      &          1.2555068\\
-2013  &          0.7641544    &          1.1590637\\
-2014  &        -16.0369276    &          1.1186796\\
-2015  &          7.0056582    &          0.8945503\\
-2016  &         26.6988327    &          0.9035895 \\\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-
-\begin{table}[!ht]
-\begin{center}
-\caption{Percentage change in quantity of fed cattle}
-\begin{tabular}{lll}
-\hline
-Year & percentChange\_sl\_obs & percentChange\_sl\_model \\ \hline
- 2010   &         0.5114821   &        -1.617407e-14 \\
- 2011   &         0.3457242   &          0.000000e+00 \\
- 2012   &        -2.7404237   &         0.000000e+00 \\
- 2013   &         0.2974021   &         -1.643580e-14 \\
- 2014   &        -2.5022686   &       -1.675859e-14 \\
- 2015   &        -0.7994106   &       -1.773940e-14 \\
- 2016   &         1.2584954   &        1.734328e-14 \\\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-Here we have percentage change from the observed data and model respectively. The fed cattle price fell compared to observed, this is reflected in the quantities. The quantities went up by a little. The fed cattle prices went up compared to the model estimates. However, the quantities changed very little. Note that the price went by a little so we expect the same change in the quantities. 
+<!-- \begin{table}[!ht] -->
+<!-- \begin{center} -->
+<!-- \caption{Percentage change in price of fed cattle} -->
+<!-- \begin{tabular}{lll} -->
+<!-- \hline -->
+<!-- Year & percentChange\_ps\_obs & percentChange\_ps\_model \\ \hline -->
+<!-- 2010  &        -6.5766982     &          1.6306733\\ -->
+<!-- 2011  &       -14.1895916     &          1.4796200\\ -->
+<!-- 2012  &       -2.5595639      &          1.2555068\\ -->
+<!-- 2013  &          0.7641544    &          1.1590637\\ -->
+<!-- 2014  &        -16.0369276    &          1.1186796\\ -->
+<!-- 2015  &          7.0056582    &          0.8945503\\ -->
+<!-- 2016  &         26.6988327    &          0.9035895 \\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{center} -->
+<!-- \end{table} -->
 
 
-\begin{table}[!ht]
-\begin{center}
-\caption{Percentage change in price of cull cows}
-\begin{tabular}{lll}
-\hline
-Year & percentChange\_pc\_obs & percentChange\_pc\_model \\ \hline
- 2010   &         -22.305687    &             3.535708 \\
- 2011   &         -22.916642    &            2.729425 \\
- 2012   &         -11.560880    &            2.094137 \\
- 2013   &          -1.322547    &            1.829043 \\
- 2014   &         -23.717126    &            1.767165 \\
- 2015   &           1.929532    &            1.353151 \\
- 2016   &          37.000319    &            1.363775 \\\hline
-\end{tabular}
-\end{center}
-\end{table}
+<!-- \begin{table}[!ht] -->
+<!-- \begin{center} -->
+<!-- \caption{Percentage change in quantity of fed cattle} -->
+<!-- \begin{tabular}{lll} -->
+<!-- \hline -->
+<!-- Year & percentChange\_sl\_obs & percentChange\_sl\_model \\ \hline -->
+<!--  2010   &         0.5114821   &        -1.617407e-14 \\ -->
+<!--  2011   &         0.3457242   &          0.000000e+00 \\ -->
+<!--  2012   &        -2.7404237   &         0.000000e+00 \\ -->
+<!--  2013   &         0.2974021   &         -1.643580e-14 \\ -->
+<!--  2014   &        -2.5022686   &       -1.675859e-14 \\ -->
+<!--  2015   &        -0.7994106   &       -1.773940e-14 \\ -->
+<!--  2016   &         1.2584954   &        1.734328e-14 \\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{center} -->
+<!-- \end{table} -->
 
-\begin{table}[!ht]
-\begin{center}
-\caption{Percentage change in quantity of cull cows}
-\begin{tabular}{lll}
-\hline
-Year & percentChange\_cl\_obs & percentChange\_cl\_model \\ \hline
- 2010   &        -0.5767056     &     1.130325e-05 \\
- 2011   &         9.1561672     &      8.016228e-06 \\
- 2012   &         8.1515734     &      1.013729e-05 \\
- 2013   &        -8.3312239     &      1.063030e-05 \\
- 2014   &        14.6568011     &     -1.535018e-05 \\
- 2015   &        12.9117106     &      1.151384e-05 \\
- 2016   &        11.5011345     &      9.786865e-06 \\\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-Although prices fell for cull cows (compared to observed prices), the quantities remained almost same. However the prices went up when compared to the model estimates and the quantities remained same or fell by a little. 
+<!-- Here we have percentage change from the observed data and model respectively. The fed cattle price fell compared to observed, this is reflected in the quantities. The quantities went up by a little. The fed cattle prices went up compared to the model estimates. However, the quantities changed very little. Note that the price went by a little so we expect the same change in the quantities.  -->
 
 
-Just note that cattle cycles play important role too. The observed data (especially stocks), follows the expansion and contraction of the stocks so our model does the same.
+<!-- \begin{table}[!ht] -->
+<!-- \begin{center} -->
+<!-- \caption{Percentage change in price of cull cows} -->
+<!-- \begin{tabular}{lll} -->
+<!-- \hline -->
+<!-- Year & percentChange\_pc\_obs & percentChange\_pc\_model \\ \hline -->
+<!--  2010   &         -22.305687    &             3.535708 \\ -->
+<!--  2011   &         -22.916642    &            2.729425 \\ -->
+<!--  2012   &         -11.560880    &            2.094137 \\ -->
+<!--  2013   &          -1.322547    &            1.829043 \\ -->
+<!--  2014   &         -23.717126    &            1.767165 \\ -->
+<!--  2015   &           1.929532    &            1.353151 \\ -->
+<!--  2016   &          37.000319    &            1.363775 \\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{center} -->
+<!-- \end{table} -->
+
+<!-- \begin{table}[!ht] -->
+<!-- \begin{center} -->
+<!-- \caption{Percentage change in quantity of cull cows} -->
+<!-- \begin{tabular}{lll} -->
+<!-- \hline -->
+<!-- Year & percentChange\_cl\_obs & percentChange\_cl\_model \\ \hline -->
+<!--  2010   &        -0.5767056     &     1.130325e-05 \\ -->
+<!--  2011   &         9.1561672     &      8.016228e-06 \\ -->
+<!--  2012   &         8.1515734     &      1.013729e-05 \\ -->
+<!--  2013   &        -8.3312239     &      1.063030e-05 \\ -->
+<!--  2014   &        14.6568011     &     -1.535018e-05 \\ -->
+<!--  2015   &        12.9117106     &      1.151384e-05 \\ -->
+<!--  2016   &        11.5011345     &      9.786865e-06 \\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{center} -->
+<!-- \end{table} -->
+
+<!-- Although prices fell for cull cows (compared to observed prices), the quantities remained almost same. However the prices went up when compared to the model estimates and the quantities remained same or fell by a little.  -->
 
 
-\begin{table}[!ht]
-\begin{center}
-\caption{Aggregate producer surplus}
-\begin{tabular}{lll}
-\hline
-Year & diffRevCost\_t\_obs & diffRevCost\_t\_model \\ \hline
- 2010   &     -2.1681188    &      -0.1577323 \\
- 2011   &     -4.4930972    &      -0.1707075 \\
- 2012   &     -2.1005092    &      -0.1675756 \\
- 2013   &     -0.4705478    &      -0.1437623 \\
- 2014   &     -6.9141243    &      -0.1545304 \\
- 2015   &      1.8134526    &      -0.1474051 \\
- 2016   &      7.5518716    &      -0.1561541 \\\hline
-\end{tabular}
-\end{center}
-\end{table}
+<!-- Just note that cattle cycles play important role too. The observed data (especially stocks), follows the expansion and contraction of the stocks so our model does the same. -->
 
-The aggregate producer surplus is negative for the first 5 years and then positive when we compare it to the observed data. However it is negative all the way when compared to the model.
+
+<!-- \begin{table}[!ht] -->
+<!-- \begin{center} -->
+<!-- \caption{Aggregate producer surplus} -->
+<!-- \begin{tabular}{lll} -->
+<!-- \hline -->
+<!-- Year & diffRevCost\_t\_obs & diffRevCost\_t\_model \\ \hline -->
+<!--  2010   &     -2.1681188    &      -0.1577323 \\ -->
+<!--  2011   &     -4.4930972    &      -0.1707075 \\ -->
+<!--  2012   &     -2.1005092    &      -0.1675756 \\ -->
+<!--  2013   &     -0.4705478    &      -0.1437623 \\ -->
+<!--  2014   &     -6.9141243    &      -0.1545304 \\ -->
+<!--  2015   &      1.8134526    &      -0.1474051 \\ -->
+<!--  2016   &      7.5518716    &      -0.1561541 \\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{center} -->
+<!-- \end{table} -->
+
+<!-- The aggregate producer surplus is negative for the first 5 years and then positive when we compare it to the observed data. However it is negative all the way when compared to the model. -->
 
 
 # Changes with observed prices and quantities until 2009 and then model estimates from 2010
@@ -115,11 +115,11 @@ I estimate the price and quantities with the additional costs to the model estim
 \begin{tabular}{lll}
 \hline
 Year & percentChange\_ps\_obs & percentChange\_ps\_model \\ \hline
- 2010   &        -10.603034    &        -2.74938210 \\
- 2011   &        -15.509197    &         -0.08094854 \\
- 2012   &         -3.289823    &          0.49665633 \\
- 2013   &         -1.321448    &         -0.93471286 \\
- 2014   &        -16.989992    &         -0.02911836 \\\hline
+ 2010   &            -2.058      &            6.547\\
+ 2011    &          -12.339      &            3.668\\
+2012      &         -1.357        &          2.506\\
+2013       &         3.168         &         3.573\\
+ 2014       &       -14.713         &         2.713\\\hline
 \end{tabular}
 \end{center}
 \end{table}
@@ -130,18 +130,20 @@ Year & percentChange\_ps\_obs & percentChange\_ps\_model \\ \hline
 \begin{tabular}{lll}
 \hline
 Year & percentChange\_sl\_obs & percentChange\_sl\_model \\ \hline
- 2010   &         11.741485     &         11.172856 \\
- 2011   &          4.600009     &          4.239627 \\
- 2012   &         -0.277849     &          2.531961 \\
- 2013   &          7.310272     &          6.992075 \\
- 2014   &          1.570732     &          4.177534 \\\hline
+ 2010 &              3.5945   &              3.0673 \\
+ 2011 &              1.5390   &              1.1891\\
+ 2012 &             -2.0401   &              0.7200\\
+ 2013 &              2.2449   &              1.9418\\
+ 2014 &             -1.3540   &              1.1778 \\\hline
 \end{tabular}
 \end{center}
 \end{table}
 
-The fed cattle price fell compared to observed, this is reflected in the quantities. The quantities went up. The fed cattle prices fell compared to the model estimates. Again, the quantities went up reflecting the fall in prices.
 
-\newpage
+
+
+<!-- The fed cattle price fell compared to observed, this is reflected in the quantities. The quantities went up. The fed cattle prices fell compared to the model estimates. Again, the quantities went up reflecting the fall in prices. -->
+
 
 \begin{table}[!ht]
 \begin{center}
@@ -149,14 +151,17 @@ The fed cattle price fell compared to observed, this is reflected in the quantit
 \begin{tabular}{lll}
 \hline
 Year & percentChange\_pc\_obs & percentChange\_pc\_model \\ \hline
- 2010   &         -14.62216       &      13.774801 \\
- 2011   &         -20.53594       &        5.902204 \\
- 2012   &         -10.45579       &        3.369853 \\
- 2013   &           2.05221       &        5.311585 \\
- 2014   &         -22.29011       &        3.670906 \\\hline
+ 2010   &           -28.411       &          -4.600 \\
+ 2011   &           -24.199        &          1.021\\
+ 2012    &          -11.938         &         1.659\\
+ 2013     &          -3.749          &       -0.674\\
+ 2014      &        -24.573           &       0.625 \\\hline
 \end{tabular}
 \end{center}
 \end{table}
+
+
+
 
 \begin{table}[!ht]
 \begin{center}
@@ -164,16 +169,16 @@ Year & percentChange\_pc\_obs & percentChange\_pc\_model \\ \hline
 \begin{tabular}{lll}
 \hline
 Year & percentChange\_cl\_obs & percentChange\_cl\_model \\ \hline
- 2010     &       10.454190      &        11.094893 \\
- 2011     &       13.807654      &          4.261322 \\
- 2012     &       11.214696      &          2.832260 \\
- 2013     &       -1.974307      &          6.934670 \\
- 2014     &       19.723108      &          4.418655 \\\hline
+ 2010 &             23.2497      &          23.9647\\
+ 2011 &             18.8652     &            8.8946\\
+ 2012 &             13.5344     &            4.9771\\
+ 2013 &              5.3688     &           14.9451\\
+ 2014 &             24.3446     &            8.4494 \\\hline
 \end{tabular}
 \end{center}
 \end{table}
 
-The cull cow prices fell compared to the observed. This is reflected in the quantities for the cull cows. However, the prices and quantities of cull cows went up compared to the model estimates. This is a strange phenomena.
+<!-- The cull cow prices fell compared to the observed. This is reflected in the quantities for the cull cows. However, the prices and quantities of cull cows went up compared to the model estimates. This is a strange phenomena. -->
 
 
 \begin{table}[!ht]
@@ -182,19 +187,16 @@ The cull cow prices fell compared to the observed. This is reflected in the quan
 \begin{tabular}{lll}
 \hline
 Year & diffRevCost\_t\_obs & diffRevCost\_t\_model \\ \hline
- 2010    &    -0.3326094       &     1.6777770 \\
- 2011    &    -3.6351486       &    0.6872411 \\
- 2012    &    -1.4358652       &    0.4970684 \\
- 2013    &     1.4075129       &    1.7342984 \\
- 2014    &    -5.7498617       &    1.0097323 \\\hline
+ 2010   &        -0.6205      &        1.3899 \\
+ 2011   &        -3.8432      &        0.4694\\
+ 2012   &        -1.7107      &        0.2171\\
+ 2013   &         0.7793      &        1.1148\\
+ 2014   &        -6.1877      &        0.5618 \\\hline
 \end{tabular}
 \end{center}
 \end{table}
 
-The aggregate producer surplus fell when compared to the observed data. It went up when compared with the model estimates.
-
-
-
+<!-- The aggregate producer surplus fell when compared to the observed data. It went up when compared with the model estimates. -->
 
 
 
