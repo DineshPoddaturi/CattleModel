@@ -7,13 +7,6 @@ require(BB)
 require(Metrics)
 require(pracma)
 
-
-
-
-
-
-
-
 # Parameters
 beta <- 0.98
 delta <- 0.95
@@ -23,9 +16,6 @@ gamma1 <- 0.95
 
 g <- 0.97
 phi <- 0.63
-
-
-
 
 
 ############# Cattle totals (these are numbers of total cattle in any year not age dist.) in 1000 head##########
@@ -733,11 +723,11 @@ predict_df <- cbind(Stock_temp$Year, Stock_temp$k9  ,Stock_temp$k8, Stock_temp$k
 names(predict_df) <- c("Year", "k9", "k8", "k7", "k6", "k5", "k4", "k3" ,"ps", "pc", "hc", 
                        "dressedWeightCL","dressedWeightSL", "sl", "cl", "Dissappear", "Imports", "Exports")
 
-k6_t <- predict_df %>% select(Year, k6)
-k7_t <- predict_df %>% select(Year, k7)
-k8_t <- predict_df %>% select(Year, k8)
-dressed_t <- predict_df %>% select(Year, dressedWeight)
-pricesCosts_t <- prices_costs %>% filter(Year>=1995)
+# k6_t <- predict_df %>% select(Year, k6)
+# k7_t <- predict_df %>% select(Year, k7)
+# k8_t <- predict_df %>% select(Year, k8)
+# dressed_t <- predict_df %>% select(Year, dressedWeight)
+# pricesCosts_t <- prices_costs %>% filter(Year>=1995)
 
 demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 
@@ -818,15 +808,6 @@ for(i in 1:nrow(predict_df)){
     parameters$mu_tilde[i] <- params_t1[1]
     parameters$s_tilde[i] <- params_t1[2]
     
-    # share_t1 <- (exp((params_t1[1] - ((ps_t - pc_t)/phi))/ (params_t1[2])))
-    # 
-    # demand_t1_hat <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
-    # 
-    # sl_t1_hat <- (demand_t1_hat * ((share_t1)/(1 + share_t1))) * adj
-    # cl_t1_hat <- (demand_t1_hat * 1/(1+share_t1)) * adj
-    
-    
-    
     
     p <- c(ps_t, pc_t, hc_t)
     A <- demand_t1_hat
@@ -839,6 +820,18 @@ for(i in 1:nrow(predict_df)){
     ps_hat_t1 <- est_bb[1]
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
+    
+    
+    
+    # share_t1 <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1)/phi))/ (params_t1[2])))
+    # 
+    # # demand_t1_hat <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_t/1000000000) * (1 + share_t1)
+    # 
+    # sl_t1_hat <- (demand_t1_hat * ((share_t1)/(1 + share_t1))) * adj
+    # cl_t1_hat <- (demand_t1_hat * 1/(1+share_t1)) * adj
+    # demand_t1_hat <- sl_t1_hat + cl_t1_hat
+    
+    
     
     prices_predict$ps_hat[i] <- ps_hat_t1
     prices_predict$pc_hat[i] <- pc_hat_t1
@@ -1017,10 +1010,9 @@ for(i in 1:(nrow(predict_df)-2)){
     
     # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
     # 
-    # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
-    # 
     # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
     # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+    # demand_t1_hat <- sl_t1_hat + cl_t1_hat
     
     
     prices_predict$ps_hat[i] <- ps_hat_t1
@@ -1205,7 +1197,7 @@ predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$
                     totalDisappearedNew %>% filter(Year>=1994 & Year<=2017) %>% select(total_meat_bill)) %>% as.data.frame()
 names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
 
-
+predict_df <- predict_df %>% filter(Year > 2008)
 demand_predict_co4<- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 
 # demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
@@ -1213,6 +1205,9 @@ demand_predict_co4<- data.frame(Year = predict_df$Year+1, demand_est = numeric(n
 prices_predict_co4 <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
 parameters_co4 <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+adj_co4 <- data.frame(Year = predict_df$Year + 1, adj = numeric(nrow(predict_df)), adj_2009 = numeric(nrow(predict_df)))
+shares_co4 <- data.frame(Year = predict_df$Year + 1, shares = numeric(nrow(predict_df)), shares_2009 = numeric(nrow(predict_df)))
+
 
 for(i in 1:(nrow(predict_df)-2)){
   
@@ -1239,6 +1234,7 @@ for(i in 1:(nrow(predict_df)-2)){
   cl <- predict_df$cl[i]
   demand <- predict_df$Dissappear[i]
   adj <- demand/(sl+cl)
+  adj_co4$adj[i] <- adj
   
   
   imports_t <- predict_df$imports[i]
@@ -1246,6 +1242,7 @@ for(i in 1:(nrow(predict_df)-2)){
   
   
   slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  shares_co4$shares[i] <- slShare_t
   
   demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
   
@@ -1256,7 +1253,7 @@ for(i in 1:(nrow(predict_df)-2)){
   parameters_co4$mu_tilde[i] <- params_t1[1]
   parameters_co4$s_tilde[i] <- params_t1[2]
   
-  # adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
+  
   
   p <- c(ps_t, pc_t, hc_t)
   sl <- sl_t1_hat
@@ -1270,14 +1267,16 @@ for(i in 1:(nrow(predict_df)-2)){
   pc_hat_t1 <- est_bb[2]
   hc_hat_t1 <- est_bb[3]
   
-  # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  # 
-  # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
-  # 
-  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj1
-  # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj1
+  adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
+  adj_co4$adj_2009[i] <- adj1
   
-  
+  slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  shares_co4$shares_2009[i] <- slShare_t
+
+ 
+  demand_t1_hat <- (sl_t1_hat + cl_t1_hat) * (adj1)
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) 
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t))
   
   
   prices_predict_co4$ps_hat[i] <- ps_hat_t1
@@ -1354,7 +1353,8 @@ holdingCosts_plot_co4 <- prices_predict_co4_merge111 %>% ggplot(aes(x=Year))+geo
 
 demand_predict_co4_merge111 <- demand_predict_co4_merge %>% select(Year, Demand_est, Demand_hat, sl_est, sl_hat, cl_est, cl_hat) %>% filter(Year>2009)
 
-demand_predict_co4_merge111 <- left_join(demand_predict_co4_merge %>% select(Year, Demand , sl, cl), demand_predict_co4_merge111)
+demand_predict_co4_merge111 <- left_join(demand_predict_co4_merge %>% select(Year, Demand , sl, cl), demand_predict_co4_merge111
+                                         ) %>% select(Year, Demand, Demand_est, Demand_hat, sl, sl_est, sl_hat, cl, cl_est, cl_hat)
 
 stock_slaughter_co4 <- demand_predict_co4_merge111 %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
   geom_point(aes(y=sl_est,color="Model estimate")) + geom_line(aes(y=sl_hat, color="Estimate with added costs")) + 
@@ -1538,7 +1538,7 @@ revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = totalRev
 # cost_price_addedCosts_obs_1_ps_pc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc)
 # cost_price_addedCosts_obs_1_hc <- cost_price_addedCosts_obs_r %>% select(Year, hc) %>% filter(Year<=2009)
 # 
-# ccc_1 <- ccc %>% mutate(Year = Year - 1 ,hc = hc_hat) %>% select(Year, hc) %>% filter(Year>2009)
+# ccc_1 <- ccc %>% mutate(Year = Year,hc = hc_hat) %>% select(Year, hc) %>% filter(Year>2009)
 # cost_price_addedCosts_obs_1_hc <- rbind(cost_price_addedCosts_obs_1_hc, ccc_1)
 # 
 # cost_price_addedCosts_obs_1 <- merge(cost_price_addedCosts_obs_1_ps_pc, cost_price_addedCosts_obs_1_hc)
@@ -1562,19 +1562,19 @@ revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = totalRev
 
 #### Case 3:
 cost_price_addedCosts_obs_1_ps_pc_hc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc, hc) %>% filter(Year<=2009)
-ccc_1 <- ccc %>% mutate(Year = Year, ps = ps_hat, pc = pc_hat, hc = hc_hat) %>% select(Year, ps, pc, hc) %>% filter(Year>2009)
+ccc_1 <- ccc %>% mutate(Year = Year - 1, ps = ps_hat, pc = pc_hat, hc = hc_hat) %>% select(Year, ps, pc, hc) %>% filter(Year>2009)
 cost_price_addedCosts_obs_1 <- rbind(cost_price_addedCosts_obs_1_ps_pc_hc, ccc_1)
 
 supp_sl_1 <- supp_sl %>% filter(Year<=2009) %>% mutate(sl = Bill_meatLb_sl) %>% select(Year, sl)
-sl_1 <- demand_predict_est %>% mutate(Year = Year, sl = sl_est) %>% select(Year, sl) %>% filter(Year>2009)
+sl_1 <- demand_predict_est %>% mutate(Year = Year - 1, sl = sl_est) %>% select(Year, sl) %>% filter(Year>2009)
 supp_sl_1 <- rbind(supp_sl_1, sl_1)
 
 supp_cl_1 <- supp_cl %>% filter(Year<=2009) %>% mutate(cl = Bill_meatLb_cl) %>% select(Year, cl)
-cl_1 <- demand_predict_est %>% mutate(Year = Year, cl = cl_est) %>% select(Year, cl) %>% filter(Year>2009)
+cl_1 <- demand_predict_est %>% mutate(Year = Year - 1, cl = cl_est) %>% select(Year, cl) %>% filter(Year>2009)
 supp_cl_1 <- rbind(supp_cl_1, cl_1)
 
 totalDisappearedNew_1 <- totalDisappearedNew %>% filter(Year >= min(supp_sl_1$Year) & Year<=2009) %>% mutate(Demand = total_meat_bill) %>% select(Year, Demand)
-disappear_1 <- demand_predict_est %>% mutate(Year = Year, Demand = Demand_est) %>% select(Year, Demand) %>% filter(Year>2009)
+disappear_1 <- demand_predict_est %>% mutate(Year = Year - 1, Demand = Demand_est) %>% select(Year, Demand) %>% filter(Year>2009)
 totalDisappearedNew_1 <- rbind(totalDisappearedNew_1,disappear_1)
 
 cost_price_addedCosts_obs_1 <- cost_price_addedCosts_obs_1 %>% filter(Year >= min(supp_sl_1$Year))
@@ -1592,15 +1592,15 @@ names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight",
 
 predict_df <- predict_df %>% filter(Year > 2008)
 
-demand_predict_co4_1<- data.frame(Year = predict_df$Year, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+demand_predict_co4_1<- data.frame(Year = predict_df$Year + 1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 
 # demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 
-prices_predict_co4_1 <- data.frame(Year = predict_df$Year, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+prices_predict_co4_1 <- data.frame(Year = predict_df$Year + 1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
 parameters_co4_1 <- data.frame(Year = predict_df$Year, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
-adj_co4_1 <- data.frame(Year = predict_df$Year, adj = numeric(nrow(predict_df)))
-shares_co4_1 <- data.frame(Year = predict_df$Year, shares = numeric(nrow(predict_df)), shares_2009 = numeric(nrow(predict_df)))
+adj_co4_1 <- data.frame(Year = predict_df$Year + 1, adj = numeric(nrow(predict_df)))
+shares_co4_1 <- data.frame(Year = predict_df$Year + 1, shares = numeric(nrow(predict_df)), shares_2009 = numeric(nrow(predict_df)))
 
 for(i in 1:(nrow(predict_df) - 2)){
   
@@ -1642,9 +1642,9 @@ for(i in 1:(nrow(predict_df) - 2)){
   
   
   slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  shares_co4_1$shares[i] <- slShare_t
   
-  
-  if(year_t==2009){
+  if(year_t<=2009){
     shares_co4_1$shares[i] <- slShare_t
     demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
     sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
@@ -1676,12 +1676,12 @@ for(i in 1:(nrow(predict_df) - 2)){
   
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  
+  shares_co4_1$shares_2009[i] <- slShare_t
   if(year_t <= 2009){
     
     shares_co4_1$shares_2009[i] <- slShare_t
-    sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) 
-    cl_t1_hat <- demand_t1_hat * 1/(1+slShare_t) 
+    sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
+    cl_t1_hat <- demand_t1_hat * 1/(1+slShare_t) * adj
     demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
     
   }else{
