@@ -258,9 +258,6 @@ totalSupply <- (supp_sl %>% select(Bill_meatLb_sl)) + (supp_cl %>% select(Bill_m
 names(totalSupply) <- "TotalSupply"
 totalSupply <- totalSupply %>% mutate(Year = supp_cl$Year) %>% select(Year,everything())
 
-
-
-
 totalDisappearedNew <- totalDisappeared %>% filter(Year<2018) %>% select(Year, total_meat_bill)
 
 supp_diss <- merge(totalDisappearedNew,totalSupply)
@@ -1128,7 +1125,7 @@ costs_sl_2years <- costs_sl %>% mutate(costs_2years = Slaughter * taggingCosts *
   select(Year, Slaughter, costs_2years, cost_Lb_2years)
 
 
-# Now think about how to include these costs on the model. 
+# Now think about how to include these costs in the model. 
 costs_sl_cl <- merge(costs_cl_9years, costs_sl_2years) %>% select(Year, cost_Lb_9years, cost_Lb_2years) %>% 
   mutate(cost_both = cost_Lb_9years + cost_Lb_2years)
 
@@ -1267,16 +1264,16 @@ for(i in 1:(nrow(predict_df)-2)){
   pc_hat_t1 <- est_bb[2]
   hc_hat_t1 <- est_bb[3]
   
-  adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
-  adj_co4$adj_2009[i] <- adj1
+  # adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
+  # adj_co4$adj_2009[i] <- adj1
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
   shares_co4$shares_2009[i] <- slShare_t
 
- 
-  demand_t1_hat <- (sl_t1_hat + cl_t1_hat) * (adj1)
-  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) 
-  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t))
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
+  
   
   
   prices_predict_co4$ps_hat[i] <- ps_hat_t1
@@ -1299,13 +1296,20 @@ demand_predict_co4 <- demand_predict_co4 %>% filter(demand_est>0) %>% mutate(Dem
                                                                                                          sl_hat, cl_hat)
 
 
-prices_predict_co4_merge <- merge(prices_predict_co4, merge(prices_predict_est, prices_costs_obs))%>% 
+# prices_predict_co4_merge <- merge(prices_predict_co4, merge(prices_predict_est, prices_costs_obs))%>% 
+#   mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, 
+#          ps_est = ps_est * 100, pc_est = pc_est * 100, hc_est = hc_est * 100,
+#          ps = ps * 100, pc = pc * 100, hc = hc * 100) %>% select(Year, ps, ps_est, ps_hat, pc, pc_est, pc_hat ,hc, hc_est, hc_hat)
+# 
+# demand_predict_co4_merge <- merge(demand_predict_co4, merge(demand_predict_est, demand_obs)) %>% 
+#   select(Year, Demand, Demand_est, Demand_hat, sl, sl_est, sl_hat, cl, cl_est, cl_hat)
+
+prices_predict_co4_merge <- left_join(merge(prices_predict_est,prices_costs_obs), prices_predict_co4) %>% 
   mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, 
          ps_est = ps_est * 100, pc_est = pc_est * 100, hc_est = hc_est * 100,
-         ps = ps * 100, pc = pc * 100, hc = hc * 100) %>% select(Year, ps, ps_est, ps_hat, pc, pc_est, pc_hat ,hc, hc_est, hc_hat)
-
-demand_predict_co4_merge <- merge(demand_predict_co4, merge(demand_predict_est, demand_obs)) %>% 
-  select(Year, Demand, Demand_est, Demand_hat, sl, sl_est, sl_hat, cl, cl_est, cl_hat)
+         ps = ps * 100, pc = pc * 100, hc = hc * 100,) %>% select(Year, ps, ps_est, ps_hat, pc, pc_est, pc_hat, hc, hc_est, hc_hat) %>% filter(Year<=prices_predict_co4_1$Year[nrow(prices_predict_co4_1)])
+demand_predict_co4_merge <- left_join(merge(demand_predict_est,demand_obs), demand_predict_co4) %>%
+  select(Year, Demand, Demand_est, Demand_hat, sl, sl_est, sl_hat, cl, cl_est, cl_hat) %>% filter(Year<=prices_predict_co4_1$Year[nrow(prices_predict_co4_1)])
 
 # prices_predict_co4_merge1 <- merge(prices_predict_co4, prices_costs_obs) %>% 
 #   mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, ps = ps * 100, pc = pc * 100, hc = hc * 100) %>%
@@ -1677,11 +1681,12 @@ for(i in 1:(nrow(predict_df) - 2)){
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
   shares_co4_1$shares_2009[i] <- slShare_t
+  
   if(year_t <= 2009){
     
     shares_co4_1$shares_2009[i] <- slShare_t
     sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
-    cl_t1_hat <- demand_t1_hat * 1/(1+slShare_t) * adj
+    cl_t1_hat <- demand_t1_hat * 1/(1+slShare_t)  * adj
     demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
     
   }else{

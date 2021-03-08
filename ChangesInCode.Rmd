@@ -477,7 +477,7 @@ demand_predict_co4_1
 ```
 
 
-# 3: We use the model estimates (only for fed cattle price, cull cow price, holding costs with added costs from 2010 onwards), original (fquantities) to estimate the changes with added costs
+# 3: We use the model estimates (only for fed cattle price, cull cow price, holding costs with added costs from 2010 onwards), original (quantities) to estimate the changes with added costs
 ```{r echo=FALSE}
 
 cost_price_addedCosts_obs_1_ps_pc_hc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc, hc) %>% filter(Year<=2009)
@@ -620,3 +620,7 @@ for(i in 1:(nrow(predict_df) - 2)){
 prices_predict_co4_1
 demand_predict_co4_1
 ```
+
+
+
+
