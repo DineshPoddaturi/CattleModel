@@ -173,6 +173,253 @@ for(i in 1:(nrow(predict_df) - 2)){
 prices_predict_co4_1
 demand_predict_co4_1
 ```
+percentChange_price_1_ps
+  Year percentChange_ps_obs percentChange_ps_model
+1 2010               -2.058                  6.547
+2 2011              -12.339                  3.668
+3 2012               -1.357                  2.506
+4 2013                3.168                  3.573
+5 2014              -14.713                  2.713
+
+percentChange_sl_1
+  Year percentChange_sl_obs percentChange_sl_model
+1 2010              -1.7489                -2.2489
+2 2011              -0.5474                -0.8900
+3 2012              -3.2572                -0.5314
+4 2013              -1.1524                -1.4455
+5 2014              -3.3520                -0.8716
+
+percentChange_price_1_pc
+  Year percentChange_pc_obs percentChange_pc_model
+1 2010              -28.411                 -4.600
+2 2011              -24.199                  1.021
+3 2012              -11.938                  1.659
+4 2013               -3.749                 -0.674
+5 2014              -24.573                  0.625
+
+percentChange_cl_1
+  Year percentChange_cl_obs percentChange_cl_model
+1 2010              16.8925                17.5705
+2 2011              16.4228                 6.6571
+3 2012              12.1238                 3.6728
+4 2013               1.8676                11.1258
+5 2014              21.8260                 6.2527
+
+revDiff_costs_t_1_pSurp
+  Year diffRevCost_t_obs diffRevCost_t_model
+1 2010           -1.8032              0.2071
+2 2011           -4.3611             -0.0485
+3 2012           -2.0766             -0.1489
+4 2013           -0.2600              0.0755
+5 2014           -6.8125             -0.0631
+
+```{r}
+cost_price_addedCosts_obs_1_ps_pc_hc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc, hc) %>% filter(Year<=2009)
+ccc_1 <- ccc %>% mutate(Year = Year, ps = ps_hat, pc = pc_hat, hc = hc_hat) %>% select(Year, ps, pc, hc) %>% filter(Year>2009)
+cost_price_addedCosts_obs_1 <- rbind(cost_price_addedCosts_obs_1_ps_pc_hc, ccc_1)
+
+supp_sl_1 <- supp_sl %>% filter(Year<=2009) %>% mutate(sl = Bill_meatLb_sl) %>% select(Year, sl)
+sl_1 <- demand_predict_est %>% mutate(Year = Year, sl = sl_est) %>% select(Year, sl) %>% filter(Year>2009)
+supp_sl_1 <- rbind(supp_sl_1, sl_1)
+
+supp_cl_1 <- supp_cl %>% filter(Year<=2009) %>% mutate(cl = Bill_meatLb_cl) %>% select(Year, cl)
+cl_1 <- demand_predict_est %>% mutate(Year = Year, cl = cl_est) %>% select(Year, cl) %>% filter(Year>2009)
+supp_cl_1 <- rbind(supp_cl_1, cl_1)
+
+totalDisappearedNew_1 <- totalDisappearedNew %>% filter(Year >= min(supp_sl_1$Year) & Year<=2009) %>% mutate(Demand = total_meat_bill) %>% select(Year, Demand)
+disappear_1 <- demand_predict_est %>% mutate(Year = Year, Demand = Demand_est) %>% select(Year, Demand) %>% filter(Year>2009)
+totalDisappearedNew_1 <- rbind(totalDisappearedNew_1,disappear_1)
+
+cost_price_addedCosts_obs_1 <- cost_price_addedCosts_obs_1 %>% filter(Year >= min(supp_sl_1$Year))
+
+Stock_temp <- Stock %>% filter(Year>=min(supp_sl_1$Year) & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
+imports_temp <- imports %>% filter(Year>=min(supp_sl_1$Year) & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
+exports_temp <- exports %>% filter(Year>=min(supp_sl_1$Year) & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])
+
+predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$Imports, exports_temp$Exports,
+                    dressedWeights_sl_cl %>% filter(Year>=min(supp_sl_1$Year)  & Year<=cost_price_addedCosts_obs_1$Year[nrow(cost_price_addedCosts_obs_1)])%>% select(Slaughter_avg),
+                    cost_price_addedCosts_obs_1 %>% select(ps), cost_price_addedCosts_obs_1 %>% select(pc),
+                    cost_price_addedCosts_obs_1 %>% select(hc), supp_sl_1 %>% select(sl), supp_cl_1 %>% select(cl),
+                    totalDisappearedNew_1 %>% select(Demand)) %>% as.data.frame()
+names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
+
+predict_df <- predict_df %>% filter(Year > 2008)
+
+demand_predict_co4_1<- data.frame(Year = predict_df$Year, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+
+# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
+
+prices_predict_co4_1 <- data.frame(Year = predict_df$Year, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+
+parameters_co4_1 <- data.frame(Year = predict_df$Year, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+adj_co4_1 <- data.frame(Year = predict_df$Year, adj = numeric(nrow(predict_df)))
+shares_co4_1 <- data.frame(Year = predict_df$Year, shares = numeric(nrow(predict_df)), shares_2009 = numeric(nrow(predict_df)))
+
+# for(i in 1:(nrow(predict_df) - 2)){
+for(i in 1:(nrow(predict_df))){ 
+  # i <- 8
+  K_t <- predict_df$K[i]
+  k3_t2 <- predict_df$k3[i+2]
+  k3_t2
+  # imports_t <- predict_df$imports[i]
+  
+  if(i<=1){
+    ps_t <- predict_df$ps[i]
+    pc_t <- predict_df$pc[i]
+    hc_t <- predict_df$hc[i]
+    sl <- predict_df$sl[i]
+    cl <- predict_df$cl[i]
+    demand <- predict_df$Dissappear[i]
+    # adj <- demand/(sl+cl)
+  }
+  
+  year_t <- predict_df$Year[i]
+  ps_t <- predict_df$ps[i]
+  pc_t <- predict_df$pc[i]
+  hc_t <- predict_df$hc[i]
+  dressed_t <- predict_df$dressedWeight[i]
+  sl <- predict_df$sl[i]
+  cl <- predict_df$cl[i]
+  demand <- predict_df$Dissappear[i]
+  adj <- demand/(sl+cl)
+  
+  if(adj>1){
+    adj <- 1/adj
+  }
+  
+  
+  adj_co4_1$adj[i] <- adj
+  
+  
+  imports_t <- predict_df$imports[i]
+  exports_t <- predict_df$exports[i]
+  
+  
+  slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
+  shares_co4_1$shares[i] <- slShare_t
+  
+  if(year_t<=2009){
+    shares_co4_1$shares[i] <- slShare_t
+    demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+    sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+    cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  }else{
+    demand_t1_hat <- demand
+    sl_t1_hat <- sl
+    cl_t1_hat <- cl
+  }
+  
+  
+  
+  params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
+  parameters_co4_1$mu_tilde[i] <- params_t1[1]
+  parameters_co4_1$s_tilde[i] <- params_t1[2]
+  
+  
+  p <- c(ps_t, pc_t, hc_t)
+  sl <- sl_t1_hat
+  cl <- cl_t1_hat
+  A <- demand_t1_hat
+  mu_Tilde <- params_t1[1]
+  s_Tilde <- params_t1[2]
+  
+  est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
+  ps_hat_t1 <- est_bb[1]
+  pc_hat_t1 <- est_bb[2]
+  hc_hat_t1 <- est_bb[3]
+  
+  
+  slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  shares_co4_1$shares_2009[i] <- slShare_t
+  
+  if(year_t <= 2009){
+    
+    shares_co4_1$shares_2009[i] <- slShare_t
+    sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
+    cl_t1_hat <- demand_t1_hat * 1/(1+slShare_t)  * adj
+    demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
+    
+  }else{
+    shares_co4_1$shares_2009[i] <- slShare_t
+
+    sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
+    cl_t1_hat <- demand_t1_hat * 1/(1+slShare_t) * adj
+    demand_t1_hat <- sl_t1_hat + cl_t1_hat
+  }
+  
+  # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  # 
+  # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
+  # 
+  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  
+  prices_predict_co4_1$ps_hat[i] <- ps_hat_t1
+  prices_predict_co4_1$pc_hat[i] <- pc_hat_t1
+  prices_predict_co4_1$hc_hat[i] <- hc_hat_t1
+  demand_predict_co4_1$demand_est[i] <- demand_t1_hat
+  demand_predict_co4_1$sl_est[i] <- sl_t1_hat
+  demand_predict_co4_1$cl_est[i] <- cl_t1_hat
+  
+  
+  # adj <- demand_t1_hat/ (sl_t1_hat + cl_t1_hat)
+  # print(adj)
+  
+}
+prices_predict_co4_1
+demand_predict_co4_1
+```
+percentChange_price_1_ps
+  Year percentChange_ps_obs percentChange_ps_model
+1 2010               -2.058                  6.547
+2 2011              -12.339                  3.668
+3 2012               -1.357                  2.506
+4 2013                3.168                  3.573
+5 2014              -14.713                  2.713
+6 2015                9.744                  3.476
+7 2016               29.665                  3.266
+
+percentChange_sl_1
+  Year percentChange_sl_obs percentChange_sl_model
+1 2010              -1.7489                -2.2489
+2 2011              -0.5474                -0.8900
+3 2012              -3.2572                -0.5314
+4 2013              -1.1524                -1.4455
+5 2014              -3.3520                -0.8716
+6 2015              -3.0643                -2.2832
+7 2016              -0.6603                -1.8949
+
+percentChange_price_1_pc
+  Year percentChange_pc_obs percentChange_pc_model
+1 2010              -28.411                 -4.600
+2 2011              -24.199                  1.021
+3 2012              -11.938                  1.659
+4 2013               -3.749                 -0.674
+5 2014              -24.573                  0.625
+6 2015               -1.142                 -1.701
+7 2016               33.532                 -1.203
+
+percentChange_cl_1
+  Year percentChange_cl_obs percentChange_cl_model
+1 2010              16.8925                17.5705
+2 2011              16.4228                 6.6571
+3 2012              12.1238                 3.6728
+4 2013               1.8676                11.1258
+5 2014              21.8260                 6.2527
+6 2015              30.5119                15.5875
+7 2016              26.2346                13.2137
+
+revDiff_costs_t_1_pSurp
+  Year diffRevCost_t_obs diffRevCost_t_model
+1 2010           -1.8032              0.2071
+2 2011           -4.3611             -0.0485
+3 2012           -2.0766             -0.1489
+4 2013           -0.2600              0.0755
+5 2014           -6.8125             -0.0631
+6 2015            2.0609              0.0895
+7 2016            7.7899              0.0702
+
+
 
 # 1: We use the model estimates (both prices with added costs and quantities) to estimate the changes with added but with different years in the estimated dataframe
 
@@ -330,6 +577,56 @@ for(i in 1:(nrow(predict_df) - 2)){
 prices_predict_co4_1
 demand_predict_co4_1
 ```
+ percentChange_price_1_ps
+  Year percentChange_ps_obs percentChange_ps_model
+1 2010               -5.913                  2.353
+2 2011              -12.339                  3.668
+3 2012               -1.357                  2.506
+4 2013                3.168                  3.573
+5 2014              -14.713                  2.713
+6 2015                9.744                  3.476
+7 2016               29.665                  3.266
+
+ percentChange_sl_1
+  Year percentChange_sl_obs percentChange_sl_model
+1 2010              -1.7489                -2.2489
+2 2011              -0.5474                -0.8900
+3 2012              -3.2572                -0.5314
+4 2013              -1.1524                -1.4455
+5 2014              -3.3520                -0.8716
+6 2015              -3.0643                -2.2832
+7 2016              -0.6603                -1.8949
+
+percentChange_price_1_pc
+  Year percentChange_pc_obs percentChange_pc_model
+1 2010              -21.130                  5.102
+2 2011              -24.199                  1.021
+3 2012              -11.938                  1.659
+4 2013               -3.749                 -0.674
+5 2014              -24.573                  0.625
+6 2015               -1.142                 -1.701
+7 2016               33.532                 -1.203
+
+percentChange_cl_1
+  Year percentChange_cl_obs percentChange_cl_model
+1 2010              16.8925                17.5705
+2 2011              16.4228                 6.6571
+3 2012              12.1238                 3.6728
+4 2013               1.8676                11.1258
+5 2014              21.8260                 6.2527
+6 2015              30.5119                15.5875
+7 2016              26.2346                13.2137
+
+ revDiff_costs_t_1_pSurp
+  Year diffRevCost_t_obs diffRevCost_t_model
+1 2010           -2.4758             -0.4655
+2 2011           -4.3611             -0.0485
+3 2012           -2.0766             -0.1489
+4 2013           -0.2600              0.0755
+5 2014           -6.8125             -0.0631
+6 2015            2.0609              0.0895
+7 2016            7.7899              0.0702
+
 
 # 2: We use the model estimates (only for holding costs with added costs from 2010 onwards), original (fed cattle price, cull cow price, quantities) to estimate the changes with added costs
 ```{r echo=FALSE}
@@ -476,6 +773,51 @@ prices_predict_co4_1
 demand_predict_co4_1
 ```
 
+percentChange_price_1_ps
+  Year percentChange_ps_obs percentChange_ps_model
+1 2010               -5.913                  2.353
+2 2011              -14.319                  1.326
+3 2012               -3.081                  0.714
+4 2013                0.775                  1.170
+5 2014              -15.896                  1.289
+6 2015                6.274                  0.204
+
+percentChange_sl_1
+  Year percentChange_sl_obs percentChange_sl_model
+1 2010              -1.7489                -2.2489
+2 2011              -0.5474                -0.8900
+3 2012              -3.2572                -0.5313
+4 2013              -1.1524                -1.4455
+5 2014              -3.3521                -0.8716
+6 2015              -3.0646                -2.2834
+
+percentChange_price_1_pc
+  Year percentChange_pc_obs percentChange_pc_model
+1 2010              -21.130                  5.102
+2 2011              -23.129                  2.446
+3 2012              -12.344                  1.190
+4 2013               -1.306                  1.846
+5 2014              -23.516                  2.036
+6 2015                0.879                  0.308
+
+percentChange_cl_1
+  Year percentChange_cl_obs percentChange_cl_model
+1 2010              16.8925                17.5705
+2 2011              16.4228                 6.6571
+3 2012              12.1237                 3.6728
+4 2013               1.8676                11.1257
+5 2014              21.8261                 6.2529
+6 2015              30.5139                15.5893
+
+revDiff_costs_t_1_pSurp
+  Year diffRevCost_t_obs diffRevCost_t_model
+1 2010           -2.4758             -0.4655
+2 2011           -4.8548             -0.5422
+3 2012           -2.5543             -0.6266
+4 2013           -0.8415             -0.5060
+5 2014           -7.1600             -0.4106
+6 2015            1.1181             -0.8533
+
 
 # 3: We use the model estimates (only for fed cattle price, cull cow price, holding costs with added costs from 2010 onwards), original (quantities) to estimate the changes with added costs
 ```{r echo=FALSE}
@@ -620,6 +962,48 @@ for(i in 1:(nrow(predict_df) - 2)){
 prices_predict_co4_1
 demand_predict_co4_1
 ```
+
+percentChange_price_1_ps
+  Year percentChange_ps_obs percentChange_ps_model
+1 2010               -5.913                  2.353
+2 2011              -12.367                  3.635
+3 2012               -1.380                  2.481
+4 2013                3.082                  3.486
+5 2014              -14.763                  2.653
+
+percentChange_sl_1
+  Year percentChange_sl_obs percentChange_sl_model
+1 2010              -1.7489                -2.2489
+2 2011              -0.5368                -0.8795
+3 2012              -3.2533                -0.5273
+4 2013              -1.1249                -1.4181
+5 2014              -3.3418                -0.8611
+
+percentChange_price_1_pc
+  Year percentChange_pc_obs percentChange_pc_model
+1 2010              -21.130                  5.102
+2 2011              -24.151                  1.085
+3 2012              -11.900                  1.702
+4 2013               -3.607                 -0.528
+5 2014              -24.498                  0.725
+
+percentChange_cl_1
+  Year percentChange_cl_obs percentChange_cl_model
+1 2010              16.8925                17.5705
+2 2011              24.6720                14.2143
+3 2012              16.9807                 8.1637
+4 2013              13.3183                23.6171
+5 2014              30.2448                13.5953
+
+revDiff_costs_t_1_pSurp
+  Year diffRevCost_t_obs diffRevCost_t_model
+1 2010           -2.4758             -0.4655
+2 2011           -4.2411              0.0715
+3 2012           -1.9772             -0.0494
+4 2013            0.0065              0.3420
+5 2014           -6.6457              0.1037
+
+
 
 
 

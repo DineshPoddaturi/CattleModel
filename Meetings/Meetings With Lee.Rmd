@@ -47,14 +47,11 @@
 
 03/04/2021:
 
-* Said hello and told him about my concerns of presenting the solved model. He said, I might be overthinking. Show them whatever you have. Since it is ten minutes, show them the important elkements. 
+* Said hello and told him about my concerns of presenting the solved model. He said, I might be overthinking. Show them whatever you have. Since it is ten minutes, show them the important elements. 
 
 * Presenting comparitive statics could be difficult. We cannot keep everything else constant and take some first derivatives. For instance, if I change the fed cattle price, it should reflect in prices, costs, and quantities over the time. Keeping everything else same and changing one thing at a time is not gonna workout.
 
 * Maybe show them how our model is different from the static EDM, and using our model is important for the Beef industry.
-
-
-
 
 
 
