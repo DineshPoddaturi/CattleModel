@@ -1025,7 +1025,8 @@ demandMerge_new <- merge(demand_new, demand_predict) %>% select(Year, Demand, de
 demandMerge_new$Year <- as.numeric(demandMerge_new$Year)
 demand_plot_new <- demandMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=demand_est, color="Estimated"))+geom_point(aes(y=demand_est,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(demandMerge_new$Year[1], demandMerge_new$Year[nrow(demandMerge_new)])))
+  scale_x_continuous(name="Year", breaks=c(seq(demandMerge_new$Year[1], demandMerge_new$Year[nrow(demandMerge_new)])))+
+  theme(legend.position = c(0.7, 0.2))
 
 # ddl <- detrend(as.matrix(demandMerge_new%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2016))) %>% select(Year, everything())
 
@@ -1044,7 +1045,8 @@ pricesMerge_new <- merge(prices_predict,prices_costs) %>% filter(ps_hat>0) %>% s
 
 slaughterPrices_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Observed"))+geom_point(aes(y=ps,color="Observed"))+geom_line(aes(y=ps_hat, color="Estimate"))+geom_point(aes(y=ps_hat,color="Estimate")) + 
   labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)]))) 
+  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)]))) +
+  theme(legend.position = c(0.2, 0.7))
 
 cullPrices_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color="Observed"))+geom_point(aes(y=pc,color="Observed")) + geom_line(aes(y=pc_hat, color="Estimate")) + geom_point(aes(y=pc_hat,color="Estimate")) + 
   labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
