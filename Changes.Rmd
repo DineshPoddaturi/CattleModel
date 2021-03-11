@@ -289,3 +289,93 @@ Year & diffRevCost\_t\_obs & diffRevCost\_t\_model \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
+
+\newpage
+# Changes with observed prices and quantities until 2009 and then model estimates from 2010. Here I am projecting the future prices and quantities with model estimates
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Percentage change in price of fed cattle}
+\begin{tabular}{lll}
+\hline
+Year & percentChange\_ps\_obs & percentChange\_ps\_model \\ \hline
+2010        &       -5.913          &        2.353 \\
+ 2011       &       -18.721         &        -3.879 \\
+ 2012       &       -16.553         &       -13.286 \\
+ 2013       &        -3.894         &        -3.518 \\
+ 2014       &       -15.549         &         1.706 \\
+ 2015       &       -11.858         &       -16.892 \\
+ 2016       &        34.699         &         7.275\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Percentage change in quantity of fed cattle}
+\begin{tabular}{lll}
+\hline
+Year & percentChange\_sl\_obs & percentChange\_sl\_model \\ \hline
+2010               -1.749                 -2.249 \\
+2011               -4.412                 -4.741 \\
+2012               -1.699                  1.071 \\
+2013                2.013                  1.711 \\
+2014               -2.025                  0.490 \\
+2015                4.091                  4.930 \\
+2016               -3.263                 -4.465\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Percentage change in price of cull cows}
+\begin{tabular}{lll}
+\hline
+Year & percentChange\_pc\_obs & percentChange\_pc\_model \\ \hline
+2010      &        -21.130        &         5.102 \\
+2011      &        -45.056        &        -26.776 \\
+2012      &        -33.816        &        -23.597 \\ 
+2013      &        -12.277        &         -9.475 \\
+2014      &        -26.813        &         -2.363 \\
+2015      &        -21.591        &        -22.034 \\
+2016      &         37.425        &          1.678\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Percentage change in quantity of cull cows}
+\begin{tabular}{lll}
+\hline
+Year & percentChange\_cl\_obs & percentChange\_cl\_model \\ \hline
+2010      &         16.893      &          17.571 \\
+2011      &         19.732      &            9.689 \\
+2012      &          8.706      &            0.513 \\
+2013      &          8.207      &           18.041 \\
+2014      &         21.092      &            5.612 \\
+2015      &         20.854      &            7.034 \\
+2016      &         28.701      &           15.426\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Aggregate producer surplus}
+\begin{tabular}{lll}
+\hline
+Year & diffRevCost\_t\_obs & diffRevCost\_t\_model \\ \hline
+2010    &       -2.4758       &      -0.4655 \\
+2011    &       -7.3020       &      -2.9893 \\
+2012    &       -6.4745       &      -4.5468 \\
+2013    &       -1.4112       &      -1.0758 \\
+2014    &       -6.7984       &      -0.0489 \\
+2015    &       -3.2772       &      -5.2486 \\
+2016    &        8.3218       &       0.6021\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+

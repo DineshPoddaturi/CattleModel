@@ -83,8 +83,6 @@ total_Costs <- sum(cost_CowCalf_Tag,cost_CowCalf_NTag, cost_Bckg, cost_Feedlot, 
 
 
 
-
-
 #### Some of my concerns:
 
 How am I going to change the quantities? 

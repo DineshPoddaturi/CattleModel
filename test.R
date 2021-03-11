@@ -928,7 +928,7 @@ adj_factor <- data.frame(Year = predict_df$Year+1, adj = numeric(nrow(predict_df
 
 for(i in 1:(nrow(predict_df)-2)){
     
-    # i <- 3
+    # i <- 2
     K_t <- predict_df$K[i]
     k3_t2 <- predict_df$k3[i+2]
     # imports_t <- predict_df$imports[i]
@@ -1000,7 +1000,8 @@ for(i in 1:(nrow(predict_df)-2)){
     hc_hat_t1 <- est_bb[3]
     
     # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-    # 
+    
+    # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
     # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
     # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
     # demand_t1_hat <- sl_t1_hat + cl_t1_hat
@@ -1025,6 +1026,12 @@ demandMerge_new$Year <- as.numeric(demandMerge_new$Year)
 demand_plot_new <- demandMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=demand_est, color="Estimated"))+geom_point(aes(y=demand_est,color="Estimated")) + 
   labs(x="Year", y="Demand (in bill pounds)", colour = "") + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(demandMerge_new$Year[1], demandMerge_new$Year[nrow(demandMerge_new)])))
+
+# ddl <- detrend(as.matrix(demandMerge_new%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2016))) %>% select(Year, everything())
+
+# ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed"))+geom_point(aes(y=Demand,color="Observed"))+geom_line(aes(y=demand_est, color="Estimated"))+geom_point(aes(y=demand_est,color="Estimated")) + 
+#   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2016))) 
+
 
 
 # prices_costs_tmp <- prices_costs
@@ -1052,7 +1059,6 @@ names(Master_sl_cl) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl[,-1] <- round(Master_sl_cl[,-1],3) 
 Master_sl_cl$Year <- as.numeric(Master_sl_cl$Year)
 
-
 stock_slaughter <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_hat, color="Estimate")) + geom_point(aes(y=sl_hat,color="Estimate")) + 
   labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)]))) 
@@ -1060,6 +1066,13 @@ stock_slaughter <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color
 stock_cull <- Master_sl_cl %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +geom_line(aes(y=cl_hat, color="Estimate")) + geom_point(aes(y=cl_hat,color="Estimate")) + 
   labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl$Year[1],Master_sl_cl$Year[nrow(Master_sl_cl)])))
+
+# ddl <- detrend(as.matrix(Master_sl_cl%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1995,2016))) %>% select(Year, everything())
+# 
+# ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed"))+geom_line(aes(y=sl_hat, color="Estimated"))+geom_point(aes(y=sl_hat,color="Estimated")) + 
+#   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2016)))
+
+
 
 parameters_new <- parameters %>% filter(mu_tilde>0)
 parameter_mu <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=mu_tilde, color="mu_tilde")) + geom_point(aes(y=mu_tilde, color="mu_tilde"))+
@@ -1590,15 +1603,15 @@ names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight",
 
 predict_df <- predict_df %>% filter(Year > 2008)
 
-demand_predict_co4_1<- data.frame(Year = predict_df$Year, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
+demand_predict_co4_1<- data.frame(Year = predict_df$Year + 1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
 
 # demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 
-prices_predict_co4_1 <- data.frame(Year = predict_df$Year, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
+prices_predict_co4_1 <- data.frame(Year = predict_df$Year + 1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
-parameters_co4_1 <- data.frame(Year = predict_df$Year, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
-adj_co4_1 <- data.frame(Year = predict_df$Year, adj = numeric(nrow(predict_df)))
-shares_co4_1 <- data.frame(Year = predict_df$Year, shares = numeric(nrow(predict_df)), shares_2009 = numeric(nrow(predict_df)))
+parameters_co4_1 <- data.frame(Year = predict_df$Year + 1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
+adj_co4_1 <- data.frame(Year = predict_df$Year + 1, adj = numeric(nrow(predict_df)))
+shares_co4_1 <- data.frame(Year = predict_df$Year + 1, shares = numeric(nrow(predict_df)), shares_2009 = numeric(nrow(predict_df)))
 
 # for(i in 1:(nrow(predict_df) - 2)){
 for(i in 1:(nrow(predict_df))){
