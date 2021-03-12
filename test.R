@@ -999,12 +999,12 @@ for(i in 1:(nrow(predict_df)-2)){
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
     
-    # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+    slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
     
     # demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
-    # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-    # cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
-    # demand_t1_hat <- sl_t1_hat + cl_t1_hat
+    sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+    cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+    demand_t1_hat <- sl_t1_hat + cl_t1_hat
     
     
     prices_predict$ps_hat[i] <- ps_hat_t1
@@ -1045,8 +1045,7 @@ pricesMerge_new <- merge(prices_predict,prices_costs) %>% filter(ps_hat>0) %>% s
 
 slaughterPrices_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Observed"))+geom_point(aes(y=ps,color="Observed"))+geom_line(aes(y=ps_hat, color="Estimate"))+geom_point(aes(y=ps_hat,color="Estimate")) + 
   labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)]))) +
-  theme(legend.position = c(0.2, 0.7))
+  scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)])))
 
 cullPrices_plot <- pricesMerge_new %>% ggplot(aes(x=Year))+geom_line(aes(y=pc,color="Observed"))+geom_point(aes(y=pc,color="Observed")) + geom_line(aes(y=pc_hat, color="Estimate")) + geom_point(aes(y=pc_hat,color="Estimate")) + 
   labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
@@ -1462,12 +1461,12 @@ rev_total_Plot <- rev_total %>% ggplot(aes(x=Year))+geom_line(aes(y=totalRev_pos
   scale_x_continuous(name="Year", breaks=c(seq(rev_total$Year[1],rev_total$Year[nrow(rev_total)])))
 
 
-percentChange_price <- prices_predict_co4_merge %>% mutate(percentChange_ps_obs = ((ps_hat - ps)/ps)*100,
-                                                           percentChange_ps_model = ((ps_hat - ps_est)/ps_est)*100,
-                                                           percentChange_pc_obs = ((pc_hat - pc)/pc)*100, 
-                                                           percentChange_pc_model = ((pc_hat - pc_est)/pc_est)*100,
-                                                           percentChange_hc_obs = ((hc_hat - hc)/hc)*100,
-                                                           percentChange_hc_model = ((hc_hat - hc_est)/hc_est)*100,) %>% select(Year, percentChange_ps_obs, 
+percentChange_price <- prices_predict_co4_merge %>% mutate(percentChange_ps_obs = round(((ps_hat - ps)/ps)*100,3),
+                                                           percentChange_ps_model = round(((ps_hat - ps_est)/ps_est)*100,3),
+                                                           percentChange_pc_obs = round(((pc_hat - pc)/pc)*100,3), 
+                                                           percentChange_pc_model = round(((pc_hat - pc_est)/pc_est)*100,3),
+                                                           percentChange_hc_obs = round(((hc_hat - hc)/hc)*100,3),
+                                                           percentChange_hc_model = round(((hc_hat - hc_est)/hc_est)*100,3)) %>% select(Year, percentChange_ps_obs, 
                                                                                                                      percentChange_ps_model, percentChange_pc_obs,
                                                                                                                      percentChange_pc_model, percentChange_hc_obs,
                                                                                                                     percentChange_hc_model) %>% filter(Year>2009)
@@ -1475,12 +1474,12 @@ percentChange_price_ps <- percentChange_price %>% select(Year, percentChange_ps_
 percentChange_price_pc <- percentChange_price %>% select(Year, percentChange_pc_obs, percentChange_pc_model)
 percentChange_cost_hc <- percentChange_price %>% select(Year, percentChange_hc_obs, percentChange_hc_model)
 
-percentChange_demand <- demand_predict_co4_merge %>% mutate(percentChange_demand_obs = ((Demand_hat - Demand)/Demand)*100,
-                                                            percentChange_demand_model = ((Demand_hat - Demand_est)/Demand_est)*100,
-                                                            percentChange_sl_obs = ((sl_hat - sl)/sl)*100,
-                                                            percentChange_sl_model = ((sl_hat - sl_est)/sl_est)*100,
-                                                            percentChange_cl_obs = ((cl_hat - cl)/cl)*100,
-                                                            percentChange_cl_model = ((cl_hat - cl_est)/cl_est)*100) %>% select(Year, percentChange_demand_obs,
+percentChange_demand <- demand_predict_co4_merge %>% mutate(percentChange_demand_obs = round(((Demand_hat - Demand)/Demand)*100,3),
+                                                            percentChange_demand_model = round(((Demand_hat - Demand_est)/Demand_est)*100,3),
+                                                            percentChange_sl_obs = round(((sl_hat - sl)/sl)*100,3),
+                                                            percentChange_sl_model = round(((sl_hat - sl_est)/sl_est)*100,3),
+                                                            percentChange_cl_obs = round(((cl_hat - cl)/cl)*100,3),
+                                                            percentChange_cl_model = round(((cl_hat - cl_est)/cl_est)*100,3)) %>% select(Year, percentChange_demand_obs,
                                                                                                                               percentChange_demand_model, percentChange_sl_obs, 
                                                                                                                               percentChange_sl_model, percentChange_cl_obs,
                                                                                                                               percentChange_cl_model) %>% filter(Year>2009)
@@ -1534,8 +1533,8 @@ revDiff_costs_sl_pSurp <- revDiff_costs_sl %>% mutate(diffRevCost_sl_obs = slRev
 revDiff_costs_cl_pSurp <- revDiff_costs_cl %>% mutate(diffRevCost_cl_obs = clRev_diff_obs - costSupply_cl_obs,
                                                 diffRevCost_cl_model = clRev_diff_model - costSupply_cl_model) %>% select(
                                                   Year, diffRevCost_cl_obs, diffRevCost_cl_model)
-revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = totalRev_diff_obs - costSupply_t_obs,
-                                              diffRevCost_t_model = totalRev_diff_model - costSupply_t_model) %>% select(
+revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = round(totalRev_diff_obs - costSupply_t_obs,4),
+                                              diffRevCost_t_model = round(totalRev_diff_model - costSupply_t_model,4)) %>% select(
                                                 Year, diffRevCost_t_obs, diffRevCost_t_model)
 
 ######## Compute the above again. Note sl, cl, demand are not changing at all. This is because of small changes in the prices and costs.
@@ -1548,13 +1547,13 @@ revDiff_costs_t_pSurp <- revDiff_costs_t %>% mutate(diffRevCost_t_obs = totalRev
 
 
 #### Case 1:
-# cost_price_addedCosts_obs_1_ps_pc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc)
-# cost_price_addedCosts_obs_1_hc <- cost_price_addedCosts_obs_r %>% select(Year, hc) %>% filter(Year<=2009)
-# 
-# ccc_1 <- ccc %>% mutate(Year = Year,hc = hc_hat) %>% select(Year, hc) %>% filter(Year>2009)
-# cost_price_addedCosts_obs_1_hc <- rbind(cost_price_addedCosts_obs_1_hc, ccc_1)
-# 
-# cost_price_addedCosts_obs_1 <- merge(cost_price_addedCosts_obs_1_ps_pc, cost_price_addedCosts_obs_1_hc)
+cost_price_addedCosts_obs_1_ps_pc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc)
+cost_price_addedCosts_obs_1_hc <- cost_price_addedCosts_obs_r %>% select(Year, hc) %>% filter(Year<=2009)
+
+ccc_1 <- ccc %>% mutate(Year = Year,hc = hc_hat) %>% select(Year, hc) %>% filter(Year>2009)
+cost_price_addedCosts_obs_1_hc <- rbind(cost_price_addedCosts_obs_1_hc, ccc_1)
+
+cost_price_addedCosts_obs_1 <- merge(cost_price_addedCosts_obs_1_ps_pc, cost_price_addedCosts_obs_1_hc)
 
 ##### Case 2:
 # cost_price_addedCosts_obs_1_ps_pc_hc <- cost_price_addedCosts_obs_r %>% select(Year, ps, pc, hc) %>% filter(Year<=2009)
