@@ -70,6 +70,10 @@ steersHeifers_Prices <- steersHeifers_Prices %>% select(Year, Period, Value)
 pcs <- cows_prices %>% group_by(Year) %>% mutate(pc = mean(Value)/100) %>% select(Year,pc) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame()
 pss <- steersHeifers_Prices %>% group_by(Year) %>% mutate(ps = mean(Value)/100) %>% select(Year,ps) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame()
 
+pcs_cwt <- pcs %>% mutate(pcs_cwt = pc*100)
+pss_cwt <- pss %>% mutate(pss_cwt = ps*100)
+pc_ps_cwt <- merge(pcs_cwt, pss_cwt) %>% filter(Year>=1993) %>% select(Year,pss_cwt, pcs_cwt)
+
 pc_ps <- merge(pcs,pss) %>% filter(Year>=1993)
 
 
