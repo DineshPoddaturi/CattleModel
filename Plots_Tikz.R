@@ -8,7 +8,7 @@ require(tikzDevice)
 # 
 # 
 
-pricesMerge_new_plots <- pricesMerge_new %>% filter(Year >=2000)
+pricesMerge_new_plots <- pricesMerge_new %>% filter(Year >=2005)
 
 tikz(file="TexPlots/SlaughterPlot.tex", width=6, height=3)
 slaughter_plot <- pricesMerge_new_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=ps,color="Observed"))+geom_point(aes(y=ps,color="Observed"))+geom_line(aes(y=ps_hat, color="Estimate"))+geom_point(aes(y=ps_hat,color="Estimate")) +
@@ -32,6 +32,26 @@ holding_plot <- pricesMerge_new_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=hc
   scale_x_continuous(name="Year", breaks=c(seq(pricesMerge_new$Year[1], pricesMerge_new$Year[nrow(pricesMerge_new)]))) + 
   theme(legend.position = c(0.2, 0.7))
 print(holding_plot)
+dev.off()
+
+Master_sl_cl_plots <- Master_sl_cl %>% filter(Year >=2005)
+
+tikz(file="TexPlots/FedCattleSupply.tex", width=6, height=4)
+fedCattleSupply_plot <- Master_sl_cl_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +
+  geom_line(aes(y=sl_hat, color="Estimate")) + geom_point(aes(y=sl_hat,color="Estimate")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl_plots$Year[1],Master_sl_cl_plots$Year[nrow(Master_sl_cl_plots)]))) + 
+  theme(legend.position = c(0.9, 0.9))
+print(fedCattleSupply_plot)
+dev.off()
+
+tikz(file="TexPlots/CullCowSupply.tex", width=6, height=3)
+cullCowSupply_plot <- Master_sl_cl_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=cl,color="Observed"))+geom_point(aes(y=cl,color="Observed")) +
+  geom_line(aes(y=cl_hat, color="Estimate")) + geom_point(aes(y=cl_hat,color="Estimate")) + 
+  labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(Master_sl_cl_plots$Year[1],Master_sl_cl_plots$Year[nrow(Master_sl_cl_plots)]))) + 
+  theme(legend.position = c(0.2, 0.7))
+print(cullCowSupply_plot)
 dev.off()
 
 
