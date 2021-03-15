@@ -96,6 +96,10 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 * We will see changes once we adjust for the demand.
 
 
+03/15/2021:
 
+* Showed the results from the simulations. He said the simulations from using the model estimates and using the data look promising. 
+* Told me to use the results of simulation using observed data to put it in the paper. We can use the results of simulation from the model estimates for a different paper.
+* Asked me to go ahead and project the future prices and quantities for 10 years. If they flatten out after some years that means we are doing it rite. If they are going up and down that means we are in trouble.
 
 
