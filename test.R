@@ -737,12 +737,12 @@ prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(pre
 
 parameters <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predict_df)), s_tilde = numeric(nrow(predict_df)))
 
-for(i in 1:nrow(predict_df)){
+for(i in 1:nrow(predict_df)-1){
     # K_t <- predict_df$K[i]
     # k_3_t2 <- predict_df$k3[i+2]
     # imports_t1 <- predict_df$imports[i+1]
     
-    # i <- 1
+    # i <- 24
     
     #### We use the current data to estimate the future demand first and use that demand to estimate 
     #### the future prices
@@ -751,8 +751,12 @@ for(i in 1:nrow(predict_df)){
     k5_t <- predict_df$k5[i]
     k6_t <- predict_df$k6[i]
     k7_t <- predict_df$k7[i]
+    
     k8_t <- predict_df$k8[i]
+    k8_t1 <- predict_df$k8[i+1]
+    
     k9_t <- predict_df$k9[i]
+    k9_t1 <- predict_df$k9[i+1]
     
     imports_t <- predict_df$Imports[i]
     exports_t <- predict_df$Exports[i]
@@ -793,10 +797,10 @@ for(i in 1:nrow(predict_df)){
     
     share_t1 <- (exp((muTilde - ((ps_t - pc_t)/phi))/ (sTilde)))
     
-    demand_t1_hat <- delta * (k8_t + (1-delta) * (k7_t + k6_t) ) * (dressed_tCL/1000000000) * (1 + share_t1)
+    demand_t1_hat <- (k9_t + k7_t - k8_t1 + k8_t - k9_t1) * (dressed_tCL/1000000000) * (1 + share_t1)
     
     sl_t1_hat <-   (demand_t1_hat * ((share_t1)/(1 + share_t1)))* adj
-    cl_t1_hat <- (demand_t1_hat * 1/(1+share_t1)) * adj
+    cl_t1_hat <- (demand_t1_hat * (1/(1+share_t1))) * adj
     
     
     # demand_t1_hat - (sl_t1_hat + cl_t1_hat)
@@ -976,7 +980,7 @@ for(i in 1:(nrow(predict_df)-2)){
     
     demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t) 
     sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-    cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+    cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
     
     
     
