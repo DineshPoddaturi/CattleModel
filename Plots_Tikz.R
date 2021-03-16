@@ -55,6 +55,19 @@ print(cullCowSupply_plot)
 dev.off()
 
 
+parameters_paper <- parameters %>% filter(Year>=2006) %>% mutate(mu_tilde = round(mu_tilde,3), s_tilde = round(s_tilde,3))
+
+pricesMerge_new_paper <- pricesMerge_new
+pricesMerge_new_paper[,-1] <- round(pricesMerge_new_paper[,-1],3)
+
+dressedWeights_sl_cl_paper <- dressedWeights_sl_cl %>% filter(Year>=2006) %>% mutate(Slaughter_avg = round(Slaughter_avg,3),
+                                                                                    Cull_avg = round(Cull_avg,3))
+supp_cl_adj_paper <- supp_cl_adj %>% filter(Year>=2006) %>% mutate(Bill_meatLb_cl = round(Bill_meatLb_cl,3))
+supp_sl_adj_paper <- supp_sl_adj %>% filter(Year>=2006) %>% mutate(Bill_meatLb_sl = round(Bill_meatLb_sl,3))
+
+pc_ps_cwt_paper <- pc_ps_cwt %>% filter(Year >=2006) %>% mutate(pss_cwt = round(pss_cwt,3), pcs_cwt = round(pcs_cwt,3))
+
+
 
 
 
