@@ -73,6 +73,8 @@ Aggregating all the costs. I am using the upperbound from the cow/calf costs i.e
 
 ```{r}
 total_Costs <- sum(cost_CowCalf_Tag,cost_CowCalf_NTag, cost_Bckg, cost_Feedlot, cost_Packers)
+
+round(total_Costs,3)
 ```
 
 
