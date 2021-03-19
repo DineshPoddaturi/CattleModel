@@ -32,11 +32,11 @@ parameters_project <- data.frame(Year = years_project, mu_tilde = numeric(length
                                  s_tilde = numeric(length(years_project)))
 
 adj_project <- data.frame(Year = years_project, adj_fac = numeric(length(years_project)))
+share_project <- data.frame(Year = years_project, shares_project = numeric(length(years_project)))
 
 for(i in 1:nrow(prices_project)){
   
-  
-  i <- 2
+  # i <- 2
   if(i<=1){
     
     K_t <- predict_df_tail$K[i]
@@ -52,7 +52,7 @@ for(i in 1:nrow(prices_project)){
     exports_t <- predict_df_tail$exports[i]
     slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
   }
-  year_t <- predict_df_tail$Year[i]
+  year_t <- demand_project$Year[i]
   
   adj <- demand/(sl+cl)
   adj_project$adj_fac[i] <- adj
@@ -60,8 +60,6 @@ for(i in 1:nrow(prices_project)){
   if(adj>1){
     adj <- 1/adj
   }
-  
-  
   
   # slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
   
@@ -71,10 +69,9 @@ for(i in 1:nrow(prices_project)){
     cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
   }else{
     demand_t1_hat <- demand
-    sl_t1_hat <- sl * adj 
-    cl_t1_hat <- cl * adj
+    sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+    cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
   }      
-  
   
   params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
   parameters_project$mu_tilde[i] <- params_t1[1]
@@ -93,23 +90,11 @@ for(i in 1:nrow(prices_project)){
   hc_hat_t1 <- est_bb[3]
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  share_project$shares_project[i] <- slShare_t
   
-  if(year_t<=2016){
-    sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
-    cl_t1_hat <- demand_t1_hat * (1/(1+slShare_t)) * adj
-    # demand_t1_hat <- demand_t1_hat
-  }else{
-    # if(adj > 1){
-    #   adj1 <- 1/adj
-    #   sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj1
-    #   cl_t1_hat <- demand_t1_hat * (1/(1+slShare_t)) * adj1
-    # }else{
-      sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
-      cl_t1_hat <- demand_t1_hat * (1/(1+slShare_t)) * adj
-      # demand_t1_hat <- demand_t1_hat 
-    # }
-    # demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
-  }
+  sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  demand_t1_hat <- (sl_t1_hat + cl_t1_hat) * (1/adj)
   
     prices_project$ps_est[i] <- ps_hat_t1
     prices_project$pc_est[i] <- pc_hat_t1

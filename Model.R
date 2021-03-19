@@ -956,7 +956,6 @@ for(i in 1:(nrow(predict_df)-2)){
   imports_t <- predict_df$imports[i]
   exports_t <- predict_df$exports[i]
   
-  
   slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
   shares_slcl$share_pre[i] <- slShare_t
   
@@ -975,14 +974,13 @@ for(i in 1:(nrow(predict_df)-2)){
   mu_Tilde <- params_t1[1]
   s_Tilde <- params_t1[2]
   
-  
   est_bb <- BBoptim(par=p, fn = sysEqs_solve)$par
   ps_hat_t1 <- est_bb[1]
   pc_hat_t1 <- est_bb[2]
   hc_hat_t1 <- est_bb[3]
   
-  slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  shares_slcl$share_post[i] <- slShare_t
+  # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  # shares_slcl$share_post[i] <- slShare_t
   
   prices_predict$ps_hat[i] <- ps_hat_t1
   prices_predict$pc_hat[i] <- pc_hat_t1
@@ -990,9 +988,8 @@ for(i in 1:(nrow(predict_df)-2)){
   demand_predict$demand_est[i] <- demand_t1_hat
   demand_predict$sl_est[i] <- sl_t1_hat
   demand_predict$cl_est[i] <- cl_t1_hat
-  
-  
 }
+
 # for(i in 1:(nrow(predict_df)-2)){
 #   
 #   # i <- 2
@@ -1349,8 +1346,6 @@ for(i in 1:(nrow(predict_df)-2)){
   sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
   cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
   demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
-  
-  
   
   prices_predict_co4$ps_hat[i] <- ps_hat_t1
   prices_predict_co4$pc_hat[i] <- pc_hat_t1
