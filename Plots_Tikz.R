@@ -101,7 +101,7 @@ dev.off()
 
 demand_predict_co4_merge111_paper <- demand_predict_co4_merge111 %>% filter(Year>=2004)
 
-tikz(file="TexPlots/FedCattleMeat.tex", width=6, height=3)
+tikz(file="TexPlots/FedCattleMeat.tex", width=6, height=4)
 fedCattleMeat_plot <- demand_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
   geom_point(aes(y=sl_est,color="Model estimate")) + geom_line(aes(y=sl_hat, color="Estimate with added costs")) + 
   geom_point(aes(y=sl_hat,color="Estimate with added costs")) + geom_line(aes(y=sl, color="Observed")) + 
@@ -123,6 +123,22 @@ cullCowMeat_plot <- demand_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+ge
 print(cullCowMeat_plot)
 dev.off()
 
+
+
+pSurplus_paper <- merge(pSurp_20, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
+names(pSurplus_paper) <- c("Year", "20 \\%", "50 \\%", "70 \\%", "90 \\%", "100 \\%")
+
+pSurplus_merge_paper <- pSurplus
+
+pSurplus_long_paper <- pivot_longer(pSurplus_paper, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
+
+
+tikz(file="TexPlots/ProducerSurplus2010.tex", width=6, height=4)
+pSurplus_2010_plot <- pSurplus_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x=  "Animal ID and Traceability Adoption Rate" , y= "Surplus (in Billion \\$)") + 
+  theme_test()
+print(pSurplus_2010_plot)
+dev.off()
 
 
 

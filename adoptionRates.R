@@ -12,7 +12,7 @@ adoption_70 <- 70
 
 
 ################ different adoption rate ##########
-adoption <- 1
+adoption <- 0.5
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -50,7 +50,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                           share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_Y
+predict_df_adopt <- predict_df_adopt_N
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -294,6 +294,7 @@ demand_predict_co4_adopt <- demand_predict_co4_adopt %>% filter(demand_est>0) %>
 # demand_predict_co4_merge <- merge(demand_predict_co4, merge(demand_predict_est, demand_obs)) %>% 
 #   select(Year, Demand, Demand_est, Demand_hat, sl, sl_est, sl_hat, cl, cl_est, cl_hat)
 
+
 prices_predict_co4_merge_adopt <- left_join(merge(prices_predict_est_adopt_Y, merge(prices_predict_est_adopt_N,prices_costs_obs)), prices_predict_co4_adopt) %>% 
   mutate(ps_hat = ps_hat * 100, pc_hat = pc_hat * 100, hc_hat = hc_hat * 100, 
          ps_estY = ps_estY * 100, pc_estY = pc_estY * 100, hc_estY = hc_estY * 100,
@@ -363,6 +364,59 @@ revDiff_costs_t_pSurp_adopt <- revDiff_costs_t_adopt %>% mutate(diffRevCost_t_ob
                                                     diffRevCost_t_model = round(totalRev_diff_model - costSupply_t_model,4)) %>% select(
                                                       Year, diffRevCost_t_obs, diffRevCost_t_model)
 
+
+
+# revDiff_costs_t_pSurp_adopt_90 <- revDiff_costs_t_pSurp_adopt
+
+# revDiff_costs_t_pSurp_adopt_70 <- revDiff_costs_t_pSurp_adopt
+
+# revDiff_costs_t_pSurp_adopt_50 <- revDiff_costs_t_pSurp_adopt
+
+# revDiff_costs_t_pSurp_adopt_20 <- revDiff_costs_t_pSurp_adopt
+
+pSurp_100 <- revDiff_costs_t_pSurp %>% mutate(surplus_100 = diffRevCost_t_model) %>% select(Year, surplus_100)
+pSurp_90 <- revDiff_costs_t_pSurp_adopt_90 %>% mutate(surplus_90 = diffRevCost_t_model) %>% select(Year, surplus_90)
+pSurp_70 <- revDiff_costs_t_pSurp_adopt_70 %>% mutate(surplus_70 = diffRevCost_t_model) %>% select(Year, surplus_70)
+pSurp_50 <- revDiff_costs_t_pSurp_adopt_50 %>% mutate(surplus_50 = diffRevCost_t_model) %>% select(Year, surplus_50)
+pSurp_20 <- revDiff_costs_t_pSurp_adopt_20 %>% mutate(surplus_20 = diffRevCost_t_model) %>% select(Year, surplus_20)
+
+
+pSurplus <- merge(pSurp_20, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
+names(pSurplus) <- c("Year", "20%", "50%", "70%", "90%", "100%")
+
+pSurplus_merge <- pSurplus
+
+pSurplus_long <- pivot_longer(pSurplus, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
+
+pSurplus_2010 <- pSurplus_long %>% filter(Year <= 2010)
+
+pSurplus_2010 <- pSurplus_long %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+
+  theme_test()
+
+pSurplus_2011 <- pSurplus_long %>% filter(Year == 2011) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue", width=0.4)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
+  scale_x_discrete(position = "top") + theme_linedraw()
+
+pSurplus_2012 <- pSurplus_long %>% filter(Year == 2012) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue", width=0.4)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
+  scale_x_discrete(position = "top") + theme_linedraw()
+
+pSurplus_2013 <- pSurplus_long %>% filter(Year == 2013) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue", width=0.4)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
+  scale_x_discrete(position = "top") + theme_linedraw()
+
+pSurplus_2014 <- pSurplus_long %>% filter(Year == 2014) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue", width=0.4)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
+  scale_x_discrete(position = "top") + theme_linedraw()
+
+pSurplus_2015 <- pSurplus_long %>% filter(Year == 2015) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue", width=0.4)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
+  scale_x_discrete(position = "top") + theme_linedraw()
+
+pSurplus_2016 <- pSurplus_long %>% filter(Year == 2016) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue", width=0.4)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
+  scale_x_discrete(position = "top") + theme_linedraw()
 
 
 

@@ -1,0 +1,93 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Aggregate producer surplus with $100\%$ adoption}
+\begin{tabular}{ll}
+\hline
+Year & Surplus  \\ \hline
+ 2010     & -0.4655 \\
+ 2011     & -0.3373 \\
+ 2012     & -0.2975 \\
+ 2013     & -0.3515 \\
+ 2014     & -0.3099 \\
+ 2015     & -0.4581 \\
+ 2016     & -0.4254\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Aggregate producer surplus with $90\%$ adoption}
+\begin{tabular}{ll}
+\hline
+Year &  Surplus  \\ \hline
+ 2010    & -0.4223 \\
+ 2011    & -0.3063 \\
+ 2012    & -0.2699 \\
+ 2013    & -0.3191 \\
+ 2014    & -0.2812 \\ 
+ 2015    & -0.4166 \\
+ 2016    & -0.3863\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Aggregate producer surplus with $70\%$ adoption}
+\begin{tabular}{ll}
+\hline
+Year &  Surplus  \\ \hline
+ 2010  &   -0.3358 \\
+ 2011  &    -0.2442 \\
+ 2012  &    -0.2147 \\
+ 2013  &    -0.2545 \\
+ 2014  &   -0.2238 \\
+ 2015  &    -0.3335 \\
+ 2016  &    -0.3079\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Aggregate producer surplus with $50\%$ adoption}
+\begin{tabular}{ll}
+\hline
+Year & Surplus  \\ \hline
+ 2010    & -0.2493 \\
+ 2011    & -0.1821 \\
+ 2012    & -0.1594 \\
+ 2013    & -0.1899 \\
+ 2014    & -0.1665 \\
+ 2015    & -0.2503 \\
+ 2016    & -0.2296\\\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Aggregate producer surplus with $20\%$ adoption}
+\begin{tabular}{ll}
+\hline
+Year &  Surplus  \\ \hline
+ 2010    & -0.1196 \\
+ 2011    & -0.0889 \\
+ 2012    & -0.0766 \\
+ 2013    & -0.0929 \\
+ 2014    & -0.0805 \\
+ 2015    & -0.1256 \\
+ 2016    & -0.1122\\\hline
+\end{tabular}
+\end{center}
+\end{table}
