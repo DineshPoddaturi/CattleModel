@@ -54,5 +54,22 @@
 * Maybe show them how our model is different from the static EDM, and using our model is important for the Beef industry.
 
 
+03/23/2021:
+
+* Showed him the producer surplus loss with different adoption rate. He asked whether they are linear in the losses. If it's a mandatory program what adoption would give less losses.
+
+* Also think about how can we compare and constrast the results. Is there anyway we could include elasticities in the model to get numerical measurement?
+
+* Our current model is letting everything flow freely. If we include some form of elasticity, would it give measures that can be compared with other studies?
+
+* Also make sure the results can be used for some policy advice.
+
+
+
+
+
+
+
+
 
 
