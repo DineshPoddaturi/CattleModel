@@ -383,7 +383,7 @@ pSurplus_long <- pivot_longer(pSurplus, -c(Year), values_to = "Surplus", names_t
 pSurplus_2010 <- pSurplus_long %>% filter(Year <= 2010)
 
 pSurplus_2010 <- pSurplus_long %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+
+  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
   theme_test()
 
 pSurplus_2011 <- pSurplus_long %>% filter(Year == 2011) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
