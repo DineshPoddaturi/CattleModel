@@ -2,17 +2,8 @@
 ####### In this case we know how the prices and quantities change once adoption. ############ 
 ####### So use them for whomever adopts and for rest old price and quantities. ##############
 
-adoption_20 <- 30
-adoption_50 <- 50
-adoption_70 <- 70
-
-
-
-
-
-
 ################ different adoption rate ##########
-adoption <- 0.5
+adoption <- 0.7
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -99,7 +90,8 @@ for(i in 1:(nrow(predict_df_adopt)-2)){
   hc_hat_t1 <- est_bb[3]
   
   # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  # shares_slcl$share_post[i] <- slShare_t
+  # sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
+  # cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
   
   prices_predict_adopt$ps_hat[i] <- ps_hat_t1
   prices_predict_adopt$pc_hat[i] <- pc_hat_t1
@@ -134,7 +126,7 @@ Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new))
                           Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
-Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3) 
+Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
 Master_sl_cl_adopt$Year <- as.numeric(Master_sl_cl_adopt$Year)
 
 stock_slaughter_adopt <- Master_sl_cl_adopt   %>% ggplot(aes(x=Year))+geom_line(aes(y=sl,color="Observed"))+geom_point(aes(y=sl,color="Observed")) +geom_line(aes(y=sl_hat, color="Estimate")) + geom_point(aes(y=sl_hat,color="Estimate")) + 
