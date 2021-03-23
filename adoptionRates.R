@@ -374,13 +374,22 @@ pSurp_20 <- revDiff_costs_t_pSurp_adopt_20 %>% mutate(surplus_20 = diffRevCost_t
 
 
 pSurplus <- merge(pSurp_20, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
-names(pSurplus) <- c("Year", "20%", "50%", "70%", "90%", "100%")
+names(pSurplus) <- c("Year", "20", "50", "70", "90", "100")
 
 pSurplus_merge <- pSurplus
 
 pSurplus_long <- pivot_longer(pSurplus, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
 
-pSurplus_2010 <- pSurplus_long %>% filter(Year <= 2010)
+pSurplus_10 <- pSurplus_long %>% filter(Year == 2010) %>% mutate(Surplus = -Surplus)
+pSurplus_10$Adoption <- as.numeric(pSurplus_10$Adoption)
+
+pSurplus_10 %>% ggplot(aes(x=Adoption, y=Surplus))+ geom_point() + geom_smooth(method = "loess")
+
+
+lm(formula = Surplus~Adoption, data = pSurplus_10)
+
+
+
 
 pSurplus_2010 <- pSurplus_long %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
