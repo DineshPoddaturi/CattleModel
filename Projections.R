@@ -51,27 +51,30 @@ for(i in 1:nrow(prices_project)){
       imports_t <- predict_df_tail$imports[i]
       exports_t <- predict_df_tail$exports[i]
       # slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
+      adj <- demand/(sl+cl)
     }
     year_t <- demand_project$Year[i]
     
-    adj <- demand/(sl+cl)
-    
-    if(adj>1){
-      adj <- 1/adj
-    }
+    # adj <- demand/(sl+cl)
+    # 
+    # # adj1 <- adj
+    # 
+    # if(adj>1){
+    #   adj <- 1/adj
+    # }
     
     adj_project$adj_fac[i] <- adj
     
     slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
     
     if(year_t<=2016){
-      demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t) 
+      demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t)
       sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
       cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
     }else{
       demand_t1_hat <- demand
-      sl_t1_hat <- sl
-      cl_t1_hat <- cl
+      sl_t1_hat <- sl * adj
+      cl_t1_hat <- cl * adj
     }      
   
     params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
@@ -90,18 +93,14 @@ for(i in 1:nrow(prices_project)){
     pc_hat_t1 <- est_bb[2]
     hc_hat_t1 <- est_bb[3]
     
-    slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+    slShare_t <- (exp((muTilde - ((ps_hat_t1 - pc_hat_t1))/phi)/sTilde))
     share_project$shares_project[i] <- slShare_t
     
-    if(year_t<=2016){
+    if(year_t>2016){
       sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
       cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
-      demand_t1_hat <- (sl_t1_hat + cl_t1_hat) * (1/adj)  
-    }else{
-      sl_t1_hat <- demand_t1_hat * ((slShare_t)/(1 + slShare_t)) * adj
-      cl_t1_hat <- demand_t1_hat * (1/(1+slShare_t)) * adj
-      demand_t1_hat <- (sl_t1_hat + cl_t1_hat)  * (1/adj)
-    } 
+      demand_t1_hat <- demand_t1_hat
+    }
   
     prices_project$ps_est[i] <- ps_hat_t1
     prices_project$pc_est[i] <- pc_hat_t1
@@ -114,16 +113,36 @@ for(i in 1:nrow(prices_project)){
     cl <- cl_t1_hat
     demand <- demand_t1_hat
   
-    ps_t <- ps_hat_t1
-    pc_t <- pc_hat_t1
-    hc_t <- hc_hat_t1
+    # ps_t <- ps_hat_t1
+    # pc_t <- pc_hat_t1
+    # hc_t <- hc_hat_t1
     
 }
 
+round(prices_project,3) %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est*100,color="Model Projection"))+
+  geom_point(aes(y=ps_est*100,color="Model Projection"))+ labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + 
+  theme_classic() + 
+  scale_x_continuous(breaks=c(seq(prices_project$Year[1], prices_project$Year[nrow(prices_project)])))
 
+round(prices_project,3) %>% ggplot(aes(x=Year))+geom_line(aes(y=pc_est*100,color="Model Projection"))+
+  geom_point(aes(y=pc_est*100,color="Model Projection"))+ labs(x="Year", y="Cull Cow Prices (\\$/cwt)", colour = "") + 
+  theme_classic() + 
+  scale_x_continuous(breaks=c(seq(prices_project$Year[1], prices_project$Year[nrow(prices_project)])))
 
+round(prices_project,3) %>% ggplot(aes(x=Year))+geom_line(aes(y=hc_est*100,color="Model Projection"))+
+  geom_point(aes(y=hc_est*100,color="Model Projection"))+ labs(x="Year", y="Holding Costs(\\$/cwt)", colour = "") + 
+  theme_classic() + 
+  scale_x_continuous(breaks=c(seq(prices_project$Year[1], prices_project$Year[nrow(prices_project)])))
 
+round(demand_project,4) %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model Projection"))+
+  geom_point(aes(y=sl_est,color="Model Projection")) + labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + 
+  theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_project$Year[1],demand_project$Year[nrow(demand_project)])))
 
+round(demand_project,4) %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model Projection"))+
+  geom_point(aes(y=cl_est,color="Model Projection")) + labs(x="Year", y="Cull cow meat (in Billion pounds)", colour="") + 
+  theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_project$Year[1],demand_project$Year[nrow(demand_project)])))
 
 
 

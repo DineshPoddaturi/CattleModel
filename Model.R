@@ -979,8 +979,8 @@ for(i in 1:(nrow(predict_df)-2)){
   pc_hat_t1 <- est_bb[2]
   hc_hat_t1 <- est_bb[3]
   
-  # slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  # shares_slcl$share_post[i] <- slShare_t
+  slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
+  shares_slcl$share_post[i] <- slShare_t
   
   prices_predict$ps_hat[i] <- ps_hat_t1
   prices_predict$pc_hat[i] <- pc_hat_t1
@@ -1340,11 +1340,22 @@ for(i in 1:(nrow(predict_df)-2)){
   # adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
   # adj_co4$adj_2009[i] <- adj1
   
+  ################################################################################################################################
+  ##################################################### IMPORTANT ################################################################
+  ################################################################################################################################
+  
+  #### Here we get the shares after the prices are realized. This is because once the new prices are realized the share of 
+  #### fed cattle and cull cows might change. This share metric will give us new supply of fed cattle and cull cows. 
+  #### I guess this process is mainly giving us the counterfactuals i.e., what would the supply looks like with increased 
+  #### costs which change the realized price.
+  #### Note: We did not do that in the model estimation because that is representing the real world realization not the 
+  #### changes with the policy. 
+  
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
   shares_co4$shares_2009[i] <- slShare_t
 
   sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
-  cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
+  cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
   demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
   
   prices_predict_co4$ps_hat[i] <- ps_hat_t1

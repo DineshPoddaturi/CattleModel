@@ -386,11 +386,6 @@ pSurplus_10$Adoption <- as.numeric(pSurplus_10$Adoption)
 pSurplus_10 %>% ggplot(aes(x=Adoption, y=Surplus))+ geom_point() + geom_smooth(method = "loess")
 
 
-lm(formula = Surplus~Adoption, data = pSurplus_10)
-
-
-
-
 pSurplus_2010 <- pSurplus_long %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $)")+ 
   theme_test()
