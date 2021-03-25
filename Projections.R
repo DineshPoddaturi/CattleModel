@@ -22,7 +22,7 @@ predict_df_tail <- tail(predict_df, 3)
 years_project <- c(seq(predict_df_tail$Year[nrow(predict_df_tail)]-1,
                        predict_df_tail$Year[nrow(predict_df_tail)]+8))
 
-demand_project <- data.frame(Year = years_project, demand_est = numeric(length(years_project)), 
+demand_project <- data.frame(Year = years_project, Demand_est = numeric(length(years_project)), 
                              sl_est = numeric(length(years_project)), cl_est = numeric(length(years_project)))
 
 prices_project <- data.frame(Year = years_project, ps_est = numeric(length(years_project)), 
@@ -55,13 +55,13 @@ for(i in 1:nrow(prices_project)){
     }
     year_t <- demand_project$Year[i]
     
-    # adj <- demand/(sl+cl)
-    # 
-    # # adj1 <- adj
-    # 
-    # if(adj>1){
-    #   adj <- 1/adj
-    # }
+    adj <- demand/(sl+cl)
+
+    # adj1 <- adj
+
+    if(adj>1){
+      adj <- 1/adj
+    }
     
     adj_project$adj_fac[i] <- adj
     
@@ -105,7 +105,7 @@ for(i in 1:nrow(prices_project)){
     prices_project$ps_est[i] <- ps_hat_t1
     prices_project$pc_est[i] <- pc_hat_t1
     prices_project$hc_est[i] <- hc_hat_t1
-    demand_project$demand_est[i] <- demand_t1_hat
+    demand_project$Demand_est[i] <- demand_t1_hat
     demand_project$sl_est[i] <- sl_t1_hat
     demand_project$cl_est[i] <- cl_t1_hat
   
@@ -118,6 +118,39 @@ for(i in 1:nrow(prices_project)){
     # hc_t <- hc_hat_t1
     
 }
+
+demand_proj <- left_join(rbind(demand_predict_est,demand_project%>%filter(Year>2016)), demand_obs%>%filter(Year<=2016))
+
+prices_proj <- left_join(rbind(prices_predict_est, prices_project%>% filter(Year>2016)),prices_costs_obs%>%filter(Year<=2016)) %>%
+  mutate(ps = ps* 100, pc = pc*100, hc=hc*100, ps_est = ps_est*100, pc_est = pc_est*100, hc_est = hc_est*100)
+
+
+
+
+prices_proj %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est,color="Model Estimate"))+
+  geom_point(aes(y=ps_est,color="Model Estimate"))+geom_line(aes(y=ps, color="Observed"))+
+  geom_point(aes(y=ps,color="Observed")) + labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_proj$Year[1], prices_proj$Year[nrow(prices_proj)])))
+
+prices_proj %>% ggplot(aes(x=Year))+geom_line(aes(y=pc_est,color="Model Estimate"))+
+  geom_point(aes(y=pc_est,color="Model Estimate"))+geom_line(aes(y=pc, color="Observed"))+
+  geom_point(aes(y=pc,color="Observed")) + labs(x="Year", y="Culled Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_proj$Year[1], prices_proj$Year[nrow(prices_proj)]))) 
+
+
+demand_proj %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
+  geom_point(aes(y=sl_est,color="Model estimate")) + geom_line(aes(y=sl, color="Observed")) + 
+  geom_point(aes(y=sl,color="Observed")) + labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_proj$Year[1],demand_proj$Year[nrow(demand_proj)])))
+
+demand_proj %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model estimate"))+
+  geom_point(aes(y=cl_est,color="Model estimate")) + geom_line(aes(y=cl, color="Observed")) + 
+  geom_point(aes(y=cl,color="Observed")) + labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  scale_x_continuous(name="Year", breaks=c(seq(demand_proj$Year[1],demand_proj$Year[nrow(demand_proj)])))
+
+
+
+
 
 round(prices_project,3) %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est*100,color="Model Projection"))+
   geom_point(aes(y=ps_est*100,color="Model Projection"))+ labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + 
@@ -134,6 +167,7 @@ round(prices_project,3) %>% ggplot(aes(x=Year))+geom_line(aes(y=hc_est*100,color
   theme_classic() + 
   scale_x_continuous(breaks=c(seq(prices_project$Year[1], prices_project$Year[nrow(prices_project)])))
 
+
 round(demand_project,4) %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model Projection"))+
   geom_point(aes(y=sl_est,color="Model Projection")) + labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + 
   theme_classic()+ 
@@ -145,5 +179,31 @@ round(demand_project,4) %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Mo
   scale_x_continuous(name="Year", breaks=c(seq(demand_project$Year[1],demand_project$Year[nrow(demand_project)])))
 
 
+
+# prices_project
+# Year   ps_est    pc_est    hc_est
+# 1  2016 1.527698 1.0122139 0.4730073
+# 2  2017 1.554179 0.9837815 0.4789974
+# 3  2018 1.545118 0.9935105 0.4769477
+# 4  2019 1.545866 0.9927073 0.4771170
+# 5  2020 1.545799 0.9927787 0.4771019
+# 6  2021 1.545805 0.9927724 0.4771033
+# 7  2022 1.545805 0.9927729 0.4771031
+# 8  2023 1.545805 0.9927729 0.4771031
+# 9  2024 1.545805 0.9927729 0.4771031
+# 10 2025 1.545805 0.9927729 0.4771031
+
+# demand_project
+# Year demand_est   sl_est   cl_est
+# 1  2016   24.50651 20.48467 2.937606
+# 2  2017   24.50651 19.67647 3.745800
+# 3  2018   24.50651 19.81608 3.606187
+# 4  2019   24.50651 19.80472 3.617550
+# 5  2020   24.50651 19.80573 3.616539
+# 6  2021   24.50651 19.80564 3.616628
+# 7  2022   24.50651 19.80565 3.616620
+# 8  2023   24.50651 19.80565 3.616621
+# 9  2024   24.50651 19.80565 3.616621
+# 10 2025   24.50651 19.80565 3.616621
 
 
