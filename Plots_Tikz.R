@@ -125,8 +125,8 @@ dev.off()
 
 
 
-pSurplus_paper <- merge(pSurp_20, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
-names(pSurplus_paper) <- c("Year", "20 \\%", "50 \\%", "70 \\%", "90 \\%", "100 \\%")
+pSurplus_paper <- merge(pSurp_30, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
+names(pSurplus_paper) <- c("Year", "30 \\%", "50 \\%", "70 \\%", "90 \\%", "100 \\%")
 
 pSurplus_merge_paper <- pSurplus
 

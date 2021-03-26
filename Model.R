@@ -940,6 +940,7 @@ shares_slcl <- data.frame(Year = predict_df$Year+1, share_pre = numeric(nrow(pre
 
 for(i in 1:(nrow(predict_df)-2)){
   
+  # i <- 1
   K_t <- predict_df$K[i]
   k3_t2 <- predict_df$k3[i+2]
   ps_t <- predict_df$ps[i]
@@ -968,6 +969,7 @@ for(i in 1:(nrow(predict_df)-2)){
   parameters$s_tilde[i] <- params_t1[2]
   
   p <- c(ps_t, pc_t, hc_t)
+  # p <- c(1,1,1)
   sl <- sl_t1_hat
   cl <- cl_t1_hat
   A <- demand_t1_hat

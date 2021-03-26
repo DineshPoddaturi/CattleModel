@@ -4,10 +4,10 @@
 
 * The sectors invovled in the model are different as well. I differentiate the type of meat fed cattle vs cull cows. And the prices of those type of cattle.
 
-* We could consider 20% traceability as a voluntary expansion in traceability participation by some U.S. producers. (This is from Pendall et. al. 2011)
+<!-- * We could consider 20% traceability as a voluntary expansion in traceability participation by some U.S. producers. (This is from Pendall et. al. 2011) -->
 
-* We need to write the differences in the analysis as well. 
+* We need to write the differences in the analysis as well.
 
 * Note that the model is mimicking the previous literature indicating the model can be used for policy analysis. We fill the gap in the literature by analysing different types of meat (in our case fed cattle and cull cow) in the model. Specifically, our model is used to study the welfare of producers.
 
-* Increased costs raise cattle and beef prices at each level,
+* Increased costs raise cattle and beef prices at each level.
