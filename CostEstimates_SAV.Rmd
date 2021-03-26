@@ -8,6 +8,14 @@ $2.42 1000-1999
 $2.43 2000-4999
 $2.40 5,000+
 
+$14.51
+$5.28
+$3.65
+$2.96
+$2.86
+$2.82
+$2.75
+
 Here we get a conservative estimate (upper bound). We take the weighted mean of the about to get one number. 
 
 ```{r}
@@ -22,6 +30,14 @@ $5.04
 $5.04
 $5.04
 $5.04
+
+$15.83
+$7.66
+$6.10
+$5.57
+$5.49
+$5.43
+$5.39
 
 ```{r}
 cost_CowCalf_NTag <- weighted.mean(x = c(5.54, 5.29, 5.20, 5.04, 5.04, 5.04, 5.04), w = c(49,99,499,999,1999,4999,5000))
@@ -38,6 +54,13 @@ $0.20  722
 $0.16  1,453
 $0.14  2,963
 
+$23.51
+$7.14
+$2.24
+$1.59
+$1.16
+$0.64
+$0.39
 
 
 ```{r}
@@ -54,6 +77,14 @@ $0.12  8000-15999
 $0.12  16000-31999
 $0.12  32000+
 
+$15.89
+$0.96
+$0.58
+$0.48
+$0.29
+$0.21
+$0.15
+
 ```{r}
 cost_Feedlot <- weighted.mean(x = c(0.50, 0.16, 0.14, 0.12, 0.12, 0.12, 0.12), w = c(999,1999,3999,7999,15999,31999,32000))
 ```
@@ -69,7 +100,8 @@ cost_Packers <- weighted.mean(x = c(0.47,0.16), w = c(300,1.3*1000000))
 
 
 
-Aggregating all the costs. I am using the upperbound from the cow/calf costs i.e., the costs from the operations that currently not tag
+Aggregating all the costs. 
+<!-- I am using the upperbound from the cow/calf costs i.e., the costs from the operations that currently not tag -->
 
 ```{r}
 total_Costs <- sum(cost_CowCalf_Tag,cost_CowCalf_NTag, cost_Bckg, cost_Feedlot, cost_Packers)
@@ -112,7 +144,7 @@ This is not working. $\hat{sl}$ remains same, $\hat{demand}, \hat{cl}$ change by
 
 ### Some prelim results:
 * The prices and costs are changing by a small magnitude (very small! we are speaking of single digit dollars per cwt)
-* The quantities remain same! (because the prices change by very small magnitude).
+* The quantities remain same when we don't adjust for change in price! (because the prices change by very small magnitude).
 
 
 

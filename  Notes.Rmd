@@ -1,0 +1,13 @@
+# Notes
+
+* The results from our model and the past studies were alike. Especially the direction. When it comes to magnitude we see differences. This is expected from the fact that the models used in the studies are fundamentally different. Along with that, the costs used in both the models are different as well. As in Variable Costs (VC) vs Variable Costs + Fixed Costs (VC + FC). I could include the fixed costs in the model but it's just an accounting exercise. I do not see the point of it in the model. Here with the different adoption rates simulation, if I remove the VC from the model the change in producer surplus would be zero. Where, in the past studies it would still be negative.  
+
+* The sectors invovled in the model are different as well. I differentiate the type of meat fed cattle vs cull cows. And the prices of those type of cattle.
+
+* We could consider 20% traceability as a voluntary expansion in traceability participation by some U.S. producers. (This is from Pendall et. al. 2011)
+
+* We need to write the differences in the analysis as well. 
+
+* Note that the model is mimicking the previous literature indicating the model can be used for policy analysis. We fill the gap in the literature by analysing different types of meat (in our case fed cattle and cull cow) in the model. Specifically, our model is used to study the welfare of producers.
+
+* Increased costs raise cattle and beef prices at each level,

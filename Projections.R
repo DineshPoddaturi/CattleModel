@@ -149,9 +149,6 @@ demand_proj %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model estimate
   scale_x_continuous(name="Year", breaks=c(seq(demand_proj$Year[1],demand_proj$Year[nrow(demand_proj)])))
 
 
-
-
-
 round(prices_project,3) %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est*100,color="Model Projection"))+
   geom_point(aes(y=ps_est*100,color="Model Projection"))+ labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + 
   theme_classic() + 

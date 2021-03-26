@@ -108,7 +108,7 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * The answer is: the models are different, the cost structure we included are different. We used only Variable Cost (tag and tagging costs per head). Now if we remove the variable cost the surplus would be zero. The past studies also included the Fixed Costs (say database or other technological costs). Again our model is mimicking the past studies which confirms that the model can be used for further analysis. 
 
-* It's actually good that the numbers are different. We expect those numbers to be different.
+* It's actually good that the numbers are different. We expect those numbers to be different. If we add the other things like in the past studies, with a simple accounting exercise we can get the same results.
 
 * About elasticities: Our main parameter $\tilde{\mu}$ is capturing the elasticity. That parameter is mean/median WTP for fed cattle meat over cull cow meat so that should say something about the elasticity. Without that parameter we cannot proceed with anything.
 
