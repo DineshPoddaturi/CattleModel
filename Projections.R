@@ -19,6 +19,7 @@ predict_df_tail <- tail(predict_df, 3)
 # 
 # demand_prices_project_last <- last(demand_prices_project)
 
+
 years_project <- c(seq(predict_df_tail$Year[nrow(predict_df_tail)]-1,
                        predict_df_tail$Year[nrow(predict_df_tail)]+8))
 

@@ -6,8 +6,12 @@
 
 <!-- * We could consider 20% traceability as a voluntary expansion in traceability participation by some U.S. producers. (This is from Pendall et. al. 2011) -->
 
-* We need to write the differences in the analysis as well.
+* We need to write the differences in the analysis as well. Like how our work depands on different types of data and such.
 
 * Note that the model is mimicking the previous literature indicating the model can be used for policy analysis. We fill the gap in the literature by analysing different types of meat (in our case fed cattle and cull cow) in the model. Specifically, our model is used to study the welfare of producers.
 
 * Increased costs raise cattle and beef prices at each level.
+
+
+* About adding to literature:
+We add to the existing literature of impacts of traceability on producers by using a dynamic model for the analysis. In contrast to the existing literature on the subject, we take a data driven approach to estimate the impacts. Our study fills the gap by analysing different types of cattle, use 

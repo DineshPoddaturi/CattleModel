@@ -1217,7 +1217,6 @@ costs_sl_cl <- merge(costs_cl_9years, costs_sl_2years) %>% select(Year, cost_Lb_
 # Change the costs from 2009. I take the year from the paper
 cost_price_hat <- prices_predict %>% filter(ps_hat>0)
 
-
 cost_price_addedCosts <- merge(cost_price_hat,costs_sl_cl) %>% select(Year, ps_hat, pc_hat, hc_hat, cost_both)
 
 ccc <- cost_price_addedCosts %>% filter(Year>=2009) %>% mutate(hc_hat = hc_hat + cost_both) %>% select (-cost_both)
@@ -1308,10 +1307,8 @@ for(i in 1:(nrow(predict_df)-2)){
   adj <- demand/(sl+cl)
   adj_co4$adj[i] <- adj
   
-  
   imports_t <- predict_df$imports[i]
   exports_t <- predict_df$exports[i]
-  
   
   slShare_t <- (exp((muTilde - ((ps_t - pc_t))/phi)/sTilde))
   shares_co4$shares[i] <- slShare_t
@@ -1324,8 +1321,6 @@ for(i in 1:(nrow(predict_df)-2)){
   params_t1 <- mu_s_tildes(sl=sl_t1_hat, cl=cl_t1_hat, ps = ps_t, pc = pc_t, thetas = c(1,1))
   parameters_co4$mu_tilde[i] <- params_t1[1]
   parameters_co4$s_tilde[i] <- params_t1[2]
-  
-  
   
   p <- c(ps_t, pc_t, hc_t)
   sl <- sl_t1_hat
@@ -1351,14 +1346,14 @@ for(i in 1:(nrow(predict_df)-2)){
   #### I guess this process is mainly giving us the counterfactuals i.e., what would the supply looks like with increased 
   #### costs which change the realized price.
   #### Note: We did not do that in the model estimation because that is representing the real world realization not the 
-  #### changes with the policy. 
+  #### changes with the policy.
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
   shares_co4$shares_2009[i] <- slShare_t
 
   sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
   cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
-  demand_t1_hat <- (sl_t1_hat + cl_t1_hat)
+  demand_t1_hat <- demand_t1_hat
   
   prices_predict_co4$ps_hat[i] <- ps_hat_t1
   prices_predict_co4$pc_hat[i] <- pc_hat_t1
