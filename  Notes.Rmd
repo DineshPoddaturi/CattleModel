@@ -15,3 +15,18 @@
 
 * About adding to literature:
 We add to the existing literature of impacts of traceability on producers by using a dynamic model for the analysis. In contrast to the existing literature on the subject, we take a data driven approach to estimate the impacts. Our study fills the gap by analysing different types of cattle, use 
+
+
+<!-- 
+###########################################################################
+                                NEW UPDATE
+###########################################################################
+-->
+* I see changes in the priuce and quantities with the increase in demand. When simulating the model with increase in demand we increase the demand for meat before determining the prices i.e., increase the variable A in the code (for instance with a 10 percent increase in demand increase A from demand to demand * (1.1)).
+* Upon increasing trhe demand I see the price for fed cattle increased and supply went down drastically. However, the price of cull cows went down and the supply for cull cow meat increased. Just with a 10 percentr increase I see the loss in producer surplus decrease. 
+* Need to do more detailed analysis. But I guess this is good news.
+
+
+
+
+
