@@ -969,7 +969,7 @@ for(i in 1:(nrow(predict_df)-2)){
   parameters$s_tilde[i] <- params_t1[2]
   
   p <- c(ps_t, pc_t, hc_t)
-  # p <- c(1,1,1)
+  # p <- c(0.5,0.3,0.2)
   sl <- sl_t1_hat
   cl <- cl_t1_hat
   A <- demand_t1_hat
