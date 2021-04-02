@@ -133,7 +133,7 @@ pSurplus_merge_paper <- pSurplus
 pSurplus_long_paper <- pivot_longer(pSurplus_paper, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
 
 
-tikz(file="TexPlots/ProducerSurplus2010.tex", width=6, height=3)
+tikz(file="TexPlots/ProducerSurplus2010_sub.tex", width=3, height=2.5)
 pSurplus_2010_plot <- pSurplus_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x=  "Animal ID and Traceability Adoption Rate" , y= "Surplus (in Billion \\$)") + 
   theme_test()
