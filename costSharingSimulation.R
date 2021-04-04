@@ -545,6 +545,10 @@ surplusChange_50ToAll <- surplusChange_50ToAll%>% filter(Year==2010) %>% mutate(
 
 
 
+surplusLoss_costShare %>% mutate(zero_20 = surplusLoss0 - surplusLoss20,
+                                 zero_30 = surplusLoss0 - surplusLoss30,
+                                 zero_50 = surplusLoss0 - surplusLoss50,
+                                 zero_70 = surplusLoss0 - surplusLoss70)
 
 
 

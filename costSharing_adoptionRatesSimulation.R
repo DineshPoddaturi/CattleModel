@@ -1,5 +1,5 @@
 ################ different adoption rate ##########
-adoption <- 0.3
+adoption <- 0.9
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -37,7 +37,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                                 share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_Y
+predict_df_adopt <- predict_df_adopt_N
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -118,8 +118,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * ( adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * ( adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -151,7 +151,7 @@ demand_predict_est_adopt_N <- demand_predict_adopt %>% mutate(Demand_estN = dema
 
 ########################################################################################################################################################################
 
-costShare <- 0
+costShare <- 0.7
 
 taggingCosts <- round(total_Costs * (1-costShare),3)
 
@@ -431,6 +431,144 @@ revDiff_costs_t_pSurp_adopt <- revDiff_costs_t_adopt %>% mutate(diffRevCost_t_ob
 
 
 
+
+####################################################################################
+############################    30% adoption   #####################################
+####################################################################################
+
+
+###### 20% Cost Share
+pSurplus_30_20 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus30_20 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus30_20)
+
+##### 30% Cost Share
+pSurplus_30_30 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus30_30 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus30_30)
+
+##### 50% Cost Share
+pSurplus_30_50 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus30_50 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus30_50)
+
+##### 70% Cost Share
+pSurplus_30_70 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus30_70 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus30_70)
+
+
+
+####################################################################################
+############################    50% adoption   #####################################
+####################################################################################
+
+
+###### 20% Cost Share
+pSurplus_50_20 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus50_20 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus50_20)
+
+##### 30% Cost Share
+pSurplus_50_30 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus50_30 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus50_30)
+
+##### 50% Cost Share
+pSurplus_50_50 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus50_50 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus50_50)
+
+##### 70% Cost Share
+pSurplus_50_70 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus50_70 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus50_70)
+
+
+####################################################################################
+############################    70% adoption   #####################################
+####################################################################################
+
+
+###### 20% Cost Share
+pSurplus_70_20 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus70_20 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus70_20)
+
+##### 30% Cost Share
+pSurplus_70_30 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus70_30 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus70_30)
+
+##### 50% Cost Share
+pSurplus_70_50 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus70_50 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus70_50)
+
+##### 70% Cost Share
+pSurplus_70_70 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus70_70 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus70_70)
+
+
+####################################################################################
+############################    90% adoption   #####################################
+####################################################################################
+
+###### 20% Cost Share
+pSurplus_90_20 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus90_20 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus90_20)
+
+##### 30% Cost Share
+pSurplus_90_30 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus90_30 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus90_30)
+
+##### 50% Cost Share
+pSurplus_90_50 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus90_50 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus90_50)
+
+##### 70% Cost Share
+pSurplus_90_70 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus90_70 = diffRevCost_t_model) %>% select(Year, 
+                                                                                                         pSurplus90_70)
+
+
+
+
+
+
+############# Here I compute the percent changes from no cost sharing to cost sharing for different adoption rates ########
+
+##### Under 30% adoption rate
+pSurp_30_CostShare<- merge(pSurp_30,merge(pSurplus_30_20,merge(pSurplus_30_30, merge(pSurplus_30_50,pSurplus_30_70))))
+pSurp_30_CostShare_Loss <- pSurp_30_CostShare[,-1] * (-1)
+pSurp_30_CostShare_Loss <- pSurp_30_CostShare_Loss %>% mutate(Year = pSurp_30_CostShare$Year) %>% select(Year, everything())
+
+pSurp_30_CostShare_Change <- pSurp_30_CostShare_Loss %>% mutate(change30_0To20 =  ((pSurplus30_20 - surplus_30)/surplus_30)*100,
+                                                                change30_0To30 =  ((pSurplus30_30 - surplus_30)/surplus_30)*100,
+                                                                change30_0To50 =  ((pSurplus30_50 - surplus_30)/surplus_30)*100,
+                                                                change30_0To70 =  ((pSurplus30_70 - surplus_30)/surplus_30)*100) %>% select(
+                                                                  Year, change30_0To20, change30_0To30, change30_0To50, change30_0To70)
+
+##### Under 50% adoption rate
+pSurp_50_CostShare<- merge(pSurp_50,merge(pSurplus_50_20,merge(pSurplus_50_30, merge(pSurplus_50_50,pSurplus_50_70))))
+pSurp_50_CostShare_Loss <- pSurp_50_CostShare[,-1] * (-1)
+pSurp_50_CostShare_Loss <- pSurp_50_CostShare_Loss %>% mutate(Year = pSurp_50_CostShare$Year) %>% select(Year, everything())
+
+pSurp_50_CostShare_Change <- pSurp_50_CostShare_Loss %>% mutate(change50_0To20 =  ((pSurplus50_20 - surplus_50)/surplus_50)*100,
+                                                                change50_0To30 =  ((pSurplus50_30 - surplus_50)/surplus_50)*100,
+                                                                change50_0To50 =  ((pSurplus50_50 - surplus_50)/surplus_50)*100,
+                                                                change50_0To70 =  ((pSurplus50_70 - surplus_50)/surplus_50)*100) %>% select(
+                                                                  Year, change50_0To20, change50_0To30, change50_0To50, change50_0To70)
+
+##### Under 70% adoption rate
+pSurp_70_CostShare<- merge(pSurp_70,merge(pSurplus_70_20,merge(pSurplus_70_30, merge(pSurplus_70_50,pSurplus_70_70))))
+pSurp_70_CostShare_Loss <- pSurp_70_CostShare[,-1] * (-1)
+pSurp_70_CostShare_Loss <- pSurp_70_CostShare_Loss %>% mutate(Year = pSurp_70_CostShare$Year) %>% select(Year, everything())
+
+pSurp_70_CostShare_Change <- pSurp_70_CostShare_Loss %>% mutate(change70_0To20 =  ((pSurplus70_20 - surplus_70)/surplus_70)*100,
+                                                                change70_0To30 =  ((pSurplus70_30 - surplus_70)/surplus_70)*100,
+                                                                change70_0To50 =  ((pSurplus70_50 - surplus_70)/surplus_70)*100,
+                                                                change70_0To70 =  ((pSurplus70_70 - surplus_70)/surplus_70)*100) %>% select(
+                                                                  Year, change70_0To20, change70_0To30, change70_0To50, change70_0To70)
+
+##### Under 90% adoption rate
+pSurp_90_CostShare<- merge(pSurp_90,merge(pSurplus_90_20,merge(pSurplus_90_30, merge(pSurplus_90_50,pSurplus_90_70))))
+pSurp_90_CostShare_Loss <- pSurp_90_CostShare[,-1] * (-1)
+pSurp_90_CostShare_Loss <- pSurp_90_CostShare_Loss %>% mutate(Year = pSurp_90_CostShare$Year) %>% select(Year, everything())
+
+pSurp_90_CostShare_Change <- pSurp_90_CostShare_Loss %>% mutate(change90_0To20 =  ((pSurplus90_20 - surplus_90)/surplus_90)*100,
+                                                                change90_0To30 =  ((pSurplus90_30 - surplus_90)/surplus_90)*100,
+                                                                change90_0To50 =  ((pSurplus90_50 - surplus_90)/surplus_90)*100,
+                                                                change90_0To70 =  ((pSurplus90_70 - surplus_90)/surplus_90)*100) %>% select(
+                                                                  Year, change90_0To20, change90_0To30, change90_0To50, change90_0To70)
 
 
 
