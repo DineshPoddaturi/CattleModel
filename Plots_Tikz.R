@@ -125,18 +125,18 @@ dev.off()
 
 
 ##### Different adoption rates no cost sharing
-pSurplus_paper <- merge(pSurp_30, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
+pSurplus_paper <- round(merge(pSurp_30, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100)))),3)
 names(pSurplus_paper) <- c("Year", "30 \\%", "50 \\%", "70 \\%", "90 \\%", "100 \\%")
 
 pSurplus_merge_paper <- pSurplus
 
 pSurplus_long_paper <- pivot_longer(pSurplus_paper, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
 
-tikz(file="TexPlots/ProducerSurplus2010_sub.tex", width=3, height=2.5)
+tikz(file="TexPlots/ProducerSurplus2010.tex", width=6, height=3)
 pSurplus_2010_plot <- pSurplus_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="darkslategray4", width=0.3)+ 
+  geom_bar(stat="identity", fill="darkslategray4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Adoption Rate" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
+  geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
 print(pSurplus_2010_plot)
 dev.off()
@@ -148,11 +148,11 @@ names(pSurplus_adopt100_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%
 
 pSurplus_adopt100_long_paper <- pivot_longer(pSurplus_adopt100_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
-tikz(file="TexPlots/ProducerSurplus2010_adopt100_sub.tex", width=3, height=2.5)
+tikz(file="TexPlots/ProducerSurplus2010_adopt100_sub.tex", width=6, height=3)
 pSurplus_adopt100_2010_plot <- pSurplus_adopt100_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ 
+  geom_bar(stat="identity", fill="steelblue4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
+  geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
 print(pSurplus_adopt100_2010_plot)
 dev.off()
@@ -164,11 +164,11 @@ names(pSurplus_adopt30_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%"
 
 pSurplus_adopt30_long_paper <- pivot_longer(pSurplus_adopt30_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
-tikz(file="TexPlots/ProducerSurplus2010_adopt30_sub.tex", width=3, height=2.5)
+tikz(file="TexPlots/ProducerSurplus2010_adopt30_sub.tex", width=6, height=3)
 pSurplus_adopt30_2010_plot <- pSurplus_adopt30_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="slategray4", width=0.3)+ 
+  geom_bar(stat="identity", fill="slategray4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
+  geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
 print(pSurplus_adopt30_2010_plot)
 dev.off()
@@ -179,11 +179,11 @@ names(pSurplus_adopt50_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%"
 
 pSurplus_adopt50_long_paper <- pivot_longer(pSurplus_adopt50_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
-tikz(file="TexPlots/ProducerSurplus2010_adopt50_sub.tex", width=3, height=2.5)
+tikz(file="TexPlots/ProducerSurplus2010_adopt50_sub.tex", width=6, height=3)
 pSurplus_adopt50_2010_plot <- pSurplus_adopt50_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="thistle4", width=0.3)+ 
+  geom_bar(stat="identity", fill="thistle4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
+  geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
 print(pSurplus_adopt50_2010_plot)
 dev.off()
@@ -194,11 +194,11 @@ names(pSurplus_adopt70_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%"
 
 pSurplus_adopt70_long_paper <- pivot_longer(pSurplus_adopt70_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
-tikz(file="TexPlots/ProducerSurplus2010_adopt70_sub.tex", width=3, height=2.5)
+tikz(file="TexPlots/ProducerSurplus2010_adopt70_sub.tex", width=6, height=3)
 pSurplus_adopt70_2010_plot <- pSurplus_adopt70_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="wheat4", width=0.3)+ 
+  geom_bar(stat="identity", fill="wheat4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
+  geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
 print(pSurplus_adopt70_2010_plot)
 dev.off()
@@ -209,15 +209,13 @@ names(pSurplus_adopt90_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%"
 
 pSurplus_adopt90_long_paper <- pivot_longer(pSurplus_adopt90_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
-tikz(file="TexPlots/ProducerSurplus2010_adopt90_sub.tex", width=3, height=2.5)
+tikz(file="TexPlots/ProducerSurplus2010_adopt90_sub.tex", width=6, height=3)
 pSurplus_adopt90_2010_plot <- pSurplus_adopt90_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="seashell4", width=0.3)+ 
+  geom_bar(stat="identity", fill="seashell4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
+  geom_text(aes(label=Surplus),vjust=-1) +
   theme_test()
 print(pSurplus_adopt90_2010_plot)
 dev.off()
-
-
 
 

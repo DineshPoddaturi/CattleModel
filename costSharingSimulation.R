@@ -515,8 +515,8 @@ surplus_costShare_50 <- data.frame(Year = revDiff_costs_t_pSurp$Year ,
 surplus_costShare_70 <- data.frame(Year = revDiff_costs_t_pSurp$Year ,
                                    surplusLoss70= c(0.3062,0.1649,0.1283,0.2063,0.1538,0.3093,0.2677))
 
-surplusLoss_costShare <- merge(surplus_costShare_0,merge(surplus_costShare_20,merge(surplus_costShare_30,
-                                                                                     merge(surplus_costShare_50,surplus_costShare_70))))
+surplusLoss_costShare <- round(merge(surplus_costShare_0,merge(surplus_costShare_20,merge(surplus_costShare_30,
+                                                                                     merge(surplus_costShare_50,surplus_costShare_70)))),3)
 surplusLoss_costShare[,-1] <- surplusLoss_costShare[,-1] * (-1)
 
 surplusChange_0ToAll <- surplusLoss_costShare
