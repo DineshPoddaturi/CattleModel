@@ -6,7 +6,7 @@
 
 ###### We will perform this with 30%, 50%, 70% cost sharing by the policy makers #############
 
-costShare <- 0
+costShare <- 0.5
 
 taggingCosts <- round(total_Costs * (1-costShare),3)
 
@@ -517,6 +517,7 @@ surplus_costShare_70 <- data.frame(Year = revDiff_costs_t_pSurp$Year ,
 
 surplusLoss_costShare <- merge(surplus_costShare_0,merge(surplus_costShare_20,merge(surplus_costShare_30,
                                                                                      merge(surplus_costShare_50,surplus_costShare_70))))
+surplusLoss_costShare[,-1] <- surplusLoss_costShare[,-1] * (-1)
 
 surplusChange_0ToAll <- surplusLoss_costShare
 surplusChange_0ToAll <- surplusChange_0ToAll%>% filter(Year==2010) %>% mutate(change_0To20 = ((surplusLoss20 - surplusLoss0)/surplusLoss0)*100,
@@ -542,13 +543,10 @@ surplusChange_50ToAll <- surplusChange_50ToAll%>% filter(Year==2010) %>% mutate(
 
 
 
-
-
-
-surplusLoss_costShare %>% mutate(zero_20 = surplusLoss0 - surplusLoss20,
-                                 zero_30 = surplusLoss0 - surplusLoss30,
-                                 zero_50 = surplusLoss0 - surplusLoss50,
-                                 zero_70 = surplusLoss0 - surplusLoss70)
+# surplusLoss_costShare %>% mutate(zero_20 = surplusLoss0 - surplusLoss20,
+#                                  zero_30 = surplusLoss0 - surplusLoss30,
+#                                  zero_50 = surplusLoss0 - surplusLoss50,
+#                                  zero_70 = surplusLoss0 - surplusLoss70)
 
 
 

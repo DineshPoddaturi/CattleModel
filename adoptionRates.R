@@ -40,7 +40,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                           share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_Y
+predict_df_adopt <- predict_df_adopt_N
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -121,8 +121,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * ( adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * ( adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -380,10 +380,10 @@ pSurplus_merge <- pSurplus
 
 pSurplus_long <- pivot_longer(pSurplus, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
 
-pSurplus_10 <- pSurplus_long %>% filter(Year == 2010) %>% mutate(Surplus = -Surplus)
-pSurplus_10$Adoption <- as.numeric(pSurplus_10$Adoption)
-
-pSurplus_10 %>% ggplot(aes(x=Adoption, y=Surplus))+ geom_point() + geom_smooth(method = "loess")
+# pSurplus_10 <- pSurplus_long %>% filter(Year == 2010) %>% mutate(Surplus = -Surplus)
+# pSurplus_10$Adoption <- as.numeric(pSurplus_10$Adoption)
+# 
+# pSurplus_10 %>% ggplot(aes(x=Adoption, y=Surplus))+ geom_point() + geom_smooth(method = "loess")
 
 
 pSurplus_2010 <- pSurplus_long %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+

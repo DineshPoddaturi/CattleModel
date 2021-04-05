@@ -1173,7 +1173,7 @@ prices_costs_new <- prices_costs
 
 ##### Work on these again (I think the problem is with the cost per pound) ###########
 
-costShare <- 0.3
+# costShare <- 0.3
 
 taggingCosts <- round(total_Costs,3)
 
