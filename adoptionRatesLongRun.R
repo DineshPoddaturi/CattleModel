@@ -40,7 +40,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                                 share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_N
+predict_df_adopt <- predict_df_adopt_Y
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -121,8 +121,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -148,6 +148,7 @@ prices_predict_est_adopt_N <- prices_predict_adopt %>% mutate(ps_estN = ps_hat, 
 demand_predict_est_adopt_N <- demand_predict_adopt %>% mutate(Demand_estN = demand_est, 
                                                               sl_estN = sl_est, cl_estN = cl_est) %>% filter(Demand_estN>0) %>% select(Year, Demand_estN, sl_estN, cl_estN)
 
+###################################################################
 
 cost_price_addedCosts_obs <- cost_price_addedCosts_obs_r
 
@@ -298,11 +299,11 @@ demand_predict_co4_merge_adopt <- left_join(merge(demand_predict_est_adopt_Y,mer
 #####################################
 
 percentChange_price_adopt <- prices_predict_co4_merge_adopt %>% mutate(percentChange_ps_obs = round(((ps_hat - ps)/ps)*100,3),
-                                                           percentChange_ps_model = round(((ps_hat - ps_est)/ps_est)*100,3),
+                                                           percentChange_ps_model = round(((ps_hat - ps_estY)/ps_estY)*100,3),
                                                            percentChange_pc_obs = round(((pc_hat - pc)/pc)*100,3), 
-                                                           percentChange_pc_model = round(((pc_hat - pc_est)/pc_est)*100,3),
+                                                           percentChange_pc_model = round(((pc_hat - pc_estY)/pc_estY)*100,3),
                                                            percentChange_hc_obs = round(((hc_hat - hc)/hc)*100,3),
-                                                           percentChange_hc_model = round(((hc_hat - hc_est)/hc_est)*100,3)) %>% select(Year, percentChange_ps_obs, 
+                                                           percentChange_hc_model = round(((hc_hat - hc_estY)/hc_estY)*100,3)) %>% select(Year, percentChange_ps_obs, 
                                                                                                                                         percentChange_ps_model, percentChange_pc_obs,
                                                                                                                                         percentChange_pc_model, percentChange_hc_obs,
                                                                                                                                         percentChange_hc_model) %>% filter(Year>2009)
@@ -311,11 +312,11 @@ percentChange_price_pc_adopt <- percentChange_price_adopt %>% select(Year, perce
 percentChange_cost_hc_adopt <- percentChange_price_adopt %>% select(Year, percentChange_hc_obs, percentChange_hc_model)
 
 percentChange_demand_adopt <- demand_predict_co4_merge_adopt %>% mutate(percentChange_demand_obs = round(((Demand_hat - Demand)/Demand)*100,3),
-                                                            percentChange_demand_model = round(((Demand_hat - Demand_est)/Demand_est)*100,3),
+                                                            percentChange_demand_model = round(((Demand_hat - Demand_estY)/Demand_estY)*100,3),
                                                             percentChange_sl_obs = round(((sl_hat - sl)/sl)*100,3),
-                                                            percentChange_sl_model = round(((sl_hat - sl_est)/sl_est)*100,3),
+                                                            percentChange_sl_model = round(((sl_hat - sl_estY)/sl_estY)*100,3),
                                                             percentChange_cl_obs = round(((cl_hat - cl)/cl)*100,3),
-                                                            percentChange_cl_model = round(((cl_hat - cl_est)/cl_est)*100,3)) %>% select(Year, percentChange_demand_obs,
+                                                            percentChange_cl_model = round(((cl_hat - cl_estY)/cl_estY)*100,3)) %>% select(Year, percentChange_demand_obs,
                                                                                                                                          percentChange_demand_model, percentChange_sl_obs, 
                                                                                                                                          percentChange_sl_model, percentChange_cl_obs,
                                                                                                                                          percentChange_cl_model) %>% filter(Year>2009)
@@ -331,11 +332,11 @@ sl_change_adopt <- percentChange_sl_adopt %>% filter(Year==2010) %>% select(perc
 
 cl_change_adopt <- percentChange_cl_adopt %>% filter(Year==2010) %>% select(percentChange_cl_model)
 
-temp_ps_adopt <- prices_predict_co4_merge_adopt$ps_est + prices_predict_co4_merge_adopt$ps_est*(ps_change_adopt$percentChange_ps_model/100)
-temp_pc_adopt <- prices_predict_co4_merge_adopt$pc_est + prices_predict_co4_merge_adopt$pc_est*(pc_change_adopt$percentChange_pc_model/100)
+temp_ps_adopt <- prices_predict_co4_merge_adopt$ps_estY + prices_predict_co4_merge_adopt$ps_estY*(ps_change_adopt$percentChange_ps_model/100)
+temp_pc_adopt <- prices_predict_co4_merge_adopt$pc_estY + prices_predict_co4_merge_adopt$pc_estY*(pc_change_adopt$percentChange_pc_model/100)
 
-temp_sl_adopt <- demand_predict_co4_merge_adopt$sl_est + demand_predict_co4_merge_adopt$sl_est * (sl_change_adopt$percentChange_sl_model/100)
-temp_cl_adopt <- demand_predict_co4_merge_adopt$cl_est + demand_predict_co4_merge_adopt$cl_est * (cl_change_adopt$percentChange_cl_model/100)
+temp_sl_adopt <- demand_predict_co4_merge_adopt$sl_estY + demand_predict_co4_merge_adopt$sl_estY * (sl_change_adopt$percentChange_sl_model/100)
+temp_cl_adopt <- demand_predict_co4_merge_adopt$cl_estY + demand_predict_co4_merge_adopt$cl_estY * (cl_change_adopt$percentChange_cl_model/100)
 
 prices_predict_co4_merge_adopt_LR <- prices_predict_co4_merge_adopt
 demand_predict_co4_merge_adopt_LR <- demand_predict_co4_merge_adopt
@@ -358,17 +359,17 @@ demand_predict_co4_merge_adopt_LR$cl_hat <- temp_cl_adopt
 
 
 
-rev_sl_adopt_LR <-  prices_predict_co4_merge_adopt_LR %>% mutate(slRev_post_adopt = (ps_hat/100) * demand_predict_co4_merge_adopt$sl_hat,
-                                                           slRev_model_adopt = (ps_estY/100) * demand_predict_co4_merge_adopt$sl_estY,
-                                                           slRev_obs_adopt = (ps/100) * demand_predict_co4_merge_adopt$sl * adoption,
+rev_sl_adopt_LR <-  prices_predict_co4_merge_adopt_LR %>% mutate(slRev_post_adopt = (ps_hat/100) * demand_predict_co4_merge_adopt_LR$sl_hat,
+                                                           slRev_model_adopt = (ps_estY/100) * demand_predict_co4_merge_adopt_LR$sl_estY,
+                                                           slRev_obs_adopt = (ps/100) * demand_predict_co4_merge_adopt_LR$sl * adoption,
                                                            slRev_diff_obs = slRev_post_adopt - slRev_obs_adopt,
                                                            slRev_diff_model = slRev_post_adopt  - slRev_model_adopt) %>% select(
                                                              Year, slRev_post_adopt, slRev_model_adopt, slRev_obs_adopt, 
                                                              slRev_diff_obs, slRev_diff_model)
 
-rev_cl_adopt_LR <- prices_predict_co4_merge_adopt_LR %>% mutate(clRev_post_adopt = (pc_hat/100) * demand_predict_co4_merge_adopt$cl_hat,
-                                                          clRev_model_adopt = (pc_estY/100) * demand_predict_co4_merge_adopt$cl_estY,
-                                                          clRev_obs_adopt = (pc/100) * demand_predict_co4_merge_adopt$cl * adoption,
+rev_cl_adopt_LR <- prices_predict_co4_merge_adopt_LR %>% mutate(clRev_post_adopt = (pc_hat/100) * demand_predict_co4_merge_adopt_LR$cl_hat,
+                                                          clRev_model_adopt = (pc_estY/100) * demand_predict_co4_merge_adopt_LR$cl_estY,
+                                                          clRev_obs_adopt = (pc/100) * demand_predict_co4_merge_adopt_LR$cl * adoption,
                                                           clRev_diff_obs = clRev_post_adopt - clRev_obs_adopt,
                                                           clRev_diff_model = clRev_post_adopt - clRev_model_adopt) %>% select(
                                                             Year, clRev_post_adopt, clRev_model_adopt, clRev_obs_adopt, 
@@ -380,6 +381,7 @@ rev_total_adopt_LR <- merge(rev_sl_adopt_LR, rev_cl_adopt_LR) %>% mutate(
   totalRev_diff_model = totalRev_post - totalRev_model) %>% select(Year, totalRev_post, totalRev_model, 
                                                                    totalRev_obs, totalRev_diff_obs, totalRev_diff_model)
 
+# rev_total_2009_adopt_LR <- rev_total_adopt_LR %>% filter(Year>2009)
 
 
 costs_cl <- costs_cl_9years %>% filter(Year>1994 & Year<2017) %>% select(Year, cost_Lb_9years)
@@ -419,29 +421,29 @@ revDiff_costs_t_pSurp_adopt_LR <- revDiff_costs_t_adopt_LR %>% mutate(diffRevCos
 
 
 
-# revDiff_costs_t_pSurp_adopt_90 <- revDiff_costs_t_pSurp_adopt
+# revDiff_costs_t_pSurp_adopt_90_LR  <- revDiff_costs_t_pSurp_adopt_LR
 
-# revDiff_costs_t_pSurp_adopt_70 <- revDiff_costs_t_pSurp_adopt
+# revDiff_costs_t_pSurp_adopt_70_LR  <- revDiff_costs_t_pSurp_adopt_LR
 
-# revDiff_costs_t_pSurp_adopt_50 <- revDiff_costs_t_pSurp_adopt
+# revDiff_costs_t_pSurp_adopt_50_LR  <- revDiff_costs_t_pSurp_adopt_LR
 
-# revDiff_costs_t_pSurp_adopt_30 <- revDiff_costs_t_pSurp_adopt
+# revDiff_costs_t_pSurp_adopt_30_LR  <- revDiff_costs_t_pSurp_adopt_LR
 
-# revDiff_costs_t_pSurp_adopt_20 <- revDiff_costs_t_pSurp_adopt
+# revDiff_costs_t_pSurp_adopt_20_LR  <- revDiff_costs_t_pSurp_adopt_LR 
 
-pSurp_100 <- revDiff_costs_t_pSurp %>% mutate(surplus_100 = diffRevCost_t_model) %>% select(Year, surplus_100)
-pSurp_90 <- revDiff_costs_t_pSurp_adopt_90 %>% mutate(surplus_90 = diffRevCost_t_model) %>% select(Year, surplus_90)
-pSurp_70 <- revDiff_costs_t_pSurp_adopt_70 %>% mutate(surplus_70 = diffRevCost_t_model) %>% select(Year, surplus_70)
-pSurp_50 <- revDiff_costs_t_pSurp_adopt_50 %>% mutate(surplus_50 = diffRevCost_t_model) %>% select(Year, surplus_50)
-pSurp_30 <- revDiff_costs_t_pSurp_adopt_30 %>% mutate(surplus_30 = diffRevCost_t_model) %>% select(Year, surplus_30)
-pSurp_20 <- revDiff_costs_t_pSurp_adopt_20 %>% mutate(surplus_20 = diffRevCost_t_model) %>% select(Year, surplus_20)
+pSurp_100_LR  <- revDiff_costs_t_pSurp_LR %>% mutate(surplus_100 = diffRevCost_t_model) %>% select(Year, surplus_100)
+pSurp_90_LR  <- revDiff_costs_t_pSurp_adopt_90_LR  %>% mutate(surplus_90 = diffRevCost_t_model) %>% select(Year, surplus_90)
+pSurp_70_LR  <- revDiff_costs_t_pSurp_adopt_70_LR  %>% mutate(surplus_70 = diffRevCost_t_model) %>% select(Year, surplus_70)
+pSurp_50_LR  <- revDiff_costs_t_pSurp_adopt_50_LR  %>% mutate(surplus_50 = diffRevCost_t_model) %>% select(Year, surplus_50)
+pSurp_30_LR  <- revDiff_costs_t_pSurp_adopt_30_LR  %>% mutate(surplus_30 = diffRevCost_t_model) %>% select(Year, surplus_30)
+# pSurp_20_LR  <- revDiff_costs_t_pSurp_adopt_20_LR  %>% mutate(surplus_20 = diffRevCost_t_model) %>% select(Year, surplus_20)
 
-pSurplus <- merge(pSurp_20, merge(pSurp_30, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100)))))
-names(pSurplus) <- c("Year", "20", "30", "50", "70", "90", "100")
+pSurplus_LR  <- merge(pSurp_30_LR, merge(pSurp_50_LR, merge(pSurp_70_LR, merge(pSurp_90_LR, pSurp_100_LR))))
+names(pSurplus_LR ) <- c("Year", "30", "50", "70", "90", "100")
 
-pSurplus_merge <- pSurplus
+pSurplus_merge_LR <- pSurplus_LR
 
-pSurplus_long <- pivot_longer(pSurplus, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
+pSurplus_long_LR <- pivot_longer(pSurplus_LR, -c(Year), values_to = "Surplus", names_to = "Adoption") %>% as.data.frame()
 
 # pSurplus_10 <- pSurplus_long %>% filter(Year == 2010) %>% mutate(Surplus = -Surplus)
 # pSurplus_10$Adoption <- as.numeric(pSurplus_10$Adoption)
@@ -449,32 +451,33 @@ pSurplus_long <- pivot_longer(pSurplus, -c(Year), values_to = "Surplus", names_t
 # pSurplus_10 %>% ggplot(aes(x=Adoption, y=Surplus))+ geom_point() + geom_smooth(method = "loess")
 
 
-pSurplus_2010 <- pSurplus_long %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+pSurplus_2010_LR <- pSurplus_long_LR %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2010")+ 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test()
 
-pSurplus_2011 <- pSurplus_long %>% filter(Year == 2011) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+pSurplus_2011_LR <- pSurplus_long_LR %>% filter(Year == 2011) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2011")+ 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test()
 
-pSurplus_2012 <- pSurplus_long %>% filter(Year == 2012) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+pSurplus_2012_LR <- pSurplus_long_LR %>% filter(Year == 2012) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2012")+ 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test()
 
-pSurplus_2013 <- pSurplus_long %>% filter(Year == 2013) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+pSurplus_2013_LR <- pSurplus_long_LR %>% filter(Year == 2013) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2013")+ 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test()
 
-pSurplus_2014 <- pSurplus_long %>% filter(Year == 2014) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+pSurplus_2014_LR <- pSurplus_long_LR %>% filter(Year == 2014) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2014")+ 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test()
 
-pSurplus_2015 <- pSurplus_long %>% filter(Year == 2015) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+pSurplus_2015_LR <- pSurplus_long_LR %>% filter(Year == 2015) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
   geom_bar(stat="identity", fill="steelblue", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2015")+ 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test()
 
-pSurplus_2016 <- pSurplus_long %>% filter(Year == 2016) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2016")+ 
+pSurplus_2016_LR <- pSurplus_long_LR %>% filter(Year == 2016) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
+  geom_bar(stat="identity", fill="steelblue4", width=0.3)+ labs(x="Adoption Rate", y=" Surplus (in billion $) - 2016")+
+  geom_text(aes(label=Surplus),vjust=1.5) +
   theme_test()
 
 

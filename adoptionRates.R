@@ -373,8 +373,8 @@ pSurp_50 <- revDiff_costs_t_pSurp_adopt_50 %>% mutate(surplus_50 = diffRevCost_t
 pSurp_30 <- revDiff_costs_t_pSurp_adopt_30 %>% mutate(surplus_30 = diffRevCost_t_model) %>% select(Year, surplus_30)
 pSurp_20 <- revDiff_costs_t_pSurp_adopt_20 %>% mutate(surplus_20 = diffRevCost_t_model) %>% select(Year, surplus_20)
 
-pSurplus <- merge(pSurp_20, merge(pSurp_30, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100)))))
-names(pSurplus) <- c("Year", "20", "30", "50", "70", "90", "100")
+pSurplus <- merge(pSurp_30, merge(pSurp_50, merge(pSurp_70, merge(pSurp_90, pSurp_100))))
+names(pSurplus) <- c("Year", "30", "50", "70", "90", "100")
 
 pSurplus_merge <- pSurplus
 
