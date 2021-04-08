@@ -1,5 +1,5 @@
 ################ different adoption rate ##########
-adoption <- 0.3
+adoption <- 0.9
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -151,7 +151,7 @@ demand_predict_est_adopt_N <- demand_predict_adopt %>% mutate(Demand_estN = dema
 
 ########################################################################################################################################################################
 
-costShare <- 0.7
+costShare <- 0.2
 
 taggingCosts <- round(total_Costs * (1-costShare),3)
 
@@ -406,37 +406,43 @@ sl_change_adopt <- percentChange_sl_adopt %>% filter(Year==2010) %>% select(perc
 
 cl_change_adopt <- percentChange_cl_adopt %>% filter(Year==2010) %>% select(percentChange_cl_model)
 
-temp_ps_adopt <- prices_predict_co4_merge_adopt$ps_estY + prices_predict_co4_merge_adopt$ps_estY*(ps_change_adopt$percentChange_ps_model/100)
-temp_pc_adopt <- prices_predict_co4_merge_adopt$pc_estY + prices_predict_co4_merge_adopt$pc_estY*(pc_change_adopt$percentChange_pc_model/100)
+psTBA_adopt <- prices_predict_co4_merge_adopt %>% filter(Year>2009) %>% select(ps_estY)
+pcTBA_adopt <- prices_predict_co4_merge_adopt %>% filter(Year>2009) %>% select(pc_estY)
+slTBA_adopt <- demand_predict_co4_merge_adopt %>% filter(Year>2009) %>% select(sl_estY)
+clTBA_adopt <- demand_predict_co4_merge_adopt %>% filter(Year>2009) %>% select(cl_estY)
 
-temp_sl_adopt <- demand_predict_co4_merge_adopt$sl_estY + demand_predict_co4_merge_adopt$sl_estY * (sl_change_adopt$percentChange_sl_model/100)
-temp_cl_adopt <- demand_predict_co4_merge_adopt$cl_estY + demand_predict_co4_merge_adopt$cl_estY * (cl_change_adopt$percentChange_cl_model/100)
+temp_ps_adopt <- psTBA_adopt + psTBA_adopt*(ps_change_adopt$percentChange_ps_model/100)
+temp_pc_adopt <- pcTBA_adopt + pcTBA_adopt*(pc_change_adopt$percentChange_pc_model/100)
 
-prices_predict_co4_merge_adopt_LR <- prices_predict_co4_merge_adopt
-demand_predict_co4_merge_adopt_LR <- demand_predict_co4_merge_adopt
+temp_sl_adopt <- slTBA_adopt + slTBA_adopt * (sl_change_adopt$percentChange_sl_model/100)
+temp_cl_adopt <- clTBA_adopt + clTBA_adopt * (cl_change_adopt$percentChange_cl_model/100)
 
-prices_predict_co4_merge_adopt_LR$ps_hat <- temp_ps_adopt
+temp_p_adopt <- cbind(temp_ps_adopt, temp_pc_adopt) %>% mutate(Year = c(seq(2010,2016)), ps_hat = ps_estY, pc_hat = pc_estY) %>% select(Year, ps_hat, pc_hat)
+temp_q_adopt <-  cbind(temp_sl_adopt, temp_cl_adopt) %>% mutate(Year = c(seq(2010,2016)), sl_hat = sl_estY, cl_hat = cl_estY) %>% select(Year, sl_hat, cl_hat)
 
-prices_predict_co4_merge_adopt_LR$pc_hat <- temp_pc_adopt 
+prices_predict_co4_merge_adopt_LR <- prices_predict_co4_merge_adopt %>% select(-ps_hat, -pc_hat)
+demand_predict_co4_merge_adopt_LR <- demand_predict_co4_merge_adopt %>% select(-sl_hat, -cl_hat)
 
-demand_predict_co4_merge_adopt_LR$sl_hat <- temp_sl_adopt
+prices_predict_co4_merge_adopt_LR <- left_join(prices_predict_co4_merge_adopt_LR, temp_p_adopt, by = "Year") %>% select(Year, ps, ps_estY, ps_hat,
+                                                                                                                        pc, pc_estY, pc_hat)
 
-demand_predict_co4_merge_adopt_LR$cl_hat <- temp_cl_adopt
+demand_predict_co4_merge_adopt_LR <- left_join(demand_predict_co4_merge_adopt_LR, temp_q_adopt, by = "Year") %>% select(Year, sl, sl_estY, sl_hat,
+                                                                                                                        cl, cl_estY, cl_hat)
 
 ##############################################
 
 
-rev_sl_adopt_LR <-  prices_predict_co4_merge_adopt_LR %>% mutate(slRev_post_adopt = (ps_hat/100) * demand_predict_co4_merge_adopt$sl_hat,
-                                                                 slRev_model_adopt = (ps_estY/100) * demand_predict_co4_merge_adopt$sl_estY,
-                                                                 slRev_obs_adopt = (ps/100) * demand_predict_co4_merge_adopt$sl * adoption,
+rev_sl_adopt_LR <-  prices_predict_co4_merge_adopt_LR %>% mutate(slRev_post_adopt = (ps_hat/100) * demand_predict_co4_merge_adopt_LR$sl_hat,
+                                                                 slRev_model_adopt = (ps_estY/100) * demand_predict_co4_merge_adopt_LR$sl_estY,
+                                                                 slRev_obs_adopt = (ps/100) * demand_predict_co4_merge_adopt_LR$sl * adoption,
                                                                  slRev_diff_obs = slRev_post_adopt - slRev_obs_adopt,
                                                                  slRev_diff_model = slRev_post_adopt  - slRev_model_adopt) %>% select(
                                                                    Year, slRev_post_adopt, slRev_model_adopt, slRev_obs_adopt, 
                                                                    slRev_diff_obs, slRev_diff_model)
 
-rev_cl_adopt_LR <- prices_predict_co4_merge_adopt_LR %>% mutate(clRev_post_adopt = (pc_hat/100) * demand_predict_co4_merge_adopt$cl_hat,
-                                                                clRev_model_adopt = (pc_estY/100) * demand_predict_co4_merge_adopt$cl_estY,
-                                                                clRev_obs_adopt = (pc/100) * demand_predict_co4_merge_adopt$cl * adoption,
+rev_cl_adopt_LR <- prices_predict_co4_merge_adopt_LR %>% mutate(clRev_post_adopt = (pc_hat/100) * demand_predict_co4_merge_adopt_LR$cl_hat,
+                                                                clRev_model_adopt = (pc_estY/100) * demand_predict_co4_merge_adopt_LR$cl_estY,
+                                                                clRev_obs_adopt = (pc/100) * demand_predict_co4_merge_adopt_LR$cl * adoption,
                                                                 clRev_diff_obs = clRev_post_adopt - clRev_obs_adopt,
                                                                 clRev_diff_model = clRev_post_adopt - clRev_model_adopt) %>% select(
                                                                   Year, clRev_post_adopt, clRev_model_adopt, clRev_obs_adopt, 

@@ -470,8 +470,8 @@ Here I adjust the prices and quantities to get the long-run producer surplus est
 
 \begin{table}[!ht]
 \begin{center}
-\caption{Aggregate producer surplus}
-\begin{tabular}{lll}
+\caption{Long run aggregate producer surplus}
+\begin{tabular}{ll}
 \hline
 Year   & diffRevCost\_t\_model \\ \hline
 2010   &      -0.4655 \\
@@ -485,5 +485,25 @@ Year   & diffRevCost\_t\_model \\ \hline
 \end{center}
 \end{table}
 
+
+
+Long-Run impacts for different adoption rates
+
+\begin{table}[!ht]
+\begin{center}
+\caption{Long Run aggregate producer surplus for different adoption rates}
+\begin{tabular}{l l l l l l}
+\hline
+Year   &    30    & 50      & 70      & 90      & 100 \\ \hline
+2010   &  -0.1628 & -0.2493 & -0.3358 & -0.4223 & -0.4655    \\
+2011   &  -0.1401 & -0.2127 & -0.2852 & -0.3577 & -0.3940    \\
+2012   &  -0.0827 & -0.1266 & -0.1704 & -0.2142 & -0.2361     \\
+2013   &  -0.0640 & -0.0971 & -0.1302 & -0.1632 & -0.1797    \\
+2014   &  -0.0506 & -0.0772 & -0.1039 & -0.1304 & -0.1437   \\ 
+2015   &  0.0212  & 0.0317  & 0.0422  & 0.0528  & 0.0580     \\
+2016   &  0.0089  & 0.0135  & 0.0180  & 0.0227  & 0.0250       \\\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 
