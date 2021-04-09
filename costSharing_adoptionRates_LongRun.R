@@ -37,7 +37,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                                 share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_N
+predict_df_adopt <- predict_df_adopt_Y
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -118,8 +118,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -151,7 +151,7 @@ demand_predict_est_adopt_N <- demand_predict_adopt %>% mutate(Demand_estN = dema
 
 ########################################################################################################################################################################
 
-costShare <- 0.2
+costShare <- 0.7
 
 taggingCosts <- round(total_Costs * (1-costShare),3)
 
@@ -431,7 +431,6 @@ demand_predict_co4_merge_adopt_LR <- left_join(demand_predict_co4_merge_adopt_LR
 
 ##############################################
 
-
 rev_sl_adopt_LR <-  prices_predict_co4_merge_adopt_LR %>% mutate(slRev_post_adopt = (ps_hat/100) * demand_predict_co4_merge_adopt_LR$sl_hat,
                                                                  slRev_model_adopt = (ps_estY/100) * demand_predict_co4_merge_adopt_LR$sl_estY,
                                                                  slRev_obs_adopt = (ps/100) * demand_predict_co4_merge_adopt_LR$sl * adoption,
@@ -492,7 +491,7 @@ revDiff_costs_t_pSurp_adopt_LR <- revDiff_costs_t_adopt_LR %>% mutate(diffRevCos
                                                                       diffRevCost_t_model = round(totalRev_diff_model - costSupply_t_model,4)) %>% select(
                                                                         Year, diffRevCost_t_obs, diffRevCost_t_model)
 
-
+########################################################################################################################################################################
 
 ####################################################################################
 ############################    30% adoption   #####################################
@@ -581,6 +580,18 @@ pSurplus_90_50_LR <- revDiff_costs_t_pSurp_adopt_LR %>% mutate(pSurplus90_50 = d
 pSurplus_90_70_LR <- revDiff_costs_t_pSurp_adopt_LR %>% mutate(pSurplus90_70 = diffRevCost_t_model) %>% select(Year, 
                                                                                                          pSurplus90_70)
 
+
+
+
+########################################################################################################################################################################
+
+pSurplus_30_costS_LR <- merge(pSurplus_30_20_LR,merge(pSurplus_30_30_LR,merge(pSurplus_30_50_LR, pSurplus_30_70_LR)))
+
+pSurplus_50_costS_LR <- merge(pSurplus_50_20_LR,merge(pSurplus_50_30_LR,merge(pSurplus_50_50_LR, pSurplus_50_70_LR)))
+
+pSurplus_70_costS_LR <- merge(pSurplus_70_20_LR,merge(pSurplus_70_30_LR,merge(pSurplus_70_50_LR,pSurplus_70_70_LR)))
+
+pSurplus_90_costS_LR <- merge(pSurplus_90_20_LR,merge(pSurplus_90_30_LR,merge(pSurplus_90_50_LR, pSurplus_90_70_LR)))
 
 
 

@@ -1,5 +1,5 @@
 ################ different adoption rate ##########
-adoption <- 0.3
+adoption <- 0.9
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -37,7 +37,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                                 share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_Y
+predict_df_adopt <- predict_df_adopt_N
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -118,8 +118,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * (adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * (adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -146,12 +146,9 @@ demand_predict_est_adopt_N <- demand_predict_adopt %>% mutate(Demand_estN = dema
                                                               sl_estN = sl_est, cl_estN = cl_est) %>% filter(Demand_estN>0) %>% select(Year, Demand_estN, sl_estN, cl_estN)
 
 
-
-
-
 ########################################################################################################################################################################
 
-costShare <- 0.2
+costShare <- 0.7
 
 taggingCosts <- round(total_Costs * (1-costShare),3)
 
@@ -244,7 +241,7 @@ predict_df_adopt <- predict_df %>% mutate(K = K * adoption, k3 = k3 * adoption, 
                                           cl = cl * adoption, Dissappear = Dissappear * adoption)
 
 
-demand_predict_co4_adopt<- data.frame(Year = predict_df_adopt$Year+1, 
+demand_predict_co4_adopt <- data.frame(Year = predict_df_adopt$Year+1, 
                                       demand_est = numeric(nrow(predict_df_adopt)), 
                                       sl_est = numeric(nrow(predict_df_adopt)), 
                                       cl_est = numeric(nrow(predict_df_adopt)))
