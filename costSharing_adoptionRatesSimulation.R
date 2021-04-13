@@ -593,7 +593,7 @@ names(pSurplus_adopt30_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%"
 pSurplus_adopt30_long_paper <- pivot_longer(pSurplus_adopt30_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
 pSurplus_adopt30_2010_plot <- pSurplus_adopt30_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="slategray4", width=0.3)+ 
+  geom_bar(stat="identity", fill="turquoise4", width=0.3)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=1.5) + 
   theme_test()

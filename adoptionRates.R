@@ -2,7 +2,7 @@
 ####### So use them for whomever adopts and for rest old price and quantities. ##############
 
 ################ different adoption rate ##########
-adoption <- 0.3
+adoption <- 0.9
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -40,7 +40,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                           share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_N
+predict_df_adopt <- predict_df_adopt_Y
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -121,8 +121,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -250,7 +250,7 @@ for(i in 1:(nrow(predict_df)-2)){
   # adj_co4$adj_2009[i] <- adj1
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  shares_co4$shares_2009[i] <- slShare_t
+  shares_co4_adopt$shares_2009[i] <- slShare_t
   
   sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
   cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj

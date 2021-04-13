@@ -150,7 +150,7 @@ pSurplus_adopt100_long_paper <- pivot_longer(pSurplus_adopt100_paper, -c(Year), 
 
 tikz(file="TexPlots/ProducerSurplus2010_adopt100_sub.tex", width=6, height=3)
 pSurplus_adopt100_2010_plot <- pSurplus_adopt100_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="steelblue4", width=0.5)+ 
+  geom_bar(stat="identity", fill="steelblue4", width=0.25)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
@@ -166,7 +166,7 @@ pSurplus_adopt30_long_paper <- pivot_longer(pSurplus_adopt30_paper, -c(Year), va
 
 tikz(file="TexPlots/ProducerSurplus2010_adopt30_sub.tex", width=6, height=3)
 pSurplus_adopt30_2010_plot <- pSurplus_adopt30_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="slategray4", width=0.5)+ 
+  geom_bar(stat="identity", fill="turquoise4", width=0.25)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
@@ -181,7 +181,7 @@ pSurplus_adopt50_long_paper <- pivot_longer(pSurplus_adopt50_paper, -c(Year), va
 
 tikz(file="TexPlots/ProducerSurplus2010_adopt50_sub.tex", width=6, height=3)
 pSurplus_adopt50_2010_plot <- pSurplus_adopt50_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="thistle4", width=0.5)+ 
+  geom_bar(stat="identity", fill="peachpuff4", width=0.25)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
@@ -196,7 +196,7 @@ pSurplus_adopt70_long_paper <- pivot_longer(pSurplus_adopt70_paper, -c(Year), va
 
 tikz(file="TexPlots/ProducerSurplus2010_adopt70_sub.tex", width=6, height=3)
 pSurplus_adopt70_2010_plot <- pSurplus_adopt70_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="wheat4", width=0.5)+ 
+  geom_bar(stat="identity", fill="thistle4", width=0.25)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
@@ -211,7 +211,7 @@ pSurplus_adopt90_long_paper <- pivot_longer(pSurplus_adopt90_paper, -c(Year), va
 
 tikz(file="TexPlots/ProducerSurplus2010_adopt90_sub.tex", width=6, height=3)
 pSurplus_adopt90_2010_plot <- pSurplus_adopt90_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="seashell4", width=0.5)+ 
+  geom_bar(stat="identity", fill="skyblue4", width=0.25)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=-1) +
   theme_test()

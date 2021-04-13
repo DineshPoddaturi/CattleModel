@@ -151,7 +151,7 @@ demand_predict_est_adopt_N <- demand_predict_adopt %>% mutate(Demand_estN = dema
 
 ########################################################################################################################################################################
 
-costShare <- 0.7
+costShare <- 0.2
 
 taggingCosts <- round(total_Costs * (1-costShare),3)
 
@@ -322,10 +322,10 @@ for(i in 1:(nrow(predict_df)-2)){
   hc_hat_t1 <- est_bb[3]
   
   # adj1 <- demand_t1_hat / (sl_t1_hat + cl_t1_hat)
-  # adj_co4$adj_2009[i] <- adj1
+  # adj_co4_adopt$adj_2009[i] <- adj1
   
   slShare_t <- (exp((params_t1[1] - ((ps_hat_t1 - pc_hat_t1))/phi)/params_t1[2]))
-  shares_co4$shares_2009[i] <- slShare_t
+  shares_co4_adopt$shares_2009[i] <- slShare_t
   
   sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
   cl_t1_hat <- (demand_t1_hat * 1/(1+slShare_t)) * adj
