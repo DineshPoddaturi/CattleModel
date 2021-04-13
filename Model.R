@@ -1327,7 +1327,7 @@ for(i in 1:(nrow(predict_df)-2)){
   p <- c(ps_t, pc_t, hc_t)
   sl <- sl_t1_hat
   cl <- cl_t1_hat
-  A <- demand_t1_hat
+  A <- demand_t1_hat 
   mu_Tilde <- params_t1[1]
   s_Tilde <- params_t1[2]
   
