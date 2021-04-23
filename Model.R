@@ -576,15 +576,6 @@ ddl_plot <- ddl %>% ggplot(aes(x=Year))+geom_line(aes(y=Demand,color="Observed")
   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2017))) 
 
 
-
-
-
-
-
-
-
-
-
 Stock_temp <- Stock%>% filter(Year>1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>1994 & Year<=2017)
 
@@ -956,6 +947,12 @@ for(i in 1:(nrow(predict_df)-2)){
   
   imports_t <- predict_df$imports[i]
   exports_t <- predict_df$exports[i]
+  
+  ### Here when I am compouting the share we are accounting for the carcass weight. Hence we do not have to convert the
+  ### original prices from dollars per live weight to dollars per dressed weight.
+  ### If we change the prices to dollars per carcass weight we need to remove phi from the share metric formula. And if I
+  ### remove it from the formula and the analysis, we get the same slaughter and cull supply the same as the case when
+  ### we didn't convert them. DO NOT GET CONFUSED.
   
   slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
   shares_slcl$share_pre[i] <- slShare_t

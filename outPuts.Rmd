@@ -1,0 +1,12 @@
+
+
+
+
+```{r}
+prices_costs_temp <- prices_costs
+
+prices_costs_temp[,-1] <- prices_costs_temp[,-1]/0.63
+
+prices_costs_temp[,-1] - prices_costs[,-1]
+
+````
