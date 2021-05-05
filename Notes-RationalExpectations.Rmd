@@ -1,0 +1,18 @@
+Notes on rational expectations work:
+
+When it comes to finding the expected price, we have to use all the information we have. Not just the prices, but also the supply and demand shocks we observe. 
+
+Probably we use the feed costs in the function as well. As the price of corn basically dictates the supply of the fed cattle and cull cows. One would say if the price of the corn increases the supply of the cull cow might go up as the costs to keep the cull cows in the breeding stock increase. additionally, one could contend that the supply of the fed cattle goes down in the short-run but in the long-run (>3 years) it will go up. This could imply the price of cattle would depend on the price of the corn/feed, supply of the cull cows, fed cattle, and the demand shock.
+
+This is the price of the fed cattle
+$p_{s,t} =\hat{p}(sl_t, cl_t, p_{corn}, \epsilon_D)$ or 
+$p_{s,t} =\hat{p}(p_{corn}, \epsilon_D, TS)$
+
+similarlly we can write the price of the cull cows as
+$p_{c,t} =\hat{p}(sl_t, cl_t, p_{corn}, \epsilon_D)$ or 
+$p_{c,t} =\hat{p}(p_{corn}, \epsilon_D, TS)$
+
+Here $TS$ is the total supply, $\epsilon_D$ is the demand shock, $p_{corn}$ is the price of the corn.
+
+I have to determins the number of nodes for the chebychev modeling. So we have data for every year, and then we will 
+ 
