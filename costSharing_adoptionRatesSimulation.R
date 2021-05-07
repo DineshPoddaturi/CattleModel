@@ -1,5 +1,5 @@
 ################ different adoption rate ##########
-adoption <- 0.9
+adoption <- 1
 
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)
 imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
@@ -37,7 +37,7 @@ adj_factor_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, adj = numeric(n
 shares_slcl_adopt <- data.frame(Year = predict_df_adopt_Y$Year+1, share_pre = numeric(nrow(predict_df_adopt_Y)), 
                                 share_post = numeric(nrow(predict_df_adopt_Y)))
 
-predict_df_adopt <- predict_df_adopt_N
+predict_df_adopt <- predict_df_adopt_Y
 
 for(i in 1:(nrow(predict_df_adopt)-2)){
   
@@ -118,8 +118,8 @@ holdingCosts_plot_adopt <- pricesMerge_new_adopt   %>% ggplot(aes(x=Year))+geom_
 Master_sl_cl_adopt <- merge(demand_predict_adopt,merge(supp_sl_new,supp_cl_new)) %>% filter(
   sl_est>0)  %>% select(Year,Bill_meatLb_sl, sl_est, 
                         Bill_meatLb_cl, cl_est)  %>% mutate(
-                          Bill_meatLb_sl = Bill_meatLb_sl * (1-adoption),
-                          Bill_meatLb_cl = Bill_meatLb_cl * (1-adoption))
+                          Bill_meatLb_sl = Bill_meatLb_sl * (adoption),
+                          Bill_meatLb_cl = Bill_meatLb_cl * (adoption))
 
 names(Master_sl_cl_adopt) <- c("Year", "sl", "sl_hat", "cl", "cl_hat")
 Master_sl_cl_adopt[,-1] <- round(Master_sl_cl_adopt[,-1],3)
@@ -514,7 +514,25 @@ pSurplus_90_50 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus90_50 = diffRev
 pSurplus_90_70 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus90_70 = diffRevCost_t_model) %>% select(Year, 
                                                                                                          pSurplus90_70)
 
-
+# ####################################################################################
+# ############################    100% adoption   #####################################
+# ####################################################################################
+# 
+# ###### 20% Cost Share
+# pSurplus_100_20 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus100_20 = diffRevCost_t_model) %>% select(Year, 
+#                                                                                                          pSurplus100_20)
+# 
+# ##### 30% Cost Share
+# pSurplus_100_30 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus100_30 = diffRevCost_t_model) %>% select(Year, 
+#                                                                                                          pSurplus100_30)
+# 
+# ##### 50% Cost Share
+# pSurplus_100_50 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus100_50 = diffRevCost_t_model) %>% select(Year, 
+#                                                                                                          pSurplus100_50)
+# 
+# ##### 70% Cost Share
+# pSurplus_100_70 <- revDiff_costs_t_pSurp_adopt %>% mutate(pSurplus100_70 = diffRevCost_t_model) %>% select(Year, 
+#                                                                                                          pSurplus100_70)
 
 
 
@@ -600,15 +618,15 @@ pSurplus_adopt30_2010_plot <- pSurplus_adopt30_long_paper %>% filter(Year == 201
 
 ##### 50% adoption
 pSurplus_adopt50_paper <- pSurp_50_CostShare
-names(pSurplus_adopt50_paper) <- c("Year", "0 \\%", "20 \\%", "30 \\%", "50 \\%", "70 \\%")
+names(pSurplus_adopt50_paper) <- c("Year", "0", "20", "30", "50", "70")
 
 pSurplus_adopt50_long_paper <- pivot_longer(pSurplus_adopt50_paper, -c(Year), values_to = "Surplus", names_to = "CostShare") %>% as.data.frame()
 
 pSurplus_adopt50_2010_plot <- pSurplus_adopt50_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="thistle4", width=0.3)+ 
+  geom_bar(stat="identity", fill="turquoise4", width=0.45)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=1.5) + 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + 
+  theme_test() + scale_x_discrete(labels = function(x) paste0(x, '%'))
 
 ##### 70% adoption
 pSurplus_adopt70_paper <- pSurp_70_CostShare

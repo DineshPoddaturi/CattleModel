@@ -948,7 +948,7 @@ for(i in 1:(nrow(predict_df)-2)){
   imports_t <- predict_df$imports[i]
   exports_t <- predict_df$exports[i]
   
-  ### Here when I am compouting the share we are accounting for the carcass weight. Hence we do not have to convert the
+  ### Here when I am computing the share we are accounting for the carcass weight. Hence we do not have to convert the
   ### original prices from dollars per live weight to dollars per dressed weight.
   ### If we change the prices to dollars per carcass weight we need to remove phi from the share metric formula. And if I
   ### remove it from the formula and the analysis, we get the same slaughter and cull supply the same as the case when
@@ -1414,11 +1414,13 @@ prices_predict_co4_merge111 <- left_join(prices_predict_co4_merge %>% select(Yea
 # demand_predict_co4_merge111$cl_est[-16:-22] <- NA
 # demand_predict_co4_merge111$cl_hat[-16:-22] <- NA
 
-slaughterPrices_plot_co4 <- prices_predict_co4_merge111 %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est,color="Model Estimate"))+
+slaughterPrices_plot_co4 <- prices_predict_co4_merge111 %>% filter(Year>=2004) %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est,color="Model Estimate"))+
   geom_point(aes(y=ps_est,color="Model Estimate"))+ geom_line(aes(y=ps_hat, color="Estimate with added costs"))+
   geom_point(aes(y=ps_hat,color="Estimate with added costs")) + geom_line(aes(y=ps, color="Observed"))+
-  geom_point(aes(y=ps,color="Observed")) + labs(x="Year", y="Slaughter Prices (\\$/cwt)", colour = "") + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co4_merge111$Year[1], prices_predict_co4_merge111$Year[nrow(prices_predict_co4_merge111)]))) 
+  geom_point(aes(y=ps,color="Observed")) + labs(x="Year", y="Slaughter Prices ($/cwt)", colour = "") + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co4_merge111$Year[1], prices_predict_co4_merge111$Year[nrow(prices_predict_co4_merge111)])))+ 
+  theme(legend.position = c(0.2, 0.7)) 
+slaughterPrices_plot_co4 + scale_color_manual(values=c("mediumorchid3", "mediumseagreen", "slateblue1"))
 
 cullPrices_plot_co4 <- prices_predict_co4_merge111 %>% ggplot(aes(x=Year))+geom_line(aes(y=pc_est,color="Model estimate"))+
   geom_point(aes(y=pc_est,color="Model estimate")) + geom_line(aes(y=pc_hat, color="Estimate with added costs")) + 
@@ -1438,11 +1440,12 @@ demand_predict_co4_merge111 <- demand_predict_co4_merge %>% select(Year, Demand_
 demand_predict_co4_merge111 <- left_join(demand_predict_co4_merge %>% select(Year, Demand , sl, cl), demand_predict_co4_merge111
                                          ) %>% select(Year, Demand, Demand_est, Demand_hat, sl, sl_est, sl_hat, cl, cl_est, cl_hat)
 
-stock_slaughter_co4 <- demand_predict_co4_merge111 %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
+stock_slaughter_co4 <- demand_predict_co4_merge111 %>% filter(Year>=2004) %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
   geom_point(aes(y=sl_est,color="Model estimate")) + geom_line(aes(y=sl_hat, color="Estimate with added costs")) + 
   geom_point(aes(y=sl_hat,color="Estimate with added costs")) + geom_line(aes(y=sl, color="Observed")) + 
   geom_point(aes(y=sl,color="Observed")) + labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
-  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge$Year[1],demand_predict_co4_merge$Year[nrow(demand_predict_co4_merge)])))
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge$Year[1],demand_predict_co4_merge$Year[nrow(demand_predict_co4_merge)])))+ 
+  theme(legend.position = c(0.3, 0.4))
 
 stock_cull_co4 <- demand_predict_co4_merge111 %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model estimate"))+
   geom_point(aes(y=cl_est,color="Model estimate")) + geom_line(aes(y=cl_hat, color="Estimate with added costs")) + 
