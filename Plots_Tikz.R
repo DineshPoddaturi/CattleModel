@@ -108,7 +108,12 @@ fedCattleMeat_plot <- demand_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+
   geom_point(aes(y=sl,color="Observed")) + labs(x="Year", y="Fed Cattle meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge111_paper$Year[1],
                                                demand_predict_co4_merge111_paper$Year[nrow(demand_predict_co4_merge111_paper)]))) + 
-  theme(legend.position = c(0.3, 0.4))
+  theme(legend.position = c(0.3, 0.4))+
+  theme( panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_rect(fill = "transparent",colour = NA),
+    plot.background = element_rect(fill = "transparent",colour = NA))
+
+ggsave("FedCattleMeat.png", fedCattleMeat_plot, bg = "transparent")
+
 print(fedCattleMeat_plot)
 dev.off()
 
@@ -134,7 +139,7 @@ pSurplus_long_paper <- pivot_longer(pSurplus_paper, -c(Year), values_to = "Surpl
 
 tikz(file="TexPlots/ProducerSurplus2010.tex", width=6, height=3)
 pSurplus_2010_plot <- pSurplus_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(Adoption, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="darkslategray4", width=0.5)+ 
+  geom_bar(stat="identity", fill="darkseagreen4", width=0.5)+ 
   labs(x=  "Animal ID and Traceability Adoption Rate" , y= "Surplus (in Billion \\$)") +
   geom_text(aes(label=Surplus),vjust=-1) + 
   theme_test()
@@ -181,10 +186,13 @@ pSurplus_adopt50_long_paper <- pivot_longer(pSurplus_adopt50_paper, -c(Year), va
 
 tikz(file="TexPlots/ProducerSurplus2010_adopt50_sub.tex", width=6, height=3)
 pSurplus_adopt50_2010_plot <- pSurplus_adopt50_long_paper %>% filter(Year == 2010) %>% ggplot(aes(fct_rev(fct_reorder(CostShare, Surplus)),Surplus))+
-  geom_bar(stat="identity", fill="peachpuff4", width=0.45)+ 
+  geom_bar(stat="identity", fill="turquoise4", width=0.45)+ 
   labs(x=  "Animal ID and Traceability Cost Share" , y= "Surplus (in Billion \\$)") +
-  geom_text(aes(label=Surplus),vjust=-1) + 
-  theme_test()
+  geom_text(aes(label=Surplus),vjust=-1) + theme_test() + 
+  theme(plot.background = element_rect(fill = 'grey', colour = 'red'))
+
+ggsave(pSurplus_adopt50_2010_plot, filename = "ProducerSurplus2010_adopt50_sub.png",  bg = "transparent")
+
 print(pSurplus_adopt50_2010_plot)
 dev.off()
 
