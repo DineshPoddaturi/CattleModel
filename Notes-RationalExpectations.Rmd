@@ -13,6 +13,11 @@ $p_{c,t} =\hat{p}(sl_t, cl_t, p_{corn}, \epsilon_D)$ or
 $p_{c,t} =\hat{p}(p_{corn}, \epsilon_D, TS)$
 
 Here $TS$ is the total supply, $\epsilon_D$ is the demand shock, $p_{corn}$ is the price of the corn.
+All the RHS variables are the observed previous years data. I could either use individual supply i.e., $sl_t, cl_t$ or total supply of the meat $TS$.
+*Lee suggested that including supply is smart. Because a producer can see the past data, expect the price changes according to it.* 
 
-I have to determins the number of nodes for the chebychev modeling. So we have data for every year, and then we will 
- 
+I believe we have to include more than a year of data. We make use of all the available past data (prices, quantities). Need to think more about it. Basically nothing is changed. Even the equilibrium conditions. Except the price function. So once I estimate the price, use it to get the share function and derive the supply of meat.
+
+
+I have to determine the number of nodes for the chebychev modeling. So we have data for every year, and then we will 
+  
