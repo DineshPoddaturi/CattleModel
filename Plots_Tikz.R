@@ -108,12 +108,7 @@ fedCattleMeat_plot <- demand_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+
   geom_point(aes(y=sl,color="Observed")) + labs(x="Year", y="Fed Cattle meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge111_paper$Year[1],
                                                demand_predict_co4_merge111_paper$Year[nrow(demand_predict_co4_merge111_paper)]))) + 
-  theme(legend.position = c(0.3, 0.4))+
-  theme( panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_rect(fill = "transparent",colour = NA),
-    plot.background = element_rect(fill = "transparent",colour = NA))
-
-ggsave("FedCattleMeat.png", fedCattleMeat_plot, bg = "transparent")
-
+  theme(legend.position = c(0.3, 0.4))
 print(fedCattleMeat_plot)
 dev.off()
 
