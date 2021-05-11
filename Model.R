@@ -1444,8 +1444,7 @@ stock_slaughter_co4 <- demand_predict_co4_merge111 %>% filter(Year>=2004) %>% gg
   geom_point(aes(y=sl_est,color="Model estimate")) + geom_line(aes(y=sl_hat, color="Estimate with added costs")) + 
   geom_point(aes(y=sl_hat,color="Estimate with added costs")) + geom_line(aes(y=sl, color="Observed")) + 
   geom_point(aes(y=sl,color="Observed")) + labs(x="Year", y="Slaughter meat (in Billion pounds)", colour="") + theme_classic()+ 
-  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge$Year[1],demand_predict_co4_merge$Year[nrow(demand_predict_co4_merge)])))+ 
-  theme(legend.position = c(0.3, 0.4))
+  scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge$Year[1],demand_predict_co4_merge$Year[nrow(demand_predict_co4_merge)])))
 
 stock_cull_co4 <- demand_predict_co4_merge111 %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model estimate"))+
   geom_point(aes(y=cl_est,color="Model estimate")) + geom_line(aes(y=cl_hat, color="Estimate with added costs")) + 
