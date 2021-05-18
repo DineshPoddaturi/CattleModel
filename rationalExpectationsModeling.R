@@ -15,3 +15,4 @@ meat_bill <- merge(supp_sl, merge(supp_cl, merge(totalSupply, totalDisappearedNe
 
 prices_quant <- merge(allPrices, meat_bill)
 
+# In order to construct the shocks I need to estimate the quantities and see the observed ones. 

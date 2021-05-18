@@ -301,6 +301,9 @@ demand_new <- supp_diss %>% select(Year,total_meat_bill)
 
 names(demand_new) <- c("Year", "Demand")
 
+merge(totalSupply_adj, demand_new) %>% ggplot(aes(x=Year))+ geom_line(aes(y=Demand,color="Demand Slaughter")) + geom_point(aes(y=Demand,color="Demand Slaughter")) +
+  geom_line(aes(y=TotalSupply, color="Supply")) + geom_point(aes(y=TotalSupply, color="Supply")) +
+  labs(x="Year", y="Meat (in billion pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2017)))
 
 ### Ratio of slaughter supply  to total supply, in the model this is exp()/(1+exp())
 
