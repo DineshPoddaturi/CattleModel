@@ -76,10 +76,10 @@ pc_ps_cwt_paper <- pc_ps_cwt %>% filter(Year >=2006) %>% mutate(pss_cwt = round(
 prices_predict_co4_merge111_paper <- prices_predict_co4_merge111 %>% filter(Year>=2004)
 
 tikz(file="TexPlots/FedCattlePrices.tex", width=6, height=3)
-fedCattlePrices_plot <- prices_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est,color="Model Estimate"))+
+fedCattlePrices_plot <- prices_predict_co4_merge111_paper %>% filter(Year>=2010) %>% ggplot(aes(x=Year))+geom_line(aes(y=ps_est,color="Model Estimate"))+
   geom_point(aes(y=ps_est,color="Model Estimate"))+ geom_line(aes(y=ps_hat, color="Estimate with added costs"))+
-  geom_point(aes(y=ps_hat,color="Estimate with added costs")) + geom_line(aes(y=ps, color="Observed"))+
-  geom_point(aes(y=ps,color="Observed")) + labs(x="Year", y="Fed Cattle Prices (\\$/cwt)", colour = "") + theme_classic() + 
+  geom_point(aes(y=ps_hat,color="Estimate with added costs")) + labs(x="Year", y="Fed Cattle Prices (\\$/cwt)", colour = "") + 
+  theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co4_merge111_paper$Year[1], 
                                                prices_predict_co4_merge111_paper$Year[nrow(prices_predict_co4_merge111_paper)]))) + 
   theme(legend.position = c(0.2, 0.7))
@@ -102,10 +102,11 @@ dev.off()
 demand_predict_co4_merge111_paper <- demand_predict_co4_merge111 %>% filter(Year>=2004)
 
 tikz(file="TexPlots/FedCattleMeat.tex", width=6, height=4)
-fedCattleMeat_plot <- demand_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
+fedCattleMeat_plot <- demand_predict_co4_merge111_paper %>% filter(Year>=2010) %>% ggplot(aes(x=Year))+geom_line(aes(y=sl_est,color="Model estimate"))+
   geom_point(aes(y=sl_est,color="Model estimate")) + geom_line(aes(y=sl_hat, color="Estimate with added costs")) + 
-  geom_point(aes(y=sl_hat,color="Estimate with added costs")) + geom_line(aes(y=sl, color="Observed")) + 
-  geom_point(aes(y=sl,color="Observed")) + labs(x="Year", y="Fed Cattle meat (in Billion pounds)", colour="") + theme_classic()+ 
+  geom_point(aes(y=sl_hat,color="Estimate with added costs")) + 
+  labs(x="Year", y="Fed Cattle Production (in Billion pounds)", colour="") + 
+  theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge111_paper$Year[1],
                                                demand_predict_co4_merge111_paper$Year[nrow(demand_predict_co4_merge111_paper)]))) + 
   theme(legend.position = c(0.3, 0.4))
