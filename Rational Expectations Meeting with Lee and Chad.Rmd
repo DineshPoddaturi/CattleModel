@@ -1,0 +1,10 @@
+05/25/2021:
+
+* In order to get the price of the fed cattle at t+3 I need to know the storage at t+1 i.e., need to know the replacement heifers at t+1. For that we might need to create an estimate for t+1 storage. 
+  * Try analyzing the relationship between Calf-Crop data and Replacement Heifers data. For instance Calf-crop 2019 and Replacement Heifers 2021 can be compared to get a relation, so that we can estimate replacement heifers in future. Note: This is just an estimate. We can always get better with estimates. 
+  
+* In price function, we might need to include the trend variable so that we are mimicing the history. Maybe? Dunno. Have to think about this clearly. 
+
+* Futures markets (1st week of Jan) might give an approximate estimate of the expecetd price. Maybe try to compare our to theirs. or use it as a reference.
+
+* ERS and FAPRI has price series. Look at them. Maybe borrow something from their model. If I can see the model. 
