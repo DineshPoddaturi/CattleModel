@@ -1,6 +1,19 @@
 
+####### I read calf crop data. These are in number of head
+calf_crop <- read_excel("Data/New/CalfCrop.xlsx") %>% as.data.frame()
 
-#### Here I read data of corn prices. These are in $/bushel
+calf_crop <- calf_crop %>% select(Year, Value) %>% transmute(Year = Year, calfCrop = Value)
+
+calfCrop_replacementHeifers <- merge(calf_crop, replacementInventory) %>% transmute(Year = Year, calfCrop = calfCrop,
+                                                                                    repHeifers = k3)
+
+##### Here I am computing the ratio of the replacement heifers to calf crop of prv year
+calfCrop_replacementHeifers <- calfCrop_replacementHeifers %>% mutate(calfCrop_repHeifers_Ratio = repHeifers/lag(calfCrop), 
+                                       calfCrop_repHeifers_Percent = repHeifers/lag(calfCrop) * 100)
+
+
+
+#### Here I read corn price data. These are in $/bushel
 corn_price <- read_excel("Data/New/CornPrices_Monthly.xlsx") %>% as.data.frame()
 names(corn_price)
 corn_price <- corn_price %>% select(Year, Period, Value)
