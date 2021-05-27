@@ -11,6 +11,10 @@ calfCrop_replacementHeifers <- merge(calf_crop, replacementInventory) %>% transm
 calfCrop_replacementHeifers <- calfCrop_replacementHeifers %>% mutate(calfCrop_repHeifers_Ratio = repHeifers/lag(calfCrop), 
                                        calfCrop_repHeifers_Percent = repHeifers/lag(calfCrop) * 100)
 
+summary(calfCrop_replacementHeifers$calfCrop_repHeifers_Percent)
+
+
+
 
 
 #### Here I read corn price data. These are in $/bushel
