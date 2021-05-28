@@ -111,7 +111,7 @@ demandBeef[,-1] <- demandBeef[,-1]/1000000000
 
 
 beefDemand <- demandBeef %>% mutate(Demand = `Beginning Stocks` + Production + Imports - Exports - `Ending Stocks`) %>% select(Year, Demand) %>% filter(Year>=1994 & Year<2018)
-
+rownames(beefDemand) <- 1:nrow(beefDemand)
 
 ############################################################################################
 
