@@ -13,10 +13,6 @@ calfCrop_replacementHeifers <- calfCrop_replacementHeifers %>% mutate(calfCrop_r
 
 summary(calfCrop_replacementHeifers$calfCrop_repHeifers_Percent)
 
-
-
-
-
 #### Here I read corn price data. These are in $/bushel
 corn_price <- read_excel("Data/New/CornPrices_Monthly.xlsx") %>% as.data.frame()
 names(corn_price)
@@ -34,10 +30,6 @@ prices_quant <- merge(allPrices, meat_bill)
 
 # In order to construct the shocks I need to estimate the quantities and see the observed ones. 
 
-
-
-
-
 ### But first I will construct the nodes for corn price, fed cattle supply, and cull cow supply.
 
 cornPrices <- allPrices %>% select(Year, pcorn)
@@ -45,7 +37,10 @@ cornPrices <- allPrices %>% select(Year, pcorn)
 cornPrices_nodes <- cornPrices %>% mutate(cNode = (2*pcorn - max(pcorn) - min(pcorn))/(max(pcorn) - min(pcorn)))
 
 
-#### Functions that returns the chebychev nodes and Chebychev interpolation matrix
+#### Functions that returns the chebychev nodes and Chebychev interpolation matrix.
+
+
+########################## NOTE: ALL THESE ARE EMPLOYED TO GET OPTIMAL COEFFICIENTS #################
 
 ###### Chebychev Nodes
 
@@ -101,13 +96,46 @@ fedCattleSupply_interpolationMatrix <- chebychevInterpolationMatrix(d=prices_qua
 cullCowSupply_interpolationMatrix <- chebychevInterpolationMatrix(d=prices_quant$cl, n = chebNodes)
 
 
-### First shot at constructing demand shocks
+### First shot at constructing demand shocks.
+### We assume these shocks follow Gaussian distribution with mean 1 and standard deviation consistent with historical observations.
+
 obsEst_Demand <- merge(beefDemand, totalDisappearedNew) %>% transmute(Year = Year, obsDemand = Demand, 
                                                                       estDemand = total_meat_bill, shock = obsDemand/estDemand)
 
+#### I will generate 24 shocks (length of the other state variables in the analysis) with mean 1 and standard deviation 
+#### equal to the standard deviation of the constructed shocks. I am also setting seed so that we get the same random numbers.
+set.seed(1)
+demand_Shock <- rnorm(n=nrow(prices_quant), mean = mean(obsEst_Demand$shock), sd = std(obsEst_Demand$shock))
 
-plot(sort(obsEst_Demand$shock), 
-     pnorm(sort(obsEst_Demand$shock), mean = mean(sort(obsEst_Demand$shock)), sd = std(sort(obsEst_Demand$shock))))
+demandShock_interpolationMatrix <- chebychevInterpolationMatrix(d= demand_Shock, n = chebNodes)
+
+
+#### I need to construct production shock. supp_sl and supp_cl are the estimated fed cattle and cull cow supply. I need to get the 
+#### observed supply as well. Isn't it the animals slaughtered? If yes, then we are assuming that the supply equals demand.
+#### For now that is what I am doing i.e., assuming that the animal slaughtered as the observed supply and the constructed supply is 
+#### the estimated supply.
+#### This might not be true. But for now that's what I am doing.
+obsEst_Supply <- merge(totalSupply, totalDisappearedNew) %>% transmute(Year = Year, obsSupply = total_meat_bill,
+                                                      estSupply = TotalSupply, shock = obsSupply/estSupply)
+
+set.seed(2)
+supply_Shock <- rnorm(n=nrow(prices_quant), mean = mean(obsEst_Supply$shock), sd = std(obsEst_Supply$shock))
+supplyShock_interpolationMatrix <- chebychevInterpolationMatrix(d= supply_Shock, n = chebNodes)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
