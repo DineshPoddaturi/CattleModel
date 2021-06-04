@@ -32,11 +32,6 @@ prices_quant <- merge(allPrices, meat_bill)
 
 ### But first I will construct the nodes for corn price, fed cattle supply, and cull cow supply.
 
-cornPrices <- allPrices %>% select(Year, pcorn)
-
-cornPrices_nodes <- cornPrices %>% mutate(cNode = (2*pcorn - max(pcorn) - min(pcorn))/(max(pcorn) - min(pcorn)))
-
-
 #### Functions that returns the chebychev nodes and Chebychev interpolation matrix.
 
 
@@ -53,11 +48,13 @@ chebychevNodes <- function(d, n){
   
   #### Here we create chebychev collocation nodes
   for (i  in 1:n) {
-    x[i] <- 0.5 * (a+b) + 0.5 * (b-a) * cos(((n-i+0.5)/n)*pi)
+    x[i] <- ((a+b)/2) + ((b-a)/2) * cos( ((n-i+0.5)/n) * pi )
   }
 
   #### We normalize the chevychev collocation nodes such that they are in between [-1,1]
-  nodes <- (2*x - b - a)/(b - a)
+  nodes <- (2 * (x-a)/(b-a)) - 1
+  # nodes <- x
+  
   return(nodes)
 }
 
@@ -66,10 +63,9 @@ chebychevNodes <- function(d, n){
 chebychevInterpolationMatrix <- function(d, n){
   
   normalizedNodes <- chebychevNodes(d,n)
+  interpolationMatrix <- matrix(data=0, nrow = length(normalizedNodes), ncol = length(normalizedNodes))
   
-  interpolationMatrix <- matrix(data=0, nrow = length(normalizedNodes), ncol = n)
-  
-  for(i in 1:n){
+  for(i in 1:length(normalizedNodes)){
     interpolationMatrix[,1] <- 1
     interpolationMatrix[,2] <- normalizedNodes
     if(i >=3){
@@ -80,52 +76,74 @@ chebychevInterpolationMatrix <- function(d, n){
 }
 
 ### I will have to select n. I will start with three
-chebNodes <- 5
+chebNodesN <- 4
 
-corn_interpolationMatrix <- chebychevInterpolationMatrix(d = prices_quant$pcorn, n = chebNodes)
+corn_interpolationMatrix <- chebychevInterpolationMatrix(d = prices_quant$pcorn, n = chebNodesN)
 
 # The interpolation matrix is orthogonal. To see that we just get the diagonal elements of t(matrix) * matrix
 
 #### Interpolationmatrix for fed cattle supply (which is in billion pounds)
 
-fedCattleSupply_interpolationMatrix <- chebychevInterpolationMatrix(d=prices_quant$sl, n = chebNodes)
+fedCattleSupply_interpolationMatrix <- chebychevInterpolationMatrix(d = prices_quant$sl, n = chebNodesN)
 
 
 #### Interpolationmatrix for cull cow supply (which is in billion pounds)
-
-cullCowSupply_interpolationMatrix <- chebychevInterpolationMatrix(d=prices_quant$cl, n = chebNodes)
+cullCowSupply_interpolationMatrix <- chebychevInterpolationMatrix(d = prices_quant$cl, n = chebNodesN)
 
 
 ### First shot at constructing demand shocks.
 ### We assume these shocks follow Gaussian distribution with mean 1 and standard deviation consistent with historical observations.
 
+
+### I will use Exports + Domestic Consumption as the observed derived demand
+
+################################################### THINK ABOUT THIS AGAIN #############################################################
+##################################################################################################################################
 obsEst_Demand <- merge(beefDemand, totalDisappearedNew) %>% transmute(Year = Year, obsDemand = Demand, 
                                                                       estDemand = total_meat_bill, shock = obsDemand/estDemand)
 
 #### I will generate 24 shocks (length of the other state variables in the analysis) with mean 1 and standard deviation 
 #### equal to the standard deviation of the constructed shocks. I am also setting seed so that we get the same random numbers.
 set.seed(1)
-demand_Shock <- rnorm(n=nrow(prices_quant), mean = mean(obsEst_Demand$shock), sd = std(obsEst_Demand$shock))
+demand_Shock <- rnorm(n=nrow(prices_quant), mean = 1, sd = std(obsEst_Demand$shock))
 
-demandShock_interpolationMatrix <- chebychevInterpolationMatrix(d= demand_Shock, n = chebNodes)
+demandShock_interpolationMatrix <- chebychevInterpolationMatrix(d= demand_Shock, n = chebNodesN)
 
 
 #### I need to construct production shock. supp_sl and supp_cl are the estimated fed cattle and cull cow supply. I need to get the 
 #### observed supply as well. Isn't it the animals slaughtered? If yes, then we are assuming that the supply equals demand.
 #### For now that is what I am doing i.e., assuming that the animal slaughtered as the observed supply and the constructed supply is 
-#### the estimated supply.
-#### This might not be true. But for now that's what I am doing.
+#### the estimated supply. (After talking with Lee and Chad, I have decided the slaughtered data as the observed supply)
 obsEst_Supply <- merge(totalSupply, totalDisappearedNew) %>% transmute(Year = Year, obsSupply = total_meat_bill,
                                                       estSupply = TotalSupply, shock = obsSupply/estSupply)
 
 set.seed(2)
-supply_Shock <- rnorm(n=nrow(prices_quant), mean = mean(obsEst_Supply$shock), sd = std(obsEst_Supply$shock))
-supplyShock_interpolationMatrix <- chebychevInterpolationMatrix(d= supply_Shock, n = chebNodes)
+supply_Shock <- rnorm(n=nrow(prices_quant), mean = 1, sd = std(obsEst_Supply$shock))
+supplyShock_interpolationMatrix <- chebychevInterpolationMatrix(d= supply_Shock, n = chebNodesN)
+
+##### Now I get production shocks for fed cattle and cull cows seperately
+
+cowsSlaughtered_obs <- cowsSlaughtered %>% transmute(Year = Year, cullMeat = cull_meat/1000000000)
+heifersSlaughtered_obs <- heifersSlaughtered %>% transmute(Year = Year, heiferMeat = heifer_meat/1000000000)
+steersSlaughtered_obs <- steersSlaughtered %>% transmute(Year = Year, steerMeat = steer_meat/1000000000)
+
+fedCattleSupply_obs <- merge(heifersSlaughtered_obs, steersSlaughtered_obs) %>% transmute(Year = Year, sl_obs = heiferMeat + steerMeat)
+cullCowSupply_obs <- cowsSlaughtered_obs %>% transmute(Year = Year, cl_obs = cullMeat)
+
+obsEst_sl_Supply <- merge(fedCattleSupply_obs, supp_sl) %>% transmute(Year = Year, sl_obs = sl_obs, sl_est = Bill_meatLb_sl,
+                                                                      slShock = sl_obs/sl_est)
+set.seed(3)
+slSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_sl_Supply$slShock))
+
+sl_supplyShock_interporlationMatrix <- chebychevInterpolationMatrix(d = slSupply_Shock, n = chebNodesN)
 
 
+obsEst_cl_Supply <- merge(cullCowSupply_obs, supp_cl) %>% transmute(Year = Year, cl_obs = cl_obs, cl_est = Bill_meatLb_cl,
+                                                                    clShock = cl_obs/cl_est)
+set.seed(4)
+clSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 
-
-
+cl_supplyShock_interporlationMatrix <- chebychevInterpolationMatrix(d = slSupply_Shock, n = chebNodesN)
 
 
 

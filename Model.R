@@ -268,7 +268,6 @@ supp_diss <- merge(totalDisappearedNew,totalSupply)
 
 supp_diss$Year <- as.numeric(supp_diss$Year)
 
-
 supp_diss %>% ggplot(aes(x=Year))+ geom_line(aes(y=total_meat_bill,color="Demand Slaughter")) + geom_point(aes(y=total_meat_bill,color="Demand Slaughter")) +
   geom_line(aes(y=TotalSupply, color="Supply")) + geom_point(aes(y=TotalSupply, color="Supply")) +
   labs(x="Year", y="Meat (in billion pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1994,2017)))
