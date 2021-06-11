@@ -44,12 +44,12 @@ chebychevNodes <- function(d, n){
   a <- min(d)
   b <- max(d)
   
-  x <- NA
+  x <- d
   
   #### Here we create chebychev collocation nodes
-  for (i  in 1:n) {
-    x[i] <- ((a+b)/2) + ((b-a)/2) * cos( ((n-i+0.5)/n) * pi )
-  }
+  # for (i  in 1:n) {
+  #   x[i] <- ((a+b)/2) + ((b-a)/2) * cos( ((n-i+0.5)/n) * pi )
+  # }
 
   #### We normalize the chevychev collocation nodes such that they are in between [-1,1]
   nodes <- (2 * (x-a)/(b-a)) - 1

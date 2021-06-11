@@ -20,7 +20,7 @@ ourFunction <- function(x,y,rho){
   f <- ( x^rho + y^rho )^rho
 }
 
-x_min <- 0.01
+x_min <- 0.1
 x_max <- 2
 y_min <- 0.01
 y_max <- 2
