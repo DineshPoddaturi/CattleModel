@@ -44,12 +44,12 @@ chebychevNodes <- function(d, n){
   a <- min(d)
   b <- max(d)
   
-  x <- d
+  x <- NA
   
   #### Here we create chebychev collocation nodes
-  # for (i  in 1:n) {
-  #   x[i] <- ((a+b)/2) + ((b-a)/2) * cos( ((n-i+0.5)/n) * pi )
-  # }
+  for (i  in 1:n) {
+    x[i] <- ((a+b)/2) + ((b-a)/2) * cos( ((n-i+0.5)/n) * pi )
+  }
 
   #### We normalize the chevychev collocation nodes such that they are in between [-1,1]
   nodes <- (2 * (x-a)/(b-a)) - 1
@@ -76,7 +76,7 @@ chebychevInterpolationMatrix <- function(d, n){
 }
 
 ### I will have to select n. I will start with three
-chebNodesN <- 4
+chebNodesN <- 3
 
 corn_interpolationMatrix <- chebychevInterpolationMatrix(d = prices_quant$pcorn, n = chebNodesN)
 
@@ -95,7 +95,7 @@ cullCowSupply_interpolationMatrix <- chebychevInterpolationMatrix(d = prices_qua
 ### We assume these shocks follow Gaussian distribution with mean 1 and standard deviation consistent with historical observations.
 
 
-### I will use Exports + Domestic Consumption as the observed derived demand
+### I will use Exports + Domestic Consumption as the observed derived demand. 
 
 ################################################### THINK ABOUT THIS AGAIN #############################################################
 ##################################################################################################################################
@@ -144,6 +144,81 @@ set.seed(4)
 clSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 
 cl_supplyShock_interporlationMatrix <- chebychevInterpolationMatrix(d = slSupply_Shock, n = chebNodesN)
+
+######### Here I am generating the all the grids of the cull cows ###########
+
+corn_interpolationMatrix
+
+cl_supplyShock_interporlationMatrix
+
+
+
+#### We generate the grids with kronecker product of interpolation matrices.
+gridsCullCows <- kronecker(kronecker(corn_interpolationMatrix, cl_supplyShock_interporlationMatrix),
+          demandShock_interpolationMatrix)
+
+
+
+
+################### Here I am retracing the steps by writing the code again
+
+# State variables: corn price, demand shock, cull cows production, fed cattle production
+cornPrice <- prices_quant %>% select(Year, pcorn)
+cullCowsProd <- supp_cl %>% transmute(Year = Year, cullCows = Bill_meatLb_cl)
+fedCattleProd <- supp_sl %>% transmute(Year = Year, fedcattle = Bill_meatLb_sl)
+
+##### I will generate the demand shocks. For this I need the observed demand and the constructed demand. 
+##### The observed demand is from derived demand from data. 
+##### Constructed demand would be animals slaughtered for consumption.
+
+### Observed derived demand would be the sum of Exports and Domestic Consumption from demandBeef dataframe
+### Constructed demand would be the total animals slaughtered for consumption purposes. I get this from slaughtered data. The dataframe
+### totalDisappeared has the data.
+obsDemand <- demandBeef %>% transmute(Year = Year, demandObs = Exports + `Domestic Consumption`)
+rownames(obsDemand) <- 1:nrow(obsDemand)
+estDemand <- totalDisappeared %>% transmute(Year = Year, demandEst = total_meat_bill)
+demandShock <- merge(obsDemand, estDemand) %>% mutate(dShock = demandObs/demandEst)
+
+## Now i generate gaussian shock which is consistent with historical data.
+## I use the standard deviation of historical data to construct the gaussian random variables. Here the mean is 1
+set.seed(1)
+demandShockGaussian <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
+
+##### Function to create chebyshev polynomial matrix
+chebyshevMatrix <- function(x,d,n){
+  # x contains chebyshev nodes, d contains the original data, and n contains the number of polynomials
+  xmin <- min(d)
+  xmax <- max(d)
+  z <- (2 * (x - xmin )/(xmax - xmin)) - 1
+  mat <- matrix(data=0, nrow = length(z), ncol = n)
+  for(i in 1:n){
+    mat[,1] <- 1
+    mat[,2] <- z
+    if(i >=3){
+      mat[,i] <- 2 * z * mat[,i-1] - mat[,i-2]
+    }
+  }
+  return(mat)
+}
+
+#### Functoin that creates chebyshev node vector
+chebyshevNodes <- function(d, n){
+  # d contains the data and n contains the number of chebyshev nodes to be created
+  xmin <- min(d)
+  xmax <- max(d)
+  x <- NA
+  for (i in 1:n){
+    x[i] <- ((xmin + xmax)/2) + ((xmax - xmin)/2) * cos( ((n-i+0.5)/n) * pi )
+  }
+  return(x)
+}
+
+#### For testing purposes I use n = 5 for now. 
+
+
+
+
+
 
 
 

@@ -272,12 +272,6 @@ supp_diss %>% ggplot(aes(x=Year))+ geom_line(aes(y=total_meat_bill,color="Demand
   geom_line(aes(y=TotalSupply, color="Supply")) + geom_point(aes(y=TotalSupply, color="Supply")) +
   labs(x="Year", y="Meat (in billion pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1994,2017)))
 
-
-
-
-
-
-
 ################## Here we find the adjustment factor to adjust for demand and supply meat ###############
 # Taking ratio of demand and supply
 
