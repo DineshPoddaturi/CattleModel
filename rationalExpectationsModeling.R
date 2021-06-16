@@ -219,11 +219,34 @@ chebyshevNodes <- function(d, n){
 
 #### For testing purposes I use n = 5 for now. 
 
-chebNodes <- 5
+chebNodesN <- 5
 
 stateVars <- merge(merge(merge(cornPrice, cullCowsProd),fedCattleProd),demandShockGaussian)
 
+cornNodes <- chebyshevNodes(d = stateVars$pcorn, n = chebNodesN)
+cullCowNodes <- chebyshevNodes(d = stateVars$cullCows, n = chebNodesN)
+fedCattleNodes <- chebyshevNodes(d = stateVars$fedcattle, n = chebNodesN)
+dShockNodes <- chebyshevNodes(d = stateVars$Shock, n = chebNodesN)
 
+
+
+cornChebyshevMatrix <- chebyshevMatrix(x = cornNodes, d = stateVars$pcorn, n = chebNodesN)
+cullCowsChebyshevMatrix <- chebyshevMatrix(x = cullCowNodes, d = stateVars$cullCows, n = chebNodesN)
+fedCattleChebyshevMatrix <- chebyshevMatrix(x = fedCattleNodes, d = stateVars$fedcattle, n = chebNodesN)
+dShockChebyshevMatrix <- chebyshevMatrix(x = dShockNodes, d = stateVars$Shock, n = chebNodesN)
+
+
+###### Here I am taking the tensor product to create interpolation matrix of grids. 
+###### kron takes the kronecker tensor product of two matrices
+
+##### For cull cows we use corn, cull cows production, and demand shock chebyshev matrices
+##### For fed cattle we use corn, fed cattle production, and demand shock chebyshev matrices
+
+cullInterpolationMatrix <- kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatrix), dShockChebyshevMatrix)
+fedCattleInterpolationMatrix <- kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
+
+c_cull <- matrix(data = numeric(nrow(cullInterpolationMatrix)), ncol = 1)
+c_fed <- matrix(data = numeric(nrow(cullInterpolationMatrix)), ncol = 1)
 
 
 
