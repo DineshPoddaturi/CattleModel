@@ -179,10 +179,14 @@ rownames(obsDemand) <- 1:nrow(obsDemand)
 estDemand <- totalDisappeared %>% transmute(Year = Year, demandEst = total_meat_bill)
 demandShock <- merge(obsDemand, estDemand) %>% mutate(dShock = demandObs/demandEst)
 
+demandShockGaussian <- demandShock %>% transmute(Year = Year, Shock = 0)
+
+
 ## Now i generate gaussian shock which is consistent with historical data.
 ## I use the standard deviation of historical data to construct the gaussian random variables. Here the mean is 1
 set.seed(1)
-demandShockGaussian <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
+demandShockG <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
+demandShockGaussian$Shock <- demandShockG
 
 ##### Function to create chebyshev polynomial matrix
 chebyshevMatrix <- function(x,d,n){
@@ -214,6 +218,11 @@ chebyshevNodes <- function(d, n){
 }
 
 #### For testing purposes I use n = 5 for now. 
+
+chebNodes <- 5
+
+stateVars <- merge(merge(merge(cornPrice, cullCowsProd),fedCattleProd),demandShockGaussian)
+
 
 
 
