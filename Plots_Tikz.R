@@ -87,10 +87,9 @@ print(fedCattlePrices_plot)
 dev.off()
 
 tikz(file="TexPlots/CullCowPrices.tex", width=6, height=3)
-cullCowPrices_plot <- prices_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+geom_line(aes(y=pc_est,color="Model estimate"))+
+cullCowPrices_plot <- prices_predict_co4_merge111_paper %>% filter(Year>=2010) %>% ggplot(aes(x=Year))+geom_line(aes(y=pc_est,color="Model estimate"))+
   geom_point(aes(y=pc_est,color="Model estimate")) + geom_line(aes(y=pc_hat, color="Estimate with added costs")) + 
-  geom_point(aes(y=pc_hat,color="Estimate with added costs")) + geom_line(aes(y=pc, color="Observed")) + 
-  geom_point(aes(y=pc,color="Observed")) + labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
+  geom_point(aes(y=pc_hat,color="Estimate with added costs")) + labs(x="Year", y="Culled Prices (\\$/cwt)", colour="") + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(prices_predict_co4_merge111_paper$Year[1], 
                                                prices_predict_co4_merge111_paper$Year[nrow(prices_predict_co4_merge111_paper)]))) + 
   theme(legend.position = c(0.2, 0.7))
@@ -114,13 +113,12 @@ print(fedCattleMeat_plot)
 dev.off()
 
 tikz(file="TexPlots/CullCowMeat.tex", width=6, height=3)
-cullCowMeat_plot <- demand_predict_co4_merge111_paper %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model estimate"))+
+cullCowMeat_plot <- demand_predict_co4_merge111_paper %>% filter(Year>=2010) %>% ggplot(aes(x=Year))+geom_line(aes(y=cl_est,color="Model estimate"))+
   geom_point(aes(y=cl_est,color="Model estimate")) + geom_line(aes(y=cl_hat, color="Estimate with added costs")) + 
-  geom_point(aes(y=cl_hat,color="Estimate with added costs")) + geom_line(aes(y=cl, color="Observed")) + 
-  geom_point(aes(y=cl,color="Observed")) + labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
+  geom_point(aes(y=cl_hat,color="Estimate with added costs")) + labs(x="Year", y="Culled meat (in Billion pounds)", colour="") + theme_classic()+ 
   scale_x_continuous(name="Year", breaks=c(seq(demand_predict_co4_merge111_paper$Year[1],
                                                demand_predict_co4_merge111_paper$Year[nrow(demand_predict_co4_merge111_paper)]))) + 
-  theme(legend.position = c(0.2, 0.8))
+  theme(legend.position = c(0.558, 0.93))
 print(cullCowMeat_plot)
 dev.off()
 

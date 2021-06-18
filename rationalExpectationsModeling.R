@@ -246,13 +246,20 @@ cullInterpolationMatrix <- kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatri
 fedCattleInterpolationMatrix <- kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
 
 c_cull <- matrix(data = numeric(nrow(cullInterpolationMatrix)), ncol = 1)
-c_fed <- matrix(data = numeric(nrow(cullInterpolationMatrix)), ncol = 1)
+c_fed <- matrix(data = numeric(nrow(fedCattleInterpolationMatrix)), ncol = 1)
+
+
+p_cull <- matrix(data = numeric(nrow(cullInterpolationMatrix)), ncol = 1)
+p_fed <- matrix(data = numeric(nrow(fedCattleInterpolationMatrix)), ncol = 1)
 
 
 
+##### Here I am writing the system of equations that need to be solved for optimal k_{3,t+1} and k_{j,t+1} for j in {8,9,10}
+##### let K[1] is k_{3,t+1} and K[2] is sum of k_{8,t+1}, k_{9,t+1}, k_{10,t+1}
 
+g * Stock_1t - K[1] - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
-
+k_10t + k_9t + k_8t + k_7t - K[2] - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
 
 
 
