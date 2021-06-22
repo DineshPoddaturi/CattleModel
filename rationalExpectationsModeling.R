@@ -253,14 +253,75 @@ p_cull <- matrix(data = numeric(nrow(cullInterpolationMatrix)), ncol = 1)
 p_fed <- matrix(data = numeric(nrow(fedCattleInterpolationMatrix)), ncol = 1)
 
 
+pc_obs <- prices_quant %>% select(Year, pc)
+ps_obs <- prices_quant %>% select(Year, ps)
+p_corn <- prices_quant %>% select(Year, pcorn)
+
+p_cull[,1] <- pc_obs$pc[1]
+
+
+c_cull <- solve(cullInterpolationMatrix) %*% p_cull
+
+
 
 ##### Here I am writing the system of equations that need to be solved for optimal k_{3,t+1} and k_{j,t+1} for j in {8,9,10}
 ##### let K[1] is k_{3,t+1} and K[2] is sum of k_{8,t+1}, k_{9,t+1}, k_{10,t+1}
 
 g * Stock_1t - K[1] - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
-k_10t + k_9t + k_8t + k_7t - K[2] - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+# k_10t + k_9t + k_8t + k_7t - K[2] - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+# We know k_10t is zero. So the above expression becomes
+k_9t + k_8t + k_7t - K[2] - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
 
+#### I can back out the value of three year old animal as follows
+
+V_3t1 <- ps - g * beta^3 * p_st3 + (1+g*beta*(gamma0 + gamma1*beta))*((1-beta^7)/(1-beta))*h
+
+
+####### I construct the supply in addition to the storage
+
+Stock_1t_rat <- Stock_temp %>% transmute(Year = Year, K = K)
+k_9t_rat <- Stock_temp %>% select(Year, k9)
+k_8t_rat <- Stock_temp %>% select(Year, k8)
+k_7t_rat <- Stock_temp %>% select(Year, k7)
+
+
+###### To get the expected price I need to integrate out the demand shock and supply shock from the price. 
+###### For that we employ guassian quadrature integration.
+
+
+#### Function that computes the optimal K[1] and K[2]
+Stock_1t <- (Stock_1t_rat$K[23]*1500)/1000000000
+k_9t <- (k_9t_rat$k9[23]*1500)/1000000000
+k_8t <- (k_8t_rat$k8[23]*1500)/1000000000
+k_7t <- (k_7t_rat$k7[23]*1500)/1000000000
+# 
+ps <- ps_obs$ps[23]
+pc <- pc_obs$pc[23]
+A <-  demandShock$demandEst[23]
+
+fnnnnn <- function(K){
+  K1 <- K[1]
+  K2 <- K[2]
+  
+  fed <- g * Stock_1t - K1 - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+  cull <- k_9t + k_8t + k_7t - K2 - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+  
+  F = fed^2 + cull^2
+
+  return(F)
+  # return(c(fed,cull))
+
+}
+
+op <- BBoptim(par = c(1,1), fn = fnnnnn)
+
+
+### Here K[1] is the number of replacement heifers in next period i.e., the heifers that are not sent to slaughter
+### house for consumption purposes.
+
+#### Now I have to write code to generate price series using the interpolation matrix, coefficient vector, 
+#### and actual prices. This needs a lot of work. 
 
 
 

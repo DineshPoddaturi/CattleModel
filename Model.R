@@ -947,7 +947,7 @@ for(i in 1:(nrow(predict_df)-2)){
   ### Here when I am computing the share we are accounting for the carcass weight. Hence we do not have to convert the
   ### original prices from dollars per live weight to dollars per dressed weight.
   ### If we change the prices to dollars per carcass weight we need to remove phi from the share metric formula. And if I
-  ### remove it from the formula and the analysis, we get the same slaughter and cull supply the same as the case when
+  ### remove it from the formula and do the analysis, we get the same slaughter and cull supply the same as the case when
   ### we didn't convert them. DO NOT GET CONFUSED.
   
   slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
