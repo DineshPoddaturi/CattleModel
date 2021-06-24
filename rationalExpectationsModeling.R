@@ -324,6 +324,190 @@ op <- BBoptim(par = c(1,1), fn = fnnnnn)
 #### and actual prices. This needs a lot of work. 
 
 
+### I am going to guess the 
+
+optPriceFunction<- function(p){
+  
+  ps <- p[1]
+  pc <- p[2]
+  
+  F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+
+  F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+  
+  F <- F1^2 + F2^2
+  
+  return(F)
+
+}
+
+optKFunction <- function(K){
+  
+  K1 <- K[1]
+  K2 <- K[2]
+  
+  fed <- g * Stock_1t - K1 - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+  cull <- k_9t + k_8t + k_7t - K2 - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+  
+  F = fed^2 + cull^2
+  
+  return(F)
+  
+}
+
+valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
+  
+  # cornNodes <- chebyshevNodes(d = pCorn, n = chebNodesN)
+  # cullCowNodes <- chebyshevNodes(d = TSCull, n = chebNodesN)
+  # fedCattleNodes <- chebyshevNodes(d = TSFed, n = chebNodesN)
+  # dShockNodes <- chebyshevNodes(d = dShock, n = chebNodesN)
+  
+  pCorn <- stateVars$pcorn
+  TSCull <- stateVars$cullCows
+  dShock <- stateVars$Shock
+  TSFed <- stateVars$fedcattle
+  
+  # nnn <-kron(kron(cullCowNodes, dShockNodes),  cornNodes)
+  
+  
+  
+  corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
+  cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
+  dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
+  fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
+  
+  cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
+  fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
+  
+  pc_new <- cull_InterpolationMatrix %*% c_old_cull
+  ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+  
+  p <- c(ps_new, pc_new)
+  
+  estP <- BBoptim(par = p, fn = optPriceFunction)
+  
+  ps_new <- estP$par[1]
+  pc_new <- estP$par[2]
+  
+  # K <- c(1,1)
+  # ps <- ps_new
+  # pc <- pc_new
+  # 
+  # estK <- BBoptim(par = K, fn = optKFunction)
+  # 
+  # k_3t1 <- estK$par[1]
+  # k_8_10t1 <- estK$par[2]
+  # 
+  # prices <- cbind(ps, pc)
+  # Ks <- cbind(k_3t1, k_8_10t1)
+  
+  # return(c(prices, Ks))
+  
+  return(c(ps_new, pc_new))
+  
+}
+
+collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNodes, dShockNodes,
+                              cornPrice, cullSupp, fedSupp, dShock){
+  
+  cornPrice <- stateVars$pcorn
+  cullSupp <- stateVars$cullCows
+  dShock <- stateVars$Shock
+  fedSupp <- stateVars$fedcattle
+  
+  corn_nodes <- cornNodes %>% as.data.frame()
+  cull_nodes <- cullCowNodes %>% as.data.frame()
+  fed_nodes <- fedCattleNodes  %>% as.data.frame()
+  dshock_nodes <- dShockNodes %>% as.data.frame()
+  
+  names(corn_nodes) <- "cornNodes"
+  names(cull_nodes) <- "cullNodes"
+  names(fed_nodes) <- "fedNodes"
+  names(dshock_nodes) <- "dShockNodes"
+  
+  
+  ### Cartesian product of the nodes
+  cull_cartesian <- crossing(corn_nodes, cull_nodes, dshock_nodes) %>% as.data.frame()
+  
+  fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes) %>% as.data.frame()
+  
+  
+  
+  c_old_cull <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
+  c_old_fed <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
+  
+  c_cull <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
+  c_fed <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
+  
+  ps_new <- as.matrix(numeric(nrow(fed_cartesian)), ncol = 1)
+  pc_new <- as.matrix(numeric(nrow(fed_cartesian)), ncol = 1)
+  
+  maxit <- 10
+  
+  for(l in 1:maxit){
+    
+    c_old_cull <- c_cull
+    c_old_fed <- c_fed
+    
+    for(i in 1:nrow(fed_cartesian)){
+      # i <- 1
+      P_Q <- valueFunction(cornNode = cull_cartesian$cornNodes[i], cullCowNode = cull_cartesian$cullNodes[i], 
+                           dShockNode = cull_cartesian$dShockNodes[i], fedCattleNode = fed_cartesian$fedNodes[i], 
+                           pCorn = cornPrice, TSCull = cullSupp, dShock = dShock, TSFed = fedSupp) 
+      
+      ps_new[i,] <- P_Q[1]
+      pc_new[i,] <- P_Q[2]
+      
+    }
+    
+    # ps_new1 <- as.matrix(x = rep(ps_new[1], 125), ncol = 1)
+    # pc_new1 <- as.matrix(x = rep(pc_new[1], 125), ncol = 1)
+    
+    c_cull <- solve(cullInterpolationMatrix) %*% pc_new
+    c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
+    
+    if((norm(c_cull - c_old_cull) && norm(c_fed - c_old_fed)) < 0.001){
+      break
+    }
+    
+  }
+  
+}
+
+
+
+
+chebyshevMatrix1 <- function(x,xmin,xmax,n){
+  # x contains chebyshev nodes, d contains the original data, and n contains the number of polynomials
+  z <- (2 * (x - xmin )/(xmax - xmin)) - 1
+  mat <- matrix(data=0, nrow = length(z), ncol = n)
+  for(i in 1:n){
+    mat[,1] <- 1
+    mat[,2] <- z
+    if(i >=3){
+      mat[,i] <- 2 * z * mat[,i-1] - mat[,i-2]
+    }
+  }
+  return(mat)
+}
+
+cornNodes
+dShockNodes
+cullCowNodes
+
+cMat <- chebyshevMatrix1(x = cornNodes[1], xmin = min(stateVars$pcorn), 
+                         xmax = max(stateVars$pcorn), n = chebNodesN)
+
+dMat <- chebyshevMatrix1(x = dShockNodes[1], xmin = min(stateVars$Shock), 
+                         xmax = max(stateVars$Shock), n = chebNodesN)
+
+culMat <- chebyshevMatrix1(x = cullCowNodes[1], xmin = min(stateVars$cullCows), 
+                           xmax = max(stateVars$cullCows), n = chebNodesN)
+
+kron(cMat,kron(dMat, culMat)) %>% as.data.frame()
+
+round(cullInterpolationMatrix[1,],4) == round(kron(cMat,kron(dMat, culMat)),4)
+
 
 
 
