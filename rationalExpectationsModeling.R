@@ -439,8 +439,16 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   c_cull <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
   c_fed <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
   
-  ps_new <- as.matrix(numeric(nrow(fed_cartesian)), ncol = 1)
-  pc_new <- as.matrix(numeric(nrow(fed_cartesian)), ncol = 1)
+  ps_new <- as.matrix(rep(0.9723333,nrow(fed_cartesian)), ncol = 1)
+  pc_new <- as.matrix(rep(0.5493333,nrow(fed_cartesian)), ncol = 1)
+  
+  A <- 25.48906
+  sl <- 23.04224
+  cl <- 2.981532
+  
+  c_cull <- solve(cullInterpolationMatrix) %*% pc_new
+  c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
+  
   
   maxit <- 10
   
@@ -449,31 +457,70 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
     c_old_cull <- c_cull
     c_old_fed <- c_fed
     
+    
     for(i in 1:nrow(fed_cartesian)){
-      # i <- 1
-      P_Q <- valueFunction(cornNode = cull_cartesian$cornNodes[i], cullCowNode = cull_cartesian$cullNodes[i], 
-                           dShockNode = cull_cartesian$dShockNodes[i], fedCattleNode = fed_cartesian$fedNodes[i], 
-                           pCorn = cornPrice, TSCull = cullSupp, dShock = dShock, TSFed = fedSupp) 
+    
+        # i <- 1
       
+      P_Q <- valueFunction(cornNode = cull_cartesian$cornNodes[i], cullCowNode = cull_cartesian$cullNodes[i],
+                           dShockNode = cull_cartesian$dShockNodes[i], fedCattleNode = fed_cartesian$fedNodes[i],
+                           pCorn = cornPrice, TSCull = cullSupp, dShock = dShock, TSFed = fedSupp)
+
       ps_new[i,] <- P_Q[1]
       pc_new[i,] <- P_Q[2]
+      
+      
+      # pCorn <- stateVars$pcorn
+      # TSCull <- stateVars$cullCows
+      # dShock <- stateVars$Shock
+      # TSFed <- stateVars$fedcattle
+      # cornNode <- cull_cartesian$cornNodes[i]
+      # cullCowNode <- cull_cartesian$cullNodes[i]
+      # dShockNode <- cull_cartesian$dShockNodes[i]
+      # fedCattleNode <- fed_cartesian$fedNodes[i]
+      # 
+      # 
+      # corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
+      # cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
+      # dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
+      # fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
+      # 
+      # cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
+      # fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
+      # 
+      # pc_new <- cull_InterpolationMatrix %*% c_old_cull
+      # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+      # 
+      # p <- c(ps_new, pc_new)
+      # 
+      # estP <- BBoptim(par = p, fn = optPriceFunction)
+      # 
+      # ps_new <- estP$par[1]
+      # pc_new <- estP$par[2]
+      
+      ps_new1 <- as.matrix(rep(ps_new[i,],nrow(fed_cartesian)), ncol = 1)
+      pc_new1 <- as.matrix(rep(pc_new[i,],nrow(fed_cartesian)), ncol = 1)
+      
+      c_cull <- solve(cullInterpolationMatrix) %*% pc_new1
+      c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new1
+      
       
     }
     
     # ps_new1 <- as.matrix(x = rep(ps_new[1], 125), ncol = 1)
     # pc_new1 <- as.matrix(x = rep(pc_new[1], 125), ncol = 1)
     
-    c_cull <- solve(cullInterpolationMatrix) %*% pc_new
-    c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
     
-    if((norm(c_cull - c_old_cull) && norm(c_fed - c_old_fed)) < 0.001){
-      break
+    
+    if((norm(c_cull - c_old_cull) ) < 0.001){
+      if(norm(c_fed - c_old_fed) < 0.001){
+        break
+      }
     }
     
   }
   
 }
-
 
 
 
