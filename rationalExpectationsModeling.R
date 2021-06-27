@@ -357,19 +357,10 @@ optKFunction <- function(K){
 
 valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
   
-  # cornNodes <- chebyshevNodes(d = pCorn, n = chebNodesN)
-  # cullCowNodes <- chebyshevNodes(d = TSCull, n = chebNodesN)
-  # fedCattleNodes <- chebyshevNodes(d = TSFed, n = chebNodesN)
-  # dShockNodes <- chebyshevNodes(d = dShock, n = chebNodesN)
-  
   pCorn <- stateVars$pcorn
   TSCull <- stateVars$cullCows
   dShock <- stateVars$Shock
   TSFed <- stateVars$fedcattle
-  
-  # nnn <-kron(kron(cullCowNodes, dShockNodes),  cornNodes)
-  
-  
   
   corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
   cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
@@ -408,12 +399,19 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
 }
 
 collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNodes, dShockNodes,
-                              cornPrice, cullSupp, fedSupp, dShock){
+                              stateVars, A, sl, cl, capK, ps, pc){
   
   cornPrice <- stateVars$pcorn
   cullSupp <- stateVars$cullCows
   dShock <- stateVars$Shock
   fedSupp <- stateVars$fedcattle
+  
+  A <- A
+  sl <- sl
+  cl <- cl
+  K <- capK
+  ps <- ps
+  pc <- pc
   
   corn_nodes <- cornNodes %>% as.data.frame()
   cull_nodes <- cullCowNodes %>% as.data.frame()
@@ -439,18 +437,14 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   c_cull <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
   c_fed <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
   
-  ps_new <- as.matrix(rep(0.9723333,nrow(fed_cartesian)), ncol = 1)
-  pc_new <- as.matrix(rep(0.5493333,nrow(fed_cartesian)), ncol = 1)
-  
-  A <- 25.48906
-  sl <- 23.04224
-  cl <- 2.981532
+  ps_new <- as.matrix(rep(ps,nrow(fed_cartesian)), ncol = 1)
+  pc_new <- as.matrix(rep(pc,nrow(fed_cartesian)), ncol = 1)
   
   c_cull <- solve(cullInterpolationMatrix) %*% pc_new
   c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
   
   
-  maxit <- 10
+  maxit <- 100
   
   for(l in 1:maxit){
     
@@ -460,57 +454,21 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
     
     for(i in 1:nrow(fed_cartesian)){
     
-        # i <- 1
       
       P_Q <- valueFunction(cornNode = cull_cartesian$cornNodes[i], cullCowNode = cull_cartesian$cullNodes[i],
                            dShockNode = cull_cartesian$dShockNodes[i], fedCattleNode = fed_cartesian$fedNodes[i],
                            pCorn = cornPrice, TSCull = cullSupp, dShock = dShock, TSFed = fedSupp)
-
-      ps_new[i,] <- P_Q[1]
-      pc_new[i,] <- P_Q[2]
       
-      
-      # pCorn <- stateVars$pcorn
-      # TSCull <- stateVars$cullCows
-      # dShock <- stateVars$Shock
-      # TSFed <- stateVars$fedcattle
-      # cornNode <- cull_cartesian$cornNodes[i]
-      # cullCowNode <- cull_cartesian$cullNodes[i]
-      # dShockNode <- cull_cartesian$dShockNodes[i]
-      # fedCattleNode <- fed_cartesian$fedNodes[i]
-      # 
-      # 
-      # corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
-      # cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
-      # dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
-      # fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
-      # 
-      # cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
-      # fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
-      # 
-      # pc_new <- cull_InterpolationMatrix %*% c_old_cull
-      # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
-      # 
-      # p <- c(ps_new, pc_new)
-      # 
-      # estP <- BBoptim(par = p, fn = optPriceFunction)
-      # 
-      # ps_new <- estP$par[1]
-      # pc_new <- estP$par[2]
-      
-      ps_new1 <- as.matrix(rep(ps_new[i,],nrow(fed_cartesian)), ncol = 1)
-      pc_new1 <- as.matrix(rep(pc_new[i,],nrow(fed_cartesian)), ncol = 1)
-      
-      c_cull <- solve(cullInterpolationMatrix) %*% pc_new1
-      c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new1
-      
+      ps_new[i,l] <- P_Q[1]
+      pc_new[i,l] <- P_Q[2]
       
     }
     
-    # ps_new1 <- as.matrix(x = rep(ps_new[1], 125), ncol = 1)
-    # pc_new1 <- as.matrix(x = rep(pc_new[1], 125), ncol = 1)
+    ps_new1 <- as.matrix(x = rep(ps_new[1], 125), ncol = 1)
+    pc_new1 <- as.matrix(x = rep(pc_new[1], 125), ncol = 1)
     
-    
+    c_cull <- solve(cullInterpolationMatrix) %*% pc_new1
+    c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new1
     
     if((norm(c_cull - c_old_cull) ) < 0.001){
       if(norm(c_fed - c_old_fed) < 0.001){
@@ -523,40 +481,24 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
 }
 
 
+##### Here setting up the data frame for the quantities. Note: It contains K_{t-1} and K_{j,t} for j = {10,9,8,7}
 
-chebyshevMatrix1 <- function(x,xmin,xmax,n){
-  # x contains chebyshev nodes, d contains the original data, and n contains the number of polynomials
-  z <- (2 * (x - xmin )/(xmax - xmin)) - 1
-  mat <- matrix(data=0, nrow = length(z), ncol = n)
-  for(i in 1:n){
-    mat[,1] <- 1
-    mat[,2] <- z
-    if(i >=3){
-      mat[,i] <- 2 * z * mat[,i-1] - mat[,i-2]
-    }
-  }
-  return(mat)
-}
+K_jt <- Stock %>% select(Year, k7, k8, k9, k10)
 
-cornNodes
-dShockNodes
-cullCowNodes
+K_1t <- Stock %>% transmute(Year = Year+1, K)
 
-cMat <- chebyshevMatrix1(x = cornNodes[1], xmin = min(stateVars$pcorn), 
-                         xmax = max(stateVars$pcorn), n = chebNodesN)
+capK <- merge(K_1t, K_jt)
 
-dMat <- chebyshevMatrix1(x = dShockNodes[1], xmin = min(stateVars$Shock), 
-                         xmax = max(stateVars$Shock), n = chebNodesN)
+sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
+cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
+A_quant <- totalDisappearedNew %>% transmute(Year = Year, A = total_meat_bill)
 
-culMat <- chebyshevMatrix1(x = cullCowNodes[1], xmin = min(stateVars$cullCows), 
-                           xmax = max(stateVars$cullCows), n = chebNodesN)
+quantities <- merge(merge(A_quant,sl_quant), cl_quant)
 
-kron(cMat,kron(dMat, culMat)) %>% as.data.frame()
-
-round(cullInterpolationMatrix[1,],4) == round(kron(cMat,kron(dMat, culMat)),4)
+price_sl_cl <- prices_quant %>% select(Year, ps , pc)
 
 
-
+quantities_prices_capK <- merge(merge(quantities, price_sl_cl), capK)
 
 
 
