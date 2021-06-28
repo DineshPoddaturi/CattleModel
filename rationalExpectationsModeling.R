@@ -399,7 +399,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
 }
 
 collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNodes, dShockNodes,
-                              stateVars, A, sl, cl, capK, ps, pc){
+                              stateVars, A, sl, cl, capK, ps, pc, k9, k8, k7){
   
   cornPrice <- stateVars$pcorn
   cullSupp <- stateVars$cullCows
@@ -409,9 +409,14 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   A <- A
   sl <- sl
   cl <- cl
-  K <- capK
+  
   ps <- ps
   pc <- pc
+  
+  K  <- capK
+  k9 <- k9
+  k8 <- k8
+  k7 <- k7
   
   corn_nodes <- cornNodes %>% as.data.frame()
   cull_nodes <- cullCowNodes %>% as.data.frame()
@@ -429,8 +434,6 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   
   fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes) %>% as.data.frame()
   
-  
-  
   c_old_cull <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
   c_old_fed <- as.matrix(numeric(chebNodesN*chebNodesN*chebNodesN), ncol = 1)
   
@@ -444,7 +447,7 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
   
   
-  maxit <- 100
+  maxit <- 10
   
   for(l in 1:maxit){
     
@@ -500,7 +503,11 @@ price_sl_cl <- prices_quant %>% select(Year, ps , pc)
 
 quantities_prices_capK <- merge(merge(quantities, price_sl_cl), capK)
 
-
+collocationMethod(chebNodesN = chebNodesN, cornNodes = cornNodes, cullCowNodes = cullCowNodes, fedCattleNodes = fedCattleNodes,
+                  dShockNodes = dShockNodes, stateVars = stateVars, A = quantities_prices_capK$A[1], sl = quantities_prices_capK$sl[1],
+                  cl = quantities_prices_capK$cl[1], capK = quantities_prices_capK$K[1], ps = quantities_prices_capK$ps[1], 
+                  pc = quantities_prices_capK$pc[1], k9 = quantities_prices_capK$k9[1], k8 = quantities_prices_capK$k8[1],
+                  k7 = quantities_prices_capK$k7[1])
 
 
 
