@@ -370,8 +370,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
   fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
   
-  pc_new <- cull_InterpolationMatrix %*% c_old_cull
-  ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+  # pc_new <- cull_InterpolationMatrix %*% c_old_cull
+  # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
   
   p <- c(ps_new, pc_new)
   
@@ -380,21 +380,34 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   ps_new <- estP$par[1]
   pc_new <- estP$par[2]
   
-  # K <- c(1,1)
-  # ps <- ps_new
-  # pc <- pc_new
-  # 
-  # estK <- BBoptim(par = K, fn = optKFunction)
-  # 
-  # k_3t1 <- estK$par[1]
-  # k_8_10t1 <- estK$par[2]
-  # 
-  # prices <- cbind(ps, pc)
-  # Ks <- cbind(k_3t1, k_8_10t1)
+  Stock_1t <- (Kt1*1500)/1000000000
+  k_9t <- (k9*1500)/1000000000
+  k_8t <- (k8*1500)/1000000000
+  k_7t <- (k7*1500)/1000000000
   
-  # return(c(prices, Ks))
+  K <- c(1,1)
+  ps <- ps_new
+  pc <- pc_new
+
+  estK <- BBoptim(par = K, fn = optKFunction)
+
+  k_3t1 <- estK$par[1]
+  k_7_10t1 <- estK$par[2]
   
-  return(c(ps_new, pc_new))
+  sl <- g * Stock_1t - k_3t1
+  cl <- k_9t + k_8t + k_7t - k_7_10t1
+  
+  p <- c(ps, pc)
+  estP <- BBoptim(par = p, fn = optPriceFunction)
+  ps <- estP$par[1]
+  pc <- estP$par[2]
+
+  prices <- cbind(ps, pc)
+  Ks <- cbind(k_3t1, k_8_10t1)
+  
+  return(c(prices, Ks))
+  
+  # return(c(ps_new, pc_new))
   
 }
 
@@ -406,17 +419,17 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   dShock <- stateVars$Shock
   fedSupp <- stateVars$fedcattle
   
-  A <- A
-  sl <- sl
-  cl <- cl
+  A <- quantities_prices_capK$A[1]
+  sl <- quantities_prices_capK$sl[1]
+  cl <- quantities_prices_capK$cl[1]
   
-  ps <- ps
-  pc <- pc
+  ps <- quantities_prices_capK$ps[1]
+  pc <- quantities_prices_capK$pc[1]
   
-  K  <- capK
-  k9 <- k9
-  k8 <- k8
-  k7 <- k7
+  Kt1  <- quantities_prices_capK$K[1]
+  k9 <- quantities_prices_capK$k9[1]
+  k8 <- quantities_prices_capK$k8[1]
+  k7 <- quantities_prices_capK$k7[1]
   
   corn_nodes <- cornNodes %>% as.data.frame()
   cull_nodes <- cullCowNodes %>% as.data.frame()
@@ -457,13 +470,15 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
     
     for(i in 1:nrow(fed_cartesian)){
     
+      pc_new <- cull_InterpolationMatrix %*% c_old_cull
+      ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
       
       P_Q <- valueFunction(cornNode = cull_cartesian$cornNodes[i], cullCowNode = cull_cartesian$cullNodes[i],
                            dShockNode = cull_cartesian$dShockNodes[i], fedCattleNode = fed_cartesian$fedNodes[i],
                            pCorn = cornPrice, TSCull = cullSupp, dShock = dShock, TSFed = fedSupp)
       
-      ps_new[i,l] <- P_Q[1]
-      pc_new[i,l] <- P_Q[2]
+      ps_new[i,] <- P_Q[1]
+      pc_new[i,] <- P_Q[2]
       
     }
     
@@ -473,8 +488,8 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
     c_cull <- solve(cullInterpolationMatrix) %*% pc_new1
     c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new1
     
-    if((norm(c_cull - c_old_cull) ) < 0.001){
-      if(norm(c_fed - c_old_fed) < 0.001){
+    if((norm(c_cull - c_old_cull) ) < 0.0001){
+      if(norm(c_fed - c_old_fed) < 0.0001){
         break
       }
     }
