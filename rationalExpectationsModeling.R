@@ -357,10 +357,119 @@ optKFunction <- function(K){
 
 valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
   
+  prices_ps <- matrix(data = 0,nrow=125,ncol = 23)
+  prices_pc <- matrix(data = 0,nrow=125,ncol = 23)
+  k3t1 <- matrix(data = 0,nrow=125,ncol = 23)
+  kjt1 <- matrix(data = 0,nrow=125,ncol = 23)
+  c_cull1 <- matrix(data=0, nrow = 125, ncol = 125)
+  c_fed1 <- matrix(data=0, nrow = 125, ncol = 125)
+  
+  
+  i <- 1
+  
+  A <- quantities_prices_capK$A[i]
+  sl <- quantities_prices_capK$sl[i]
+  cl <- quantities_prices_capK$cl[i]
+  
+  ps <- quantities_prices_capK$ps[i]
+  pc <- quantities_prices_capK$pc[i]
+  
+  Kt1  <- quantities_prices_capK$K[i]
+  k9 <- quantities_prices_capK$k9[i]
+  k8 <- quantities_prices_capK$k8[i]
+  k7 <- quantities_prices_capK$k7[i]
+  
+  slDressed <- quantities_prices_capK$Slaughter_avg[i]
+  clDressed <- quantities_prices_capK$Cull_avg[i]
+  
+  ps_new <- as.matrix(rep(ps,nrow(fed_cartesian)), ncol = 1)
+  pc_new <- as.matrix(rep(pc,nrow(fed_cartesian)), ncol = 1)
+  
+  c_cull <- solve(cullInterpolationMatrix) %*% pc_new
+  c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
+  
+  c_old_cull <- c_cull
+  c_old_fed <- c_fed
+  
+  
+  #### Here we are going through each node
+  for (j in 1:125) {
+    cornNode <- cull_cartesian$cornNodes[j]
+    cullCowNode <- cull_cartesian$cullNodes[j]
+    dShockNode <- cull_cartesian$dShockNodes[j]
+    fedCattleNode <- fed_cartesian$fedNodes[j]
+    
+    pCorn <- stateVars$pcorn
+    TSCull <- stateVars$cullCows
+    dShock <- stateVars$Shock
+    TSFed <- stateVars$fedcattle
+    
+    
+    corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
+    cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
+    dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
+    fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
+    
+    cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
+    fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
+    
+    pc_new <- cull_InterpolationMatrix %*% c_old_cull
+    ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+    
+    p <- c(ps_new, pc_new)
+    
+    estP <- BBoptim(par = p, fn = optPriceFunction)
+    
+    ps_new <- estP$par[1]
+    pc_new <- estP$par[2]
+    
+    Stock_1t <- (Kt1*slDressed)/1000000000
+    k_9t <- (k9*clDressed)/1000000000
+    k_8t <- (k8*clDressed)/1000000000
+    k_7t <- (k7*clDressed)/1000000000
+    
+    K <- c(0,0)
+    ps <- ps_new
+    pc <- pc_new
+    
+    estK <- BBoptim(par = K, fn = optKFunction)
+    
+    k_3t1 <- estK$par[1]
+    k_7_10t1 <- estK$par[2]
+    
+    sl <- g * Stock_1t - k_3t1
+    cl <- k_9t + k_8t + k_7t - k_7_10t1
+    
+    p <- c(ps, pc)
+    estP <- BBoptim(par = p, fn = optPriceFunction)
+    ps <- estP$par[1]
+    pc <- estP$par[2]
+    
+    prices_ps[j,i] <- ps
+    prices_pc[j,i] <- pc
+    k3t1[j,i] <- k_3t1
+    kjt1[j,i] <- k_7_10t1
+    
+    ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
+    pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
+    
+    c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
+    c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
+    
+    c_cull1[,j] <- c_cull
+    c_fed1[,j] <- c_fed
+  }
+  
+  cornNode <- cull_cartesian$cornNodes[j]
+  cullCowNode <- cull_cartesian$cullNodes[j]
+  dShockNode <- cull_cartesian$dShockNodes[j]
+  fedCattleNode <- fed_cartesian$fedNodes[j]
+  
   pCorn <- stateVars$pcorn
   TSCull <- stateVars$cullCows
   dShock <- stateVars$Shock
   TSFed <- stateVars$fedcattle
+
   
   corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
   cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
@@ -370,8 +479,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
   fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
   
-  # pc_new <- cull_InterpolationMatrix %*% c_old_cull
-  # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+  pc_new <- cull_InterpolationMatrix %*% c_old_cull
+  ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
   
   p <- c(ps_new, pc_new)
   
@@ -380,12 +489,12 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   ps_new <- estP$par[1]
   pc_new <- estP$par[2]
   
-  Stock_1t <- (Kt1*1500)/1000000000
-  k_9t <- (k9*1500)/1000000000
-  k_8t <- (k8*1500)/1000000000
-  k_7t <- (k7*1500)/1000000000
+  Stock_1t <- (Kt1*slDressed)/1000000000
+  k_9t <- (k9*clDressed)/1000000000
+  k_8t <- (k8*clDressed)/1000000000
+  k_7t <- (k7*clDressed)/1000000000
   
-  K <- c(1,1)
+  K <- c(0,0)
   ps <- ps_new
   pc <- pc_new
 
@@ -402,8 +511,29 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   ps <- estP$par[1]
   pc <- estP$par[2]
 
-  prices <- cbind(ps, pc)
-  Ks <- cbind(k_3t1, k_8_10t1)
+  prices_ps[j,i] <- ps
+  prices_pc[j,i] <- pc
+  k3t1[j,i] <- k_3t1
+  kjt1[j,i] <- k_7_10t1
+  
+  ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
+  pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
+  
+  c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
+  c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
+  
+  c_cull1[,j] <- c_cull
+  c_fed1[,j] <- c_fed
+  
+  norm(c_old_cull - c_cull)
+  norm(c_old_fed - c_fed)
+  
+  c_old_cull <- c_cull
+  c_old_fed <- c_fed 
+  
+  
+  
+  
   
   return(c(prices, Ks))
   
@@ -412,7 +542,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
 }
 
 collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNodes, dShockNodes,
-                              stateVars, A, sl, cl, capK, ps, pc, k9, k8, k7){
+                              stateVars, A, sl, cl, capK, ps, pc, k9, k8, k7, slWeight, clWeight){
   
   cornPrice <- stateVars$pcorn
   cullSupp <- stateVars$cullCows
@@ -430,6 +560,9 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
   k9 <- quantities_prices_capK$k9[1]
   k8 <- quantities_prices_capK$k8[1]
   k7 <- quantities_prices_capK$k7[1]
+  
+  slDressed <- quantities_prices_capK$Slaughter_avg[1]
+  clDressed <- quantities_prices_capK$Cull_avg[1]
   
   corn_nodes <- cornNodes %>% as.data.frame()
   cull_nodes <- cullCowNodes %>% as.data.frame()
@@ -470,8 +603,8 @@ collocationMethod <- function(chebNodesN, cornNodes, cullCowNodes, fedCattleNode
     
     for(i in 1:nrow(fed_cartesian)){
     
-      pc_new <- cull_InterpolationMatrix %*% c_old_cull
-      ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+      # pc_new <- cull_InterpolationMatrix %*% c_old_cull
+      # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
       
       P_Q <- valueFunction(cornNode = cull_cartesian$cornNodes[i], cullCowNode = cull_cartesian$cullNodes[i],
                            dShockNode = cull_cartesian$dShockNodes[i], fedCattleNode = fed_cartesian$fedNodes[i],
@@ -515,14 +648,16 @@ quantities <- merge(merge(A_quant,sl_quant), cl_quant)
 
 price_sl_cl <- prices_quant %>% select(Year, ps , pc)
 
+dressedWeights_sl_cl
 
-quantities_prices_capK <- merge(merge(quantities, price_sl_cl), capK)
+quantities_prices_capK <- merge(merge(merge(quantities, price_sl_cl), capK),dressedWeights_sl_cl)
 
 collocationMethod(chebNodesN = chebNodesN, cornNodes = cornNodes, cullCowNodes = cullCowNodes, fedCattleNodes = fedCattleNodes,
                   dShockNodes = dShockNodes, stateVars = stateVars, A = quantities_prices_capK$A[1], sl = quantities_prices_capK$sl[1],
                   cl = quantities_prices_capK$cl[1], capK = quantities_prices_capK$K[1], ps = quantities_prices_capK$ps[1], 
                   pc = quantities_prices_capK$pc[1], k9 = quantities_prices_capK$k9[1], k8 = quantities_prices_capK$k8[1],
-                  k7 = quantities_prices_capK$k7[1])
+                  k7 = quantities_prices_capK$k7[1], slWeight = quantities_prices_capK$Slaughter_avg[1],
+                  clWeight = quantities_prices_capK$Cull_avg[1])
 
 
 
