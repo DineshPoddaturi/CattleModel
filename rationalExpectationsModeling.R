@@ -364,6 +364,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   c_cull1 <- matrix(data=0, nrow = 125, ncol = 125)
   c_fed1 <- matrix(data=0, nrow = 125, ncol = 125)
   
+  c_cull_opt <- list(matrix(data=0, nrow = 125, ncol = 125))
+  c_fed_opt <- rep(0,23)
   
   i <- 1
   
@@ -382,8 +384,13 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   slDressed <- quantities_prices_capK$Slaughter_avg[i]
   clDressed <- quantities_prices_capK$Cull_avg[i]
   
+  
+  
   ps_new <- as.matrix(rep(ps,nrow(fed_cartesian)), ncol = 1)
   pc_new <- as.matrix(rep(pc,nrow(fed_cartesian)), ncol = 1)
+  
+  # ps_new <- prices_ps[,i-1]
+  # pc_new <- prices_pc[,i-1]
   
   c_cull <- solve(cullInterpolationMatrix) %*% pc_new
   c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
@@ -459,6 +466,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     c_cull1[,j] <- c_cull
     c_fed1[,j] <- c_fed
   }
+  
+  c_cull_opt[[i]] <- c_cull1
+  c_fed_opt[[i]] <- c_fed1
+  
   
   cornNode <- cull_cartesian$cornNodes[j]
   cullCowNode <- cull_cartesian$cullNodes[j]
