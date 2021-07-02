@@ -124,3 +124,31 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Our model differs from the other models especially with the parameters. Instead of fixing the parameters to a single value, we made it flexible so it can move with the changes we observe in the data. This is a good feature.
 
+
+
+07/02/2021:
+
+* Showed him how I am estimating the prices (by making the difference between old coefficients and new coefficients to a pre determined tolerance level). The prices are becoming stagnent after going through two/three nodes. We should be able to go through all the nodes without becoming constant immediately. Chad thinks the program might be finding a local min/max and isn't moving/jumping to next value. 
+
+* The suggestion Chad gave: instead of checking the tolerance level between the coefficients try checking them for supply and demand. If somehow this works we are out of the woods. But be careful when making these kind of changes. We should be able to explain things why we made that decision.
+
+* Gaussian quadrature for integration is another complicated work. We should be careful when it comes to that. I (dinesh) believe that with gaussian quadrature for integration we should be able to get the expected price properly. 
+
+* Note: Expected price and actual price are not same and shouldn't be same. So remember that. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
