@@ -378,18 +378,37 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   prices_ps <- matrix(data = 0,nrow=125,ncol = 23)
   prices_pc <- matrix(data = 0,nrow=125,ncol = 23)
+  
   k3t1 <- matrix(data = 0,nrow=125,ncol = 23)
   kjt1 <- matrix(data = 0,nrow=125,ncol = 23)
+  
+  slNew <- matrix(data = 0,nrow=125,ncol = 23)
+  clNew <- matrix(data = 0,nrow=125,ncol = 23)
+  
+  slD <- matrix(data = 0,nrow=125,ncol = 23)
+  clD <- matrix(data = 0,nrow=125,ncol = 23)
+  
   c_cull1 <- matrix(data=0, nrow = 125, ncol = 125)
   c_fed1 <- matrix(data=0, nrow = 125, ncol = 125)
   
   c_cull_opt <- lapply(1:13, matrix, data= NA, nrow=125, ncol=125)
   c_fed_opt <- lapply(1:13, matrix, data= NA, nrow=125, ncol=125)
   
+ ###### THINK ABOUT THE INDEXING PROPERLY. ARE YOU PREDICTING THE NEXT YEAR OR JUST USING THE SAME YEARS DATA TO 
+ ###### ESTIMATE THE SAME NUMBERS? WE SHOULD BE ESTIMATING THE NEXT YEARS PRICES AND QUANTITIES
+  
   
 for(i in 1:23){
 
-  # i <- 1
+  # i <- 2
+  ### Here we get the observed quantities
+  Stock_1t <- (Kt1*slDressed)/1000000000
+  imports <- (importsObs*slDressed)/1000000000
+  exports <- (exportsObs*slDressed)/1000000000
+  k_9t <- (k9*clDressed)/1000000000
+  k_8t <- (k8*clDressed)/1000000000
+  k_7t <- (k7*clDressed)/1000000000
+  
   A <- quantities_prices_capK$A[i]
   sl <- quantities_prices_capK$sl[i]
   cl <- quantities_prices_capK$cl[i]
@@ -408,10 +427,10 @@ for(i in 1:23){
   importsObs <- quantities_prices_capK$Imports[i]
   exportsObs <- quantities_prices_capK$Exports[i]
   
-  adj <- A/(sl+cl)
-
-  sl <- sl * adj
-  cl <- cl * adj
+  # adj <- A/(sl+cl)
+  # 
+  # sl <- sl * adj
+  # cl <- cl * adj
   
   ps_new <- as.matrix(rep(ps,nrow(fed_cartesian)), ncol = 1)
   pc_new <- as.matrix(rep(pc,nrow(fed_cartesian)), ncol = 1)
@@ -430,107 +449,147 @@ for(i in 1:23){
   mu_Tilde <- params_mu_s[1]
   s_Tilde <- params_mu_s[2]
   
-  #### Here we are going through each node
-  for (j in 1:dim(cullInterpolationMatrix)[1]) {
-    
-    # j <- 2
-    c_old_cull <- c_cull
-    c_old_fed <- c_fed
-    
-    sl_old <- sl
-    cl_old <- cl
-    
-    cornNode <- cull_cartesian$cornNodes[j]
-    cullCowNode <- cull_cartesian$cullNodes[j]
-    dShockNode <- cull_cartesian$dShockNodes[j]
-    fedCattleNode <- fed_cartesian$fedNodes[j]
-    
-    pCorn <- stateVars$pcorn
-    TSCull <- stateVars$cullCows
-    dShock <- stateVars$Shock
-    TSFed <- stateVars$fedcattle
-    
-    
-    corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
-    cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
-    dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
-    fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
-    
-    cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
-    fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
-    
-    pc_new <- cull_InterpolationMatrix %*% c_old_cull
-    ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
-    
-    
-    #### getting the parameters from the optParamFunction
-    # params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps_new, pc = pc_new, thetas = c(1,1))
-    # 
-    # mu_Tilde <- params_mu_s[1]
-    # s_Tilde <- params_mu_s[2]
-    
-    
-    ### Here we get the price for the observed supply and demand of fed and cull cows
-    p <- c(ps_new, pc_new)
-    estP <- BBoptim(par = p, fn = optPriceFunction)
-
-    ps_new <- estP$par[1]
-    pc_new <- estP$par[2]
-    
-    ### Here we get the observed quantities
-    Stock_1t <- (Kt1*slDressed)/1000000000
-    imports <- (importsObs*slDressed)/1000000000
-    exports <- (exportsObs*slDressed)/1000000000
-    k_9t <- (k9*clDressed)/1000000000
-    k_8t <- (k8*clDressed)/1000000000
-    k_7t <- (k7*clDressed)/1000000000
-    
-    K <- c(0,0)
-    ps <- ps_new
-    pc <- pc_new
-    
-    ### From this function we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9}
-    estK <- BBoptim(par = K, fn = optKFunction)
-    
-    k_3t1 <- estK$par[1]
-    k_7_10t1 <- estK$par[2]
-    
-    sl <- (g * Stock_1t - k_3t1) * adj
-    cl <- (k_9t + k_8t + k_7t - k_7_10t1) * adj
-    
-    p <- c(ps, pc)
-    estP <- BBoptim(par = p, fn = optPriceFunction)
-    ps <- estP$par[1]
-    pc <- estP$par[2]
-    
-    prices_ps[j,i] <- ps
-    prices_pc[j,i] <- pc
-    k3t1[j,i] <- k_3t1
-    kjt1[j,i] <- k_7_10t1
-    
-    slD <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
-    clD <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+  count <- 0
+  
+  c_old_cull <- matrix(data = 0, nrow = 125, ncol = 1)
+  c_old_fed <- matrix(data = 0, nrow = 125, ncol = 1)
+  
+  while(norm(c_cull - c_old_cull) > 0.001 & norm(c_fed - c_old_fed) > 0.001){
       
-    ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
-    pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
+      count <- count + 1
+      
+      c_old_cull <- c_cull
+      c_old_fed <- c_fed
+      
+      sl_old <- sl
+      cl_old <- cl
+      
+      #### Here we are going through each node
+      for (j in 1:dim(cullInterpolationMatrix)[1]) {
+        
+        # j <- 1
+        cornNode <- cull_cartesian$cornNodes[j]
+        cullCowNode <- cull_cartesian$cullNodes[j]
+        dShockNode <- cull_cartesian$dShockNodes[j]
+        fedCattleNode <- fed_cartesian$fedNodes[j]
+        
+        pCorn <- stateVars$pcorn
+        TSCull <- stateVars$cullCows
+        dShock <- stateVars$Shock
+        TSFed <- stateVars$fedcattle
+        
+        
+        corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
+        cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
+        dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
+        fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
+        
+        cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
+        fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
+        
+        pc_new <- cull_InterpolationMatrix %*% c_old_cull
+        ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+        
+        
+        #### getting the parameters from the optParamFunction
+        # params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps_new, pc = pc_new, thetas = c(1,1))
+        # 
+        # mu_Tilde <- params_mu_s[1]
+        # s_Tilde <- params_mu_s[2]
+        
+        
+        ### Here we get the price for the observed supply and demand of fed and cull cows
+        p <- c(ps_new, pc_new)
+        estP <- BBoptim(par = p, fn = optPriceFunction)
     
-    c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
-    c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
-    
-    c_cull1[,j] <- c_cull
-    c_fed1[,j] <- c_fed
-    
-    # if(norm(c_cull - c_old_cull)<0.001){
-    #   if(norm(c_fed - c_old_fed)<0.001){
-    #     break
-    #   }
-    # }
-    
-    if(((sl + cl) - (slD + clD))^2 < 0.001 ){
-        break
-    }
-    
+        ps_new <- estP$par[1]
+        pc_new <- estP$par[2]
+        
+        
+        ### From the following we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9}
+       
+        K <- c(0,0)
+        ps <- ps_new
+        pc <- pc_new
+        
+        estK <- BBoptim(par = K, fn = optKFunction)
+        
+        k_3t1 <- estK$par[1]
+        k_7_10t1 <- estK$par[2]
+        
+        sl <- (g * Stock_1t - k_3t1 + imports - exports)
+        cl <- (k_9t + k_8t + k_7t - k_7_10t1)  
+        
+        # adj1 <- A/(sl+cl)
+        # sl <- sl * adj
+        # cl <- cl * adj
+        
+        #### getting the parameters from the optParamFunction
+        params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
+        
+        mu_Tilde <- params_mu_s[1]
+        s_Tilde <- params_mu_s[2]
+        
+        
+        ## Backing the price for the optimal quantities determined above
+        p <- c(ps, pc)
+        estP <- BBoptim(par = p, fn = optPriceFunction)
+        ps <- estP$par[1]
+        pc <- estP$par[2]
+        
+        # if(ps < ps_new){
+        #   ps <- ps_new
+        # }
+        # 
+        # if(pc<pc_new){
+        #   pc <- pc_new
+        # }
+        
+        prices_ps[j,i] <- ps
+        prices_pc[j,i] <- pc
+        k3t1[j,i] <- k_3t1
+        kjt1[j,i] <- k_7_10t1
+        slNew[j,i] <- sl
+        clNew[j,i] <- cl
+        
+        slD[j,i] <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+        clD[j,i] <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+          
+        # ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
+        # pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
+        # 
+        # c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
+        # c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
+        
+        c_cull1[,j] <- c_cull
+        c_fed1[,j] <- c_fed
+        
+        # if(norm(c_cull - c_old_cull)<0.001){
+        #   if(norm(c_fed - c_old_fed)<0.001){
+        #     break
+        #   }
+        # }
+        
+        # if((ps_new - ps)^2 < 0.001){
+        #   if((pc_new - pc)^2 < 0.001){
+        #     break
+        #   }
+        # }
+        
+        
+        # if(((sl + cl) - (slD + clD))^2 < 0.001 ){
+        #     break
+        # }
+        
+      }
+      
+      c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
+      c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
   }
+  
+  
+  # norm(c_cull - c_old_cull)
+  
   
   c_cull_opt[[i]] <- c_cull1
   c_fed_opt[[i]] <- c_fed1
@@ -718,8 +777,8 @@ K_1t <- Stock %>% transmute(Year = Year+1, K)
 
 capK <- merge(K_1t, K_jt)
 
-sl_quant <- supp_sl %>% transmute(Year = Year, sl = Bill_meatLb_sl)
-cl_quant <- supp_cl %>% transmute(Year = Year, cl = Bill_meatLb_cl)
+sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
+cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
 A_quant <- totalDisappearedNew %>% transmute(Year = Year, A = total_meat_bill)
 
 quantities <- merge(merge(A_quant,sl_quant), cl_quant)
