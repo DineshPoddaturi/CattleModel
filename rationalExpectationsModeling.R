@@ -802,13 +802,55 @@ imports_exports <- merge(imports_temp, exports_temp)
 
 quantities_prices_capK <- merge(merge(merge(merge(quantities, price_sl_cl_hc), capK),dressedWeights_sl_cl),imports_exports)
 
-collocationMethod(chebNodesN = chebNodesN, cornNodes = cornNodes, cullCowNodes = cullCowNodes, fedCattleNodes = fedCattleNodes,
-                  dShockNodes = dShockNodes, stateVars = stateVars, A = quantities_prices_capK$A[1], sl = quantities_prices_capK$sl[1],
-                  cl = quantities_prices_capK$cl[1], capK = quantities_prices_capK$K[1], ps = quantities_prices_capK$ps[1], 
-                  pc = quantities_prices_capK$pc[1], k9 = quantities_prices_capK$k9[1], k8 = quantities_prices_capK$k8[1],
-                  k7 = quantities_prices_capK$k7[1], slWeight = quantities_prices_capK$Slaughter_avg[1],
-                  clWeight = quantities_prices_capK$Cull_avg[1])
 
+
+
+
+
+#### Here I am constructing the sl and cl quantities that includes shock (which is a gaussian random variable). 
+#### Note: these gaussian shocks has mean one and standard deviation according to the historical shocks (see above for details)
+
+cowsSlaughtered_obs <- cowsSlaughtered %>% transmute(Year = Year, cullMeat = cull_meat/1000000000)
+heifersSlaughtered_obs <- heifersSlaughtered %>% transmute(Year = Year, heiferMeat = heifer_meat/1000000000)
+steersSlaughtered_obs <- steersSlaughtered %>% transmute(Year = Year, steerMeat = steer_meat/1000000000)
+
+fedCattleSupply_obs <- merge(heifersSlaughtered_obs, steersSlaughtered_obs) %>% transmute(Year = Year, sl_obs = heiferMeat + steerMeat)
+cullCowSupply_obs <- cowsSlaughtered_obs %>% transmute(Year = Year, cl_obs = cullMeat)
+
+#### Here we get the fed cattle production shock
+obsEst_sl_Supply <- merge(fedCattleSupply_obs, supp_sl) %>% transmute(Year = Year, sl_obs = sl_obs, sl_est = Bill_meatLb_sl,
+                                                                      slShock = sl_obs/sl_est)
+slSupplyShockGaussian <- obsEst_sl_Supply %>% transmute(Year = Year, slShock = 0)
+
+set.seed(3)
+slSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_sl_Supply$slShock))
+slSupplyShockGaussian$slShock <- slSupply_Shock
+
+#### Here we construct the cull cows production shock
+obsEst_cl_Supply <- merge(cullCowSupply_obs, supp_cl) %>% transmute(Year = Year, cl_obs = cl_obs, cl_est = Bill_meatLb_cl,
+                                                                    clShock = cl_obs/cl_est)
+clSupplyShockgaussian <- obsEst_cl_Supply %>% transmute(Year = Year, clShock = 0)
+
+set.seed(4)
+clSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_cl_Supply$clShock))
+clSupplyShockgaussian$clShock <- clSupply_Shock
+
+
+sl_stock <- supp_sl %>% transmute(Year = Year, sl_est = Bill_meatLb_sl, slHead = Slaughter)
+cl_stock <- supp_cl %>% transmute(Year = Year, cl_est = Bill_meatLb_cl, clHead = Cull)
+
+# allStockShocks <- merge(merge(merge(merge(Stock, merge(sl_stock, cl_stock)),slSupplyShockGaussian),clSupplyShockgaussian),dressedWeights_sl_cl)
+
+dataList <- list(Stock, sl_stock, cl_stock, slSupplyShockGaussian, clSupplyShockgaussian, dressedWeights_sl_cl, imports_exports)
+
+allStockShocks <- Reduce(function(...) merge(...), dataList)
+
+newSL <- allStockShocks %>% transmute(Year = Year + 2, slStock = 0)
+
+ssssllll <- allStockShocks %>% transmute(slt1 = slHead * slShock + g * (K) + Imports - Exports)
+
+
+allStockShocks$slHead
 
 
 
