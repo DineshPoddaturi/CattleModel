@@ -400,7 +400,6 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  
   for(i in 1:23){
   
     i <- 1
@@ -461,18 +460,19 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     sl_obs <- sl
     cl_obs <- cl
     
-    # while(norm(c_cull - c_old_cull) > 0.001 & norm(c_fed - c_old_fed) > 0.001){
-    while((sl_obs - mean(slD[,i]))^2 > 0.001 & (cl_obs - mean(clD[,i]))^2 > 0.001){
-      
-        count <- count + 1
+    while(norm(c_cull - c_old_cull) > 0.001 & norm(c_fed - c_old_fed) > 0.001){
+    # while((sl_obs - mean(slD[,i]))^2 > 0.001 & (cl_obs - mean(clD[,i]))^2 > 0.001){
         
-        paste0("###################  ", (sl_obs - mean(slD[,i]))^2)
+        # paste0("###################  ", (sl_obs - mean(slD[,i]))^2)
         
         c_old_cull <- c_cull
         c_old_fed <- c_fed
         
-        sl_old <- sl
-        cl_old <- cl
+        # sl_obs <- sl
+        # cl_obs <- cl
+        
+        # sl <- sl_obs
+        # cl <- cl_obs
         
         #### Here we are going through each node
         for (j in 1:dim(cullInterpolationMatrix)[1]) {
@@ -596,6 +596,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
         c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
         
+        count <- count + 1
         
     }
     
@@ -845,16 +846,28 @@ dataList <- list(Stock, sl_stock, cl_stock, slSupplyShockGaussian, clSupplyShock
 
 allStockShocks <- Reduce(function(...) merge(...), dataList)
 
-newSL <- allStockShocks %>% transmute(Year = Year + 2, slStock = 0)
+newSL <- allStockShocks %>% transmute(Year = Year + 2, slStock = 0, slLbs = 0)
 
-ssssllll <- allStockShocks %>% transmute(slt1 = slHead * slShock + g * (K) + Imports - Exports)
+newSL <- allStockShocks %>%
+  transmute(Year = Year + 2, slt = (g - 0.19 ) * lag(K) * slShock ,
+            slLbs = slt * slDressed/1000000000)
+
+slEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
+  Year = Year, slHead = slHead - Imports + Exports , slLbsEst = slHead * slDressed/1000000000)
+
+# merge(newSL, slEstAge) %>% transmute(diffest = slLbs - slLbsEst)
+
+newCL <- allStockShocks %>% transmute(Year = Year + 2, clStock = 0, clLbs = 0)
+
+newCL <- allStockShocks %>%
+  transmute(Year = Year + 2, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock * lead(clShock),
+            clLbs = clt * clDressed/1000000000)
+
+clEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
+  Year = Year, clHead = clHead, clLbsEst = clHead * clDressed/1000000000)
 
 
-allStockShocks$slHead
-
-
-
-
+# merge(newCL, clEstAge) %>% transmute(diffest = clLbs - clLbsEst)
 
 ##### Here I am getting the storage numbers from the observed prices, and quantities
 
