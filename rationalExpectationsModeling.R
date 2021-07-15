@@ -460,10 +460,14 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     sl_obs <- sl
     cl_obs <- cl
     
+    slD_obs <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+    clD_obs <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+    
     while(norm(c_cull - c_old_cull) > 0.001 & norm(c_fed - c_old_fed) > 0.001){
-    # while((sl_obs - mean(slD[,i]))^2 > 0.001 & (cl_obs - mean(clD[,i]))^2 > 0.001){
+    # while((sl_obs - slD_obs)^2 > 0.001 & (cl_obs - clD_obs)^2 > 0.001){
         
-        # paste0("###################  ", (sl_obs - mean(slD[,i]))^2)
+        # cat("\n sl SSE: ", (sl_obs - slD_obs)^2)
+        # cat("\n cl SSE: ", (cl_obs - clD_obs)^2)
         
         c_old_cull <- c_cull
         c_old_fed <- c_fed
@@ -528,15 +532,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           k_7_10t1 <- estK$par[2]
           
           sl <- (g * Stock_1t - k_3t1 + imports - exports)
-          cl <- (k_9t + k_8t + k_7t - k_7_10t1)  
-          
-          # adj1 <- A/(sl+cl)
-          # sl <- sl * adj
-          # cl <- cl * adj
+          cl <- (k_9t + k_8t + k_7t - k_7_10t1)
           
           #### getting the parameters from the optParamFunction
           params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
-          
+
           mu_Tilde <- params_mu_s[1]
           s_Tilde <- params_mu_s[2]
           
@@ -546,14 +546,6 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           estP <- BBoptim(par = p, fn = optPriceFunction)
           ps <- estP$par[1]
           pc <- estP$par[2]
-          
-          # if(ps < ps_new){
-          #   ps <- ps_new
-          # }
-          # 
-          # if(pc<pc_new){
-          #   pc <- pc_new
-          # }
           
           prices_ps[j,i] <- ps
           prices_pc[j,i] <- pc
@@ -565,14 +557,14 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           slD[j,i] <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
           clD[j,i] <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
             
-          # ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
-          # pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
-          # 
-          # c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
-          # c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
+          ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
+          pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
+
+          c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
+          c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
           
-          c_cull1[,j] <- c_cull
-          c_fed1[,j] <- c_fed
+          # c_cull1[,j] <- c_cull
+          # c_fed1[,j] <- c_fed
           
           # if(norm(c_cull - c_old_cull)<0.001){
           #   if(norm(c_fed - c_old_fed)<0.001){
@@ -591,10 +583,14 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #     break
           # }
           
+          
         }
         
         c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
         c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
+        
+        slD_obs <- mean(slD[,i])
+        clD_obs <- mean(clD[,i])
         
         count <- count + 1
         
