@@ -287,9 +287,9 @@ K_1t <- Stock %>% transmute(Year = Year+1, K)
 
 capK <- merge(K_1t, K_jt)
 
-sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
-cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
-A_quant <- totalDisappearedNew %>% transmute(Year = Year, A = total_meat_bill)
+sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
+cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
+A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
 quantities <- merge(merge(A_quant,sl_quant), cl_quant)
 
@@ -372,6 +372,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     s_Tilde <- params_mu_s[2]
     
     count <- 0
+    # meanPricePS <- 0
+    # meanPricePC <- 0
+    # slOBS <- 0
+    # clOBS <- 0
+    # slDOBS <- 0
+    # clDOBS <- 0
+    # coefSLDIFF <- 0
+    # coefCLDIFF <- 0
+    # suppDemandDIFF <- 0
     
     c_old_cull <- matrix(data = 0, nrow = 125, ncol = 1)
     c_old_fed <- matrix(data = 0, nrow = 125, ncol = 1)
@@ -382,11 +391,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     slD_obs <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
     clD_obs <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
     
-    while( norm(c_cull - c_old_cull) > 0.01  & norm(c_fed - c_old_fed) > 0.01 ){
-    # while((sl_obs - slD_obs)^2 > 0.001 & (cl_obs - clD_obs)^2 > 0.001){
+    # while( norm(c_cull - c_old_cull) > 0.01  & norm(c_fed - c_old_fed) > 0.01 ){
+    while((sl_obs + cl_obs - slD_obs - clD_obs)^2 > 0.01){
       
         count <- count + 1
-        
         c_old_cull <- c_cull
         c_old_fed <- c_fed
         
@@ -427,16 +435,17 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           A_node <- A * dShockNode
           
           #### getting the parameters from the optParamFunction
-          # params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
-          # 
-          # mu_Tilde <- params_mu_s[1]
-          # s_Tilde <- params_mu_s[2]
+          params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
+
+          mu_Tilde <- params_mu_s[1]
+          s_Tilde <- params_mu_s[2]
           
           ### Here we get the price for the observed supply and demand of fed and cull cows
           p <- c(ps_new, pc_new)
           lo <- c(0,0) ## Here we set the lower limit for the price
+          up <- c(ps+1, pc+1) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
-                          lower = lo)
+                          lower = lo, upper = up)
           
           ps1 <- estP$par[1]
           pc1 <- estP$par[2]
@@ -494,16 +503,27 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
         
         cat("\n norm of old and new fed coefficients: ", norm(c_fed - c_old_fed))
-        
+
         cat("\n norm of old and new cull coefficients: ", norm(c_cull - c_old_cull))
         
+        cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
+        
+        
+        sl_obs <- mean(slNew[,i])
+        cl_obs <- mean(clNew[,i])
+        
+        # meanPricePS[count] <- mean(prices_ps[,i])
+        # meanPricePC[count] <- mean(prices_pc[,i])
+        # slOBS[count] <- mean(slNew[,i])
+        # clOBS[count] <- mean(clNew[,i])
+        # slDOBS[count] <- mean(slD[,i])
+        # clDOBS[count] <- mean(clD[,i])
+        # 
+        # coefSLDIFF[count] <- norm(c_fed - c_old_fed)
+        # coefCLDIFF[count] <- norm(c_cull - c_old_cull)
+        # suppDemandDIFF[count] <- (sl_obs + cl_obs - slD_obs - clD_obs)^2
+        
     }
-    
-    
-    
-    
-    
-    
     
     c_cull_opt[[i]] <- c_cull1
     c_fed_opt[[i]] <- c_fed1
