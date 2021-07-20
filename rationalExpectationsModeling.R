@@ -342,9 +342,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:23){
+  for(i in 1:nrow(quantities_prices_capK)){
   
-    i <- 1
+    # i <- 1
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -404,8 +404,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     slD_obs <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
     clD_obs <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
     
-    # while( norm(c_cull - c_old_cull) > 0.01  & norm(c_fed - c_old_fed) > 0.01 ){
-    while((sl_obs + cl_obs - slD_obs - clD_obs)^2 > 0.01){
+    while( norm(c_cull - c_old_cull) > 0.001  && norm(c_fed - c_old_fed) > 0.001 ){
+    # while((sl_obs + cl_obs - slD_obs - clD_obs)^2 > 0.01){
       
         count <- count + 1
         c_old_cull <- c_cull
@@ -456,7 +456,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ### Here we get the price for the observed supply and demand of fed and cull cows
           p <- c(ps_new, pc_new)
           lo <- c(ps-0.2, pc-0.2) ## Here we set the lower limit for the price
-          up <- c(ps+1, pc+1) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+          up <- c(ps+0.3, pc+0.3) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
                           lower = lo, upper = up)
           
@@ -515,6 +515,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
         c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
         
+        
         cat("\n norm of old and new fed coefficients: ", norm(c_fed - c_old_fed))
 
         cat("\n norm of old and new cull coefficients: ", norm(c_cull - c_old_cull))
@@ -538,8 +539,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         
     }
     
-    c_cull_opt[[i]] <- c_cull1
-    c_fed_opt[[i]] <- c_fed1
+    c_cull_opt[[i]] <- c_cull
+    c_fed_opt[[i]] <- c_fed
     
   }
   
