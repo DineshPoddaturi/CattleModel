@@ -57,12 +57,15 @@ demandShock <- merge(obsDemand, estDemand) %>% mutate(dShock = demandObs/demandE
 
 demandShockGaussian <- demandShock %>% transmute(Year = Year, Shock = 0)
 
+# demandConstructed <- demandShockGaussian %>% transmute(Year = Year + 2, )
 
 ## Now i generate gaussian shock which is consistent with historical data.
 ## I use the standard deviation of historical data to construct the gaussian random variables. Here the mean is 1
 set.seed(1)
 demandShockG <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
 demandShockGaussian$Shock <- demandShockG
+
+
 
 #### Here I am constructing the sl and cl quantities that includes shock (which is a gaussian random variable). 
 #### Note: these gaussian shocks has mean one and standard deviation according to the historical shocks (see above for details)
@@ -103,10 +106,11 @@ newSL <- allStockShocks %>% transmute(Year = Year + 2, slStock = 0, slLbs = 0)
 
 newSL <- allStockShocks %>%
   transmute(Year = Year + 2, slt = (g - 0.19 ) * lag(K) * slShock ,
-            slLbs = slt * slDressed/1000000000)
+            slLbs = slt * slDressed/1000000000) 
+### NOTE: we did not add any imports or exports in constructing the fed cattle production. 
 
-slEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
-  Year = Year, slHead = slHead + Imports - Exports , slLbsEst = slHead * slDressed/1000000000)
+# slEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
+#   Year = Year, slHead = slHead - Imports + Exports , slLbsEst = slHead * slDressed/1000000000)
 
 newCL <- allStockShocks %>% transmute(Year = Year + 2, clStock = 0, clLbs = 0)
 
@@ -114,12 +118,18 @@ newCL <- allStockShocks %>%
   transmute(Year = Year + 2, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock * lead(clShock),
             clLbs = clt * clDressed/1000000000)
 
-clEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
-  Year = Year, clHead = clHead, clLbsEst = clHead * clDressed/1000000000)
+# clEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
+#   Year = Year, clHead = clHead, clLbsEst = clHead * clDressed/1000000000)
 
 cornPrice <- prices_quant %>% select(Year, pcorn)
-cullCowsProd <- clEstAge %>% transmute(Year = Year, cullCows = clLbsEst)
-fedCattleProd <- slEstAge %>% transmute(Year = Year, fedcattle = slLbsEst)
+cullCowsProd <- newCL %>% transmute(Year = Year, cullCows = clLbs)
+fedCattleProd <- newSL %>% transmute(Year = Year, fedcattle = slLbs)
+
+
+#### NOTE: We constructed fed cattle supply and cull cow supply for two years ahead which includes gaussian shocks as well. 
+#### Although we are using the data of two years ahead, since we are using all the nodes of both fed cattle, and cull cows
+#### supply the price is right. DO NOT GET CONFUSED!
+
 
 
 ##############################################################################################
@@ -164,7 +174,7 @@ normalizedNodes <- function(d){
 #### For testing purposes I use n = 5 for now. 
 chebNodesN <- 5
 
-stateVars <- merge(merge(merge(cornPrice, cullCowsProd),fedCattleProd),demandShockGaussian)
+stateVars <- merge(merge(merge(cornPrice, cullCowsProd),fedCattleProd),demandShockGaussian) %>% drop_na()
 
 cornNodes <- chebyshevNodes(d = stateVars$pcorn, n = chebNodesN)
 cullCowNodes <- chebyshevNodes(d = stateVars$cullCows, n = chebNodesN)
@@ -248,6 +258,7 @@ optParamFunction <- function(sl, cl, ps, pc, thetas){
 }
 
 ###### optPriceFunction returns the price for the passed supply and demand numerics.
+# optPriceFunction<- function(p, sl, cl, A, hc, Eps3)
 optPriceFunction<- function(p, sl, cl, A){
   
   ps <- p[1]
@@ -256,6 +267,8 @@ optPriceFunction<- function(p, sl, cl, A){
   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
   F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
+  
+  # F3 <- ps - g * (beta^3) * Eps3 + ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc 
   
   F <- F1^2 + F2^2
   
@@ -300,7 +313,7 @@ price_sl_cl_hc <- merge(price_sl_cl, hcosts)
 
 imports_exports <- merge(imports_temp, exports_temp)
 
-quantities_prices_capK <- merge(merge(merge(merge(quantities, price_sl_cl_hc), capK),dressedWeights_sl_cl),imports_exports)
+quantities_prices_capK <- merge(merge(merge(merge(quantities, price_sl_cl_hc), capK),dressedWeights_sl_cl),imports_exports) %>% drop_na()
 
 
 valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
@@ -341,7 +354,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <- quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    Kt1  <- quantities_prices_capK$K[i]
+    K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
     k8 <- quantities_prices_capK$k8[i]
     k7 <- quantities_prices_capK$k7[i]
@@ -352,7 +365,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     importsObs <- quantities_prices_capK$Imports[i]
     exportsObs <- quantities_prices_capK$Exports[i]
     
-    Stock_1t <- (Kt1*slDressed)/1000000000
+    Stock_1t <- (K1t*slDressed)/1000000000
     imports <- (importsObs*slDressed)/1000000000
     exports <- (exportsObs*slDressed)/1000000000
     k_9t <- (k9*clDressed)/1000000000
@@ -360,7 +373,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     k_7t <- (k7*clDressed)/1000000000
     
     ps_new <- as.matrix(rep(ps,nrow(fed_cartesian)), ncol = 1)
-    pc_new <- as.matrix(rep(pc,nrow(fed_cartesian)), ncol = 1)
+    pc_new <- as.matrix(rep(pc,nrow(cull_cartesian)), ncol = 1)
     
     c_cull <- solve(cullInterpolationMatrix) %*% pc_new
     c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
@@ -402,7 +415,6 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         for (j in 1:dim(cullInterpolationMatrix)[1]) {
           
           # j <- 1
-          
           # cornNode <- cull_cartesianNormalized$cornNormNodes[j]
           # cullCowNode <- cull_cartesianNormalized$cullNormNodes[j]
           # dShockNode <- cull_cartesianNormalized$dShockNormNodes[j]
@@ -430,10 +442,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
           
           #### Here we apply the chebyshev node to solve the system of equations
-          sl_node <- fedCattleNode
+          sl_node <- fedCattleNode + imports - exports
           cl_node <- cullCowNode
           A_node <- A * dShockNode
           
+          # * dShockNode
           #### getting the parameters from the optParamFunction
           params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
 
@@ -442,7 +455,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           ### Here we get the price for the observed supply and demand of fed and cull cows
           p <- c(ps_new, pc_new)
-          lo <- c(0,0) ## Here we set the lower limit for the price
+          lo <- c(ps-0.2, pc-0.2) ## Here we set the lower limit for the price
           up <- c(ps+1, pc+1) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
                           lower = lo, upper = up)
