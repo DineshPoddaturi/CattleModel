@@ -344,7 +344,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 1
+    # i <- 10
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -404,9 +404,16 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     slD_obs <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
     clD_obs <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
     
-    while( norm(c_cull - c_old_cull) > 0.001  && norm(c_fed - c_old_fed) > 0.001 ){
+    # while( norm(c_cull - c_old_cull) > 0.001  && norm(c_fed - c_old_fed) > 0.001 ){
     # while((sl_obs + cl_obs - slD_obs - clD_obs)^2 > 0.01){
+    
+    maxIter <- 200
+    
+    for(k in 1:maxIter){
       
+        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
+          break
+        }
         count <- count + 1
         c_old_cull <- c_cull
         c_old_fed <- c_fed
@@ -455,14 +462,20 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           ### Here we get the price for the observed supply and demand of fed and cull cows
           p <- c(ps_new, pc_new)
-          lo <- c(ps-0.2, pc-0.2) ## Here we set the lower limit for the price
+          
+          #### I am setting the lower and upper boundaries for fed cattle and cull cows price. 
+          #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
+          #### jumps to some local maxima/minima and do not move from there. We are making sure that the prices are within
+          #### the boundaries. 
+          #### NEED MORE EXPLANATION? 
+          lo <- c(0, 0) ## Here we set the lower limit for the price
           up <- c(ps+0.3, pc+0.3) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+          
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
                           lower = lo, upper = up)
           
           ps1 <- estP$par[1]
           pc1 <- estP$par[2]
-          
           
           ### From the following we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9} which are storage 
           K <- c(0,0)
