@@ -318,23 +318,28 @@ quantities_prices_capK <- merge(merge(merge(merge(quantities, price_sl_cl_hc), c
 
 valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
   
-  prices_ps <- matrix(data = 0,nrow=125,ncol = 23)
-  prices_pc <- matrix(data = 0,nrow=125,ncol = 23)
+  prices_ps <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
+  prices_pc <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
   
-  k3t1 <- matrix(data = 0,nrow=125,ncol = 23)
-  kjt1 <- matrix(data = 0,nrow=125,ncol = 23)
+  k3t1 <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
+  kjt1 <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
   
-  slNew <- matrix(data = 0,nrow=125,ncol = 23)
-  clNew <- matrix(data = 0,nrow=125,ncol = 23)
+  slNew <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
+  clNew <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
   
-  slD <- matrix(data = 0,nrow=125,ncol = 23)
-  clD <- matrix(data = 0,nrow=125,ncol = 23)
+  slD <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
+  clD <- matrix(data = 0,nrow=125,ncol = nrow(quantities_prices_capK))
   
-  c_cull1 <- matrix(data=0, nrow = 125, ncol = 125)
-  c_fed1 <- matrix(data=0, nrow = 125, ncol = 125)
+  c_cull1 <- matrix(data=0, nrow = 125, ncol = 1)
+  c_fed1 <- matrix(data=0, nrow = 125, ncol = 1)
   
-  c_cull_opt <- lapply(1:13, matrix, data= NA, nrow=125, ncol=125)
-  c_fed_opt <- lapply(1:13, matrix, data= NA, nrow=125, ncol=125)
+  c_cull_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow=125, ncol=1)
+  c_fed_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow=125, ncol=1)
+  
+  fedPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(fed_cartesian), ncol=maxIter)
+  cullPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(cull_cartesian), ncol=maxIter)
+  fedProd <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(fed_cartesian), ncol=maxIter)
+  cullProd <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(cull_cartesian), ncol=maxIter)
   
  ###### THINK ABOUT THE INDEXING PROPERLY. ARE YOU PREDICTING THE NEXT YEAR OR JUST USING THE SAME YEARS DATA TO 
  ###### ESTIMATE THE SAME NUMBERS? WE SHOULD BE ESTIMATING THE NEXT YEARS PRICES AND QUANTITIES.
@@ -344,7 +349,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 10
+    # i <- 1
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -469,7 +474,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           lo <- c(0, 0) ## Here we set the lower limit for the price
-          up <- c(ps+0.3, pc+0.3) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+          up <- c(ps + 0.37, pc + 0.37) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
                           lower = lo, upper = up)
@@ -507,6 +512,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           kjt1[j,i] <- k_7_10t1
           slNew[j,i] <- sl1
           clNew[j,i] <- cl1
+          
+          fedPrice[[i]][j,k] <- ps1
+          cullPrice[[i]][j,k] <- pc1
+          fedProd[[i]][j,k] <- sl1
+          cullProd[[i]][j,k] <- cl1
           
           slD[j,i] <- A_node * ((exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))))
           clD[j,i] <- A_node * (1/(1+ exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde)))
