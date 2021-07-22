@@ -354,7 +354,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    i <- 1
+    # i <- 1
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -479,11 +479,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps + 0.02262 
-          pc_lo <- pc - 0.003938
+          ps_lo <- ps + 0.006083 
+          pc_lo <- pc - 0.01883
           
-          ps_up <- ps + 0.23644
-          pc_up <- pc + 0.192417 
+          ps_up <- ps + 0.145708
+          pc_up <- pc + 0.11925
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
