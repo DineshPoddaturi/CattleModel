@@ -333,13 +333,18 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   c_cull1 <- matrix(data=0, nrow = 125, ncol = 1)
   c_fed1 <- matrix(data=0, nrow = 125, ncol = 1)
   
-  c_cull_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow=125, ncol=1)
-  c_fed_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow=125, ncol=1)
+  c_cull_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow=125, ncol=1)
+  c_fed_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow=125, ncol=1)
   
-  fedPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(fed_cartesian), ncol=maxIter)
-  cullPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(cull_cartesian), ncol=maxIter)
-  fedProd <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(fed_cartesian), ncol=maxIter)
-  cullProd <- lapply(1:nrow(quantities_prices_capK), matrix, data= NA, nrow = nrow(cull_cartesian), ncol=maxIter)
+  maxIter <- 500
+  
+  fedPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(fed_cartesian), ncol=maxIter)
+  cullPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(cull_cartesian), ncol=maxIter)
+  fedProd <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(fed_cartesian), ncol=maxIter)
+  cullProd <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(cull_cartesian), ncol=maxIter)
+  
+  c_cull_itr <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(cull_cartesian), ncol=maxIter)
+  c_fed_itr <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(fed_cartesian), ncol=maxIter)
   
  ###### THINK ABOUT THE INDEXING PROPERLY. ARE YOU PREDICTING THE NEXT YEAR OR JUST USING THE SAME YEARS DATA TO 
  ###### ESTIMATE THE SAME NUMBERS? WE SHOULD BE ESTIMATING THE NEXT YEARS PRICES AND QUANTITIES.
@@ -349,7 +354,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 1
+    i <- 1
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -412,7 +417,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     # while( norm(c_cull - c_old_cull) > 0.001  && norm(c_fed - c_old_fed) > 0.001 ){
     # while((sl_obs + cl_obs - slD_obs - clD_obs)^2 > 0.01){
     
-    maxIter <- 200
+    # maxIter <- 500
     
     for(k in 1:maxIter){
       
@@ -473,8 +478,24 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### jumps to some local maxima/minima and do not move from there. We are making sure that the prices are within
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
-          lo <- c(0, 0) ## Here we set the lower limit for the price
-          up <- c(ps + 0.37, pc + 0.37) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+          
+          ps_lo <- ps + 0.02262 
+          pc_lo <- pc - 0.003938
+          
+          ps_up <- ps + 0.23644
+          pc_up <- pc + 0.192417 
+          
+          #### Here we are making sure the lower bound for the prices isn't negative
+          if(ps_lo < 0){
+             ps_lo <- 0
+          }
+          
+          if(pc_lo < 0){
+            pc_lo <- 0
+          }
+          
+          lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
+          up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
                           lower = lo, upper = up)
@@ -537,6 +558,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         
         c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
         c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
+        
+        c_cull_itr[[i]][,k] <- c_cull
+        c_fed_itr[[i]][,k] <- c_fed
         
         
         cat("\n norm of old and new fed coefficients: ", norm(c_fed - c_old_fed))

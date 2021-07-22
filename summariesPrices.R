@@ -21,4 +21,18 @@ summary( lead(quantities_prices_capK$pc,3)-quantities_prices_capK$pc )
 # -0.386667 -0.003938  0.059292  0.080153  0.192417  0.371250         3 
 
 
-mean(colMeans(fedPrice[[4]][,apply(fedPrice[[4]],2,function(x) !all(is.na(x)))]))
+mean(colMeans(fedPrice[[1]][,apply(fedPrice[[1]],2,function(x) !all(x==0))]))
+
+
+
+fedPrice[[1]][,apply(fedPrice[[1]],2,function(x) !all(x==0))]
+
+
+
+round(c_cull_itr[[1]][, apply(c_cull_itr[[1]],2,function(x) !all(x==0))][,136],5)
+
+round(c_fed_itr[[1]][, apply(c_fed_itr[[1]],2,function(x) !all(x==0))][,136],5)
+
+
+
+
