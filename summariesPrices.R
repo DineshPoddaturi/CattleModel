@@ -46,7 +46,7 @@ colMeans(prices_ps)
 
 estPS <- colMeans(prices_ps) %>% as.data.frame()
 names(estPS) <- "fedPrice"
-estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+2) %>% select(Year, everything())
+estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 
 estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(D = (fedPrice - ps)*100)
 
@@ -55,7 +55,7 @@ estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL"))
   geom_point(aes(y = fedPrice, color = "PS RATIONAL")) + geom_line(aes(y=ps, color = "PS OBS")) + 
   geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(estObs$Year[1],estObs$Year[nrow(estObs)]))) +
-  expand_limits(y = 0.5)
+  expand_limits(y = 0.25)
 
 estPC <- colMeans(prices_pc) %>% as.data.frame()
 names(estPC) <- "cullPrice"
@@ -76,6 +76,17 @@ allPrices <- Reduce(function(...) merge(...), list(pcs,pss,estPC,estPS))
 allPrices %>% transmute(Year, ps, fedPrice, fedDiff = ps - fedPrice, pc, cullPrice, cullDiff = pc - cullPrice)
 
 
+estSL <- colMeans(slNew) %>% as.data.frame()
+names(estSL) <- "SL"
+estSL <- estSL %>% mutate(Year = quantities_prices_capK$Year+2) %>% select(Year, everything())
+
+estObsSL <- merge(estSL, quantities_prices_capK) %>% select(Year, SL, sl) %>% mutate(D = (SL - sl))
+
+
+estObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=SL, color="SL RATIONAL")) +
+  geom_point(aes(y = SL, color = "SL RATIONAL")) + geom_line(aes(y=sl, color = "SL OBS")) + 
+  geom_point(aes(y=sl, color = "SL OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(estObsSL$Year[1],estObsSL$Year[nrow(estObsSL)]))) 
 
 
 

@@ -300,8 +300,11 @@ K_1t <- Stock %>% transmute(Year = Year+1, K)
 
 capK <- merge(K_1t, K_jt)
 
-sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
-cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
+# sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
+# cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
+
+sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
+cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
 quantities <- merge(merge(A_quant,sl_quant), cl_quant)
@@ -421,10 +424,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
+        # if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
+        #   break
+        # }
+        if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.01){
           break
         }
+      
         count <- count + 1
+        
         c_old_cull <- c_cull
         c_old_fed <- c_fed
         
@@ -459,7 +467,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
           
           #### Here we apply the chebyshev node to solve the system of equations
-          sl_node <- fedCattleNode + imports - exports
+          # sl_node <- fedCattleNode + imports - exports
+          sl_node <- fedCattleNode
           cl_node <- cullCowNode
           A_node <- A * dShockNode
           
@@ -479,20 +488,23 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps + 0.006083 
-          pc_lo <- pc - 0.01883
+          ps_lo <- ps - 0.02492
+          pc_lo <- pc - 0.03717 
           
-          ps_up <- ps + 0.145708
-          pc_up <- pc + 0.11925
+          ps_up <- ps + 0.060004
+          pc_up <- pc + 0.03968
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
              ps_lo <- 0
           }
-          
+
           if(pc_lo < 0){
             pc_lo <- 0
           }
+          
+          # ps_lo <- 0
+          # pc_lo <- 0
           
           lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
@@ -572,6 +584,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         
         sl_obs <- mean(slNew[,i])
         cl_obs <- mean(clNew[,i])
+        
+        
         
         # meanPricePS[count] <- mean(prices_ps[,i])
         # meanPricePC[count] <- mean(prices_pc[,i])
