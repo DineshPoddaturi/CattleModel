@@ -425,12 +425,12 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        # if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
-        #   break
-        # }
-        if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.001){
+        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
           break
         }
+        # if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.001){
+        #   break
+        # }
       
         count <- count + 1
         
@@ -489,10 +489,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.226667
-          pc_lo <- pc - 0.01883 
+          ps_lo <- ps - 0.02492
+          pc_lo <- pc - 0.03717 
           
-          ps_up <- ps + 0.145708
+          ps_up <- ps + 0.05510
           pc_up <- pc + 0.03968
           
           #### Here we are making sure the lower bound for the prices isn't negative
@@ -511,7 +511,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
-                          lower = lo, upper = up)
+                          lower = lo )
           
           ps1 <- estP$par[1]
           pc1 <- estP$par[2]
