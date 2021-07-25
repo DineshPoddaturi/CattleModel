@@ -45,8 +45,9 @@ colMeans(prices_ps)
 
 
 estPS <- colMeans(prices_ps) %>% as.data.frame()
+estPS <- fedPS %>% as.data.frame()
 names(estPS) <- "fedPrice"
-estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+2) %>% select(Year, everything())
 
 estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(D = (fedPrice - ps)*100)
 

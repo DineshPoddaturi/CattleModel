@@ -105,9 +105,10 @@ allStockShocks <- Reduce(function(...) merge(...), dataList)
 newSL <- allStockShocks %>% transmute(Year = Year + 2, slStock = 0, slLbs = 0)
 
 newSL <- allStockShocks %>%
-  transmute(Year = Year + 2, slt = (g - 0.19 ) * lag(K) * slShock ,
+  transmute(Year = Year + 2, slt = (g) * lag(K) * slShock - delta * g * lag(k3),
             slLbs = slt * slDressed/1000000000) 
-### NOTE: we did not add any imports or exports in constructing the fed cattle production. 
+### NOTE: we did not add any imports or exports in constructing the fed cattle production.
+#### CHECK THE ABOVE AGAIN!!!!!
 
 # slEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
 #   Year = Year, slHead = slHead - Imports + Exports , slLbsEst = slHead * slDressed/1000000000)
@@ -300,11 +301,11 @@ K_1t <- Stock %>% transmute(Year = Year+1, K)
 
 capK <- merge(K_1t, K_jt)
 
-# sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
-# cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
+sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
+cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
 
-sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
-cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
+# sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
+# cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
 quantities <- merge(merge(A_quant,sl_quant), cl_quant)
@@ -357,7 +358,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 1
+    # i <- 2
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -427,7 +428,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
         #   break
         # }
-        if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.01){
+        if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.001){
           break
         }
       
@@ -488,10 +489,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps + 0.006083
+          ps_lo <- ps - 0.226667
           pc_lo <- pc - 0.01883 
           
-          ps_up <- ps + 0.060004
+          ps_up <- ps + 0.145708
           pc_up <- pc + 0.03968
           
           #### Here we are making sure the lower bound for the prices isn't negative
