@@ -45,7 +45,7 @@ colMeans(prices_ps)
 
 
 estPS <- colMeans(prices_ps) %>% as.data.frame()
-estPS <- fedPS %>% as.data.frame()
+# estPS <- fedPS %>% as.data.frame()
 names(estPS) <- "fedPrice"
 estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+2) %>% select(Year, everything())
 
@@ -92,6 +92,8 @@ estObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=SL, color="SL RATIONAL")) +
 
 
 
-
-
+psMean <- 0
+for (i in 1: length(quantities_prices_capK$ps)){
+  psMean[i] <- mean(quantities_prices_capK$ps[1:i])
+}
 

@@ -358,15 +358,20 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 2
+    # i <- 10
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
     cl <- quantities_prices_capK$cl[i]
     
-    ps <- quantities_prices_capK$ps[i]
-    pc <- quantities_prices_capK$pc[i]
-    hc <- quantities_prices_capK$hc[i]
+    #### Here I am trying another route. Take mean/median of the past prices and use it as the starting price for optimization
+    ps <- mean(quantities_prices_capK$ps[1:i])
+    pc <- mean(quantities_prices_capK$pc[1:i])
+    hc <- mean(quantities_prices_capK$hc[1:i])
+    
+    # ps <- quantities_prices_capK$ps[i]
+    # pc <- quantities_prices_capK$pc[i]
+    # hc <- quantities_prices_capK$hc[i]
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
@@ -375,6 +380,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     slDressed <- quantities_prices_capK$Slaughter_avg[i]
     clDressed <- quantities_prices_capK$Cull_avg[i]
+    
+    
+    #### For imports and exports I will take the mean/median of the past data.
+    # importsObs <- median(quantities_prices_capK$Imports[1:i])
+    # exportsObs <- median(quantities_prices_capK$Exports[1:i])
     
     importsObs <- quantities_prices_capK$Imports[i]
     exportsObs <- quantities_prices_capK$Exports[i]
@@ -418,19 +428,16 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     slD_obs <- A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
     clD_obs <- A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
     
-    # while( norm(c_cull - c_old_cull) > 0.001  && norm(c_fed - c_old_fed) > 0.001 ){
-    # while((sl_obs + cl_obs - slD_obs - clD_obs)^2 > 0.01){
-    
-    # maxIter <- 500
-    
     for(k in 1:maxIter){
       
-        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
-          break
-        }
-        # if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.001){
+        # if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
         #   break
         # }
+      
+        #### NOTE: For i = 12 the following condition is true in the first iteration. So I change it from 0.01 to 0.001
+        if((sl_obs + cl_obs - slD_obs - clD_obs)^2 < 0.001){
+          break
+        }
       
         count <- count + 1
         
@@ -468,8 +475,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
           
           #### Here we apply the chebyshev node to solve the system of equations
-          # sl_node <- fedCattleNode + imports - exports
-          sl_node <- fedCattleNode
+          sl_node <- fedCattleNode + imports - exports
+          # sl_node <- fedCattleNode
           cl_node <- cullCowNode
           A_node <- A * dShockNode
           
@@ -489,20 +496,20 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.02492
+          ps_lo <- ps - 0.02492 
           pc_lo <- pc - 0.03717 
           
-          ps_up <- ps + 0.05510
-          pc_up <- pc + 0.03968
+          ps_up <- ps + 0.37750 
+          pc_up <- pc + 0.15933
           
           #### Here we are making sure the lower bound for the prices isn't negative
-          # if(ps_lo < 0){
-          #    ps_lo <- 0
-          # }
-          # 
-          # if(pc_lo < 0){
-          #   pc_lo <- 0
-          # }
+          if(ps_lo < 0){
+             ps_lo <- 0
+          }
+
+          if(pc_lo < 0){
+            pc_lo <- 0
+          }
           
           # ps_lo <- 0
           # pc_lo <- 0
@@ -511,7 +518,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,
-                          lower = lo )
+                          lower = lo, upper = up)
           
           ps1 <- estP$par[1]
           pc1 <- estP$par[2]
