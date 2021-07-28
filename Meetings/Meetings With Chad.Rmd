@@ -136,8 +136,18 @@ Use the data of slaughtered animals to find the disappearance of meat and plot t
 
 * Note: Expected price and actual price are not same and shouldn't be same. So remember that. 
 
+07/28/2021:
 
+* Told him about how I am setting bounds for the price and how the price is bouncing back and forth.
+* Chads comments: Check for how often are we hitting bounds. 10-15% is okay but if it's more than that then increase the bounds and see the changes.
 
+* For getting the starting price: we could use the last periods price. But make sure that regardless of the starting price, the model should converge pretty much the same price. Keep that in mind.
+
+* Watch out for : 1. Does the prices, quantities get stuck? Does the model bounce back and forth? If that's the case then we need to think about the model carefully. 
+
+* When it comes to the additional expression we have (this expression includes expected value of the three year old cow). Look at the final expression. 
+$$\beta^7 E p_{c,t+7} + g sum^{9}_{i = 4} \beta^i p_{s,t+i} == B = p_{s,t} - g beta^3 E p_{s,t+3} + sum^{6}_{i = 0} beta^i z_{t+i}$$
+Here we know the RHS. compute that first and you basically know the RHS. So use this in the system of equations.
 
 
 

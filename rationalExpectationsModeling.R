@@ -500,7 +500,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # sl_node <- fedCattleNode + imports - exports
           sl_node <- fedCattleNode
           cl_node <- cullCowNode
-          A_node <- A * dShockNode
+          A_node <- A 
           
           # * dShockNode
           #### getting the parameters from the optParamFunction
