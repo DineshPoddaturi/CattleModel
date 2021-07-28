@@ -108,19 +108,23 @@ newSL <- allStockShocks %>%
   transmute(Year = Year+2, slt = (g - 0.19) * lag(K) * slShock + 0.19 * delta * g * K,
             slLbs = slt * slDressed/1000000000) 
 ### NOTE: we did not add any imports or exports in constructing the fed cattle production.
-#### CHECK THE ABOVE AGAIN!!!!!
+#### CHECK THE ABOVE AGAIN!!!!! 
+#### NEW NOTE: I reconstructed the total supply of the fed cattle and cull cows. This includes 
+#### production this period with shock and storage.
 
 # slEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
 #   Year = Year, slHead = slHead - Imports + Exports , slLbsEst = slHead * slDressed/1000000000)
 
 newCL <- allStockShocks %>% transmute(Year = Year + 2, clStock = 0, clLbs = 0)
 
-newCL <- allStockShocks %>%
-  transmute(Year = Year + 1, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock * lead(clShock),
-            clLbs = clt * clDressed/1000000000)
+# newCL <- allStockShocks %>%
+#   transmute(Year = Year + 1, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock * lead(clShock),
+#             clLbs = clt * clDressed/1000000000)
 
 newCL <- allStockShocks %>%
-  transmute(Year = Year + 1, clt = (k9 + (1-delta) * (k8 + k7)) * clShock + (K - ),
+  transmute(Year = Year + 2, 
+            clt = (lead(k9) + (1-delta) * (lead(k8) + lead(k7))) * lead(clShock) + 
+              delta * (lead(k8) + (1-delta) * (lead(k7) + lead(k6))),
             clLbs = clt * clDressed/1000000000)
 
 # clEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
@@ -299,21 +303,19 @@ optKFunction <- function(K, ps, pc, A){
 
 ##### Here setting up the data frame for the quantities. Note: It contains K_{t-1} and K_{j,t} for j = {10,9,8,7}
 
+### The following dataframe contains the cows of age 7, 8, 9, 10 at time t.
 K_jt <- Stock %>% select(Year, k7, k8, k9, k10)
 
+#### The followng dataframe has K_{t-1} i.e., the previous period stock
 K_1t <- Stock %>% transmute(Year = Year+1, K)
 
 capK <- merge(K_1t, K_jt)
 
-sl_quant1 <- fedCattleProd %>% transmute(Year = Year, slf = fedcattle)
-cl_quant1 <- cullCowsProd %>% transmute(Year = Year, clc = cullCows)
+sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
+cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
 
-sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
-cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
-
-merge(sl_quant1, sl_quant) %>% mutate(d = sl - slf)
-
-
+# sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
+# cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
 
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
@@ -374,19 +376,21 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     sl <- quantities_prices_capK$sl[i]
     cl <- quantities_prices_capK$cl[i]
     
-    adj <- A/(sl+cl)
+    # adj <- A/(sl+cl)
+    # sl <- sl * adj
+    # cl <- cl * adj
     
-    sl2 <- quantities_prices_capK$sl[i+2]
-    cl2 <- quantities_prices_capK$cl[i+2]
+    # sl2 <- quantities_prices_capK$sl[i+2]
+    # cl2 <- quantities_prices_capK$cl[i+2]
     
     #### Here I am trying another route. Take mean/median of the past prices and use it as the starting price for optimization
-    ps <- (max(quantities_prices_capK$ps[1:i]) + min(quantities_prices_capK$ps[1:i]))/2
-    pc <- (max(quantities_prices_capK$pc[1:i]) + min(quantities_prices_capK$pc[1:i]))/2
-    hc <- (max(quantities_prices_capK$hc[1:i]) + min(quantities_prices_capK$hc[1:i]))/2
+    # ps <- (max(quantities_prices_capK$ps[1:i]) + min(quantities_prices_capK$ps[1:i]))/2
+    # pc <- (max(quantities_prices_capK$pc[1:i]) + min(quantities_prices_capK$pc[1:i]))/2
+    # hc <- (max(quantities_prices_capK$hc[1:i]) + min(quantities_prices_capK$hc[1:i]))/2
     
-    # ps <- quantities_prices_capK$ps[i]
-    # pc <- quantities_prices_capK$pc[i]
-    # hc <- quantities_prices_capK$hc[i]
+    ps <- quantities_prices_capK$ps[i]
+    pc <- quantities_prices_capK$pc[i]
+    hc <- quantities_prices_capK$hc[i]
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
@@ -453,7 +457,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # }
       
         #### NOTE: For i = 12 the following condition is true in the first iteration. So I change it from 0.01 to 0.001
-        if((sl2 + cl2 - sl_itr - cl_itr)^2 < 0.001){
+        if((sl_obs + cl_obs - sl_itr - cl_itr)^2 < 0.001){
           break
         }
       
@@ -465,7 +469,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #### Here we are going through each node
         for (j in 1:dim(cullInterpolationMatrix)[1]) {
           
-          # j <- 4
+          j <- 1
           # cornNode <- cull_cartesianNormalized$cornNormNodes[j]
           # cullCowNode <- cull_cartesianNormalized$cullNormNodes[j]
           # dShockNode <- cull_cartesianNormalized$dShockNormNodes[j]
@@ -514,10 +518,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps + 0.02262 
-          pc_lo <- pc - 0.003938
+          ps_lo <- ps - 0.02492 
+          pc_lo <- pc - 0.03717
           
-          ps_up <- ps + 0.37750 
+          ps_up <- ps + 0.28000
           pc_up <- pc + 0.192417
           
           #### Here we are making sure the lower bound for the prices isn't negative
@@ -549,8 +553,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           k_3t1 <- estK$par[1]
           k_7_10t1 <- estK$par[2]
           
-          sl1 <- (g * Stock_1t - k_3t1 + imports - exports) * adj
-          cl1 <- (k_9t + k_8t + k_7t - k_7_10t1) * adj
+          sl1 <- (g * Stock_1t - k_3t1 + imports - exports)  
+          cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)  
           
           #### getting the parameters from the optParamFunction
           # params_mu_s <- optParamFunction(sl = sl1, cl = cl1, ps = ps1, pc = pc1, thetas = c(1,1))
