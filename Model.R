@@ -217,7 +217,6 @@ exports <- cattle_tot %>% select(Year, Exports) %>% filter(Year>=1980 & Year<201
 imports <- cattle_tot %>% select(Year, Imports) %>% filter(Year>=1980 & Year<2019)
 
 
-
 supp_sl <- NULL
 
 for(i in 1:nrow(Stock)){

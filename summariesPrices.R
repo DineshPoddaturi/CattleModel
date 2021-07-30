@@ -55,8 +55,8 @@ estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) 
 estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL")) +
   geom_point(aes(y = fedPrice, color = "PS RATIONAL")) + geom_line(aes(y=ps, color = "PS OBS")) + 
   geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(estObs$Year[1],estObs$Year[nrow(estObs)]))) +
-  expand_limits(y = 0.25)
+  scale_x_continuous(name="Year", breaks=c(seq(estObsPS$Year[1],estObsPS$Year[nrow(estObsPS)]))) +
+  expand_limits(y = 0.8)
 
 estPC <- colMeans(prices_pc) %>% as.data.frame()
 names(estPC) <- "cullPrice"
@@ -68,7 +68,7 @@ estObsPC <- merge(estPC, quantities_prices_capK) %>% select(Year, cullPrice, pc)
 estObsPC %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL")) +
   geom_point(aes(y = cullPrice, color = "PC RATIONAL")) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(estObs$Year[1],estObs$Year[nrow(estObs)]))) +
+  scale_x_continuous(name="Year", breaks=c(seq(estObsPC$Year[1],estObsPC$Year[nrow(estObsPC)]))) +
   expand_limits(y = 0)
 
 
@@ -92,8 +92,28 @@ estObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=SL, color="SL RATIONAL")) +
 
 
 
-psMean <- 0
-for (i in 1: length(quantities_prices_capK$ps)){
-  psMean[i] <- mean(quantities_prices_capK$ps[1:i])
-}
+
+
+
+# Stock_temp <- Stock %>% filter(Year>=1994 & Year<=2017)
+# imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
+# exports_temp <- exports %>% filter(Year>=1994 & Year<=2017)
+# 
+# test_df <- merge(merge(merge(Stock_temp, imports_temp), exports_temp), merge(supp_sl_adj, supp_cl_adj)) %>% 
+#   select(Year, K, k3, k9, k8, k7, k6, Slaughter, Cull, Exports, Imports)
+# 
+# K1 <- 0
+# K1 <- test_df %>% transmute(Year = Year + 1, K1 = g * (1+delta) * K - (delta * lag(K) - k3) - 
+#                               (k9 + (1-delta) * k8 + (1-delta) * k7), K2 = 0.9941 * K)
+# 
+# merge(K1, test_df) %>% select(Year, K, K1, K2) %>% mutate(DIFF1 = K1 - K, DIFF2 = K2 - K)
+# 
+# 
+# lm(K ~ -1 + lag(K), data = test_df)
+
+
+
+
+
+
 
