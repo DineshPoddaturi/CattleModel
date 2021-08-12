@@ -102,6 +102,29 @@ dataList <- list(Stock, sl_stock, cl_stock, slSupplyShockGaussian, clSupplyShock
 
 allStockShocks <- Reduce(function(...) merge(...), dataList)
 
+
+#### Here I am writing functions that return the fed cattle and cull cow production.
+#### Note: this includes the gaussian shocks we generated which has mean 1 and standard deviation according to the historical data
+
+fedProduction <- function(stockShocks){
+  newSL <- stockShocks %>%
+    transmute(Year = Year+3, slt = (delta - 0.19) * K * slShock + 
+                (1-0.19) * g * delta * (K - (delta - 0.19) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
+              slLbs = slt * Slaughter_avg/1000000000) 
+  
+  return(newSL)
+}
+
+cullProduction <- function(stockShocks){
+  
+  newCL <- stockShocks %>%
+    transmute(Year = Year + 3, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock +
+                (delta^2) * (delta * (k6 + k5 + k4) - (k5 + k6 + k7)),
+              clLbs = clt * Cull_avg/1000000000)
+  
+  return(newCL)
+}
+
 newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
 
 #### Here I am constructing the supply of fed cattle three periods ahead. Note that this is approximation. 
@@ -200,26 +223,52 @@ normalizedNodes <- function(d){
 #### For testing purposes I use n = 5 for now. 
 chebNodesN <- 7
 
-stateVars <- merge(merge(merge(cornPrice, cullCowsProd),fedCattleProd),demandShockGaussian) %>% drop_na()
+stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian, slSupplyShockGaussian, clSupplyShockgaussian)
+
+stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na()
 
 cornNodes <- chebyshevNodes(d = stateVars$pcorn, n = chebNodesN)
 cullCowNodes <- chebyshevNodes(d = stateVars$cullCows, n = chebNodesN)
 fedCattleNodes <- chebyshevNodes(d = stateVars$fedcattle, n = chebNodesN)
 dShockNodes <- chebyshevNodes(d = stateVars$Shock, n = chebNodesN)
+slShockNodes <- chebyshevNodes(d = stateVars$slShock, n = chebNodesN)
+clShockNodes <- chebyshevNodes(d = stateVars$clShock, n = chebNodesN)
 
 corn_nodes <- cornNodes %>% as.data.frame()
 cull_nodes <- cullCowNodes %>% as.data.frame()
 fed_nodes <- fedCattleNodes  %>% as.data.frame()
 dshock_nodes <- dShockNodes %>% as.data.frame()
+slShock_nodes <- slShockNodes %>% as.data.frame()
+clShock_nodes <- clShockNodes %>% as.data.frame()
 
 names(corn_nodes) <- "cornNodes"
 names(cull_nodes) <- "cullNodes"
 names(fed_nodes) <- "fedNodes"
 names(dshock_nodes) <- "dShockNodes"
+names(slShock_nodes) <- "slShockNodes"
+names(clShock_nodes) <- "clShockNodes"
 
 ##### Cartesian product of the nodes
 cull_cartesian <- crossing(corn_nodes, cull_nodes, dshock_nodes) %>% as.data.frame()
 fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes) %>% as.data.frame()
+
+# cull_cartesian <- crossing(corn_nodes, cull_nodes, dshock_nodes, clShock_nodes) %>% as.data.frame()
+# fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes, slShock_nodes) %>% as.data.frame()
+
+#### The following created chebyshev matrix containing chebyshev polynomials
+cornChebyshevMatrix <- chebyshevMatrix(x = cornNodes, d = stateVars$pcorn, n = chebNodesN)
+cullCowsChebyshevMatrix <- chebyshevMatrix(x = cullCowNodes, d = stateVars$cullCows, n = chebNodesN)
+fedCattleChebyshevMatrix <- chebyshevMatrix(x = fedCattleNodes, d = stateVars$fedcattle, n = chebNodesN)
+dShockChebyshevMatrix <- chebyshevMatrix(x = dShockNodes, d = stateVars$Shock, n = chebNodesN)
+
+###### Here I am taking the tensor product to create interpolation matrix of grids. 
+###### kron takes the kronecker tensor product of two matrices
+##### For cull cows we use corn, cull cows production, and demand shock chebyshev matrices
+##### For fed cattle we use corn, fed cattle production, and demand shock chebyshev matrices
+
+cullInterpolationMatrix <- kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatrix), dShockChebyshevMatrix)
+fedCattleInterpolationMatrix <- kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
+
 
 #### I also create normalized nodes i.e., all the nodes are in [-1,1]
 cornNormalizedNodes <- normalizedNodes(d = corn_nodes)
@@ -236,19 +285,7 @@ cull_cartesianNormalized <- crossing(cornNormalizedNodes, cullNormalizedNodes, d
 fed_cartesianNormalized <- crossing(cornNormalizedNodes, fedNormalizedNodes, dshockNormalizedNodes) %>% as.data.frame()
 
 
-#### The following created chebyshev matrix containing chebyshev polynomials
-cornChebyshevMatrix <- chebyshevMatrix(x = cornNodes, d = stateVars$pcorn, n = chebNodesN)
-cullCowsChebyshevMatrix <- chebyshevMatrix(x = cullCowNodes, d = stateVars$cullCows, n = chebNodesN)
-fedCattleChebyshevMatrix <- chebyshevMatrix(x = fedCattleNodes, d = stateVars$fedcattle, n = chebNodesN)
-dShockChebyshevMatrix <- chebyshevMatrix(x = dShockNodes, d = stateVars$Shock, n = chebNodesN)
 
-###### Here I am taking the tensor product to create interpolation matrix of grids. 
-###### kron takes the kronecker tensor product of two matrices
-##### For cull cows we use corn, cull cows production, and demand shock chebyshev matrices
-##### For fed cattle we use corn, fed cattle production, and demand shock chebyshev matrices
-
-cullInterpolationMatrix <- kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatrix), dShockChebyshevMatrix)
-fedCattleInterpolationMatrix <- kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
 
 #### Now I have to write code to generate price series using the interpolation matrix, coefficient vector, 
 #### and actual prices. This needs a lot of work. 
@@ -411,7 +448,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 1
+    i <- 1
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -518,6 +555,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # dShockNode <- cull_cartesianNormalized$dShockNormNodes[j]
           # fedCattleNode <- fed_cartesianNormalized$fedNormNodes[j]
           
+          
+          #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
+          #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
           cornNode <- cull_cartesian$cornNodes[j]
           cullCowNode <- cull_cartesian$cullNodes[j]
           dShockNode <- cull_cartesian$dShockNodes[j]
@@ -560,11 +600,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps_new - 0.02492
-          pc_lo <- pc_new - 0.03717
+          ps_lo <- ps - 0.02492
+          pc_lo <- pc - 0.03717
           
-          ps_up <- ps_new  + 0.23644
-          pc_up <- pc_new  + 0.192417
+          ps_up <- ps  + 0.23644
+          pc_up <- pc  + 0.192417
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -578,7 +618,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
-          B <- ps_new - g * (beta^3) * ps_new + hc_discounted
+          # ps_expected <- 
+          ps_expected <- ps_new
+          
+          B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,B = B, hc_discounted = hc_discounted, 
                           Eps = ps_new, lower = lo, upper = up)
@@ -612,6 +655,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           prices_ps[j,i] <- ps1
           prices_pc[j,i] <- pc1
+          
+          # ps <- ps1
+          # pc <- pc1
+          
           # k3t1[j,i] <- k_3t1
           # kjt1[j,i] <- k_7_10t1
           # slNew[j,i] <- sl1
@@ -619,6 +666,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           fedPrice[[i]][j,k] <- ps1
           cullPrice[[i]][j,k] <- pc1
+          
           # fedProd[[i]][j,k] <- sl1
           # cullProd[[i]][j,k] <- cl1
           
