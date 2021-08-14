@@ -1,3 +1,6 @@
+require(statmod)
+
+
 #### This is the test code for performing expectations using gaussian quadrature for integration.
 #### This can be done with many different types. Here we are doing it using chebyshev nodes. Chebyshev nodes are 
 #### not equidistant and that helps with approximating the functin properly. 
@@ -117,6 +120,7 @@ mu_CL_Demand <- c(mean(allShocks$clShock), mean(allShocks$Shock))
 ### Here we can select points according to our wish. As the number of points create a mesh grids of gaussian nodes. 
 ### For instance fed cattle production and demdnd shocks if n = 7 then 7X7 = 49 mesh. This will give the weights as well.
 
+
 pts_SL <- mgauss.hermite(n = 7, mu = mu_SL_Demand, sigma = sig_SL_Demand)
 
 # plot(pts_SL$points, cex=-5/log(pts_SL$weights), pch=19,
@@ -131,12 +135,12 @@ pts_CL <- mgauss.hermite(n = 7, mu = mu_CL_Demand, sigma = sig_CL_Demand)
 
 
 
+range(pts_CL$weights)
 
 
 
 
-
-
+gauss.quad(n = 7, kind = "chebyshev2")
 
 
 
