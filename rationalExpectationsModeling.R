@@ -452,13 +452,13 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    i <- 1
+    # i <- 1
     ### Here we get the observed quantities
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
     cl <- quantities_prices_capK$cl[i]
     
-    # adj <- A/(sl+cl)
+    adj <- A/(sl+cl)
     # sl <- sl * adj
     # cl <- cl * adj
     
@@ -466,8 +466,14 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     # cl2 <- quantities_prices_capK$cl[i+2]
     
     #### Here I am trying another route. Take mean/median of the past prices and use it as the starting price for optimization
-    ps <-  max(quantities_prices_capK$ps[1:i])
-    pc <- max(quantities_prices_capK$pc[1:i])
+    ps <-   quantities_prices_capK$ps[i] 
+    pc <-   quantities_prices_capK$pc[i] 
+    
+    # if(i>1){
+    #   ps <-   (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1])/2
+    #   pc <-   (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1])/2
+    # }
+    
     # hc <- (max(quantities_prices_capK$hc[1:i]) + min(quantities_prices_capK$hc[1:i]))/2
     
     # ps <- quantities_prices_capK$ps[i]
@@ -476,10 +482,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     if(i > 1){
       if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i]+quantities_prices_capK$ps[i-1])/2
+        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1])/2
       }
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i]+quantities_prices_capK$pc[i-1])/2
+        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1])/2
       }
     }
     
@@ -585,8 +591,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           #### Here we apply the chebyshev node to solve the system of equations
           # sl_node <- fedCattleNode + imports - exports
-          sl_node <- fedCattleNode
-          cl_node <- cullCowNode
+          sl_node <- fedCattleNode * adj
+          cl_node <- cullCowNode * adj
           A_node <- (sl_node + cl_node) * dShockNode
           
           #### getting the parameters from the optParamFunction
@@ -604,11 +610,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.02492
-          pc_lo <- pc - 0.03717
+          ps_lo <- ps - 0.32417
+          pc_lo <- pc - 0.386667
           
-          ps_up <- ps  + 0.23644
-          pc_up <- pc  + 0.192417
+          ps_up <- ps  + 0.4
+          pc_up <- pc  + 0.3
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){

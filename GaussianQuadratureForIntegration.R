@@ -119,7 +119,7 @@ mu_CL_Demand <- c(mean(allShocks$clShock), mean(allShocks$Shock))
 
 ### Here we can select points according to our wish. As the number of points create a mesh grids of gaussian nodes. 
 ### For instance fed cattle production and demdnd shocks if n = 7 then 7X7 = 49 mesh. This will give the weights as well.
-
+### These are hermite weights
 
 pts_SL <- mgauss.hermite(n = 7, mu = mu_SL_Demand, sigma = sig_SL_Demand)
 
@@ -140,10 +140,10 @@ range(pts_CL$weights)
 
 
 
-gauss.quad(n = 7, kind = "chebyshev2")
+gauss.quad(n = 343, kind = "chebyshev2")
 
 
-
+#### 
 
 
 
