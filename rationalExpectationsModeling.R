@@ -391,11 +391,20 @@ capK <- merge(K_1t, K_jt)
 sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
 cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
 
-# sl_quant <- supp_sl_adj %>% transmute(Year = Year, sl = Bill_meatLb_sl)
-# cl_quant <- supp_cl_adj %>% transmute(Year = Year, cl = Bill_meatLb_cl)
+
+
+sl_quant_adj <- merge(sl_quant, adjFactor)
+
+
+sl_quantObs <- supp_sl_adj %>% transmute(Year = Year, slO = Bill_meatLb_sl)
+cl_quantObs <- supp_cl_adj %>% transmute(Year = Year, clO = Bill_meatLb_cl)
+
+
+slQuantitiesMerge <- merge(sl_quant, sl_quantObs) %>% na.omit() %>% mutate(diff = slO-sl)
+clQuantitiesMerge <- merge(cl_quant, cl_quantObs) %>% na.omit() %>% mutate(diff = clO-cl)
+
 
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
-
 
 quantities <- merge(merge(A_quant,sl_quant), cl_quant)
 
@@ -482,10 +491,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     if(i > 1){
       if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1])/2
+        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
       }
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1])/2
+        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
       }
     }
     
@@ -591,8 +600,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           #### Here we apply the chebyshev node to solve the system of equations
           # sl_node <- fedCattleNode + imports - exports
-          sl_node <- fedCattleNode * adj
-          cl_node <- cullCowNode * adj
+          sl_node <- fedCattleNode
+          cl_node <- cullCowNode
           A_node <- (sl_node + cl_node) * dShockNode
           
           #### getting the parameters from the optParamFunction
