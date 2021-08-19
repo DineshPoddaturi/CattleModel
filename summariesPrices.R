@@ -49,7 +49,7 @@ estPS <- colMeans(prices_ps) %>% as.data.frame()
 names(estPS) <- "fedPrice"
 estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 
-estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(D = (fedPrice - ps))
+estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (ps - fedPrice)/ps)
 
 
 estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL")) +

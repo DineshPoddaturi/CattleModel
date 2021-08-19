@@ -64,7 +64,7 @@ demandShockGaussian <- demandShock %>% transmute(Year = Year, Shock = 0)
 set.seed(1)
 demandShockG <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
 demandShockGaussian$Shock <- demandShockG
-
+demandShockGaussian$Year <- as.double(demandShockGaussian$Year)
 
 
 #### Here I am constructing the sl and cl quantities that includes shock (which is a gaussian random variable). 
@@ -384,25 +384,19 @@ optKFunction <- function(K, ps, pc, A){
 K_jt <- Stock %>% select(Year, k7, k8, k9, k10)
 
 #### The followng dataframe has K_{t-1} i.e., the previous period stock
-K_1t <- Stock %>% transmute(Year = Year, K = K)
+K_1t <- Stock %>% transmute(Year = Year+1, K = K)
 
 capK <- merge(K_1t, K_jt)
 
 sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
 cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
 
+# sl_quantObs <- supp_sl_adj %>% transmute(Year = Year, slO = Bill_meatLb_sl)
+# cl_quantObs <- supp_cl_adj %>% transmute(Year = Year, clO = Bill_meatLb_cl)
 
 
-sl_quant_adj <- merge(sl_quant, adjFactor)
-
-
-sl_quantObs <- supp_sl_adj %>% transmute(Year = Year, slO = Bill_meatLb_sl)
-cl_quantObs <- supp_cl_adj %>% transmute(Year = Year, clO = Bill_meatLb_cl)
-
-
-slQuantitiesMerge <- merge(sl_quant, sl_quantObs) %>% na.omit() %>% mutate(diff = slO-sl)
-clQuantitiesMerge <- merge(cl_quant, cl_quantObs) %>% na.omit() %>% mutate(diff = clO-cl)
-
+# slQuantitiesMerge <- merge(sl_quant, sl_quantObs) %>% na.omit() %>% mutate(diff = slO-sl)
+# clQuantitiesMerge <- merge(cl_quant_adj, cl_quantObs) %>% na.omit() %>% mutate(diff = clO-cl)
 
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
@@ -462,41 +456,24 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   for(i in 1:nrow(quantities_prices_capK)){
   
     # i <- 1
-    ### Here we get the observed quantities
+    ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
     cl <- quantities_prices_capK$cl[i]
     
-    adj <- A/(sl+cl)
-    # sl <- sl * adj
-    # cl <- cl * adj
-    
-    # sl2 <- quantities_prices_capK$sl[i+2]
-    # cl2 <- quantities_prices_capK$cl[i+2]
-    
     #### Here I am trying another route. Take mean/median of the past prices and use it as the starting price for optimization
-    ps <-   quantities_prices_capK$ps[i] 
-    pc <-   quantities_prices_capK$pc[i] 
-    
-    # if(i>1){
-    #   ps <-   (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1])/2
-    #   pc <-   (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1])/2
-    # }
-    
-    # hc <- (max(quantities_prices_capK$hc[1:i]) + min(quantities_prices_capK$hc[1:i]))/2
-    
-    # ps <- quantities_prices_capK$ps[i]
-    # pc <- quantities_prices_capK$pc[i]
+    ps <-   quantities_prices_capK$ps[i]
+    pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 1){
-      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
-      }
-      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-      }
-    }
+    # if(i > 1){
+    #   if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+    #     ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+    #   }
+    #   if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+    #     pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #   }
+    # }
     
     hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
     
@@ -551,7 +528,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
+        if(norm(c_cull - c_old_cull) < 0.01  && norm(c_fed - c_old_fed) < 0.01){
           break
         }
       
@@ -568,7 +545,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #### Here we are going through each node
         for (j in 1:nrow(cull_cartesian)) {
           
-          # j <- 1
+          # j <- 2
           # cornNode <- cull_cartesianNormalized$cornNormNodes[j]
           # cullCowNode <- cull_cartesianNormalized$cullNormNodes[j]
           # dShockNode <- cull_cartesianNormalized$dShockNormNodes[j]
@@ -600,8 +577,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           #### Here we apply the chebyshev node to solve the system of equations
           # sl_node <- fedCattleNode + imports - exports
-          sl_node <- fedCattleNode
-          cl_node <- cullCowNode
+          sl_node <- fedCattleNode  
+          cl_node <- cullCowNode  
           A_node <- (sl_node + cl_node) * dShockNode
           
           #### getting the parameters from the optParamFunction
@@ -619,10 +596,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.32417
-          pc_lo <- pc - 0.386667
+          ps_lo <- ps - 0.3
+          pc_lo <- pc - 0.3
           
-          ps_up <- ps  + 0.4
+          ps_up <- ps  + 0.3
           pc_up <- pc  + 0.3
           
           #### Here we are making sure the lower bound for the prices isn't negative
