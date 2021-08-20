@@ -455,7 +455,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 18
+    # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -466,14 +466,14 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    # if(i > 1){
-    #   if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-    #     ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2] + quantities_prices_capK$ps[i-3])/4
-    #   }
-    #   if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-    #     pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2] + quantities_prices_capK$pc[i-3])/4
-    #   }
-    # }
+    if(i > 1){
+      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2] + quantities_prices_capK$ps[i-3])/4
+      }
+      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2] + quantities_prices_capK$pc[i-3])/4
+      }
+    }
     
     hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
     
@@ -528,7 +528,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        if(norm(c_cull - c_old_cull) < 0.01  && norm(c_fed - c_old_fed) < 0.01){
+        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
           break
         }
       
@@ -545,13 +545,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #### Here we are going through each node
         for (j in 1:nrow(cull_cartesian)) {
           
-          # j <- 2
-          # cornNode <- cull_cartesianNormalized$cornNormNodes[j]
-          # cullCowNode <- cull_cartesianNormalized$cullNormNodes[j]
-          # dShockNode <- cull_cartesianNormalized$dShockNormNodes[j]
-          # fedCattleNode <- fed_cartesianNormalized$fedNormNodes[j]
-          
-          
+          # j <- 1
           #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
           #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
           cornNode <- cull_cartesian$cornNodes[j]
@@ -626,15 +620,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           pc1 <- estP$par[2]
           
           ### From the following we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9} which are storage 
-          # K <- c(0,0)
-          # 
-          # estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
-          # 
-          # k_3t1 <- estK$par[1]
-          # k_7_10t1 <- estK$par[2]
-          # 
-          # sl1 <- (g * Stock_1t - k_3t1 + imports - exports)  
-          # cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)  
+          K <- c(0,0)
+
+          estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
+
+          k_3t1 <- estK$par[1]
+          k_7_10t1 <- estK$par[2]
+
+          sl1 <- (g * Stock_1t - k_3t1 + imports - exports)
+          cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)
           
           #### getting the parameters from the optParamFunction
           # params_mu_s <- optParamFunction(sl = sl1, cl = cl1, ps = ps1, pc = pc1, thetas = c(1,1))
@@ -648,23 +642,22 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl1, cl = cl1, A = A_node)
           # ps1 <- estP$par[1]
           # pc1 <- estP$par[2]
+          # ps <- ps1
+          # pc <- pc1
           
           prices_ps[j,i] <- ps1
           prices_pc[j,i] <- pc1
           
-          # ps <- ps1
-          # pc <- pc1
-          
-          # k3t1[j,i] <- k_3t1
-          # kjt1[j,i] <- k_7_10t1
-          # slNew[j,i] <- sl1
-          # clNew[j,i] <- cl1
+          k3t1[j,i] <- k_3t1
+          kjt1[j,i] <- k_7_10t1
+          slNew[j,i] <- sl1
+          clNew[j,i] <- cl1
           
           fedPrice[[i]][j,k] <- ps1
           cullPrice[[i]][j,k] <- pc1
           
-          # fedProd[[i]][j,k] <- sl1
-          # cullProd[[i]][j,k] <- cl1
+          fedProd[[i]][j,k] <- sl1
+          cullProd[[i]][j,k] <- cl1
           
           # slD[j,i] <- A_node * ((exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))))
           # clD[j,i] <- A_node * (1/(1+ exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde)))

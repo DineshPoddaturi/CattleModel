@@ -133,7 +133,7 @@ pts_CL <- mgauss.hermite(n = 5, mu = mu_CL_Demand, sigma = sig_CL_Demand)
 
 
 
-gauss.quad(n = 5, kind = "hermite")
+gauss.quad(n = 5, kind = "chebyshev2")
 
 
 
