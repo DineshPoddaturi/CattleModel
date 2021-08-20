@@ -455,7 +455,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 1
+    # i <- 18
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -468,10 +468,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     # if(i > 1){
     #   if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-    #     ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+    #     ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2] + quantities_prices_capK$ps[i-3])/4
     #   }
     #   if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-    #     pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #     pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2] + quantities_prices_capK$pc[i-3])/4
     #   }
     # }
     
@@ -533,7 +533,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         }
       
         #### NOTE: For i = 12 the following condition is true in the first iteration. So I change it from 0.01 to 0.001
-        # if((sl_obs + cl_obs - sl_itr - cl_itr)^2 < 0.001){
+        # if((slD_obs + clD_obs - sl_itr - cl_itr)^2 < 0.001){
         #   break
         # }
       
@@ -596,11 +596,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.3
-          pc_lo <- pc - 0.3
+          ps_lo <- ps - 0.32417
+          pc_lo <- pc - 0.386667
           
-          ps_up <- ps  + 0.3
-          pc_up <- pc  + 0.3
+          ps_up <- ps  + 0.37750
+          pc_up <- pc  + 0.371250
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -696,6 +696,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         
         # cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
         
+        
+        sl_itr <- mean(slD[,i])
+        cl_itr <- mean(clD[,i])
         
         # sl_obs <- mean(slNew[,i])
         # cl_obs <- mean(clNew[,i])
