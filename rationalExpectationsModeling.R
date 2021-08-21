@@ -590,11 +590,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.32417
-          pc_lo <- pc - 0.386667
+          ps_lo <- ps - 0.5
+          pc_lo <- pc - 0.5
           
-          ps_up <- ps  + 0.37750
-          pc_up <- pc  + 0.371250
+          ps_up <- ps  + 0.4
+          pc_up <- pc  + 0.4
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
