@@ -468,10 +468,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     if(i > 1){
       if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2] + quantities_prices_capK$ps[i-3])/4
+        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
       }
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2] + quantities_prices_capK$pc[i-3])/4
+        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
       }
     }
     
@@ -590,11 +590,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.5
-          pc_lo <- pc - 0.5
+          ps_lo <- ps - 0.4
+          pc_lo <- pc - 0.4
           
-          ps_up <- ps  + 0.4
-          pc_up <- pc  + 0.4
+          ps_up <- ps  + 0.5
+          pc_up <- pc  + 0.5
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -609,7 +609,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           # ps_expected <- 
-          ps_expected <- ps_new
+          ps_expected <- c(ps_new)  * slWeights
           
           B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
           

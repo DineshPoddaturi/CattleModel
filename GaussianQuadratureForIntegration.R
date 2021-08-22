@@ -121,6 +121,8 @@ mu_CL_Demand <- c(mean(allShocks$clShock), mean(allShocks$Shock))
 
 pts_SL <- mgauss.hermite(n = 5, mu = mu_SL_Demand, sigma = sig_SL_Demand)
 
+slWeights <- pts_SL$weights
+
 # plot(pts_SL$points, cex=-5/log(pts_SL$weights), pch=19,
 #      xlab=expression(x[1]),
 #      ylab=expression(x[2]))
@@ -133,7 +135,7 @@ pts_CL <- mgauss.hermite(n = 5, mu = mu_CL_Demand, sigma = sig_CL_Demand)
 
 
 
-gauss.quad(n = 5, kind = "chebyshev2")
+gauss.quad(n = 25, kind = "chebyshev2")$weights)
 
 
 
