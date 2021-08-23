@@ -455,7 +455,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    # i <- 1
+    i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -590,11 +590,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.4
-          pc_lo <- pc - 0.4
+          ps_lo <- ps - 0.5
+          pc_lo <- pc - 0.5
           
-          ps_up <- ps  + 0.5
-          pc_up <- pc  + 0.5
+          ps_up <- ps + 1
+          pc_up <- pc + 1
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -609,7 +609,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           # ps_expected <- 
-          ps_expected <- c(ps_new)  * slWeights
+          ps_expected <- ps_new * 
           
           B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
           
@@ -620,15 +620,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           pc1 <- estP$par[2]
           
           ### From the following we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9} which are storage 
-          K <- c(0,0)
-
-          estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
-
-          k_3t1 <- estK$par[1]
-          k_7_10t1 <- estK$par[2]
-
-          sl1 <- (g * Stock_1t - k_3t1 + imports - exports)
-          cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)
+          # K <- c(0,0)
+          # 
+          # estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
+          # 
+          # k_3t1 <- estK$par[1]
+          # k_7_10t1 <- estK$par[2]
+          # 
+          # sl1 <- (g * Stock_1t - k_3t1 + imports - exports)
+          # cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)
           
           #### getting the parameters from the optParamFunction
           # params_mu_s <- optParamFunction(sl = sl1, cl = cl1, ps = ps1, pc = pc1, thetas = c(1,1))
@@ -648,16 +648,16 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           prices_ps[j,i] <- ps1
           prices_pc[j,i] <- pc1
           
-          k3t1[j,i] <- k_3t1
-          kjt1[j,i] <- k_7_10t1
-          slNew[j,i] <- sl1
-          clNew[j,i] <- cl1
+          # k3t1[j,i] <- k_3t1
+          # kjt1[j,i] <- k_7_10t1
+          # slNew[j,i] <- sl1
+          # clNew[j,i] <- cl1
           
           fedPrice[[i]][j,k] <- ps1
           cullPrice[[i]][j,k] <- pc1
           
-          fedProd[[i]][j,k] <- sl1
-          cullProd[[i]][j,k] <- cl1
+          # fedProd[[i]][j,k] <- sl1
+          # cullProd[[i]][j,k] <- cl1
           
           # slD[j,i] <- A_node * ((exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))))
           # clD[j,i] <- A_node * (1/(1+ exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde)))

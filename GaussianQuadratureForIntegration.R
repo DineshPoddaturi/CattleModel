@@ -85,25 +85,9 @@ mgauss.hermite <- function(n, mu, sigma, prune=NULL) {
 
 
 
-
-# sig <- matrix(c(std(obsEst_sl_Supply$slShock),0,0,0,std(obsEst_cl_Supply$clShock),0,0,0,std(demandShock$dShock)),3,3)
-# 
-# pts <- mgauss.hermite(n = 7, mu = c(1,1,1), sigma = sig)
-# 
-# plot(pts$points, cex=-5/log(pts$weights), pch=19,
-#      xlab=expression(x[1]),
-#      ylab=expression(x[2]))
-
-
-
-
 #### Using the functions above I generate weights for the fed cattle and cull cow prices seperately
 #### Here I compute the varaince covariance between the shocks. One for fed cattle supply shock and demand shock, another for
 #### cull cow supply shock and demand shock
-
-# slShock_var <- var(x = allShocks$slShock)
-# clShock_var <- var(x = allShocks$clShock)
-# dShock_var <- var(x = allShocks$Shock)
 
 SL_Demand_Shocks_varCovar <- cov(allShocks %>% select(slShock, Shock))
 
@@ -116,33 +100,32 @@ sig_CL_Demand <- matrix(CL_Demand_Shocks_varCovar, 2, 2)
 mu_CL_Demand <- c(mean(allShocks$clShock), mean(allShocks$Shock))
 
 ### Here we can select points according to our wish. As the number of points create a mesh grids of gaussian nodes. 
-### For instance fed cattle production and demdnd shocks if n = 7 then 7X7 = 49 mesh. This will give the weights as well.
-### These are hermite weights
+### For instance, fed cattle production and demdnd shocks if n = 7 then 7X7 = 49 mesh. This will give the weights as well.
+### These are hermite weights and points
 
-pts_SL <- mgauss.hermite(n = 5, mu = mu_SL_Demand, sigma = sig_SL_Demand)
+### Do I use these points is the analysis? I already have the chebyshev nodes of these shocks.
+### Because these can be used to introduce the shock into the system. 
+
+pts_SL <- mgauss.hermite(n = 7, mu = mu_SL_Demand, sigma = sig_SL_Demand)
 
 slWeights <- pts_SL$weights
 
-# plot(pts_SL$points, cex=-5/log(pts_SL$weights), pch=19,
-#      xlab=expression(x[1]),
-#      ylab=expression(x[2]))
-
-pts_CL <- mgauss.hermite(n = 5, mu = mu_CL_Demand, sigma = sig_CL_Demand)
-
-# plot(pts_CL$points, cex=-5/log(pts_CL$weights), pch=19,
-#      xlab=expression(x[1]),
-#      ylab=expression(x[2]))
+pts_CL <- mgauss.hermite(n = 7, mu = mu_CL_Demand, sigma = sig_CL_Demand)
 
 
 
-gauss.quad(n = 25, kind = "chebyshev2")$weights)
 
 
+#### The below function gives the weights and points. Is it okay to use the weights from this?
+demandWeights <- gauss.quad(n = 7, kind = "chebyshev2")$weights
+fedWeights <- gauss.quad(n = 7, kind = "chebyshev2")$weights
+cullWeights <- gauss.quad(n = 7, kind = "chebyshev2")$weights
 
-#### 
+#### Mesh for fed cattle price. I take the tensor product of the weights
+fedMesh <- tensor::tensor(demandWeights, fedWeights)
 
-
-
+#### Mest for cull cows price. I take the tensor product if the weights
+cullMesh <- tensor::tensor(demandWeights, cullWeights)
 
 
 
