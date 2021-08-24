@@ -122,10 +122,30 @@ fedWeights <- gauss.quad(n = 7, kind = "chebyshev2")$weights
 cullWeights <- gauss.quad(n = 7, kind = "chebyshev2")$weights
 
 #### Mesh for fed cattle price. I take the tensor product of the weights
-fedMesh <- tensor::tensor(demandWeights, fedWeights)
+fedMeshCheb <- tensor::tensor(demandWeights, fedWeights)
 
 #### Mest for cull cows price. I take the tensor product if the weights
-cullMesh <- tensor::tensor(demandWeights, cullWeights)
+cullMeshCheb <- tensor::tensor(demandWeights, cullWeights)
+
+
+demandWeightsHermite <- gauss.quad(n = 7, kind = "hermite")$weights
+fedWeightsHermite <- gauss.quad(n = 7, kind = "hermite")$weights
+cullWeightsHermite <- gauss.quad(n = 7, kind = "hermite")$weights
+
+#### Mesh for fed cattle price. I take the tensor product of the weights
+fedMeshHermite <- tensor::tensor(demandWeightsHermite, fedWeightsHermite)
+
+#### Mest for cull cows price. I take the tensor product if the weights
+cullMeshHermite <- tensor::tensor(demandWeightsHermite, cullWeightsHermite)
+
+
+
+
+
+
+
+
+
 
 
 

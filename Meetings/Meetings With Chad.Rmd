@@ -151,7 +151,12 @@ Here we know the RHS. compute that first and you basically know the RHS. So use 
 
 
 
+08/24/2021:
 
+* Told him about how the prices are jumping off and hitting the boundaries. But they are not stabilizing. He suggested 
+ me to plot the prices for every node and see how it looks like. If we find some outliers and there's not a lot observed  until the middle, we might wanna chop some off and take the values.
+ 
+* Including the drought variable could increase the precision of the price estimation. 
 
 
 

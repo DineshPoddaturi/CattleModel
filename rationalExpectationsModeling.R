@@ -346,17 +346,17 @@ optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
   ps <- p[1]
   pc <- p[2]
 
-  # Eps3 <- Eps
+  Eps3 <- Eps
 
   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
   F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
 
-  # F3 <- B - ps - g * (beta^3) * Eps3 + hc_discounted
+  F3 <- B - ps - g * (beta^3) * Eps3 + hc_discounted
 
-  # F <- F1^2 + F2^2 + F3^2
+  F <- F1^2 + F2^2 + F3^2
   
-  F <- F1^2 + F2^2
+  # F <- F1^2 + F2^2
 
   return(F)
 
@@ -581,6 +581,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           mu_Tilde <- params_mu_s[1]
           s_Tilde <- params_mu_s[2]
           
+          ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
+          
+          B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
+          
           ### Here we get the price for the observed supply and demand of fed and cull cows
           p <- c(ps_new, pc_new)
           
@@ -590,11 +594,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.5
-          pc_lo <- pc - 0.5
+          ps_lo <- ps - 0.32417
+          pc_lo <- pc - 0.386667
           
-          ps_up <- ps + 1
-          pc_up <- pc + 1
+          ps_up <- ps + 0.37750
+          pc_up <- pc + 0.371250
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -609,12 +613,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           # ps_expected <- 
-          ps_expected <- ps_new * 
-          
-          B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,B = B, hc_discounted = hc_discounted, 
-                          Eps = ps_new, lower = lo, upper = up)
+                          Eps = ps_expected, lower = lo, upper = up)
           # B = B, hc_discounted = hc_discounted, Eps = ps_new, lower = lo, upper = up
           ps1 <- estP$par[1]
           pc1 <- estP$par[2]
