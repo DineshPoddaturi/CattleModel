@@ -66,6 +66,7 @@ demandShockG <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dSho
 demandShockGaussian$Shock <- demandShockG
 demandShockGaussian$Year <- as.double(demandShockGaussian$Year)
 
+# ggplot(data = demandShockGaussian, aes(x=Shock)) + geom_density()
 
 #### Here I am constructing the sl and cl quantities that includes shock (which is a gaussian random variable). 
 #### Note: these gaussian shocks has mean one and standard deviation according to the historical shocks (see above for details)
@@ -86,6 +87,8 @@ set.seed(3)
 slSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_sl_Supply$slShock))
 slSupplyShockGaussian$slShock <- slSupply_Shock
 
+# ggplot(data = slSupplyShockGaussian, aes(x=slShock)) + geom_density()
+
 #### Here we construct the cull cows production shock
 obsEst_cl_Supply <- merge(cullCowSupply_obs, supp_cl) %>% transmute(Year = Year, cl_obs = cl_obs, cl_est = Bill_meatLb_cl,
                                                                     clShock = cl_obs/cl_est)
@@ -94,6 +97,8 @@ clSupplyShockgaussian <- obsEst_cl_Supply %>% transmute(Year = Year, clShock = 0
 set.seed(4)
 clSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 clSupplyShockgaussian$clShock <- clSupply_Shock
+
+# ggplot(data = clSupplyShockgaussian, aes(x=clShock)) + geom_density()
 
 #### I am merging all the supply and demand shocks
 allShocks <- merge(merge(demandShockGaussian, slSupplyShockGaussian), clSupplyShockgaussian)
@@ -528,7 +533,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        if(norm(c_cull - c_old_cull) < 0.001  && norm(c_fed - c_old_fed) < 0.001){
+        if(norm(c_cull - c_old_cull) < 0.01  && norm(c_fed - c_old_fed) < 0.01){
           break
         }
       
@@ -545,7 +550,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #### Here we are going through each node
         for (j in 1:nrow(cull_cartesian)) {
           
-          # j <- 1
+          # j <- 6
           #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
           #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
           cornNode <- cull_cartesian$cornNodes[j]
@@ -594,11 +599,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### the boundaries. 
           #### NEED MORE EXPLANATION? 
           
-          ps_lo <- ps - 0.32417
-          pc_lo <- pc - 0.386667
+          ps_lo <- ps - 0.5
+          pc_lo <- pc - 0.5
           
-          ps_up <- ps + 0.37750
-          pc_up <- pc + 0.371250
+          ps_up <- ps + 1
+          pc_up <- pc + 1
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -608,6 +613,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           if(pc_lo < 0){
             pc_lo <- pc
           }
+          
           
           lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
@@ -691,8 +697,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
         
         
-        sl_itr <- mean(slD[,i])
-        cl_itr <- mean(clD[,i])
+        # sl_itr <- mean(slD[,i])
+        # cl_itr <- mean(clD[,i])
         
         # sl_obs <- mean(slNew[,i])
         # cl_obs <- mean(clNew[,i])
