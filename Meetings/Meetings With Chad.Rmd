@@ -158,8 +158,7 @@ Here we know the RHS. compute that first and you basically know the RHS. So use 
  
 * Including the drought variable could increase the precision of the price estimation. 
 
-
-
+* Chad told me to use chebyshev weights to get the expectation of the price. Usually there isn't much difference between hermite and chebyshev weights. Since we are using the chebyshev nodes and chebyshev polynomials using chebyshev weights could be optimal.
 
 
 
