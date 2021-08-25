@@ -11,3 +11,13 @@
 #   }
 # }
 
+
+(beta^7) * pc_new + g * (beta^4) * ((1-beta^6)/(1-beta)) * ps_new
+
+pricePS <- prices_ps[,i] %>% as.data.frame()
+names(pricePS) <- "ps"
+ggplot(data = pricePS, aes(x=ps)) + geom_density()
+
+pricePC <- prices_pc[,i] %>% as.data.frame()
+names(pricePC) <- "pc"
+ggplot(data = pricePC, aes(x=pc)) + geom_density()

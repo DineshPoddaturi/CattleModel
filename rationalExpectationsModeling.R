@@ -480,8 +480,6 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       }
     }
     
-    hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
-    
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
     k8 <- quantities_prices_capK$k8[i]
@@ -497,6 +495,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     importsObs <- quantities_prices_capK$Imports[i]
     exportsObs <- quantities_prices_capK$Exports[i]
+    
+    # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
+    
     
     Stock_1t <- (K1t*slDressed)/1000000000
     imports <- (importsObs*slDressed)/1000000000
@@ -533,7 +534,13 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        if(norm(c_cull - c_old_cull) < 0.01  && norm(c_fed - c_old_fed) < 0.01){
+        # Here when checking the difference between the old and new coefficients we use the function norm.
+        # Inside the function we have to specify what kind of norm we want. Here I am specifying Frobenius norm. 
+        # The Frobenius norm is the Euclidean norm of x. So basically sum of squared vector. 
+        # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
+        # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
+      
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.01  && norm(x = (c_fed - c_old_fed), type = "f") < 0.01){
           break
         }
       
@@ -550,7 +557,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #### Here we are going through each node
         for (j in 1:nrow(cull_cartesian)) {
           
-          # j <- 6
+          # j <- 1
           #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
           #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
           cornNode <- cull_cartesian$cornNodes[j]
@@ -576,7 +583,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           #### Here we apply the chebyshev node to solve the system of equations
           # sl_node <- fedCattleNode + imports - exports
-          sl_node <- fedCattleNode  
+          sl_node <- fedCattleNode 
           cl_node <- cullCowNode  
           A_node <- (sl_node + cl_node) * dShockNode
           
@@ -585,6 +592,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
 
           mu_Tilde <- params_mu_s[1]
           s_Tilde <- params_mu_s[2]
+          
+          ##### Instead of using the holding costs from the naive expectations modeling. I am changing it for every 
+          ##### iteration. The rational behind it is: if the price of fed cattle and cull cow changes the holding costs
+          ##### will change. The intuition behind this is: Assuming the price changes, the producer would react to it 
+          ##### and change his decisions which would change the holding costs per animal. I guess this is true.
+          ##### I have to think about this more!!!!! #######################
+          
+          hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
+          hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
           
           ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
           
@@ -597,13 +613,16 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
           #### jumps to some local maxima/minima and do not move from there. We are making sure that the prices are within
           #### the boundaries. 
+          
           #### NEED MORE EXPLANATION? 
+          ####        Also remember we can always find a number that satisfies the supply and demand equations. 
+          #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          ps_lo <- ps - 0.5
-          pc_lo <- pc - 0.5
+          ps_lo <- ps - 0.32417
+          pc_lo <- pc - 0.386667
           
-          ps_up <- ps + 1
-          pc_up <- pc + 1
+          ps_up <- ps + 0.37750 
+          pc_up <- pc + 0.371250
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -618,11 +637,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
-          # ps_expected <- 
+          estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
+                          hc_discounted = hc_discounted, Eps = ps_expected, lower = lo, upper = up)
           
-          estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node,B = B, hc_discounted = hc_discounted, 
-                          Eps = ps_expected, lower = lo, upper = up)
           # B = B, hc_discounted = hc_discounted, Eps = ps_new, lower = lo, upper = up
+          
           ps1 <- estP$par[1]
           pc1 <- estP$par[2]
           
@@ -690,9 +709,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         c_fed_itr[[i]][,k] <- c_fed
         
         
-        cat("\n norm of old and new fed coefficients: ", norm(c_fed - c_old_fed))
+        cat("\n norm of old and new fed coefficients: ", norm(x = (c_fed - c_old_fed), type = "f"))
 
-        cat("\n norm of old and new cull coefficients: ", norm(c_cull - c_old_cull))
+        cat("\n norm of old and new cull coefficients: ", norm(x = (c_cull - c_old_cull), type = "f"))
         
         # cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
         
