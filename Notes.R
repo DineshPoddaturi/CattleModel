@@ -12,7 +12,6 @@
 # }
 
 
-(beta^7) * pc_new + g * (beta^4) * ((1-beta^6)/(1-beta)) * ps_new
 
 pricePS <- prices_ps[,i] %>% as.data.frame()
 names(pricePS) <- "ps"

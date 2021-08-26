@@ -350,9 +350,13 @@ optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
 
   ps <- p[1]
   pc <- p[2]
-
+  
   Eps3 <- Eps
-
+  
+  # hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
+  # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+  # B <- ps - g * (beta^3) * Eps3 + hc_discounted
+  
   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
   F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
@@ -460,7 +464,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
   
-    i <- 1
+    # i <- 2
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -473,10 +477,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     if(i > 1){
       if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1])/2
       }
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1])/2
       }
     }
     
@@ -537,10 +541,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # Here when checking the difference between the old and new coefficients we use the function norm.
         # Inside the function we have to specify what kind of norm we want. Here I am specifying Frobenius norm. 
         # The Frobenius norm is the Euclidean norm of x. So basically sum of squared vector. 
+        # Which is the sum squared of the difference between the old and new coefficient vectors.
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.01  && norm(x = (c_fed - c_old_fed), type = "f") < 0.01){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.005  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.005){
           break
         }
       
@@ -599,8 +604,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ##### and change his decisions which would change the holding costs per animal. I guess this is true.
           ##### I have to think about this more!!!!! #######################
           
-          hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
-          hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+          # hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
+          # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
           
           ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
           
@@ -618,11 +623,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          ps_lo <- ps - 0.32417
-          pc_lo <- pc - 0.386667
+          ps_lo <- ps - 0.4
+          pc_lo <- pc - 0.2
           
-          ps_up <- ps + 0.37750 
-          pc_up <- pc + 0.371250
+          ps_up <- ps + 0.25
+          pc_up <- pc + 0.2
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -709,9 +714,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         c_fed_itr[[i]][,k] <- c_fed
         
         
-        cat("\n norm of old and new fed coefficients: ", norm(x = (c_fed - c_old_fed), type = "f"))
+        cat("\n norm of old and new fed coefficients: ", norm(x = (c_fed - c_old_fed) , type = "f"))
 
-        cat("\n norm of old and new cull coefficients: ", norm(x = (c_cull - c_old_cull), type = "f"))
+        cat("\n norm of old and new cull coefficients: ", norm(x = (c_cull - c_old_cull) , type = "f"))
         
         # cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
         
