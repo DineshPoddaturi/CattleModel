@@ -20,3 +20,11 @@ ggplot(data = pricePS, aes(x=ps)) + geom_density()
 pricePC <- prices_pc[,i] %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
+
+
+
+
+
+
+
+

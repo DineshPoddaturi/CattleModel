@@ -462,8 +462,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:nrow(quantities_prices_capK)){
-  
+  for(i in 1:12){
+    
     # i <- 2
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
@@ -475,13 +475,21 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 1){
-      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1])/2
+    if(i > 2){
+      
+      if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
       }
-      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1])/2
+      if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
       }
+      
+      # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+      #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1]+ quantities_prices_capK$ps[i-2])/3
+      # }
+      # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+      #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+      # }
     }
     
     K1t  <- quantities_prices_capK$K[i]
