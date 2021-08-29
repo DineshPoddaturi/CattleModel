@@ -230,7 +230,7 @@ normalizedNodes <- function(d){
 }
 
 #### For testing purposes I use n = 5 for now. 
-chebNodesN <- 7
+chebNodesN <- 10
 
 stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian, slSupplyShockGaussian, clSupplyShockgaussian)
 
@@ -462,9 +462,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:12){
+  for(i in 1:7){
     
-    # i <- 2
+    # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i]
     sl <- quantities_prices_capK$sl[i]
@@ -475,22 +475,22 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 2){
-      
-      if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-        ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
-      }
-      if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-        pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-      }
-      
-      # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-      #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1]+ quantities_prices_capK$ps[i-2])/3
-      # }
-      # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-      #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-      # }
-    }
+    # if(i > 2){
+    #   
+    #   if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #     ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+    #   }
+    #   if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+    #     pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #   }
+    #   
+    #   # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+    #   #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1]+ quantities_prices_capK$ps[i-2])/3
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+    #   #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #   # }
+    # }
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
@@ -553,7 +553,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.005  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.005){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
           break
         }
       
@@ -631,11 +631,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          ps_lo <- ps - 0.4
-          pc_lo <- pc - 0.2
+          ps_lo <- ps - 0.30
+          pc_lo <- pc - 0.32
           
-          ps_up <- ps + 0.25
-          pc_up <- pc + 0.2
+          ps_up <- ps + 0.10929
+          pc_up <- pc + 0.14
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
