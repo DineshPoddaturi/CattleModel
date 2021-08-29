@@ -230,7 +230,7 @@ normalizedNodes <- function(d){
 }
 
 #### For testing purposes I use n = 5 for now. 
-chebNodesN <- 10
+chebNodesN <- 8
 
 stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian, slSupplyShockGaussian, clSupplyShockgaussian)
 
@@ -462,7 +462,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:7){
+  for(i in 1:5){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -553,7 +553,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.003  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.003){
           break
         }
       
@@ -632,9 +632,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
           ps_lo <- ps - 0.30
-          pc_lo <- pc - 0.32
+          pc_lo <- pc - 0.2
           
-          ps_up <- ps + 0.10929
+          ps_up <- ps + 0.2
           pc_up <- pc + 0.14
           
           #### Here we are making sure the lower bound for the prices isn't negative

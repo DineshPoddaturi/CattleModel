@@ -13,11 +13,11 @@
 
 
 
-pricePS <- prices_ps[,i] %>% as.data.frame()
+pricePS <- prices_ps[,14] %>% as.data.frame()
 names(pricePS) <- "ps"
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
-pricePC <- prices_pc[,i] %>% as.data.frame()
+pricePC <- prices_pc[,15] %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
 
