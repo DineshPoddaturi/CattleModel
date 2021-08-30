@@ -464,7 +464,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:15){
     
-    # i <- 1
+    # i <- 18
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the 
                                      ## fed cattle production node and cull cow production node with demand shock to get 
@@ -477,24 +477,22 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 2){
-
-      # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-      #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
-      # }
-      # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-      #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-      # }
-
-      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- median(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],
-                       quantities_prices_capK$ps[i-3]))
-      }
-      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- median(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],
-                       quantities_prices_capK$pc[i-3]))
-      }
-    }
+    # if(i > 2){
+    # 
+    #   # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #   #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+    #   #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #   # }
+    # 
+    #   if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #     ps <- median(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
+    #   }
+    #   if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+    #     pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
+    #   }
+    # }
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
