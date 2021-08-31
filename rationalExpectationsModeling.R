@@ -633,11 +633,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          ps_lo <- ps - 0.1
-          pc_lo <- pc - 0.1
+          ps_lo <- ps - 0.32417
+          pc_lo <- pc - 0.35
           
-          ps_up <- ps + 0.25
-          pc_up <- pc + 0.25
+          ps_up <- ps + 0.10929
+          pc_up <- pc + 0.080153
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
