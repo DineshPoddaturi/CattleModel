@@ -13,6 +13,24 @@ calfCrop_replacementHeifers <- calfCrop_replacementHeifers %>% mutate(calfCrop_r
 
 summary(calfCrop_replacementHeifers$calfCrop_repHeifers_Percent)
 
+#### Here I am getting an approximate percentage of the progeny of the total stock that are added into 
+#### breeding stock as replacement heifers. Note that here I am taking replacement heifers two periods ahead
+#### Because if the cow gives birth thsi period the heifers are added into the breeding stock two periods from now
+summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>% select(ratios))
+
+# ratios      
+# Min.   :0.1504  
+# 1st Qu.:0.1684  
+# Median :0.1757  
+# Mean   :0.1779  
+# 3rd Qu.:0.1840  
+# Max.   :0.2227  
+# NA's   :2 
+
+#### From the above on average approximately 18% of the heifers are added into the breeding stock
+
+
+
 #### Here I read corn price data. These are in $/bushel
 corn_price <- read_excel("Data/New/CornPrices_Monthly.xlsx") %>% as.data.frame()
 names(corn_price)
@@ -107,7 +125,8 @@ allShocks <- merge(merge(demandShockGaussian, slSupplyShockGaussian), clSupplySh
 sl_stock <- supp_sl %>% transmute(Year = Year, sl_est = Bill_meatLb_sl, slHead = Slaughter)
 cl_stock <- supp_cl %>% transmute(Year = Year, cl_est = Bill_meatLb_cl, clHead = Cull)
 
-dataList <- list(Stock, sl_stock, cl_stock, slSupplyShockGaussian, clSupplyShockgaussian, dressedWeights_sl_cl, imports_exports)
+dataList <- list(Stock, sl_stock, cl_stock, slSupplyShockGaussian, 
+                 clSupplyShockgaussian, dressedWeights_sl_cl, imports_exports, calf_crop)
 
 allStockShocks <- Reduce(function(...) merge(...), dataList)
 
@@ -142,9 +161,10 @@ newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
 #### Maybe I need to fit a model to get some coefficient for the supply of fed cattle three periods ahead.
 
 newSL <- allStockShocks %>%
-  transmute(Year = Year+3, slt = (delta - 0.19) * K * slShock + 
-              (1-0.19) * g * delta * (K - (delta - 0.19) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
-            slLbs = slt * Slaughter_avg/1000000000) 
+  transmute(Year = Year+3, slt = (delta - 0.22 * g) * K * slShock + 
+              (1 - 0.22 * g) * g * delta * (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
+            slLbs = slt * Slaughter_avg/1000000000)
+
 ### NOTE: we did not add any imports or exports in constructing the fed cattle production.
 #### CHECK THE ABOVE AGAIN!!!!! 
 #### NEW NOTE: I reconstructed the total supply of the fed cattle and cull cows. This includes 
@@ -230,7 +250,7 @@ normalizedNodes <- function(d){
 }
 
 #### For testing purposes I use n = 5 for now. 
-chebNodesN <- 8
+chebNodesN <- 7
 
 stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian, slSupplyShockGaussian, clSupplyShockgaussian)
 
@@ -462,9 +482,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:15){
+  for(i in 1:12){
     
-    # i <- 18
+    # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the 
                                      ## fed cattle production node and cull cow production node with demand shock to get 
@@ -477,22 +497,22 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    # if(i > 2){
-    # 
-    #   # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-    #   #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
-    #   # }
-    #   # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-    #   #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-    #   # }
-    # 
-    #   if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-    #     ps <- median(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
-    #   }
-    #   if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-    #     pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
-    #   }
-    # }
+    if(i > 2){
+
+      # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+      #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+      # }
+      # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+      #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+      # }
+
+      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
+      }
+      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
+      }
+    }
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
@@ -555,7 +575,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.003  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.003){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.005  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.005){
           break
         }
       
@@ -633,11 +653,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          ps_lo <- ps - 0.32417
-          pc_lo <- pc - 0.35
+          ps_lo <- ps - 0.1
+          pc_lo <- pc - 0.1
           
-          ps_up <- ps + 0.10929
-          pc_up <- pc + 0.080153
+          ps_up <- ps + 0.2
+          pc_up <- pc + 0.2
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
