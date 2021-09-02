@@ -199,16 +199,38 @@ newCL <- allStockShocks %>%
 # clEstAge <- allStockShocks %>% filter(Year > 1995) %>% transmute(
 #   Year = Year, clHead = clHead, clLbsEst = clHead * clDressed/1000000000)
 
-cornPrice <- prices_quant %>% select(Year, pcorn)
+cornPrice <- pcorn
 cullCowsProd <- newCL %>% transmute(Year = Year, cullCows = clLbs)
 fedCattleProd <- newSL %>% transmute(Year = Year, fedcattle = slLbs)
+
+prod_CornP <- merge(merge(fedCattleProd, cullCowsProd),cornPrice) %>% drop_na()
+
+
+### Here I am generating the shocks again such that when we merge all the dataframes we have enough data.
+### Note: Since these are independent random shocks we are okay by increasing the n.
+demandShockGaussian1 <- prod_CornP %>% transmute(Year = Year, Shock = 0)
+slSupplyShockGaussian1 <- prod_CornP %>% transmute(Year = Year, slShock = 0)
+clSupplyShockgaussian1 <- prod_CornP %>% transmute(Year = Year, clShock = 0)
+
+set.seed(1)
+demandShockG <- rnorm(n = nrow(prod_CornP), mean = 1, sd = std(demandShock$dShock))
+demandShockGaussian1$Shock <- demandShockG
+
+set.seed(3)
+slSupply_Shock <- rnorm(n = nrow(prod_CornP), mean = 1, sd = std(obsEst_sl_Supply$slShock))
+slSupplyShockGaussian1$slShock <- slSupply_Shock
+
+set.seed(4)
+clSupply_Shock <- rnorm(n = nrow(prod_CornP), mean = 1, sd = std(obsEst_cl_Supply$clShock))
+clSupplyShockgaussian1$clShock <- clSupply_Shock
+
+# fedCattleProd <- supp_sl_adj %>% transmute(Year = Year, fedcattle = Bill_meatLb_sl)
+# cullCowsProd <- supp_cl_adj %>% transmute(Year = Year, cullCows = Bill_meatLb_cl)
 
 
 #### NOTE: We constructed fed cattle supply and cull cow supply for three years ahead which includes gaussian shocks as well. 
 #### Although we are using the data of three years ahead, since we are using all the nodes of both fed cattle, and cull cows
 #### supply the price is right. DO NOT GET CONFUSED!
-
-
 
 ##############################################################################################
 ###### Functions that returns the chebychev nodes and Chebychev polynomial matrix.############
@@ -252,7 +274,8 @@ normalizedNodes <- function(d){
 #### For testing purposes I use n = 5 for now. 
 chebNodesN <- 7
 
-stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian, slSupplyShockGaussian, clSupplyShockgaussian)
+stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian1, 
+                           slSupplyShockGaussian1, clSupplyShockgaussian1)
 
 stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na()
 
@@ -342,29 +365,6 @@ optParamFunction <- function(sl, cl, ps, pc, thetas){
 }
 
 ###### optPriceFunction returns the price for the passed supply and demand numerics.
-# optPriceFunction<- function(p, sl, cl, A, hc, Eps3)
-# optPriceFunction<- function(p, sl, cl, A, B, Eps){
-# 
-#   ps <- p[1]
-#   pc <- p[2]
-#   hc <- p[3]
-# 
-#   # Eps3 <- Eps
-#   
-#   # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
-# 
-#   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
-# 
-#   F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
-# 
-#   F3 <- B - ps - g * (beta^3) * Eps + 
-#     ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
-# 
-#   F <- F1^2 + F2^2 + F3^2
-# 
-#   return(F)
-# 
-# }
 
 optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
 
@@ -429,7 +429,7 @@ cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
 
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
-quantities <- merge(merge(A_quant,sl_quant), cl_quant)
+quantities <-  merge(merge(A_quant,sl_quant), cl_quant) 
 
 hcosts <- prices_costs %>% select(Year, hc)
 
@@ -438,12 +438,14 @@ price_sl_cl_hc <- merge(price_sl_cl, hcosts)
 
 imports_exports <- merge(imports_temp, exports_temp)
 
-variablesList <- list(quantities, price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_exports)
+variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_exports)
 
-quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na()
+quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% filter(Year>1994)
 
-# quantities_prices_capK <- merge(merge(merge(merge(quantities, price_sl_cl_hc), capK),dressedWeights_sl_cl),imports_exports) %>% 
-#   drop_na() 
+################################### IMPORTANT ##################################
+####### We have the constructed quantities and shocks from 1998 to 2020 ########
+####### So the prices we use are from 1995 to 2017. ############################
+################################################################################
 
 
 valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
@@ -482,13 +484,13 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:12){
+  for(i in 1:nrow(quantities_prices_capK)){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
-    A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the 
-                                     ## fed cattle production node and cull cow production node with demand shock to get 
-                                     ## the total demand for that particular node. 
+    A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
+    #                                  ## fed cattle production node and cull cow production node with demand shock to get 
+    #                                  ## the total demand for that particular node. 
     sl <- quantities_prices_capK$sl[i]
     cl <- quantities_prices_capK$cl[i]
     
@@ -575,7 +577,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.005  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.005){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.003  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.003){
           break
         }
       
@@ -656,8 +658,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ps_lo <- ps - 0.1
           pc_lo <- pc - 0.1
           
-          ps_up <- ps + 0.2
-          pc_up <- pc + 0.2
+          ps_up <- ps + 0.37750
+          pc_up <- pc + 0.371250
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
