@@ -13,12 +13,13 @@
 
 
 
-pricePS <- unique(round(prices_ps[,12],5)) %>% as.data.frame()
+pricePS <- unique(round(prices_ps[,15],6)) %>% as.data.frame()
 names(pricePS) <- "ps"
+# mean(pricePS$ps)
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
 
-pricePC <- unique(round(prices_pc[,13],3)) %>% as.data.frame()
+pricePC <- unique(round(prices_pc[,20],6)) %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
 

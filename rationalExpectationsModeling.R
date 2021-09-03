@@ -484,7 +484,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:nrow(quantities_prices_capK)){
+  for(i in 15:20){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -508,10 +508,17 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
       # }
 
-      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+      # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+      #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
+      # }
+      # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+      #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
+      # }
+      
+      if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
         ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
       }
-      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+      if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
         pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
       }
     }
@@ -655,10 +662,16 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
+          # ps_lo <- ps - 0.32417
+          # pc_lo <- pc - 0.2
+          # 
+          # ps_up <- ps + 0.23644
+          # pc_up <- pc + 0.192417
+          
           ps_lo <- ps - 0.1
           pc_lo <- pc - 0.1
           
-          ps_up <- ps + 0.37750
+          ps_up <- ps + 0.23644
           pc_up <- pc + 0.371250
           
           #### Here we are making sure the lower bound for the prices isn't negative

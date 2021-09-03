@@ -44,7 +44,10 @@ round(c_fed_itr[[1]][, apply(c_fed_itr[[1]],2,function(x) !all(x==0))][,136],5)
 colMeans(prices_ps)
 
 ####### NEW NOTE: take the unique values by rounding the matrix. This way we are not deflating/overflating the real
-####### prediction
+####### price estimate. 
+
+###### Write the code to get the unique values of the matrix and plot the densities and also the price series. 
+
 
 
 prices_pstemp <- unique(round(prices_ps,5))
@@ -59,7 +62,7 @@ estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL"))
   expand_limits(y = 0.5)
 
 
-prices_pctemp <- unique(round(prices_pc,3))
+prices_pctemp <- unique(round(prices_pc,5)) 
 estPC <- colMeans(prices_pc) %>% as.data.frame()
 names(estPC) <- "cullPrice"
 estPC <- estPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
