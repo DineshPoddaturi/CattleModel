@@ -47,11 +47,15 @@ colMeans(prices_ps)
 ####### price estimate. 
 
 ###### Write the code to get the unique values of the matrix and plot the densities and also the price series. 
+prices_pstemp <- NULL
+estPS <- NULL
+for(i in 1:ncol(prices_ps)){
+  prices_pstemp <- unique(round(prices_ps[,i],5))
+  estPS[i] <- mean(prices_pstemp)
+}
 
-
-
-prices_pstemp <- unique(round(prices_ps,5))
-estPS <- colMeans(prices_pstemp) %>% as.data.frame()
+# prices_pstemp <- unique(round(prices_ps,5))
+estPS <- estPS %>% as.data.frame()
 names(estPS) <- "fedPrice"
 estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
@@ -61,9 +65,14 @@ estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL"))
   scale_x_continuous(name="Year", breaks=c(seq(estObsPS$Year[1],estObsPS$Year[nrow(estObsPS)]))) +
   expand_limits(y = 0.5)
 
-
-prices_pctemp <- unique(round(prices_pc,5)) 
-estPC <- colMeans(prices_pc) %>% as.data.frame()
+prices_pctemp <- NULL
+estPC <- NULL
+for(i in 1:ncol(prices_pc)){
+  prices_pctemp <- unique(round(prices_pc[,i],5))
+  estPC[i] <- mean(prices_pctemp)
+}
+# prices_pctemp <- unique(round(prices_pc,5)) 
+estPC <- estPC %>% as.data.frame()
 names(estPC) <- "cullPrice"
 estPC <- estPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 estObsPC <- merge(estPC, quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(D = (cullPrice - pc))

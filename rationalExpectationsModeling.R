@@ -160,6 +160,8 @@ newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
 #### 1. We incorporated a gaussian shock, 2. The storage approximation comes into play as well.
 #### Maybe I need to fit a model to get some coefficient for the supply of fed cattle three periods ahead.
 
+#### 0.22 comes from the fact that approximately a maximum of 22% of the progeny is added to the breeding stock
+
 newSL <- allStockShocks %>%
   transmute(Year = Year+3, slt = (delta - 0.22 * g) * K * slShock + 
               (1 - 0.22 * g) * g * delta * (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
@@ -453,6 +455,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   prices_ps <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   prices_pc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
+  expected_PS <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  
   k3t1 <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   kjt1 <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
@@ -484,7 +488,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 15:20){
+  for(i in 1:10){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -508,12 +512,12 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
       # }
 
-      # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-      #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
-      # }
-      # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-      #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
-      # }
+      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
+      }
+      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
+      }
       
       if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
         ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
@@ -584,7 +588,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.003  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.003){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002  && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
           break
         }
       
@@ -650,6 +654,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
           
+          expected_PS[j,i] <- ps_expected
+          
           ### Here we get the price for the observed supply and demand of fed and cull cows
           p <- c(ps_new, pc_new)
           
@@ -668,11 +674,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # ps_up <- ps + 0.23644
           # pc_up <- pc + 0.192417
           
-          ps_lo <- ps - 0.1
+          ps_lo <- ps - 0.32417
           pc_lo <- pc - 0.1
           
           ps_up <- ps + 0.23644
-          pc_up <- pc + 0.371250
+          pc_up <- pc + 0.192417
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
