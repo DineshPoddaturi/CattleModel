@@ -488,7 +488,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:15){
+  for(i in 1:20){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -518,7 +518,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
         pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
       }
-      
+
       if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
         ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
       }
@@ -674,11 +674,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # ps_up <- ps + 0.23644
           # pc_up <- pc + 0.192417
           
-          ps_lo <- ps - 0.1
-          pc_lo <- pc - 0.1
+          ps_lo <- ps - 0.35
+          pc_lo <- pc - 0.35
           
-          ps_up <- ps + 0.3
-          pc_up <- pc + 0.25
+          ps_up <- ps + 0.35
+          pc_up <- pc + 0.35
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
