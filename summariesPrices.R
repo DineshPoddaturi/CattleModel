@@ -53,9 +53,9 @@ for(i in 1:ncol(prices_ps)){
   prices_pstemp <- unique(round(prices_ps[,i],5))
   estPS[i] <- mean(prices_pstemp)
 }
-
-# prices_pstemp <- unique(round(prices_ps,5))
-estPS <- estPS %>% as.data.frame()
+prices_pstemp <- unique(round(prices_ps,5))
+estPS <- colMeans(prices_pstemp) %>% as.data.frame()
+# estPS <- estPS %>% as.data.frame()
 names(estPS) <- "fedPrice"
 estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
