@@ -50,7 +50,7 @@ colMeans(prices_ps)
 prices_pstemp <- NULL
 estPS <- NULL
 for(i in 1:ncol(prices_ps)){
-  prices_pstemp <- unique(round(prices_ps[,i],3))
+  prices_pstemp <- unique(round(prices_ps[,i],6))
   estPS[i] <- mean(prices_pstemp)
 }
 # prices_pstemp <- unique(round(prices_ps,5))
@@ -72,6 +72,7 @@ for(i in 1:ncol(prices_pc)){
   estPC[i] <- mean(prices_pctemp)
 }
 # prices_pctemp <- unique(round(prices_pc,5)) 
+# estPC <- colMeans(prices_pc)
 estPC <- estPC %>% as.data.frame()
 names(estPC) <- "cullPrice"
 estPC <- estPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())

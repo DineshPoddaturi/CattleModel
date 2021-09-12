@@ -377,9 +377,13 @@ optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
   
   # Eps3 <- Eps
   
+  ##### Here I am trying to compute the discounted holding costs from the Naive expectations formulation.
+  ##### This could be not the correct way of doing (since I promised rational expectations) but this is the best we can do
   # hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
   # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
   # B <- ps - g * (beta^3) * Eps3 + hc_discounted
+  ####### THE ABOVE IS NOT WORKING. CONVERGING VERY QUICKLY #####
+  
   
   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
@@ -490,7 +494,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:7){
+  for(i in 1:15){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -505,7 +509,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 2){
+    if(i > 3){
 
       # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
       #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
@@ -515,17 +519,17 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       # }
 
       if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
+        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3] ))
       }
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
+        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
       }
 
       if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2]))
+        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
       }
       if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2]))
+        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
       }
     }
     
@@ -545,6 +549,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     importsObs <- quantities_prices_capK$Imports[i]
     exportsObs <- quantities_prices_capK$Exports[i]
     
+    hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
+    hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+    
     # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc
     
     
@@ -562,10 +569,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     c_fed <- solve(fedCattleInterpolationMatrix) %*% ps_new
     
     #### getting the parameters from the optParamFunction
-    params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
-    
-    mu_Tilde <- params_mu_s[1]
-    s_Tilde <- params_mu_s[2]
+    # params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
+    # 
+    # mu_Tilde <- params_mu_s[1]
+    # s_Tilde <- params_mu_s[2]
     
     count <- 0
     
@@ -667,7 +674,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ##### and change his decisions which would change the holding costs per animal. I guess this is true.
           ##### I have to think about this more!!!!! #######################
           
-          # hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
+          # hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
           # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
           
           ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
@@ -677,8 +684,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # expected_PS[j,i] <- ps_expected
           
           ### Here we get the price for the observed supply and demand of fed and cull cows
-          p <- c(ps_new, pc_new)
-          # p <- c(ps_new, pc_new, ps_expected)
+          # p <- c(ps_new, pc_new)
+          p <- c(ps_new, pc_new, ps_expected)
           
           #### I am setting the lower and upper boundaries for fed cattle and cull cows price. 
           #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
@@ -690,18 +697,18 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
           # ps_lo <- ps - 0.32417
-          # pc_lo <- pc - 0.2
+          # pc_lo <- pc - 0.386667
           # 
-          # ps_up <- ps + 0.23644
-          # pc_up <- pc + 0.192417
+          # ps_up <- ps + 0.37750
+          # pc_up <- pc + 0.371250
           
-          ps_lo <- ps  - 0.05
-          pc_lo <- pc  - 0.386667
-          # ps_expected_lo <- ps_expected - 0.1
+          ps_lo <- ps - 0.32417
+          pc_lo <- pc - 0.386667
+          ps_expected_lo <- ps_expected - 0.32417
           
-          ps_up <- ps  + 0.10929
-          pc_up <- pc  + 0.4
-          # ps_expected_up <- ps_expected + 0.3
+          ps_up <- ps + 0.37750
+          pc_up <- pc + 0.371250
+          ps_expected_up <- ps_expected + 0.37750
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -713,11 +720,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           }
           
           
-          lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
-          up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+          # lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
+          # up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
-          # lo <- c(ps_lo, pc_lo, ps_expected_lo)
-          # up <- c(ps_up, pc_up, ps_expected_up)
+          lo <- c(ps_lo, pc_lo, ps_expected_lo)
+          up <- c(ps_up, pc_up, ps_expected_up)
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
                           hc_discounted = hc_discounted, Eps = ps_expected, lower = lo, upper = up)
@@ -754,7 +761,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           prices_ps[j,i] <- ps1
           prices_pc[j,i] <- pc1
-          expected_PS[j,i] <- ps_expected
+          expected_PS[j,i] <- ps_expected1
           
           # if(cfed_tol == 1){
           #   prices_ps[j,i] <- 0
