@@ -160,6 +160,27 @@ Here we know the RHS. compute that first and you basically know the RHS. So use 
 
 * Chad told me to use chebyshev weights to get the expectation of the price. Usually there isn't much difference between hermite and chebyshev weights. Since we are using the chebyshev nodes and chebyshev polynomials using chebyshev weights could be optimal.
 
+09/13/2021:
+
+* Showed him some results and told him how the first 3/4th of the prices are captured and 1/4 are not captured when the interval is small. Also told him if the interval is large we see the opposite phenomena. 
+
+* Chad told me my construction of future production is proper. Since everything depends on the current period or the past period, and shocks. It follows the competitive storage type model framework, so that's good. 
+
+* Also told him if the price of the cull cows are captured properly, the price of the fed cattle is over estimated. However, if the price of the fed cattle is captured properly, the price of the cull cows is underestimated. He said this is strange: Since the constructed production for fed cattle is more than the observed one, we should see the lower prices. I need to look into it again. 
+
+* He told me to squeeze the price window to capture the history very well and see how much of the error for the later years. Now, if we see the model is consistently underestimating with some percentage, we can adjust for it. However, we need to have a rational for it. This can be done by checking the structural breaks, if we find a structural break and if the prices are acting weird after that structural break, we can use that break to introduce the adjustment. 
+
+
+* Also told me about the policy recommendations we can give from the model. If we want a larger supply of beef (quality beef) or more productive breeding stock, a policy that makes the farmers to cull the older cows can work. Since that would decrease the supply of fed cattle this period and increase the supply of cull cows. If we want the other way around i.e., more beef supply now, a policy (like price control on the cull cows) can help with that. 
+
+
+
+
+
+
+
+
+
 
 
 

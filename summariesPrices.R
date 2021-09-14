@@ -9,6 +9,7 @@ summary( lead(quantities_prices_capK$ps)-quantities_prices_capK$ps )
 # -0.27667 -0.02492  0.03296  0.02760  0.05510  0.28000        1 
 
 summary( lead(quantities_prices_capK$ps,3)-quantities_prices_capK$ps )
+# std((lead(quantities_prices_capK$ps,3)-quantities_prices_capK$ps) %>% na.omit())
 #     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.     NA's 
 # -0.32417  0.02262  0.09821  0.10929  0.23644  0.37750        3 
 
