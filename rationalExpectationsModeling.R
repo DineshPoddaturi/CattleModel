@@ -446,7 +446,7 @@ price_sl_cl_hc <- merge(price_sl_cl, hcosts)
 
 imports_exports <- merge(imports_temp, exports_temp)
 
-variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_exports)
+variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_exports, quantities)
 
 quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% filter(Year>1994)
 
@@ -494,7 +494,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:5){
+  for(i in 1:15){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -509,7 +509,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 2){
+    if(i > 3){
       
       # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
       #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
@@ -519,17 +519,17 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       # }
       
       if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2] ))
+        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
       }
       if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2] ))
+        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
       }
       
       if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2] ))
+        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
       }
       if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2] ))
+        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
       }
     }
     
@@ -609,7 +609,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # }
         
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.003 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.003){
           break
         }
       
@@ -706,7 +706,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           pc_lo <- pc - 0.386667
           ps_expected_lo <- ps_expected - 0.1
           
-          ps_up <- ps + 0.23644
+          ps_up <- ps + 0.10929
           pc_up <- pc + 0.192417
           ps_expected_up <- ps_expected + 0.1
           

@@ -139,7 +139,7 @@ fedMeshHermite <- tensor::tensor(demandWeightsHermite, fedWeightsHermite)
 cullMeshHermite <- tensor::tensor(demandWeightsHermite, cullWeightsHermite)
 
 
-
+###### I believe I need to add weights for the corn price as well. Check this again ########
 
 
 
