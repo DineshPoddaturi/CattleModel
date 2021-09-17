@@ -60,32 +60,6 @@ prices_quant <- merge(allPrices, meat_bill)
 # State variables: corn price, demand shock, cull cows production with gaussian shocks, and fed cattle production with gaussian shock.
 ## NOTE: the demand shock is also gaussian.
 
-##### I will generate the demand shocks. For this I need the observed demand and the constructed demand. 
-##### The observed demand is from derived demand from data. 
-##### Constructed demand would be animals slaughtered for consumption.
-
-### Observed derived demand would be the sum of Exports and Domestic Consumption from demandBeef dataframe
-### Constructed demand would be the total animals slaughtered for consumption purposes. I get this from slaughtered data. The dataframe
-### totalDisappeared has the data.
-
-obsDemand <- demandBeef %>% transmute(Year = Year, demandObs = Exports + `Domestic Consumption`)
-rownames(obsDemand) <- 1:nrow(obsDemand)
-estDemand <- totalDisappeared %>% transmute(Year = Year, demandEst = total_meat_bill)
-demandShock <- merge(obsDemand, estDemand) %>% mutate(dShock = demandObs/demandEst)
-
-demandShockGaussian <- demandShock %>% transmute(Year = Year, Shock = 0)
-
-# demandConstructed <- demandShockGaussian %>% transmute(Year = Year + 2, )
-
-## Now i generate gaussian shock which is consistent with historical data.
-## I use the standard deviation of historical data to construct the gaussian random variables. Here the mean is 1
-set.seed(1)
-demandShockG <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
-demandShockGaussian$Shock <- demandShockG
-demandShockGaussian$Year <- as.double(demandShockGaussian$Year)
-
-# ggplot(data = demandShockGaussian, aes(x=Shock)) + geom_density()
-
 #### Here I am constructing the sl and cl quantities that includes shock (which is a gaussian random variable). 
 #### Note: these gaussian shocks has mean one and standard deviation according to the historical shocks (see above for details)
 
@@ -115,6 +89,32 @@ clSupplyShockgaussian <- obsEst_cl_Supply %>% transmute(Year = Year, clShock = 0
 set.seed(4)
 clSupply_Shock <- rnorm(n = nrow(prices_quant), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 clSupplyShockgaussian$clShock <- clSupply_Shock
+
+##### I will generate the demand shocks. For this I need the observed demand and the constructed demand. 
+##### The observed demand is from derived demand from data. 
+##### Constructed demand would be animals slaughtered for consumption.
+
+### Observed derived demand would be the sum of Exports and Domestic Consumption from demandBeef dataframe
+### Constructed demand would be the total animals slaughtered for consumption purposes. I get this from slaughtered data. The dataframe
+### totalDisappeared has the data.
+
+estD <- merge(supp_sl, supp_cl) %>% transmute(Year = Year, demandEst = Bill_meatLb_sl + Bill_meatLb_cl)
+
+# obsDemand <- demandBeef %>% transmute(Year = Year, demandObs = Exports + `Domestic Consumption`)
+# rownames(obsDemand) <- 1:nrow(obsDemand)
+obsDemand <- totalDisappeared %>% transmute(Year = Year, demandObs = total_meat_bill)
+demandShock <- merge(obsDemand, estD) %>% mutate(dShock = demandObs/demandEst)
+
+demandShockGaussian <- demandShock %>% transmute(Year = Year, Shock = 0)
+
+# demandConstructed <- demandShockGaussian %>% transmute(Year = Year + 2, )
+
+## Now i generate gaussian shock which is consistent with historical data.
+## I use the standard deviation of historical data to construct the gaussian random variables. Here the mean is 1
+set.seed(1)
+demandShockG <- rnorm(n = nrow(demandShock), mean = 1, sd = std(demandShock$dShock))
+demandShockGaussian$Shock <- demandShockG
+demandShockGaussian$Year <- as.double(demandShockGaussian$Year)
 
 # ggplot(data = clSupplyShockgaussian, aes(x=clShock)) + geom_density()
 
@@ -437,7 +437,7 @@ cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
 
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
-quantities <-  merge(merge(A_quant,sl_quant), cl_quant) 
+quantities <-  merge(merge(A_quant,sl_quant), cl_quant)
 
 hcosts <- prices_costs %>% select(Year, hc)
 
@@ -460,6 +460,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   prices_ps <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   prices_pc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  prices_hc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
   expected_PS <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
@@ -494,9 +495,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:15){
+  for(i in 1:nrow(quantities_prices_capK)){
     
-    # i <- 1
+    i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
     #                                  ## fed cattle production node and cull cow production node with demand shock to get 
@@ -509,29 +510,31 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 3){
-      
-      # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-      #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
-      # }
-      # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-      #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-      # }
-      
-      if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      }
-      if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
-      }
-      
-      if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      }
-      if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
-      }
-    }
+    # if(i > 3){
+    #   
+    #   # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #   #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+    #   #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #   # }
+    #   
+    #   # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+    #   #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+    #   #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
+    #   # }
+    #   
+    #   if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #     ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], 
+    #                  quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
+    #   }
+    #   if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+    #     pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], 
+    #                  quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
+    #   }
+    # }
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
@@ -575,6 +578,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     # s_Tilde <- params_mu_s[2]
     
     count <- 0
+    sl_count <- 0
+    cl_count <- 0
     
     c_old_cull <- matrix(data = 0, nrow = nrow(cullInterpolationMatrix), ncol = 1)
     c_old_fed <- matrix(data = 0, nrow = nrow(fedCattleInterpolationMatrix), ncol = 1)
@@ -600,24 +605,20 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
         # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
         
-      # if(norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
-        #   cfed_tol <- cfed_tol + 1
-        # }
-        # 
-        # if(norm(x = (c_cull - c_old_cull) , type = "f") < 0.002){
-        #   ccull_tol <- ccull_tol + 1
-        # }
-        
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.003 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.003){
-          break
-        }
-      
-        # if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002){
+        # if(norm(x = (c_cull - c_old_cull), type = "f") < 0.01){
+        #   cl_count <- cl_count + 1
         #   break
         # }
-        
+        # 
+        # if(norm(x = (c_fed - c_old_fed), type = "f") < 0.01){
+        #   sl_count <- sl_count + 1
+        # }
       
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0002 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0002){
+          break
+        }
+        
       
         #### NOTE: For i = 12 the following condition is true in the first iteration. So I change it from 0.01 to 0.001
         # if((slD_obs + clD_obs - sl_itr - cl_itr)^2 < 0.001){
@@ -659,7 +660,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           #### Here we apply the chebyshev node to solve the system of equations
           # sl_node <- fedCattleNode + imports - exports
           sl_node <- fedCattleNode 
-          cl_node <- cullCowNode  
+          cl_node <- cullCowNode
           A_node <- (sl_node + cl_node) * dShockNode
           
           #### getting the parameters from the optParamFunction
@@ -674,8 +675,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ##### and change his decisions which would change the holding costs per animal. I guess this is true.
           ##### I have to think about this more!!!!! #######################
           
-          # hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
-          # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+          hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
+          hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
           
           ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
           
@@ -704,11 +705,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           ps_lo <- ps - 0.32417
           pc_lo <- pc - 0.386667
-          ps_expected_lo <- ps_expected - 0.1
-          
+          ps_expected_lo <- ps_expected + 1
+
           ps_up <- ps + 0.10929
-          pc_up <- pc + 0.192417
-          ps_expected_up <- ps_expected + 0.1
+          pc_up <- pc + 0.5
+          ps_expected_up <- ps_expected + 1
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -720,8 +721,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           }
           
           
-          # lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
-          # up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+           # lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
+           # up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
           lo <- c(ps_lo, pc_lo, ps_expected_lo)
           up <- c(ps_up, pc_up, ps_expected_up)
@@ -762,6 +763,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           prices_ps[j,i] <- ps1
           prices_pc[j,i] <- pc1
           expected_PS[j,i] <- ps_expected1
+          prices_hc[j,i] <- hc_new
           
           # if(cfed_tol == 1){
           #   prices_ps[j,i] <- 0
