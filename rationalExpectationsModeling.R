@@ -373,9 +373,9 @@ optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
   ps <- p[1]
   pc <- p[2]
   
-  Eps3 <- p[3]
+  # Eps3 <- p[3]
   
-  # Eps3 <- Eps
+  Eps3 <- Eps
   
   ##### Here I am trying to compute the discounted holding costs from the Naive expectations formulation.
   ##### This could be not the correct way of doing (since I promised rational expectations) but this is the best we can do
@@ -495,7 +495,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:nrow(quantities_prices_capK)){
+  for(i in 1:2){
     
     i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -615,7 +615,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #   sl_count <- sl_count + 1
         # }
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0002 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0002){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0001 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0001){
           break
         }
         
@@ -685,8 +685,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # expected_PS[j,i] <- ps_expected
           
           ### Here we get the price for the observed supply and demand of fed and cull cows
-          # p <- c(ps_new, pc_new)
-          p <- c(ps_new, pc_new, ps_expected)
+          p <- c(ps_new, pc_new)
+          # p <- c(ps_new, pc_new, ps_expected)
           
           #### I am setting the lower and upper boundaries for fed cattle and cull cows price. 
           #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
@@ -705,11 +705,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           ps_lo <- ps - 0.32417
           pc_lo <- pc - 0.386667
-          ps_expected_lo <- ps_expected + 1
-
-          ps_up <- ps + 0.10929
-          pc_up <- pc + 0.5
-          ps_expected_up <- ps_expected + 1
+          # ps_expected_lo <- ps_expected
+          
+          ps_up <- ps + 0.37750
+          pc_up <- pc + 0.371250
+          # ps_expected_up <- ps_expected 
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
@@ -721,11 +721,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           }
           
           
-           # lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
-           # up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
+           lo <- c(ps_lo, pc_lo) ## Here we set the lower limit for the price
+           up <- c(ps_up, pc_up) # Here we set the upper limit for the price. I am assuming the price per pound of meat won't go larger than a dollar
           
-          lo <- c(ps_lo, pc_lo, ps_expected_lo)
-          up <- c(ps_up, pc_up, ps_expected_up)
+          # lo <- c(ps_lo, pc_lo, ps_expected_lo)
+          # up <- c(ps_up, pc_up, ps_expected_up)
           
           estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
                           hc_discounted = hc_discounted, Eps = ps_expected, lower = lo, upper = up)
@@ -762,7 +762,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           prices_ps[j,i] <- ps1
           prices_pc[j,i] <- pc1
-          expected_PS[j,i] <- ps_expected1
+          expected_PS[j,i] <- ps_expected
           prices_hc[j,i] <- hc_new
           
           # if(cfed_tol == 1){
@@ -810,6 +810,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # 
           # # c_old_cull <- c_cull
           # # c_old_fed <- c_fed
+          
+          # expected_PS[,i]
           
         }
         

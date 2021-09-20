@@ -335,16 +335,30 @@ ps_expected_up <- ps_expected + 0.1
 
 ###################################################
 
+if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0003 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0003){
+  break
+}
+
+sl_node <- fedCattleNode 
+cl_node <- cullCowNode
+A_node <- (sl_node + cl_node) * dShockNode
+
 hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
 hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
 
-ps_lo <- ps - 0.2
-pc_lo <- pc - 0.2
-ps_expected_lo <- ps_expected - 0.1
+ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
 
-ps_up <- ps + 0.23644
-pc_up <- pc + 0.192417
-ps_expected_up <- ps_expected + 0.1
+B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
+
+ps_lo <- ps - 0.32417
+pc_lo <- pc - 0.386667
+ps_expected_lo <- ps_expected + 1
+
+ps_up <- ps + 0.10929
+pc_up <- pc + 0.35
+ps_expected_up <- ps_expected + 1
+
+
 
 
 
