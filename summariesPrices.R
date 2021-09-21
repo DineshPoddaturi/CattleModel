@@ -72,12 +72,12 @@ for(i in 1:ncol(prices_pc)){
   prices_pctemp <- unique(round(prices_pc[,i],5))
   estPC[i] <- mean(prices_pctemp)
 }
-# prices_pctemp <- unique(round(prices_pc,5)) 
-# estPC <- colMeans(prices_pc)
+# prices_pctemp <- unique(round(prices_pc,5))
+# estPC <- colMeans(prices_pctemp)
 estPC <- estPC %>% as.data.frame()
 names(estPC) <- "cullPrice"
 estPC <- estPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
-estObsPC <- merge(estPC, quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(D = (cullPrice - pc))
+estObsPC <- merge(estPC, quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(err = (cullPrice - pc))
 estObsPC %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL")) +
   geom_point(aes(y = cullPrice, color = "PC RATIONAL")) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + theme_classic() + 
