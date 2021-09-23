@@ -498,7 +498,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
  ###### if I use the coefficients to get the price we might see some improvement.
   
-  for(i in 1:10){
+  for(i in 1:nrow(quantities_prices_capK)){
     
     # i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
@@ -537,12 +537,12 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
       #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
       # }
-      
-        ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-                     quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      
+
+        ps <- mean( c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                     quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+
         pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-                     quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
+                     quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
     }
     
     K1t  <- quantities_prices_capK$K[i]
@@ -619,10 +619,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #   sl_count <- sl_count + 1
         # }
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002 ){
-          if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
+          # if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001 ){
             break
-          }
+          # }
         }
       
         count <- count + 1
@@ -664,7 +664,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # sl_node <- fedCattleNode + imports - exports
           sl_node <- fedCattleNode 
           cl_node <- cullCowNode
-          A_node <- (sl_node + cl_node) * dShockNode
+          A_node <- A * dShockNode
           
           #### getting the parameters from the optParamFunction
           params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
@@ -681,8 +681,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ##### and change his decisions which would change the holding costs per animal. I guess this is true.
           ##### I have to think about this more!!!!! #######################
           
-          hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
-          hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+          # hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
+          # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
           
           ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
           
@@ -703,19 +703,19 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
+          ps_lo <- ps - 0.02262
+          pc_lo <- pc - 0.003938
+
+          ps_up <- ps + 0.10929
+          pc_up <- pc + 0.080153
+          
           # ps_lo <- ps - 0.32417
           # pc_lo <- pc - 0.386667
-          # 
-          # ps_up <- ps + 0.37750
-          # pc_up <- pc + 0.371250
-          
-          ps_lo <- ps - 0.27667
-          pc_lo <- pc - 0.18
-          ps_expected_lo <- ps_expected - 0.1
-          
-          ps_up <- ps + 0.15
-          pc_up <- pc + 0.25933
-          ps_expected_up <- ps_expected + 0.1
+          ps_expected_lo <- ps_expected - 0.01
+
+          # ps_up <- ps + 0.10929
+          # pc_up <- pc + 0.25
+          ps_expected_up <- ps_expected + 0.01
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){

@@ -55,7 +55,8 @@ for(i in 1:ncol(prices_ps)){
   estPS[i] <- mean(prices_pstemp)
 }
 # prices_pstemp <- unique(round(prices_ps,5))
-# estPS <- colMeans(prices_pstemp) %>% as.data.frame()
+
+estPS <- colMeans(prices_ps) %>% as.data.frame()
 estPS <- estPS %>% as.data.frame()
 names(estPS) <- "fedPrice"
 estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
@@ -66,6 +67,8 @@ estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL"))
   scale_x_continuous(name="Year", breaks=c(seq(estObsPS$Year[1],estObsPS$Year[nrow(estObsPS)]))) +
   expand_limits(y = 0.5)
 
+
+
 prices_pctemp <- NULL
 estPC <- NULL
 for(i in 1:ncol(prices_pc)){
@@ -73,7 +76,7 @@ for(i in 1:ncol(prices_pc)){
   estPC[i] <- mean(prices_pctemp)
 }
 # prices_pctemp <- unique(round(prices_pc,5))
-# estPC <- colMeans(prices_pctemp)
+estPC <- colMeans(prices_pc) %>% as.data.frame()
 estPC <- estPC %>% as.data.frame()
 names(estPC) <- "cullPrice"
 estPC <- estPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
