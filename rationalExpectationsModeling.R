@@ -203,9 +203,17 @@ newCL <- allStockShocks %>%
 
 cornPrice <- pcorn
 cullCowsProd <- newCL %>% transmute(Year = Year, cullCows = clLbs)
-fedCattleProd <- newSL %>% transmute(Year = Year, fedcattle = slLbs)
+fedCattleProd <- newSL %>% transmute(Year = Year, fedCattle = slLbs)
 
-prod_CornP <- merge(merge(fedCattleProd, cullCowsProd),cornPrice) %>% drop_na()
+adjFactor_R <- adjFactor %>% mutate(Year = Year + 3)
+
+cullCowsProd_adj <- merge(cullCowsProd,adjFactor_R) %>% mutate(cullCows = 
+                                                                 cullCows * AdjFactor) %>% select(Year, cullCows)
+
+fedCattleProd_adj <- merge(fedCattleProd,adjFactor_R) %>% mutate(fedCattle = 
+                                                                   fedCattle * AdjFactor) %>% select(Year, fedCattle)
+
+prod_CornP <- merge(merge(fedCattleProd_adj, cullCowsProd_adj),cornPrice) %>% drop_na()
 
 
 ### Here I am generating the shocks again such that when we merge all the dataframes we have enough data.
@@ -276,14 +284,14 @@ normalizedNodes <- function(d){
 #### For testing purposes I use n = 5 for now. 
 chebNodesN <- 7
 
-stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian1, 
+stateVariablesList <- list(cornPrice, cullCowsProd_adj, fedCattleProd_adj, demandShockGaussian1, 
                            slSupplyShockGaussian1, clSupplyShockgaussian1)
 
 stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na()
 
 cornNodes <- chebyshevNodes(d = stateVars$pcorn, n = chebNodesN)
 cullCowNodes <- chebyshevNodes(d = stateVars$cullCows, n = chebNodesN)
-fedCattleNodes <- chebyshevNodes(d = stateVars$fedcattle, n = chebNodesN)
+fedCattleNodes <- chebyshevNodes(d = stateVars$fedCattle, n = chebNodesN)
 dShockNodes <- chebyshevNodes(d = stateVars$Shock, n = chebNodesN)
 slShockNodes <- chebyshevNodes(d = stateVars$slShock, n = chebNodesN)
 clShockNodes <- chebyshevNodes(d = stateVars$clShock, n = chebNodesN)
@@ -312,7 +320,7 @@ fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes) %>% as.data.frame
 #### The following created chebyshev matrix containing chebyshev polynomials
 cornChebyshevMatrix <- chebyshevMatrix(x = cornNodes, d = stateVars$pcorn, n = chebNodesN)
 cullCowsChebyshevMatrix <- chebyshevMatrix(x = cullCowNodes, d = stateVars$cullCows, n = chebNodesN)
-fedCattleChebyshevMatrix <- chebyshevMatrix(x = fedCattleNodes, d = stateVars$fedcattle, n = chebNodesN)
+fedCattleChebyshevMatrix <- chebyshevMatrix(x = fedCattleNodes, d = stateVars$fedCattle, n = chebNodesN)
 dShockChebyshevMatrix <- chebyshevMatrix(x = dShockNodes, d = stateVars$Shock, n = chebNodesN)
 
 ###### Here I am taking the tensor product to create interpolation matrix of grids. 
@@ -322,7 +330,6 @@ dShockChebyshevMatrix <- chebyshevMatrix(x = dShockNodes, d = stateVars$Shock, n
 
 cullInterpolationMatrix <- kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatrix), dShockChebyshevMatrix)
 fedCattleInterpolationMatrix <- kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
-
 
 #### I also create normalized nodes i.e., all the nodes are in [-1,1]
 cornNormalizedNodes <- normalizedNodes(d = corn_nodes)
@@ -425,8 +432,8 @@ K_1t <- Stock %>% transmute(Year = Year+1, K = K)
 
 capK <- merge(K_1t, K_jt)
 
-sl_quant <- fedCattleProd %>% transmute(Year = Year, sl = fedcattle)
-cl_quant <- cullCowsProd %>% transmute(Year = Year, cl = cullCows)
+sl_quant <- fedCattleProd_adj %>% transmute(Year = Year, sl = fedCattle)
+cl_quant <- cullCowsProd_adj %>% transmute(Year = Year, cl = cullCows)
 
 # sl_quantObs <- supp_sl_adj %>% transmute(Year = Year, slO = Bill_meatLb_sl)
 # cl_quantObs <- supp_cl_adj %>% transmute(Year = Year, clO = Bill_meatLb_cl)
@@ -619,7 +626,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #   sl_count <- sl_count + 1
         # }
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.002 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.002){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0015 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0015){
           # if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001 ){
             break
           # }
@@ -647,7 +654,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           pCorn <- stateVars$pcorn
           TSCull <- stateVars$cullCows
           dShock <- stateVars$Shock
-          TSFed <- stateVars$fedcattle
+          TSFed <- stateVars$fedCattle
           
           corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
           cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
@@ -664,7 +671,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # sl_node <- fedCattleNode + imports - exports
           sl_node <- fedCattleNode 
           cl_node <- cullCowNode
-          A_node <- A * dShockNode
+          A_node <- (sl_node + cl_node) * dShockNode
           
           #### getting the parameters from the optParamFunction
           params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
@@ -706,8 +713,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ps_lo <- ps - 0.02262
           pc_lo <- pc - 0.003938
 
-          ps_up <- ps + 0.10929
-          pc_up <- pc + 0.080153
+          ps_up <- ps + 0.15
+          pc_up <- pc + 0.1
           
           # ps_lo <- ps - 0.32417
           # pc_lo <- pc - 0.386667

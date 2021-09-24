@@ -225,6 +225,10 @@ for(i in 1:nrow(Stock)){
   }
 }
 
+# supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]  + imports$Imports[i] - exports$Exports[i]
+
+
+
 supp_sl <- supp_sl %>% na.omit() %>% as.data.frame() 
 names(supp_sl) <- "Slaughter"
 supp_sl <- supp_sl %>% mutate(Year = seq(from=1981, to = 2017)) %>% select(Year,everything()) %>% filter(Year>=1994)
