@@ -544,12 +544,20 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
       #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
       # }
+      ps_max <- max(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                      quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+      ps_min <- min(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                      quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
 
-        ps <- mean( c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-                     quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+      ps <- mean(c(ps_min, ps_max))
+      
+      pc_max <- max(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+                      quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+      pc_min <- min(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+                      quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
 
-        pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-                     quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+      pc <- mean(c(pc_min,pc_max))
+      
     }
     
     K1t  <- quantities_prices_capK$K[i]

@@ -13,7 +13,7 @@
 
 
 
-pricePS <- unique(round(prices_ps[,14],6)) %>% as.data.frame()
+pricePS <- unique(round(prices_ps[,19],6)) %>% as.data.frame()
 # pricePS <- prices_ps[,19] %>% as.data.frame()
 names(pricePS) <- "ps"
 # mean(pricePS$ps)
