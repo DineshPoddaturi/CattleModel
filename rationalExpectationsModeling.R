@@ -634,10 +634,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #   sl_count <- sl_count + 1
         # }
       
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0015 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0015){
-          # if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001 ){
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.001 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.001){
+          if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001 ){
             break
-          # }
+          }
         }
       
         count <- count + 1
@@ -718,8 +718,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ####        Also remember we can always find a number that satisfies the supply and demand equations. 
           #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          ps_lo <- ps - 0.02262
-          pc_lo <- pc - 0.003938
+          ps_lo <- ps - 0.08
+          pc_lo <- pc - 0.008
 
           ps_up <- ps + 0.15
           pc_up <- pc + 0.1

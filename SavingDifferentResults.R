@@ -445,7 +445,7 @@ pc_up <- pc + 0.25933
 ps_expected_up <- ps_expected + 0.1
 
 # estObsPS
-# Year  fedPrice        ps         err
+#     Year  fedPrice        ps         err
 # 1  2001 0.6286670 0.7496667 -0.12099967
 # 2  2002 0.7841518 0.7012500  0.08290182
 # 3  2003 0.8333032 0.8450000 -0.01169677
@@ -459,7 +459,7 @@ ps_expected_up <- ps_expected + 0.1
 
 
 # estObsPC
-# Year cullPrice        pc         err
+#     Year cullPrice        pc         err
 # 1  2001  0.379415 0.4100000 -0.03058500
 # 2  2002  0.391835 0.3741667  0.01766833
 # 3  2003  0.418835 0.4295833 -0.01074833
@@ -501,7 +501,7 @@ ps_expected_up <- ps_expected
 
 
 # estObsPC
-# Year cullPrice        pc          err
+#     Year cullPrice        pc          err
 # 1  2001 0.3840357 0.4100000 -0.025964286
 # 2  2002 0.3964524 0.3741667  0.022285714
 # 3  2003 0.4234524 0.4295833 -0.006130952
@@ -522,7 +522,7 @@ ps_expected_up <- ps_expected
 
 
 # estObsPS
-# Year  fedPrice        ps          err
+#     Year  fedPrice        ps          err
 # 1  2001 0.7419439 0.7496667 -0.007722805
 # 2  2002 0.7940336 0.7012500  0.092783566
 # 3  2003 0.8715627 0.8450000  0.026562733
@@ -563,7 +563,7 @@ ps_expected_up <- ps_expected
 
 
 # estObsPS
-# Year  fedPrice        ps         err
+#     Year  fedPrice        ps         err
 # 1  2001 0.7359227 0.7496667 -0.01374399
 # 2  2002 0.7896688 0.7012500  0.08841884
 # 3  2003 0.8690283 0.8450000  0.02402827
@@ -584,7 +584,7 @@ ps_expected_up <- ps_expected
 
 
 # estObsPC
-# Year cullPrice        pc           err
+#     Year cullPrice        pc           err
 # 1  2001 0.3626071 0.4100000 -0.0473928571
 # 2  2002 0.3750238 0.3741667  0.0008571429
 # 3  2003 0.4020238 0.4295833 -0.0275595238
@@ -626,7 +626,7 @@ ps_expected_up <- ps_expected + 0.01
 
 
 # estObsPS
-# Year  fedPrice        ps          err
+#     Year  fedPrice        ps          err
 # 1  2001 0.7117008 0.7496667 -0.037965905
 # 2  2002 0.7590982 0.7012500  0.057848168
 # 3  2003 0.8174949 0.8450000 -0.027505089
@@ -646,7 +646,7 @@ ps_expected_up <- ps_expected + 0.01
 # 17 2017 1.4115817 1.2191667  0.192415000
 
 # estObsPC
-# Year cullPrice        pc          err
+#     Year cullPrice        pc          err
 # 1  2001 0.3838640 0.4100000 -0.026136000
 # 2  2002 0.3962807 0.3741667  0.022114000
 # 3  2003 0.4232807 0.4295833 -0.006302667
@@ -686,7 +686,7 @@ ps_expected_lo <- ps_expected - 0.01
 ps_expected_up <- ps_expected + 0.01
 
 # estObsPS
-# Year  fedPrice        ps         err
+#     Year  fedPrice        ps         err
 # 1  2001 0.7379567 0.7496667 -0.01171000
 # 2  2002 0.7755400 0.7012500  0.07429000
 # 3  2003 0.8292900 0.8450000 -0.01571000
@@ -706,7 +706,7 @@ ps_expected_up <- ps_expected + 0.01
 # 17 2017 1.4115817 1.2191667  0.19241500
 
 # estObsPC
-# Year cullPrice        pc          err
+#     Year cullPrice        pc          err
 # 1  2001 0.4199003 0.4100000  0.009900322
 # 2  2002 0.4323124 0.3741667  0.058145776
 # 3  2003 0.4593165 0.4295833  0.029733147
@@ -746,7 +746,7 @@ ps_expected_lo <- ps_expected - 0.01
 ps_expected_up <- ps_expected + 0.01
 
 # estObsPS
-# Year  fedPrice        ps          err
+#     Year  fedPrice        ps          err
 # 1  2001 0.6701374 0.7496667 -0.079529242
 # 2  2002 0.7296530 0.7012500  0.028403033
 # 3  2003 0.7967355 0.8450000 -0.048264470
@@ -766,7 +766,7 @@ ps_expected_up <- ps_expected + 0.01
 # 17 2017 1.3351948 1.2191667  0.116028156
 
 # estObsPC
-# Year cullPrice        pc          err
+#     Year cullPrice        pc          err
 # 1  2001 0.4036405 0.4100000 -0.006359451
 # 2  2002 0.4031452 0.3741667  0.028978571
 # 3  2003 0.4230543 0.4295833 -0.006529026
@@ -813,7 +813,7 @@ for(i in 1:ncol(prices_ps)){
 }
 
 # estObsPS
-# Year  fedPrice        ps         err
+#     Year  fedPrice        ps         err
 # 1  2001 0.7032008 0.7496667 -0.04646592
 # 2  2002 0.7144623 0.7012500  0.01321233
 # 3  2003 0.7922248 0.8450000 -0.05277517
@@ -840,7 +840,7 @@ for(i in 1:ncol(prices_pc)){
 }
 
 # estObsPC
-# Year cullPrice        pc          err
+#     Year cullPrice        pc          err
 # 1  2001 0.3643200 0.4100000 -0.045680000
 # 2  2002 0.3902750 0.3741667  0.016108333
 # 3  2003 0.4307550 0.4295833  0.001171667
@@ -861,7 +861,7 @@ for(i in 1:ncol(prices_pc)){
 
 estPC <- colMeans(prices_pc) %>% as.data.frame()
 # estObsPC
-# Year cullPrice        pc         err
+#     Year cullPrice        pc         err
 # 1  2001 0.3890418 0.4100000 -0.02095820
 # 2  2002 0.3945645 0.3741667  0.02039786
 # 3  2003 0.4192327 0.4295833 -0.01035059
@@ -907,7 +907,7 @@ ps_expected_up <- ps_expected + 0.01
 estPS <- colMeans(prices_ps) %>% as.data.frame()
 
 # estObsPS
-# Year  fedPrice        ps          err
+#     Year  fedPrice        ps          err
 # 1  2001 0.7447767 0.7496667 -0.004889939
 # 2  2002 0.7902866 0.7012500  0.089036559
 # 3  2003 0.8516402 0.8450000  0.006640235
@@ -929,7 +929,7 @@ estPS <- colMeans(prices_ps) %>% as.data.frame()
 estPC <- colMeans(prices_pc) %>% as.data.frame()
 
 # estObsPC
-# Year cullPrice        pc           err
+#     Year cullPrice        pc           err
 # 1  2001 0.3952051 0.4100000 -0.0147948571
 # 2  2002 0.4076218 0.3741667  0.0334551429
 # 3  2003 0.4346218 0.4295833  0.0050384762
@@ -948,8 +948,83 @@ estPC <- colMeans(prices_pc) %>% as.data.frame()
 # 16 2016 0.7823926 0.7489167  0.0334759762
 # 17 2017 0.9156218 0.6955833  0.2200384762
 
+############################################################################################################################
 
 
+ps_max <- max(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+ps_min <- min(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
 
+ps <- mean(c(ps_min, ps_max))
 
+pc_max <- max(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+                quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+pc_min <- min(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+                quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
 
+pc <- mean(c(pc_min,pc_max))
+
+if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0015 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0015){
+  # if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001 ){
+  break
+  # }
+}
+
+ps_lo <- ps - 0.05
+pc_lo <- pc - 0.005
+
+ps_up <- ps + 0.15
+pc_up <- pc + 0.1
+
+# ps_lo <- ps - 0.32417
+# pc_lo <- pc - 0.386667
+ps_expected_lo <- ps_expected - 0.01
+
+# ps_up <- ps + 0.10929
+# pc_up <- pc + 0.25
+ps_expected_up <- ps_expected + 0.01
+
+estPS <- colMeans(prices_ps) %>% as.data.frame()
+
+# estObsPS
+#     Year  fedPrice        ps          err
+# 1  2001 0.7400879 0.7496667 -0.009578732
+# 2  2002 0.7871829 0.7012500  0.085932870
+# 3  2003 0.8500003 0.8450000  0.005000328
+# 4  2004 0.8166595 0.8968333 -0.080173866
+# 5  2005 0.8383154 0.9408333 -0.102517978
+# 6  2006 0.9077565 0.9204167 -0.012660171
+# 7  2007 0.9377500 0.9538333 -0.016083365
+# 8  2008 0.9601052 0.9446667  0.015438538
+# 9  2009 1.0311866 0.8533333  0.177853284
+# 10 2010 1.0653374 0.9723333  0.093004017
+# 11 2011 1.0774071 1.1716667 -0.094259550
+# 12 2012 1.0421300 1.2308333 -0.188703304
+# 13 2013 1.0528766 1.2633333 -0.210456750
+# 14 2014 1.1574341 1.5433333 -0.385899197
+# 15 2015 1.1885490 1.4933333 -0.304784375
+# 16 2016 1.2658173 1.2166667  0.049150619
+# 17 2017 1.5075000 1.2191667  0.288333333
+
+estPC <- colMeans(prices_pc) %>% as.data.frame()
+
+# estObsPC
+#     Year cullPrice        pc           err
+# 1  2001 0.3947500 0.4100000 -0.0152500000
+# 2  2002 0.4071667 0.3741667  0.0330000000
+# 3  2003 0.4341667 0.4295833  0.0045833333
+# 4  2004 0.4298750 0.5055000 -0.0756250000
+# 5  2005 0.4360833 0.5205833 -0.0845000000
+# 6  2006 0.4568750 0.4674167 -0.0105416667
+# 7  2007 0.4948333 0.4811667  0.0136666667
+# 8  2008 0.5023750 0.5080000 -0.0056250000
+# 9  2009 0.5300833 0.4485000  0.0815833333
+# 10 2010 0.5490000 0.5493333 -0.0003333333
+# 11 2011 0.5490000 0.7157500 -0.1667500000
+# 12 2012 0.5332500 0.8197500 -0.2865000000
+# 13 2013 0.5539167 0.8229167 -0.2690000000
+# 14 2014 0.6371250 1.0822500 -0.4451250000
+# 15 2015 0.6891250 1.0410833 -0.3519583333
+# 16 2016 0.7411250 0.7489167 -0.0077916667
+# 17 2017 0.9540000 0.6955833  0.2584166667
