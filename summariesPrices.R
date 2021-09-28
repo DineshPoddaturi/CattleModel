@@ -88,28 +88,33 @@ estObsPC %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL")
   expand_limits(y = 0)
 
 
-allPrices <- Reduce(function(...) merge(...), list(pcs,pss,estPC,estPS))
-
-allPrices %>% transmute(Year, ps, fedPrice, fedDiff = ps - fedPrice, pc, cullPrice, cullDiff = pc - cullPrice)
-
-
-estSL <- colMeans(slNew) %>% as.data.frame()
-names(estSL) <- "SL"
-estSL <- estSL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
-
-estObsSL <- merge(estSL, quantities_prices_capK) %>% select(Year, SL, sl) %>% mutate(D = (SL - sl))
-
-
-estObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=SL, color="SL RATIONAL")) +
-  geom_point(aes(y = SL, color = "SL RATIONAL")) + geom_line(aes(y=sl, color = "SL OBS")) + 
-  geom_point(aes(y=sl, color = "SL OBS")) + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(estObsSL$Year[1],estObsSL$Year[nrow(estObsSL)]))) 
-
-
+# allPrices <- Reduce(function(...) merge(...), list(pcs,pss,estPC,estPS))
+# 
+# allPrices %>% transmute(Year, ps, fedPrice, fedDiff = ps - fedPrice, pc, cullPrice, cullDiff = pc - cullPrice)
+# 
+# 
+# estSL <- colMeans(slNew) %>% as.data.frame()
+# names(estSL) <- "SL"
+# estSL <- estSL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+# 
+# estObsSL <- merge(estSL, quantities_prices_capK) %>% select(Year, SL, sl) %>% mutate(D = (SL - sl))
+# 
+# 
+# estObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=SL, color="SL RATIONAL")) +
+#   geom_point(aes(y = SL, color = "SL RATIONAL")) + geom_line(aes(y=sl, color = "SL OBS")) + 
+#   geom_point(aes(y=sl, color = "SL OBS")) + theme_classic() + 
+#   scale_x_continuous(name="Year", breaks=c(seq(estObsSL$Year[1],estObsSL$Year[nrow(estObsSL)]))) 
 
 
+mutildes_agg <- colMeans(mu_Tildes) %>% as.data.frame()
+names(mutildes_agg) <- "muTilde"
+mutildes_agg <- mutildes_agg %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 
+stildes_agg <- colMeans(s_Tildes) %>% as.data.frame()
+names(stildes_agg) <- "sTilde"
+stildes_agg <- stildes_agg %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 
+params <- merge(mutildes_agg, stildes_agg)
 
 # Stock_temp <- Stock %>% filter(Year>=1994 & Year<=2017)
 # imports_temp <- imports %>% filter(Year>=1994 & Year<=2017)
