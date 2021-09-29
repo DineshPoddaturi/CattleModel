@@ -19,7 +19,7 @@ names(pricePS) <- "ps"
 # mean(pricePS$ps)
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
-pricePC <- unique(round(prices_pc[,20],6)) %>% as.data.frame()
+pricePC <- unique(round(prices_pc[,2],6)) %>% as.data.frame()
 # pricePC <-  prices_pc[,14]  %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()

@@ -392,9 +392,9 @@ optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
   ####### THE ABOVE IS NOT WORKING. CONVERGING VERY QUICKLY #####
   
   
-  F1 <- sl - A * ((exp((muTilde - ((ps/phi) - (pc/phi)))/sTilde))/(1 + (exp((muTilde - ((ps/phi) - (pc/phi)))/sTilde))))
+  F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
 
-  F2 <- cl  - A * (1/(1+ exp((muTilde - ((ps/phi) - (pc/phi)))/sTilde)))
+  F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
 
   F3 <- B - ps - g * (beta^3) * Eps3 + hc_discounted
 
@@ -544,25 +544,25 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
       #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
       #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
       # }
-      # ps_max <- max(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-      #                 quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
-      # ps_min <- min(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-      #                 quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
-      # 
-      # ps <- mean(c(ps_min, ps_max))
-      # 
-      # pc_max <- max(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-      #                 quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
-      # pc_min <- min(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-      #                 quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
-      # 
-      # pc <- mean(c(pc_min,pc_max))
+      ps_max <- max(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                      quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+      ps_min <- min(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+                      quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+
+      ps <- mean(c(ps_min, ps_max))
+
+      pc_max <- max(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+                      quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+      pc_min <- min(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+                      quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+
+      pc <- mean(c(pc_min,pc_max))
       
-      ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-                     quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      
-      pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-                     quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
+      # ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+      #                quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
+      # 
+      # pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+      #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
       
     }
     
@@ -696,6 +696,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           mu_Tildes[j,i] <- mu_Tilde
           s_Tildes[j,i] <- s_Tilde
           
+          if(quantities_prices_capK$Year[i]>2008){
+            mu_Tilde <- muTilde
+            s_Tilde <- sTilde
+          }
+          
           ##### Instead of using the holding costs from the naive expectations modeling. I am changing it for every 
           ##### iteration. The rational behind it is: if the price of fed cattle and cull cow changes the holding costs
           ##### will change. The intuition behind this is: Assuming the price changes, the producer would react to it 
@@ -738,11 +743,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # # pc_up <- pc + 0.25
           # ps_expected_up <- ps_expected + 0.01
           
-          ps_lo <- ps - 0.08
-          pc_lo <- pc - 0.008
+          ps_lo <- ps - 0.02262
+          pc_lo <- pc - 0.003938
           
           ps_up <- ps + 0.15
-          pc_up <- pc + 0.18
+          pc_up <- pc + 0.1
           
           ps_expected_lo <- ps_expected - 0.01
           
