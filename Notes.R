@@ -13,16 +13,19 @@
 
 
 
-pricePS <- unique(round(prices_ps[,20],6)) %>% as.data.frame()
+pricePS <- (prices_ps[,17]) %>% as.data.frame()
 # pricePS <- prices_ps[,19] %>% as.data.frame()
 names(pricePS) <- "ps"
 # mean(pricePS$ps)
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
-pricePC <- unique(round(prices_pc[,2],6)) %>% as.data.frame()
+pricePC <- (prices_pc[,5]) %>% as.data.frame()
 # pricePC <-  prices_pc[,14]  %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
+
+
+
 
 mus <- unique(round(mu_Tildes[,1],3)) %>% as.data.frame()
 # pricePC <-  prices_pc[,6]  %>% as.data.frame()
@@ -134,6 +137,14 @@ t2 <- merge(supp_sl, newSL) %>% drop_na() %>% select(Year, Bill_meatLb_sl, slLbs
 
 fedPrice[[1]][, colSums(fedPrice[[1]])>0]
 
-
+# > unique(prices_ps[,i])
+# [1] 0.7379567 0.7142168 0.6300972 0.6639156 0.7205325
+# [6] 0.5390882 0.5771188 0.6414193 0.7139366 0.4591490
+# [11] 0.5002140 0.5703706 0.6503316 0.7219891 0.4664915
+# [16] 0.5001449 0.5562798 0.6181415 0.6717940 0.7097126
+# [21] 0.7290474
+# > unique(prices_pc[,i])
+# [1] 0.4199030 0.3864626 0.3397500 0.3665170 0.3646915
+# [6] 0.3757974 0.3974028 0.3670210
 
 

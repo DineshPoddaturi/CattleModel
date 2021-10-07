@@ -51,23 +51,22 @@ colMeans(prices_ps)
 prices_pstemp <- NULL
 estPS <- NULL
 for(i in 1:ncol(prices_ps)){
-  prices_pstemp <- unique(round(prices_ps[,i],6))
+  prices_pstemp <- unique((prices_ps[,i]))
   estPS[i] <- mean(prices_pstemp)
 }
 # prices_pstemp <- unique(round(prices_ps,5))
-
 estPS <- colMeans(prices_ps) %>% as.data.frame()
+# estPS <- apply(prices_ps,2,max) %>% as.data.frame()
 estPS <- estPS %>% as.data.frame()
 names(estPS) <- "fedPrice"
 estPS <- estPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+# estObsPS <- left_join(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps)
 estObsPS <- merge(estPS, quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
 estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL")) +
   geom_point(aes(y = fedPrice, color = "PS RATIONAL")) + geom_line(aes(y=ps, color = "PS OBS")) + 
   geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(estObsPS$Year[1],estObsPS$Year[nrow(estObsPS)]))) +
   expand_limits(y = 0.5)
-
-
 
 prices_pctemp <- NULL
 estPC <- NULL

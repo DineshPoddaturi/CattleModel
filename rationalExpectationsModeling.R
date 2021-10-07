@@ -282,16 +282,17 @@ normalizedNodes <- function(d){
 }
 
 #### For testing purposes I use n = 5 for now. 
-chebNodesN <- 7
-
+chebNodesN <- 5
+stateVarDemand <- merge(fedCattleProd_adj, cullCowsProd_adj) %>% transmute(Year = Year, demand = fedCattle + cullCows)
 stateVariablesList <- list(cornPrice, cullCowsProd_adj, fedCattleProd_adj, demandShockGaussian1, 
-                           slSupplyShockGaussian1, clSupplyShockgaussian1)
+                           slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
 
 stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na()
 
 cornNodes <- chebyshevNodes(d = stateVars$pcorn, n = chebNodesN)
 cullCowNodes <- chebyshevNodes(d = stateVars$cullCows, n = chebNodesN)
 fedCattleNodes <- chebyshevNodes(d = stateVars$fedCattle, n = chebNodesN)
+demandNodes <- chebyshevNodes(d = stateVars$demand, n = chebNodesN)
 dShockNodes <- chebyshevNodes(d = stateVars$Shock, n = chebNodesN)
 slShockNodes <- chebyshevNodes(d = stateVars$slShock, n = chebNodesN)
 clShockNodes <- chebyshevNodes(d = stateVars$clShock, n = chebNodesN)
@@ -299,6 +300,7 @@ clShockNodes <- chebyshevNodes(d = stateVars$clShock, n = chebNodesN)
 corn_nodes <- cornNodes %>% as.data.frame()
 cull_nodes <- cullCowNodes %>% as.data.frame()
 fed_nodes <- fedCattleNodes  %>% as.data.frame()
+d_nodes <- demandNodes %>% as.data.frame()
 dshock_nodes <- dShockNodes %>% as.data.frame()
 slShock_nodes <- slShockNodes %>% as.data.frame()
 clShock_nodes <- clShockNodes %>% as.data.frame()
@@ -306,13 +308,14 @@ clShock_nodes <- clShockNodes %>% as.data.frame()
 names(corn_nodes) <- "cornNodes"
 names(cull_nodes) <- "cullNodes"
 names(fed_nodes) <- "fedNodes"
+names(d_nodes) <- "demandNodes"
 names(dshock_nodes) <- "dShockNodes"
 names(slShock_nodes) <- "slShockNodes"
 names(clShock_nodes) <- "clShockNodes"
 
 ##### Cartesian product of the nodes
-cull_cartesian <- crossing(corn_nodes, cull_nodes, dshock_nodes) %>% as.data.frame()
-fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes) %>% as.data.frame()
+cull_cartesian <- crossing(corn_nodes, cull_nodes,dshock_nodes) %>% as.data.frame()
+fed_cartesian <- crossing(corn_nodes, fed_nodes,dshock_nodes) %>% as.data.frame()
 
 # cull_cartesian <- crossing(corn_nodes, cull_nodes, dshock_nodes, clShock_nodes) %>% as.data.frame()
 # fed_cartesian <- crossing(corn_nodes, fed_nodes, dshock_nodes, slShock_nodes) %>% as.data.frame()
@@ -322,14 +325,15 @@ cornChebyshevMatrix <- chebyshevMatrix(x = cornNodes, d = stateVars$pcorn, n = c
 cullCowsChebyshevMatrix <- chebyshevMatrix(x = cullCowNodes, d = stateVars$cullCows, n = chebNodesN)
 fedCattleChebyshevMatrix <- chebyshevMatrix(x = fedCattleNodes, d = stateVars$fedCattle, n = chebNodesN)
 dShockChebyshevMatrix <- chebyshevMatrix(x = dShockNodes, d = stateVars$Shock, n = chebNodesN)
+demandChebyshevMatrix <- chebyshevMatrix(x = demandNodes, d = stateVars$demand, n = chebNodesN)
 
 ###### Here I am taking the tensor product to create interpolation matrix of grids. 
 ###### kron takes the kronecker tensor product of two matrices
 ##### For cull cows we use corn, cull cows production, and demand shock chebyshev matrices
 ##### For fed cattle we use corn, fed cattle production, and demand shock chebyshev matrices
 
-cullInterpolationMatrix <- kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatrix), dShockChebyshevMatrix)
-fedCattleInterpolationMatrix <- kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
+cullInterpolationMatrix <-  kron(kron(cornChebyshevMatrix, cullCowsChebyshevMatrix), dShockChebyshevMatrix)
+fedCattleInterpolationMatrix <-  kron(kron(cornChebyshevMatrix, fedCattleChebyshevMatrix), dShockChebyshevMatrix)
 
 #### I also create normalized nodes i.e., all the nodes are in [-1,1]
 cornNormalizedNodes <- normalizedNodes(d = corn_nodes)
@@ -435,7 +439,18 @@ capK <- merge(K_1t, K_jt)
 sl_quant <- fedCattleProd_adj %>% transmute(Year = Year, sl = fedCattle)
 cl_quant <- cullCowsProd_adj %>% transmute(Year = Year, cl = cullCows)
 
+# dShocks <- stateVars %>% select(Year, Shock)
+
 # sl_quantObs <- supp_sl_adj %>% transmute(Year = Year, slO = Bill_meatLb_sl)
+# 
+# 
+# NetIMPORTS <- quantities_prices_capK %>% transmute(Year = Year, NET = (Imports - Exports) * Slaughter_avg/ 1000000000)
+# 
+# merge(sl_quant, sl_quantObs) %>% na.omit() %>% ggplot(aes(x=Year))+ geom_line(aes(y=sl,color="sl CSM")) + geom_point(aes(y=sl,color="sl CSM")) +
+#   geom_line(aes(y=slO, color="sl OBS")) + geom_point(aes(y=slO, color="sl OBS")) +
+#   labs(x="Year", y="Meat (in billion pounds)", colour = "") + theme_classic() 
+
+
 # cl_quantObs <- supp_cl_adj %>% transmute(Year = Year, clO = Bill_meatLb_cl)
 
 
@@ -443,6 +458,8 @@ cl_quant <- cullCowsProd_adj %>% transmute(Year = Year, cl = cullCows)
 # clQuantitiesMerge <- merge(cl_quant_adj, cl_quantObs) %>% na.omit() %>% mutate(diff = clO-cl)
 
 A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
+
+# A_quant <- merge(A_quant, dShocks) %>% mutate(A = A * lag(Shock)) %>% select(Year, A)
 
 quantities <-  merge(merge(A_quant,sl_quant), cl_quant)
 
@@ -456,6 +473,10 @@ imports_exports <- merge(imports_temp, exports_temp)
 variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_exports, quantities)
 
 quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% filter(Year>1994)
+
+
+
+
 
 ################################### IMPORTANT ##################################
 ####### We have the constructed quantities and shocks from 1998 to 2020 ########
@@ -473,6 +494,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   mu_Tildes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   s_Tildes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  
+  Anodes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  
+  mu_Tildes_Prior <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  s_Tildes_Prior <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
   k3t1 <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   kjt1 <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
@@ -499,6 +525,10 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   c_cull_itr <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(cull_cartesian), ncol=maxIter)
   c_fed_itr <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(fed_cartesian), ncol=maxIter)
   
+  
+   
+  
+  
  ###### THINK ABOUT THE INDEXING PROPERLY. ARE YOU PREDICTING THE NEXT YEAR OR JUST USING THE SAME YEARS DATA TO 
  ###### ESTIMATE THE SAME NUMBERS? WE SHOULD BE ESTIMATING THE NEXT YEARS PRICES AND QUANTITIES.
  ###### When I assume the prices and quantities are for the subsequent year and compare them with naive and observed
@@ -520,51 +550,80 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     pc <-   quantities_prices_capK$pc[i]
     hc <- quantities_prices_capK$hc[i]
     
-    if(i > 3){
+    params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
 
-      # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-      #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
-      # }
-      # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-      #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
-      # }
-
-      # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
-      #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      # }
-      # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
-      #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
-      # }
-
-      # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
-      #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-      #                quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      # }
-      # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
-      #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-      #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
-      # }
-      ps_max <- max(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-                      quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
-      ps_min <- min(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-                      quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
-
-      ps <- mean(c(ps_min, ps_max))
-
-      pc_max <- max(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-                      quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
-      pc_min <- min(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-                      quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
-
-      pc <- mean(c(pc_min,pc_max))
-      
-      # ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
-      #                quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
-      # 
-      # pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
-      #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
-      
-    }
+    mu_Tilde <- params_mu_s[1]
+    s_Tilde <- params_mu_s[2]
+    mu_Tildes_Prior[,i] <- mu_Tilde
+    s_Tildes_Prior[,i] <- s_Tilde
+    
+    
+    # mu_Tildes[j,i] <- mu_Tilde
+    # s_Tildes[j,i] <- s_Tilde
+    
+    # if(i > 1){
+    # 
+    #   # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #   #   ps <- (quantities_prices_capK$ps[i] + quantities_prices_capK$ps[i-1] + quantities_prices_capK$ps[i-2])/3
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+    #   #   pc <- (quantities_prices_capK$pc[i] + quantities_prices_capK$pc[i-1] + quantities_prices_capK$pc[i-2])/3
+    #   # }
+    # 
+    #   # if(quantities_prices_capK$ps[i] < quantities_prices_capK$ps[i-1]){
+    #   #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1], quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] < quantities_prices_capK$pc[i-1]){
+    #   #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1], quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
+    #   # }
+    # 
+    #   # if(quantities_prices_capK$ps[i] > quantities_prices_capK$ps[i-1]){
+    #   #   ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+    #   #                quantities_prices_capK$ps[i-2],quantities_prices_capK$ps[i-3]))
+    #   # }
+    #   # if(quantities_prices_capK$pc[i] > quantities_prices_capK$pc[i-1]){
+    #   #   pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+    #   #                quantities_prices_capK$pc[i-2],quantities_prices_capK$pc[i-3]))
+    #   # }
+    #   # ps_max <- max(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+    #   #                 quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+    #   # ps_min <- min(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+    #   #                 quantities_prices_capK$ps[i-2], quantities_prices_capK$ps[i-3]))
+    #   #
+    #   # ps <- mean(c(ps_min, ps_max))
+    #   #
+    #   # pc_max <- max(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+    #   #                 quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+    #   # pc_min <- min(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+    #   #                 quantities_prices_capK$pc[i-2], quantities_prices_capK$pc[i-3]))
+    #   #
+    #   # pc <- mean(c(pc_min,pc_max))
+    #   # i <- 4
+    # 
+    #   # psMAX <- max(c(quantities_prices_capK$ps[1:i]))
+    #   #
+    #   # pcMAX <- max(c(quantities_prices_capK$pc[1:i]))
+    #   #
+    #   # psMIN <- min(c(quantities_prices_capK$ps[1:i]))
+    #   #
+    #   # pcMIN <- min(c(quantities_prices_capK$pc[1:i]))
+    #   #
+    #   # ps <- mean(c(psMAX, psMIN))
+    #   #
+    #   # pc <- mean(c(pcMAX, pcMIN))
+    # 
+    #   ps <- max(c(quantities_prices_capK$ps[1:i]))
+    # 
+    #   pc <- max(c(quantities_prices_capK$pc[1:i]))
+    # 
+    # 
+    #   # ps <- mean(c(quantities_prices_capK$ps[i], quantities_prices_capK$ps[i-1],
+    #   #                quantities_prices_capK$ps[i-2]))
+    #   #
+    #   # pc <- mean(c(quantities_prices_capK$pc[i], quantities_prices_capK$pc[i-1],
+    #   #                quantities_prices_capK$pc[i-2]))
+    # 
+    # }
     
     K1t  <- quantities_prices_capK$K[i]
     k9 <- quantities_prices_capK$k9[i]
@@ -573,7 +632,6 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     slDressed <- quantities_prices_capK$Slaughter_avg[i]
     clDressed <- quantities_prices_capK$Cull_avg[i]
-    
     
     #### For imports and exports I will take the mean/median of the past data.
     # importsObs <- median(quantities_prices_capK$Imports[1:i])
@@ -639,12 +697,14 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         # if(norm(x = (c_fed - c_old_fed), type = "f") < 0.01){
         #   sl_count <- sl_count + 1
         # }
-      
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.0001 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.0001){
-          if( (ps_m - ps_old)^2 < 0.0001 && (pc_m - pc_old)^2 < 0.0001 ){
-            break
+        
+        # k <- 11
+        
+        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.07 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.07){
+          if( (ps_m - ps_old)^2 < 0.004 && (pc_m - pc_old)^2 < 0.004){
+              break
           }
-        }
+         }
       
         count <- count + 1
         
@@ -660,6 +720,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # j <- 1
           #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
           #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
+          # aNode <- fed_cartesian$demandNodes[j]
           cornNode <- cull_cartesian$cornNodes[j]
           cullCowNode <- cull_cartesian$cullNodes[j]
           dShockNode <- cull_cartesian$dShockNodes[j]
@@ -669,37 +730,42 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           TSCull <- stateVars$cullCows
           dShock <- stateVars$Shock
           TSFed <- stateVars$fedCattle
+          # d <- stateVars$demand
           
           corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
           cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
           dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
           fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
-          
-          cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
-          fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
-          
-          pc_new <- cull_InterpolationMatrix %*% c_old_cull
-          ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+          # demand_ChebyshevMatrix <- chebyshevMatrix(x = aNode, d = TSFed, n = chebNodesN)
+
+          # cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
+          # fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
+          # 
+          # pc_new <- cull_InterpolationMatrix %*% c_old_cull
+          # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
           
           #### Here we apply the chebyshev node to solve the system of equations
           # sl_node <- fedCattleNode + imports - exports
           sl_node <- fedCattleNode 
           cl_node <- cullCowNode
-          A_node <- (sl_node + cl_node) * dShockNode
+          A_node <- (A) * (dShockNode^3)
+          
+          
+          Anodes[j,i] <- A_node
           
           #### getting the parameters from the optParamFunction
           params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
 
-          mu_Tilde <- params_mu_s[1]
-          s_Tilde <- params_mu_s[2]
+          mu_Tilde1 <- params_mu_s[1]
+          s_Tilde1 <- params_mu_s[2]
           
-          mu_Tildes[j,i] <- mu_Tilde
-          s_Tildes[j,i] <- s_Tilde
+          mu_Tildes[j,i] <- mu_Tilde1
+          s_Tildes[j,i] <- s_Tilde1
           
-          if(quantities_prices_capK$Year[i]>2008){
-            mu_Tilde <- muTilde
-            s_Tilde <- sTilde
-          }
+          # if(quantities_prices_capK$Year[i]>2008){
+          #   mu_Tilde <- muTilde
+          #   s_Tilde <- sTilde
+          # }
           
           ##### Instead of using the holding costs from the naive expectations modeling. I am changing it for every 
           ##### iteration. The rational behind it is: if the price of fed cattle and cull cow changes the holding costs
@@ -707,18 +773,18 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           ##### and change his decisions which would change the holding costs per animal. I guess this is true.
           ##### I have to think about this more!!!!! #######################
           
-          # hc_new <- (((g * (beta^3) * ps_new) + (beta - 1) * pc_new)/(1 + g * beta * (gamma0 + beta * gamma1)))
-          # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+          hc_new <- (((g * (beta^3) * ps_old) + (beta - 1) * pc_old)/(1 + g * beta * (gamma0 + beta * gamma1)))
+          hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
           
-          ps_expected <- sum(as.numeric(ps_new) * fedMeshCheb)
+          ps_expected <- sum(as.numeric(ps_old) * fedMeshCheb)
           
-          B <- ps_new - g * (beta^3) * ps_expected + hc_discounted
+          B <- ps_old - g * (beta^3) * ps_expected + hc_discounted
           
           # expected_PS[j,i] <- ps_expected
           
           ### Here we get the price for the observed supply and demand of fed and cull cows
           # p <- c(ps_new, pc_new)
-          p <- c(ps_new, pc_new, ps_expected)
+          p <- c(ps_old, pc_old, ps_expected)
           
           #### I am setting the lower and upper boundaries for fed cattle and cull cows price. 
           #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
@@ -743,25 +809,38 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # # pc_up <- pc + 0.25
           # ps_expected_up <- ps_expected + 0.01
           
-          ps_lo <- ps - 0.02262
-          pc_lo <- pc - 0.003938
+          if(ps_old<ps){
+            ps_o <- ps
+          }else{
+            ps_o <- ps_old
+          }
           
-          ps_up <- ps + 0.15
-          pc_up <- pc + 0.1
+          if(pc_old<pc){
+            pc_o <- pc
+          }else{
+            pc_o <- pc_old
+          }
           
-          ps_expected_lo <- ps_expected - 0.01
+          
+          ps_lo <- ps_o  - 0.35
+          pc_lo <- pc_o - 0.4
+          
+          ps_up <- ps_o + 0.10929
+          pc_up <- pc_o  + 0.080153
+          
+          ps_expected_lo <- ps_expected - 0.1
           
           # ps_up <- ps + 0.10929
           # pc_up <- pc + 0.25
-          ps_expected_up <- ps_expected + 0.01
+          ps_expected_up <- ps_expected + 0.1
           
           #### Here we are making sure the lower bound for the prices isn't negative
           if(ps_lo < 0){
-             ps_lo <- ps
+             ps_lo <- ps_o
           }
 
           if(pc_lo < 0){
-            pc_lo <- pc
+            pc_lo <- pc_o
           }
           
           

@@ -174,6 +174,21 @@ Here we know the RHS. compute that first and you basically know the RHS. So use 
 * Also told me about the policy recommendations we can give from the model. If we want a larger supply of beef (quality beef) or more productive breeding stock, a policy that makes the farmers to cull the older cows can work. Since that would decrease the supply of fed cattle this period and increase the supply of cull cows. If we want the other way around i.e., more beef supply now, a policy (like price control on the cull cows) can help with that. 
 
 
+10/07/2021:
+
+* Showed him the things and also talked about how the supply and demand are not matching up. 
+
+* Chads suggestions: 
+    ** See the difference between the supply and demand. By looking at the difference we make the adjustments for the price. 
+    ** Also see the historical difference between the supply and demand. Use that variation to build in the model. Remember, supply and demand don't exactly matches up. There's always some difference. This is how things work. 
+    
+    ** Look at the supply and demand relationship. 
+          *** if the difference S-D>0 then price should go down.
+          *** if the difference S-D<0 then price should go up.
+              **** Within each condition we should also check the difference of fed cattle and cull cows. 
+                  * Sf-Df>0 then Pf go down;Sc-Dc>0 then Pc go down.
+                  * Sf-Df<0 then Pf go up;Sc-Dc<0 then Pc go up.
+
 
 
 
