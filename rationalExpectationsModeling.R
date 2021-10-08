@@ -495,7 +495,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   mu_Tildes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   s_Tildes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
-  Anodes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  A_nodes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  slNodes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  clNodes <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  
+  D_slPsPc <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  D_clPsPc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  
+  D_PsPc <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
+  S_psPC <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   
   mu_Tildes_Prior <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   s_Tildes_Prior <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
@@ -537,7 +545,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   for(i in 1:nrow(quantities_prices_capK)){
     
-    # i <- 1
+    i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
     #                                  ## fed cattle production node and cull cow production node with demand shock to get 
@@ -698,7 +706,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
         #   sl_count <- sl_count + 1
         # }
         
-        # k <- 11
+        k <- 1
         
         if(norm(x = (c_cull - c_old_cull), type = "f") < 0.07 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.07){
           if( (ps_m - ps_old)^2 < 0.004 && (pc_m - pc_old)^2 < 0.004){
@@ -752,6 +760,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           
           
           Anodes[j,i] <- A_node
+          slNodes[j,i] <- sl_node
+          clNodes[j,i] <- cl_node
           
           #### getting the parameters from the optParamFunction
           params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
@@ -937,6 +947,31 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
           # expected_PS[,i]
           
         }
+        
+        
+        D_slPsPc[,i] <- Anodes[,i] * 
+          ((exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))/
+             (1 + (exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))))
+        
+        D_clPsPc[,i] <- Anodes[,i] * (1/(1+ exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde)))
+        
+        D_PsPc <- as.matrix(D_slPsPc[,i] + D_clPsPc[,i])
+        
+        S_psPC <- as.matrix(slNodes[,i] + clNodes[,i])
+        
+        TS_TD_diff <- norm(x = (S_psPC- D_PsPc) , type = "f")
+        
+        TS_D_sl_diff <- norm(x = as.matrix(slNodes[,i] - D_slPsPc[,i]) , type = "f")
+        TS_D_cl_diff <- norm(x =  as.matrix(clNodes[,i] - D_clPsPc[,i]) , type = "f")
+        
+        cat("\n norm of supply and demand: ", S_D_diff)
+        
+        cat("\n norm of fed supply and demand: ", TS_D_sl_diff)
+        
+        cat("\n norm of cull supply and demand: ", TS_D_cl_diff)
+        
+        
+        
         
         c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
         c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
