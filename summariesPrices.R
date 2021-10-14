@@ -71,7 +71,7 @@ estObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL"))
 prices_pctemp <- NULL
 estPC <- NULL
 for(i in 1:ncol(prices_pc)){
-  prices_pctemp <- unique(round(prices_pc[,i],5))
+  prices_pctemp <- unique(prices_pc[,i])
   estPC[i] <- mean(prices_pctemp)
 }
 # prices_pctemp <- unique(round(prices_pc,5))
