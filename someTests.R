@@ -60,15 +60,39 @@ for (i in 1:ncol(cullShare)){
 
 
 
-(unique(sort(prices_ps[,1])))
+(unique(sort(prices_ps[,i])))
+
 
 (unique(sort(prices_pc[,i])))
 
 
 
+pricesCheck <- quantities_prices_capK %>% select(Year, ps, pc) %>% filter(Year>=2001)
 
+pricesCheckPS <- pricesCheck$ps
+pricesCheckPC <- pricesCheck$pc
 
+psCheckRes <- prices_ps
+pcCheckRes <- prices_pc
 
+for(l in 1:length(pricesCheckPS)){
+  psCheck <- pricesCheckPS[l]
+  pcCheck <- pricesCheckPC[l]
+  
+  for(m in 1:nrow(prices_ps)){
+    
+    if(prices_ps[m,l]>0 && prices_pc[m,l]>0){
+      psCheckRes[m,l] <- prices_ps[m,l] - psCheck
+      pcCheckRes[m,l] <- prices_pc[m,l] - pcCheck
+    }else{
+      psCheckRes[m,l] <- 0
+      pcCheckRes[m,l] <- 0
+    }
+    
+    
+  }
+  
+}
 
 
 

@@ -9,7 +9,7 @@ equilibriumCheck <- lapply(1:nrow(cull_cartesian), matrix, data= 0, nrow = eqIte
 
 for(k in 1:maxIter){
   
-    # k <- 3
+    # k <- 4
     
     if(norm(x = (c_cull - c_old_cull), type = "f") < 0.001 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.001){
       if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
@@ -200,8 +200,10 @@ for(k in 1:maxIter){
               equilibriumCheck[[j]][m,5] <- prices_pc[j,i]
               equilibriumCheck[[j]][m,6] <- expected_PS[j,i]
               
+              ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
               sl_node <- D_slPsPc[j,i]
               cl_node <- D_clPsPc[j,i]
+              
               # slNodes[j,i] <- sl_node
               # clNodes[j,i] <- cl_node
               
@@ -240,6 +242,7 @@ for(k in 1:maxIter){
       # TS_TD_diff <- norm(x = (S_psPC- D_PsPc) , type = "f")
       TS_D_sl_diff <- norm(x = as.matrix(slNodes[,i] - D_slPsPc[,i]) , type = "f")
       TS_D_cl_diff <- norm(x =  as.matrix(clNodes[,i] - D_clPsPc[,i]) , type = "f")
+      
       # cat("\n norm of supply and demand: ", fedDiff[,i])
       
       # cat("\n difference of fed supply and demand: ", as.matrix(fedDiff[,i]))

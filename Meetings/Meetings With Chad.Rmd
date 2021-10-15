@@ -189,6 +189,34 @@ Here we know the RHS. compute that first and you basically know the RHS. So use 
                   * Sf-Df>0 then Pf go down;Sc-Dc>0 then Pc go down.
                   * Sf-Df<0 then Pf go up;Sc-Dc<0 then Pc go up.
 
+10/15/2021:
+
+* Showed him the algorithm and also the process of it.
+* Right now I am adjusting only the supply. Chad suggested, we need to adjust the corresponding demand as well.
+* The density functions for the prices look like they are supposed to look like (Chads comments). We can pick mean or median and possibly provide confidence intervals as well. 
+
+** So basically: once we get the price, and the supply and demand difference, using that we increase or decrease the price, get the price, then supply (using the other function I wrote to get the quntities of the cattle), use them to get the new prices, using those prices get the demand and repeat this process until the differences converge to a pre determined level. 
+
+P -> S,D -> P -> S -> P -> D -> P -> S -> D so on....
+
+* Also look at the supply pattern as well. Mainly the density/distribution of the supply. This should be mirror image of prices. 
+
+** Right now the density of the prices are looking fairly okay. As we move along the years we see the hump at the higher end of the price decrease. This indicates there is a trend going on.
+
+** Now, the cull cow prices are very sporadic with a lot of noise. This is expected. We don't see that in the fed cattle price (I guess that's a good sign). Note that in an instance of increased demand for beef, farmers have to wait to sell the high quality meat (because the young steers/heifers are in the pipeline or will take 2 years to get the cattle to packing plant). So the farmers send the old animals to the slaughter house. That's why we see a lot of noise in the price.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

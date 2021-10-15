@@ -19,11 +19,20 @@ names(pricePS) <- "ps"
 # mean(pricePS$ps)
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
+prices_psLong <- melt(prices_ps, id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+
+ggplot(prices_psLong, aes (value)) + geom_density() + facet_wrap(~variable)
+
+
+
 pricePC <- prices_pc[,1] %>% as.data.frame()
 # pricePC <-  prices_pc[,14]  %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
 
+prices_pcLong <- melt(prices_pc, id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+
+ggplot(prices_pcLong, aes (value)) + geom_density() + facet_wrap(~variable)
 
 
 
