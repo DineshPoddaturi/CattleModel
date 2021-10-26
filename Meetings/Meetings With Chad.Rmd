@@ -206,6 +206,20 @@ P -> S,D -> P -> S -> P -> D -> P -> S -> D so on....
 ** Now, the cull cow prices are very sporadic with a lot of noise. This is expected. We don't see that in the fed cattle price (I guess that's a good sign). Note that in an instance of increased demand for beef, farmers have to wait to sell the high quality meat (because the young steers/heifers are in the pipeline or will take 2 years to get the cattle to packing plant). So the farmers send the old animals to the slaughter house. That's why we see a lot of noise in the price.
 
 
+10/26/2021:
+
+* Showed him the results and also the distribution of the prices. Also told him I see the prices are replicating for every 25 nodes. this is because the corn price is not utilized in the system of equations at all. So basically we have only 25 unique nodes (which are combination of the production and the demand shocks)
+
+* Also told him about how the coefficients are not converging. Note that the prices are settling down at the equiibrium. However, the coefficients are not settling down. He told me to look for coefficients as well. 
+
+* So basically: once the price reach the equilibrium keep them in seperate dataframe/matrix. Get the iteration moving and save the parameters and the prices in a different dataframe/matrix. This way we can see how the parameters are bahaving. We should also see the range of the parameters after running for a long time. This will tell us how to use the parameters/prices for future projections.
+
+
+* Right now use the mean and median statistics to compare with the historical data. Plot the history and the model estimates. Do it for prices and quantities. 
+
+
+
+
 
 
 

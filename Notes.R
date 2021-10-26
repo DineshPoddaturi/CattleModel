@@ -13,26 +13,44 @@
 
 
 
-pricePS <- prices_ps[,1] %>% as.data.frame()
+pricePS <- prices_ps[,2][1:25] %>% as.data.frame()
 # pricePS <- prices_ps[,19] %>% as.data.frame()
 names(pricePS) <- "ps"
 # mean(pricePS$ps)
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
-prices_psLong <- melt(prices_ps, id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+prices_psLong <- melt(prices_ps[1:25,], id.vars= "refseq") %>% select(variable = Var2, ps = value) %>% filter(ps >0)
+ggplot(prices_psLong, aes (ps)) + geom_density() + facet_wrap(~variable)
 
-ggplot(prices_psLong, aes (value)) + geom_density() + facet_wrap(~variable)
+prices_SlLong <- melt(slNodes[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+ggplot(prices_SlLong, aes (value)) + geom_density() + facet_wrap(~variable)
 
 
 
-pricePC <- prices_pc[,1] %>% as.data.frame()
+
+pricePC <- prices_pc[,2][1:25] %>% as.data.frame()
 # pricePC <-  prices_pc[,14]  %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
 
-prices_pcLong <- melt(prices_pc, id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+prices_pcLong <- melt(prices_pc[1:25,], id.vars= "refseq") %>% select(variable = Var2, pc = value) %>% filter(pc >0)
+ggplot(prices_pcLong, aes (pc)) + geom_density() + facet_wrap(~variable)
 
-ggplot(prices_pcLong, aes (value)) + geom_density() + facet_wrap(~variable)
+prices_ClLong <- melt(clNodes[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+ggplot(prices_ClLong, aes (value)) + geom_density() + facet_wrap(~variable)
+
+
+
+prices_hcLong <- melt(prices_hc[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+ggplot(prices_hcLong, aes (value)) + geom_density() + facet_wrap(~variable)
+
+prices_EpsLong <- melt(expected_PS[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+ggplot(prices_EpsLong, aes (value)) + geom_density() + facet_wrap(~variable)
+
+prices_EpcLong <- melt(expected_PC[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
+ggplot(prices_EpcLong, aes (value)) + geom_density() + facet_wrap(~variable)
+
+
 
 
 
