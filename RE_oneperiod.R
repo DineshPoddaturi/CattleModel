@@ -9,7 +9,7 @@ calfCrop_replacementHeifers <- merge(calf_crop, replacementInventory) %>% transm
 
 ##### Here I am computing the ratio of the replacement heifers to calf crop of prv year
 calfCrop_replacementHeifers <- calfCrop_replacementHeifers %>% mutate(calfCrop_repHeifers_Ratio = repHeifers/lag(calfCrop), 
-                                       calfCrop_repHeifers_Percent = repHeifers/lag(calfCrop) * 100)
+                                                                      calfCrop_repHeifers_Percent = repHeifers/lag(calfCrop) * 100)
 
 summary(calfCrop_replacementHeifers$calfCrop_repHeifers_Percent)
 
@@ -163,8 +163,8 @@ newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
 #### 0.22 comes from the fact that approximately a maximum of 22% of the progeny is added to the breeding stock
 
 newSL <- allStockShocks %>%
-  transmute(Year = Year+3, slt = (delta - 0.22 * g) * K * slShock + 
-              (1 - 0.22 * g) * g * delta * (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
+  transmute(Year = Year+1, slt = (delta - 0.22 * g) * lag(K,2) * slShock + 
+              (1 - 0.22 * g) * (1+g) * delta * (lag(K,2) - (delta - 0.22 * g) * lag(K,3) - (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2))),
             slLbs = slt * Slaughter_avg/1000000000)
 
 ### NOTE: we did not add any imports or exports in constructing the fed cattle production.
@@ -180,9 +180,10 @@ newCL <- allStockShocks %>% transmute(Year = Year + 3, clStock = 0, clLbs = 0)
 #### cows in the similar fashion
 
 newCL <- allStockShocks %>%
-  transmute(Year = Year + 3, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock +
-              (delta^2) * (delta * (k6 + k5 + k4) - (k5 + k6 + k7)),
+  transmute(Year = Year + 1, clt = (k9 + (1-delta) * k8 + (1-delta) * k7) * clShock +
+              (delta) * (k8 + (1-delta) * (k7 + k8)),
             clLbs = clt * Cull_avg/1000000000)
+
 
 # newCL <- allStockShocks %>%
 #   transmute(Year = Year + 3, 
@@ -379,38 +380,7 @@ optParamFunction <- function(sl, cl, ps, pc, thetas){
 
 ###### optPriceFunction returns the price for the passed supply and demand numerics.
 
-# optPriceFunction<- function(p, sl, cl, A, Eps, B, hc_discounted){
-# 
-#   ps <- p[1]
-#   pc <- p[2]
-#   
-#   Eps3 <- p[3]
-#   
-#   # Eps3 <- Eps
-#   
-#   ##### Here I am trying to compute the discounted holding costs from the Naive expectations formulation.
-#   ##### This could be not the correct way of doing (since I promised rational expectations) but this is the best we can do
-#   # hc_new <- (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
-#   # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
-#   # B <- ps - g * (beta^3) * Eps3 + hc_discounted
-#   ####### THE ABOVE IS NOT WORKING. CONVERGING VERY QUICKLY #####
-#   
-#   
-#   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
-# 
-#   F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
-# 
-#   F3 <- B - ps + g * (beta^3) * Eps3 - hc_discounted
-# 
-#   F <- F1^2 + F2^2 + F3^2
-#   
-#   # F <- F1^2 + F2^2
-# 
-#   return(F)
-# 
-# }
-
-optPriceFunction<- function(p, sl, cl, A, B, hc_discounted){
+optPriceFunction1<- function(p, sl, cl, A, Eps, B, hc_discounted, hc_new){
   
   ps <- p[1]
   pc <- p[2]
@@ -418,8 +388,7 @@ optPriceFunction<- function(p, sl, cl, A, B, hc_discounted){
   Eps3 <- p[3]
   Epc1 <- p[4]
   
-  # hc_new <- hc
-  # hc_discounted <- hc_dis
+  # Eps3 <- Eps
   
   ##### Here I am trying to compute the discounted holding costs from the Naive expectations formulation.
   ##### This could be not the correct way of doing (since I promised rational expectations) but this is the best we can do
@@ -428,19 +397,14 @@ optPriceFunction<- function(p, sl, cl, A, B, hc_discounted){
   # B <- ps - g * (beta^3) * Eps3 + hc_discounted
   ####### THE ABOVE IS NOT WORKING. CONVERGING VERY QUICKLY #####
   
-  # hc_new <- (pc - beta * Epc1 + g * (beta^3) * Eps3) * (1/(1 + beta * (g * gamma0 + beta * g * gamma1)))
-  # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
-  # B <- ps - g * (beta^3) * Eps3 + hc_discounted
   
   F1 <- sl - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
   
   F2 <- cl  - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
   
-  F3 <- B - ps + g * (beta^3) * Eps3 - hc_discounted
+  F3 <- B - ps - g * (beta^3) * Eps3 + hc_discounted
   
-  # F <- F1^2 + F2^2 + F3^2
-  
-  F4 <- pc - beta * Epc1 - g * (beta^3) * Eps3 + (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  F4 <- pc - beta * Epc1 + g * (beta^3) * Eps3 - (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
   
   F <- F1^2 + F2^2 + F3^2 + F4^2
   
@@ -577,15 +541,15 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   c_cull_itr <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(cull_cartesian), ncol=maxIter)
   c_fed_itr <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(fed_cartesian), ncol=maxIter)
   
- ###### THINK ABOUT THE INDEXING PROPERLY. ARE YOU PREDICTING THE NEXT YEAR OR JUST USING THE SAME YEARS DATA TO 
- ###### ESTIMATE THE SAME NUMBERS? WE SHOULD BE ESTIMATING THE NEXT YEARS PRICES AND QUANTITIES.
- ###### When I assume the prices and quantities are for the subsequent year and compare them with naive and observed
- ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
- ###### if I use the coefficients to get the price we might see some improvement.
+  ###### THINK ABOUT THE INDEXING PROPERLY. ARE YOU PREDICTING THE NEXT YEAR OR JUST USING THE SAME YEARS DATA TO 
+  ###### ESTIMATE THE SAME NUMBERS? WE SHOULD BE ESTIMATING THE NEXT YEARS PRICES AND QUANTITIES.
+  ###### When I assume the prices and quantities are for the subsequent year and compare them with naive and observed
+  ###### Theres not much difference between naive and rational. However, this is with the normalized nodes. I think 
+  ###### if I use the coefficients to get the price we might see some improvement.
   
   for(i in 1:nrow(quantities_prices_capK)){
     
-    i <- 14
+    i <- 1
     ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
     A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
     #                                  ## fed cattle production node and cull cow production node with demand shock to get 
@@ -599,7 +563,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     hc <- quantities_prices_capK$hc[i]
     
     params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
-
+    
     mu_Tilde1 <- params_mu_s[1]
     s_Tilde1 <- params_mu_s[2]
     mu_Tildes_Prior[,i] <- mu_Tilde1
@@ -650,363 +614,363 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
     
     for(k in 1:maxIter){
       
-        # Here when checking the difference between the old and new coefficients we use the function norm.
-        # Inside the function we have to specify what kind of norm we want. Here I am specifying Frobenius norm. 
-        # The Frobenius norm is the Euclidean norm of x. So basically sum of squared vector. 
-        # Which is the sum squared of the difference between the old and new coefficient vectors.
-        # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
-        # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
-        
-        # k <- 1
-        
-        if(norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
-          if( (ps_m - ps_old)^2 < 0.007 && (pc_m - pc_old)^2 < 0.007){
-              break
-          }
-         }
+      # Here when checking the difference between the old and new coefficients we use the function norm.
+      # Inside the function we have to specify what kind of norm we want. Here I am specifying Frobenius norm. 
+      # The Frobenius norm is the Euclidean norm of x. So basically sum of squared vector. 
+      # Which is the sum squared of the difference between the old and new coefficient vectors.
+      # In short what we are doing is taking the difference between the old and new coefficient vectors, squaring the 
+      # difference and summing all the squared differences. This will give us a scalar which is used for breaking the loop
       
-        count <- count + 1
+      # k <- 1
+      
+      if(norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
+        if( (ps_m - ps_old)^2 < 0.007 && (pc_m - pc_old)^2 < 0.007){
+          break
+        }
+      }
+      
+      count <- count + 1
+      
+      c_old_cull <- c_cull
+      c_old_fed <- c_fed
+      
+      ps_old <- ps_m
+      pc_old <- pc_m
+      
+      #### Here we are going through each node
+      for (j in 1:nrow(cull_cartesian)) {
         
-        c_old_cull <- c_cull
-        c_old_fed <- c_fed
+        # j <- 6
+        #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
+        #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
         
-        ps_old <- ps_m
-        pc_old <- pc_m
+        cornNode <- cull_cartesian$cornNodes[j]
+        cullCowNode <- cull_cartesian$cullNodes[j]
+        dShockNode <- cull_cartesian$dShockNodes[j]
+        fedCattleNode <- fed_cartesian$fedNodes[j]
         
-        #### Here we are going through each node
-        for (j in 1:nrow(cull_cartesian)) {
+        pCorn <- stateVars$pcorn
+        TSCull <- stateVars$cullCows
+        dShock <- stateVars$Shock
+        TSFed <- stateVars$fedCattle
+        
+        corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
+        cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
+        dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
+        fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
+        # demand_ChebyshevMatrix <- chebyshevMatrix(x = aNode, d = TSFed, n = chebNodesN)
+        
+        # cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
+        # fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
+        # 
+        # pc_new <- cull_InterpolationMatrix %*% c_old_cull
+        # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
+        
+        #### Here we apply the chebyshev node to solve the system of equations
+        # sl_node <- fedCattleNode + imports - exports
+        sl_node <- fedCattleNode 
+        cl_node <- cullCowNode
+        A_node <- (A) * (dShockNode^3)
+        
+        Anodes[j,i] <- A_node
+        slNodes[j,i] <- sl_node
+        clNodes[j,i] <- cl_node
+        
+        #### getting the parameters from the optParamFunction
+        params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
+        
+        mu_Tilde1 <- params_mu_s[1]
+        s_Tilde1 <- params_mu_s[2]
+        
+        mu_Tildes[j,i] <- mu_Tilde1
+        s_Tildes[j,i] <- s_Tilde1
+        
+        ##### Instead of using the holding costs from the naive expectations modeling. I am changing it for every 
+        ##### iteration. The rational behind it is: if the price of fed cattle and cull cow changes the holding costs
+        ##### will change. The intuition behind this is: Assuming the price changes, the producer would react to it 
+        ##### and change his decisions which would change the holding costs per animal. I guess this is true.
+        ##### I have to think about this more!!!!! #######################
+        
+        hc_new <- (((g * (beta^3) * ps_old) + (beta - 1) * pc_old)/(1 + g * beta * (gamma0 + beta * gamma1)))
+        hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+        
+        
+        if(k==1){
           
-          # j <- 6
-          #### Note: We don't have to normalize/need normalized nodes here. Because we are normalizing them when we are getting the 
-          #### chebyshev matrix. See the function written to generate chebyshev matrix containing the chebyshev polynomials
+          ### Here we get the price for the observed supply and demand of fed and cull cows
+          #### I am setting the lower and upper boundaries for fed cattle and cull cows price. 
+          #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
+          #### jumps to some local maxima/minima and do not move from there. We are making sure that the prices are within
+          #### the boundaries. 
           
-          cornNode <- cull_cartesian$cornNodes[j]
-          cullCowNode <- cull_cartesian$cullNodes[j]
-          dShockNode <- cull_cartesian$dShockNodes[j]
-          fedCattleNode <- fed_cartesian$fedNodes[j]
+          #### NEED MORE EXPLANATION? 
+          ####        Also remember we can always find a number that satisfies the supply and demand equations. 
+          #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
           
-          pCorn <- stateVars$pcorn
-          TSCull <- stateVars$cullCows
-          dShock <- stateVars$Shock
-          TSFed <- stateVars$fedCattle
+          if( ps_old < ps){
+            ps_o <- ps
+          }else{
+            ps_o <- ps_old
+          }
           
-          corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
-          cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
-          dShock_ChebyshevMatrix <- chebyshevMatrix(x = dShockNode, d = dShock, n = chebNodesN)
-          fedCattle_ChebyshevMatrix <- chebyshevMatrix(x = fedCattleNode, d = TSFed, n = chebNodesN)
-          # demand_ChebyshevMatrix <- chebyshevMatrix(x = aNode, d = TSFed, n = chebNodesN)
-
-          # cull_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, cullCows_ChebyshevMatrix), dShock_ChebyshevMatrix)
-          # fedCattle_InterpolationMatrix <- kron(kron(corn_ChebyshevMatrix, fedCattle_ChebyshevMatrix), dShock_ChebyshevMatrix)
-          # 
-          # pc_new <- cull_InterpolationMatrix %*% c_old_cull
-          # ps_new <- fedCattle_InterpolationMatrix %*% c_old_fed
-          
-          #### Here we apply the chebyshev node to solve the system of equations
-          # sl_node <- fedCattleNode + imports - exports
-          sl_node <- fedCattleNode 
-          cl_node <- cullCowNode
-          A_node <- (A) * (dShockNode^3)
-          
-          Anodes[j,i] <- A_node
-          slNodes[j,i] <- sl_node
-          clNodes[j,i] <- cl_node
-          
-          #### getting the parameters from the optParamFunction
-          params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
-
-          mu_Tilde1 <- params_mu_s[1]
-          s_Tilde1 <- params_mu_s[2]
-          
-          mu_Tildes[j,i] <- mu_Tilde1
-          s_Tildes[j,i] <- s_Tilde1
-          
-          ##### Instead of using the holding costs from the naive expectations modeling. I am changing it for every 
-          ##### iteration. The rational behind it is: if the price of fed cattle and cull cow changes the holding costs
-          ##### will change. The intuition behind this is: Assuming the price changes, the producer would react to it 
-          ##### and change his decisions which would change the holding costs per animal. I guess this is true.
-          ##### I have to think about this more!!!!! #######################
-          
-          hc_new <- (((g * (beta^3) * ps_old) + (beta - 1) * pc_old)/(1 + g * beta * (gamma0 + beta * gamma1)))
-          hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
-          
-          
-          if(k==1){
-            
-              ### Here we get the price for the observed supply and demand of fed and cull cows
-              #### I am setting the lower and upper boundaries for fed cattle and cull cows price. 
-              #### My rational for this is: we would like to achieve global maximum/minumum. Sometimes the point estimate 
-              #### jumps to some local maxima/minima and do not move from there. We are making sure that the prices are within
-              #### the boundaries. 
-              
-              #### NEED MORE EXPLANATION? 
-              ####        Also remember we can always find a number that satisfies the supply and demand equations. 
-              #### So we provide an initial value, upper and lower bounds which are realistic and looks like the history.
-              
-              if( ps_old < ps){
-                ps_o <- ps
-              }else{
-                ps_o <- ps_old
-              }
-              
-              if( pc_old < pc){
-                pc_o <- pc
-              }else{
-                pc_o <- pc_old
-              }
-              
-              
-              ps_lo <- ps_o  - 0.35
-              pc_lo <- pc_o - 0.4
-              
-              ps_up <- ps_o + 0.10929
-              pc_up <- pc_o  + 0.080153
-              
-              #### Here we are making sure the lower bound for the prices isn't negative
-              if(ps_lo < 0){
-                 ps_lo <- ps_o
-              }
-    
-              if(pc_lo < 0){
-                pc_lo <- pc_o
-              }
-              
-              ps_expected <- sum(as.numeric(ps_old) * fedMeshCheb)
-              
-              B <- ps_old - g * (beta^3) * ps_expected + hc_discounted
-              
-              ps_expected_lo <- ps_expected - 0.1
-              
-              ps_expected_up <- ps_expected + 0.1
-          
+          if( pc_old < pc){
+            pc_o <- pc
+          }else{
+            pc_o <- pc_old
           }
           
           
-          #### Here we are checking the equilibrium supply and demand of fed cattle and cull cow meat.
-          #### In the previous iteration, we saved the difference between the supply and demand under estimated prices. 
-          #### Basically if the difference is positive then the price should go down and vice versa. This way the prices 
-          #### are adjusted such that they satisfy the equilibrium conditions. 
+          ps_lo <- ps_o  - 0.35
+          pc_lo <- pc_o - 0.4
           
-          if( k > 1 ){
-            
-            if( fedDiff[j,i] > 0){
-              
-              ps_o <- prices_ps[j,i] - 0.01
-              
-            } else if( fedDiff[j,i] < 0){
-              
-              ps_o <- prices_ps[j,i] + 0.01
-              
-            }
-            
-            if( ps_o < 0){
-              ps_o <- prices_ps[j,i]
-            }
-            
-            if( cullDiff[j,i] > 0){
-              
-              pc_o <- prices_pc[j,i] - 0.01
-              
-              
-              
-            } else if( cullDiff[j,i] < 0){
-              
-              pc_o <- prices_pc[j,i] + 0.01
-              
-            }
-            
-            if( ps_o < 0){
-              ps_o <- prices_ps[j,i]
-            }
-            
-            if( pc_o < 0){
-              pc_o <- prices_ps[j,i]
-            }
-            
-            ps_lo <- ps_o  - 0.05
-            pc_lo <- pc_o - 0.05
-            
-            ps_up <- ps_o 
-            pc_up <- pc_o 
-            
-            if(ps_lo < 0){
-              ps_lo <- ps_o
-            }
-            
-            if(pc_lo < 0){
-              pc_lo <- pc_o
-            }
-            
-            ps_expected <- sum(as.numeric(ps_o) * fedMeshCheb)
-            
-            B <- ps_old - g * (beta^3) * ps_expected + hc_discounted
-            
-            ps_expected_lo <- ps_expected - 0.1
-            
-            ps_expected_up <- ps_expected + 0.1
-            
+          ps_up <- ps_o + 0.10929
+          pc_up <- pc_o  + 0.080153
+          
+          #### Here we are making sure the lower bound for the prices isn't negative
+          if(ps_lo < 0){
+            ps_lo <- ps_o
           }
           
-          p <- c(ps_o, pc_o, ps_expected)
+          if(pc_lo < 0){
+            pc_lo <- pc_o
+          }
           
-          lo <- c(ps_lo, pc_lo, ps_expected_lo)
-          up <- c(ps_up, pc_up, ps_expected_up)
+          ps_expected <- sum(as.numeric(ps_old) * fedMeshCheb)
           
+          B <- ps_old - g * (beta^3) * ps_expected + hc_discounted
           
-          estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
-                          hc_discounted = hc_discounted, Eps = ps_expected, lower = lo, upper = up)
+          ps_expected_lo <- ps_expected - 0.1
           
-          ps1 <- estP$par[1]
-          pc1 <- estP$par[2]
-          ps_expected1 <- estP$par[3]
-          
-          ### From the following we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9} which are storage 
-          # K <- c(0,0)
-          # 
-          # estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
-          # 
-          # k_3t1 <- estK$par[1]
-          # k_7_10t1 <- estK$par[2]
-          # 
-          # sl1 <- (g * Stock_1t - k_3t1 + imports - exports)
-          # cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)
-          
-          #### getting the parameters from the optParamFunction
-          # params_mu_s <- optParamFunction(sl = sl1, cl = cl1, ps = ps1, pc = pc1, thetas = c(1,1))
-          # 
-          # mu_Tilde <- params_mu_s[1]
-          # s_Tilde <- params_mu_s[2]
-          
-          
-          ## Backing the price for the optimal quantities determined above
-          # p <- c(ps1, pc1)
-          # estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl1, cl = cl1, A = A_node)
-          # ps1 <- estP$par[1]
-          # pc1 <- estP$par[2]
-          # ps <- ps1
-          # pc <- pc1
-          
-          prices_ps[j,i] <- ps1
-          prices_pc[j,i] <- pc1
-          expected_PS[j,i] <- ps_expected1
-          prices_hc[j,i] <- hc_new
-          
-          # if(cfed_tol == 1){
-          #   prices_ps[j,i] <- 0
-          # }
-          # 
-          # if(ccull_tol == 1){
-          #   prices_pc[j,i] <- 0
-          # }
-          
-          # expected_PS[j,i] <- ps_expected1
-          
-          # k3t1[j,i] <- k_3t1
-          # kjt1[j,i] <- k_7_10t1
-          # slNew[j,i] <- sl1
-          # clNew[j,i] <- cl1
-          
-          fedPrice[[i]][j,k] <- ps1
-          cullPrice[[i]][j,k] <- pc1
-          
-          # if(cfed_tol > 0){
-          #   prices_ps[j,i] <- fedPrice[[i]][j,k-cfed_tol]
-          #   fedPrice[[i]][j,k] <- fedPrice[[i]][j,k-cfed_tol]
-          # }
-          # 
-          # if(ccull_tol > 0){
-          #   prices_pc[j,i] <- cullPrice[[i]][j,k-ccull_tol]
-          #   cullPrice[[i]][j,k] <- cullPrice[[i]][j,k-ccull_tol]
-          # }
-          
-          # fedProd[[i]][j,k] <- sl1
-          # cullProd[[i]][j,k] <- cl1
-          
-          # slD[j,i] <- A_node * ((exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))))
-          # clD[j,i] <- A_node * (1/(1+ exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde)))
-            
-          # # ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
-          # # pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
-          # # 
-          # # c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
-          # # c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
-          # 
-          # # c_cull1[,j] <- c_cull
-          # # c_fed1[,j] <- c_fed
-          # 
-          # # c_old_cull <- c_cull
-          # # c_old_fed <- c_fed
-          
-          # expected_PS[,i]
+          ps_expected_up <- ps_expected + 0.1
           
         }
         
         
-        ### Demand of the fed cattle meat under the new prices
-        D_slPsPc[,i] <- Anodes[,i] *
-          ((exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))/
-             (1 + (exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))))
-
-        ### Demand of the cull cow meat under the new prices
-        D_clPsPc[,i] <- Anodes[,i] * (1/(1+ exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde)))
-
-        #### Total demand for the meat under new prices
-        D_PsPc <- as.matrix(D_slPsPc[,i] + D_clPsPc[,i])
-
-        #### Total supply of meat (this is by adding the nodes)
-        S_psPC <- as.matrix(slNodes[,i] + clNodes[,i])
+        #### Here we are checking the equilibrium supply and demand of fed cattle and cull cow meat.
+        #### In the previous iteration, we saved the difference between the supply and demand under estimated prices. 
+        #### Basically if the difference is positive then the price should go down and vice versa. This way the prices 
+        #### are adjusted such that they satisfy the equilibrium conditions. 
         
-        fedDiff[,i] <- slNodes[,i] - D_slPsPc[,i]
-        cullDiff[,i] <- clNodes[,i] - D_clPsPc[,i]
-
-        # TS_TD_diff <- norm(x = (S_psPC- D_PsPc) , type = "f")
-        TS_D_sl_diff <- norm(x = as.matrix(slNodes[,i] - D_slPsPc[,i]) , type = "f")
-        TS_D_cl_diff <- norm(x =  as.matrix(clNodes[,i] - D_clPsPc[,i]) , type = "f")
-        # cat("\n norm of supply and demand: ", fedDiff[,i])
-
-        # cat("\n difference of fed supply and demand: ", as.matrix(fedDiff[,i]))
-
-        # cat("\n difference of cull supply and demand: ", as.matrix(cullDiff[,i] ))
+        if( k > 1 ){
+          
+          if( fedDiff[j,i] > 0){
+            
+            ps_o <- prices_ps[j,i] - 0.01
+            
+          } else if( fedDiff[j,i] < 0){
+            
+            ps_o <- prices_ps[j,i] + 0.01
+            
+          }
+          
+          if( ps_o < 0){
+            ps_o <- prices_ps[j,i]
+          }
+          
+          if( cullDiff[j,i] > 0){
+            
+            pc_o <- prices_pc[j,i] - 0.01
+            
+            
+            
+          } else if( cullDiff[j,i] < 0){
+            
+            pc_o <- prices_pc[j,i] + 0.01
+            
+          }
+          
+          if( ps_o < 0){
+            ps_o <- prices_ps[j,i]
+          }
+          
+          if( pc_o < 0){
+            pc_o <- prices_ps[j,i]
+          }
+          
+          ps_lo <- ps_o  - 0.05
+          pc_lo <- pc_o - 0.05
+          
+          ps_up <- ps_o 
+          pc_up <- pc_o 
+          
+          if(ps_lo < 0){
+            ps_lo <- ps_o
+          }
+          
+          if(pc_lo < 0){
+            pc_lo <- pc_o
+          }
+          
+          ps_expected <- sum(as.numeric(ps_o) * fedMeshCheb)
+          
+          B <- ps_old - g * (beta^3) * ps_expected + hc_discounted
+          
+          ps_expected_lo <- ps_expected - 0.1
+          
+          ps_expected_up <- ps_expected + 0.1
+          
+        }
         
-        sdiff <- fedDiff[,i]
-        cdiff <- cullDiff[,i]
+        p <- c(ps_o, pc_o, ps_expected)
+        
+        lo <- c(ps_lo, pc_lo, ps_expected_lo)
+        up <- c(ps_up, pc_up, ps_expected_up)
         
         
+        estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
+                        hc_discounted = hc_discounted, Eps = ps_expected, lower = lo, upper = up)
         
+        ps1 <- estP$par[1]
+        pc1 <- estP$par[2]
+        ps_expected1 <- estP$par[3]
         
-        c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
-        c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
-        
-        ps_m <- mean(prices_ps[,i])
-        pc_m <- mean(prices_pc[,i])
-        
-        fedDiff_m <- mean(fedDiff[,i])
-        cullDiff_m <- mean(cullDiff[,i])
-        
-        c_cull_itr[[i]][,k] <- c_cull
-        c_fed_itr[[i]][,k] <- c_fed
-        
-        
-        cat("\n norm of old and new fed coefficients: ", norm(x = (c_fed - c_old_fed) , type = "f"))
-
-        cat("\n norm of old and new cull coefficients: ", norm(x = (c_cull - c_old_cull) , type = "f"))
-        
-        cat("\n Squared difference between old and new mean fed cattle prices: ", (ps_m - ps_old)^2)
-        
-        cat("\n Squared difference between old and new mean cull cattle prices: ", (pc_m - pc_old)^2)
-        
-        # cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
-        
-        
-        # sl_itr <- mean(slD[,i])
-        # cl_itr <- mean(clD[,i])
-        
-        # sl_obs <- mean(slNew[,i])
-        # cl_obs <- mean(clNew[,i])
+        ### From the following we get the quantities of k_{3,t+1} and sum(k_{j,t+1}) where j in {7,8,9} which are storage 
+        # K <- c(0,0)
         # 
-        # sl_itr <- mean(slNew[,i])
-        # cl_itr <- mean(clNew[,i])
+        # estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
+        # 
+        # k_3t1 <- estK$par[1]
+        # k_7_10t1 <- estK$par[2]
+        # 
+        # sl1 <- (g * Stock_1t - k_3t1 + imports - exports)
+        # cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)
         
+        #### getting the parameters from the optParamFunction
+        # params_mu_s <- optParamFunction(sl = sl1, cl = cl1, ps = ps1, pc = pc1, thetas = c(1,1))
+        # 
+        # mu_Tilde <- params_mu_s[1]
+        # s_Tilde <- params_mu_s[2]
+        
+        
+        ## Backing the price for the optimal quantities determined above
+        # p <- c(ps1, pc1)
+        # estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl1, cl = cl1, A = A_node)
+        # ps1 <- estP$par[1]
+        # pc1 <- estP$par[2]
+        # ps <- ps1
+        # pc <- pc1
+        
+        prices_ps[j,i] <- ps1
+        prices_pc[j,i] <- pc1
+        expected_PS[j,i] <- ps_expected1
+        prices_hc[j,i] <- hc_new
+        
+        # if(cfed_tol == 1){
+        #   prices_ps[j,i] <- 0
+        # }
+        # 
+        # if(ccull_tol == 1){
+        #   prices_pc[j,i] <- 0
+        # }
+        
+        # expected_PS[j,i] <- ps_expected1
+        
+        # k3t1[j,i] <- k_3t1
+        # kjt1[j,i] <- k_7_10t1
+        # slNew[j,i] <- sl1
+        # clNew[j,i] <- cl1
+        
+        fedPrice[[i]][j,k] <- ps1
+        cullPrice[[i]][j,k] <- pc1
+        
+        # if(cfed_tol > 0){
+        #   prices_ps[j,i] <- fedPrice[[i]][j,k-cfed_tol]
+        #   fedPrice[[i]][j,k] <- fedPrice[[i]][j,k-cfed_tol]
+        # }
+        # 
+        # if(ccull_tol > 0){
+        #   prices_pc[j,i] <- cullPrice[[i]][j,k-ccull_tol]
+        #   cullPrice[[i]][j,k] <- cullPrice[[i]][j,k-ccull_tol]
+        # }
+        
+        # fedProd[[i]][j,k] <- sl1
+        # cullProd[[i]][j,k] <- cl1
+        
+        # slD[j,i] <- A_node * ((exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))))
+        # clD[j,i] <- A_node * (1/(1+ exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde)))
+        
+        # # ps_new1 <- as.matrix(x = rep(ps, 125), ncol = 1)
+        # # pc_new1 <- as.matrix(x = rep(pc, 125), ncol = 1)
+        # # 
+        # # c_cull  <- solve(cullInterpolationMatrix) %*% pc_new1
+        # # c_fed  <- solve(fedCattleInterpolationMatrix) %*% ps_new1
+        # 
+        # # c_cull1[,j] <- c_cull
+        # # c_fed1[,j] <- c_fed
+        # 
+        # # c_old_cull <- c_cull
+        # # c_old_fed <- c_fed
+        
+        # expected_PS[,i]
+        
+      }
+      
+      
+      ### Demand of the fed cattle meat under the new prices
+      D_slPsPc[,i] <- Anodes[,i] *
+        ((exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))/
+           (1 + (exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))))
+      
+      ### Demand of the cull cow meat under the new prices
+      D_clPsPc[,i] <- Anodes[,i] * (1/(1+ exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde)))
+      
+      #### Total demand for the meat under new prices
+      D_PsPc <- as.matrix(D_slPsPc[,i] + D_clPsPc[,i])
+      
+      #### Total supply of meat (this is by adding the nodes)
+      S_psPC <- as.matrix(slNodes[,i] + clNodes[,i])
+      
+      fedDiff[,i] <- slNodes[,i] - D_slPsPc[,i]
+      cullDiff[,i] <- clNodes[,i] - D_clPsPc[,i]
+      
+      # TS_TD_diff <- norm(x = (S_psPC- D_PsPc) , type = "f")
+      TS_D_sl_diff <- norm(x = as.matrix(slNodes[,i] - D_slPsPc[,i]) , type = "f")
+      TS_D_cl_diff <- norm(x =  as.matrix(clNodes[,i] - D_clPsPc[,i]) , type = "f")
+      # cat("\n norm of supply and demand: ", fedDiff[,i])
+      
+      # cat("\n difference of fed supply and demand: ", as.matrix(fedDiff[,i]))
+      
+      # cat("\n difference of cull supply and demand: ", as.matrix(cullDiff[,i] ))
+      
+      sdiff <- fedDiff[,i]
+      cdiff <- cullDiff[,i]
+      
+      
+      
+      
+      c_fed  <- solve(fedCattleInterpolationMatrix) %*% prices_ps[,i]
+      c_cull <- solve(cullInterpolationMatrix) %*% prices_pc[,i]
+      
+      ps_m <- mean(prices_ps[,i])
+      pc_m <- mean(prices_pc[,i])
+      
+      fedDiff_m <- mean(fedDiff[,i])
+      cullDiff_m <- mean(cullDiff[,i])
+      
+      c_cull_itr[[i]][,k] <- c_cull
+      c_fed_itr[[i]][,k] <- c_fed
+      
+      
+      cat("\n norm of old and new fed coefficients: ", norm(x = (c_fed - c_old_fed) , type = "f"))
+      
+      cat("\n norm of old and new cull coefficients: ", norm(x = (c_cull - c_old_cull) , type = "f"))
+      
+      cat("\n Squared difference between old and new mean fed cattle prices: ", (ps_m - ps_old)^2)
+      
+      cat("\n Squared difference between old and new mean cull cattle prices: ", (pc_m - pc_old)^2)
+      
+      # cat("\n diff: ", (sl_obs + cl_obs - slD_obs - clD_obs)^2)
+      
+      
+      # sl_itr <- mean(slD[,i])
+      # cl_itr <- mean(clD[,i])
+      
+      # sl_obs <- mean(slNew[,i])
+      # cl_obs <- mean(clNew[,i])
+      # 
+      # sl_itr <- mean(slNew[,i])
+      # cl_itr <- mean(clNew[,i])
+      
     }
     
     c_cull_opt[[i]] <- c_cull
@@ -1026,7 +990,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   TSCull <- stateVars$cullCows
   dShock <- stateVars$Shock
   TSFed <- stateVars$fedcattle
-
+  
   
   corn_ChebyshevMatrix <- chebyshevMatrix(x = cornNode, d = pCorn, n = chebNodesN)
   cullCows_ChebyshevMatrix <- chebyshevMatrix(x = cullCowNode, d = TSCull, n = chebNodesN)
@@ -1054,9 +1018,9 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   K <- c(0,0)
   ps <- ps_new
   pc <- pc_new
-
+  
   estK <- BBoptim(par = K, fn = optKFunction)
-
+  
   k_3t1 <- estK$par[1]
   k_7_10t1 <- estK$par[2]
   
@@ -1067,7 +1031,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   estP <- BBoptim(par = p, fn = optPriceFunction)
   ps <- estP$par[1]
   pc <- estP$par[2]
-
+  
   prices_ps[j,i] <- ps
   prices_pc[j,i] <- pc
   k3t1[j,i] <- k_3t1
@@ -1097,7 +1061,6 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   # return(c(ps_new, pc_new))
   
 }
- 
 
 
 
@@ -1105,7 +1068,8 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
 
 
 
- 
+
+
 
 
 

@@ -1,0 +1,93 @@
+Get the expected price and use then in the optimizing function.
+The Rational: Using numerical methods we get the price and expected prices. Now these are fed into the system of equations as the starting values and let the system figure out the optimal prices and expected prices for the applied nodes. 
+
+
+
+Another idea: First we get the expected fed price and cull cow price. Using the fact that the farmers cull all 9 years old, we derive the holding costs of the cattle. So basically we do not take the holding costs from the naive expectation model. I guess this is a different way. We will see how things change if I do this.
+
+
+```{r}
+if(k > 2){
+      
+      if(abs(fedDiff[j,i])<=0.001 && abs(cullDiff[j,i])<=0.001){
+        
+        ps_n <- prices_ps[j,i]
+        pc_n <- prices_pc[j,i]
+        
+        ps_lo <- ps_n  - 0.35
+        pc_lo <- pc_n - 0.4
+        
+        ps_up <- ps_n + 0.10929
+        pc_up <- pc_n + 0.080153
+        
+        if(ps_lo < 0){
+          ps_lo <- ps_n
+        }
+        
+        if(pc_lo < 0){
+          pc_lo <- pc_n
+        }
+        
+        while(pc_lo>ps_lo){
+          pc_lo <- pc_lo - 0.01
+        }
+        
+        ps_expected <- expected_PS[j,i]
+        pc_expected <- expected_PC[j,i]
+        
+        ### This holding costs are derived from the fact that the farmers cull cows when they reach 9 yeards old. So, 
+        ### we use the equality of that to get the holding costs. From my first observation this is greater than the naive 
+        ### expectations holding costs. Because we have the expected price in the equality.
+        hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pc_expected + g * (beta^3) * ps_expected - pc_n)
+        
+        while(hc_new>pc_n){
+          hc_new <- hc_new - 0.01
+        }
+        
+        hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+        B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
+        
+        ps_expected_lo <- ps_expected - 0.1
+        
+        ps_expected_up <- ps_expected + 0.1
+        
+        pc_expected_lo <- pc_expected - 0.1
+        
+        pc_expected_up <- pc_expected + 0.1
+        
+        p <- c(ps_n, pc_n, ps_expected, pc_expected)
+        
+        lo <- c(ps_lo, pc_lo, ps_expected_lo, pc_expected_lo)
+        up <- c(ps_up, pc_up, ps_expected_up, pc_expected_up)
+        
+        sl_node <- slNodes[j,i]
+        cl_node <- clNodes[j,i]
+        A_node <- (sl_node + cl_node) * dShockNode
+        
+        params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, 
+                                        ps = ps_n, pc = pc_n, thetas = c(1,1))
+        
+        mu_Tilde <- params_mu_s[1]
+        s_Tilde <- params_mu_s[2]
+        
+        mu_Tildes[j,i] <- mu_Tilde
+        s_Tildes[j,i] <- s_Tilde
+        
+        estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
+                        hc_discounted = hc_discounted, lower = lo, upper = up)
+        
+        ps1 <- estP$par[1]
+        pc1 <- estP$par[2]
+        ps_expected1 <- estP$par[3]
+        pc_expected1 <- estP$par[4]
+        
+        prices_ps[j,i] <- ps1
+        prices_pc[j,i] <- pc1
+        expected_PS[j,i] <- ps_expected1
+        expected_PC[j,i] <- pc_expected1
+        prices_hc[j,i] <- hc_new
+        
+      }
+      
+    }
+```
