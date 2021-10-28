@@ -8,16 +8,12 @@ equilibriumCheck <- lapply(1:nrow(cull_cartesian), matrix, data= 0, nrow = eqIte
 
 for(k in 1:maxIter){
   
-  # k <- 2
+  # k <- 7
   
-  if(norm(x = (c_cull - c_old_cull), type = "f") < 0.05 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.05){
+  if(norm(x = (c_cull - c_old_cull), type = "f") < 0.001 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.001){
     if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
       break
     }
-  }
-  
-  if( k > 50 ){
-    break
   }
   
   count <- count + 1
@@ -47,7 +43,7 @@ for(k in 1:maxIter){
       clNodes[j,i] <- cl_node
       
       #### getting the parameters from the optParamFunction
-      params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_old, pc = pc_old, thetas = c(1,1))
+      params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new[1], pc = pc_new[1], thetas = c(1,1))
       
       mu_Tilde <- params_mu_s[1]
       s_Tilde <- params_mu_s[2]
@@ -67,6 +63,12 @@ for(k in 1:maxIter){
         pc_o <- pc_old
       }
       
+      # ps_lo <- ps_o  - 0.32417
+      # pc_lo <- pc_o - 0.386667
+      # 
+      # ps_up <- ps_o + 0.37750
+      # pc_up <- pc_o  + 0.371250
+      
       ps_lo <- ps_o  - 0.35
       pc_lo <- pc_o - 0.4
       
@@ -82,13 +84,11 @@ for(k in 1:maxIter){
         pc_lo <- pc_o
       }
       
-      #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
-      while( pc_lo > ps_lo ){
+      while(pc_lo>ps_lo){
         pc_lo <- pc_lo - 0.01
       }
       
       
-      ##### Gaussian quadrature for integration to get the expected price. The weights are pre determined.
       ps_expected <- sum(as.numeric(ps_o) * fedMeshCheb)
       
       pc_expected <- sum(as.numeric(pc_o) * cullMeshCheb)
@@ -98,13 +98,21 @@ for(k in 1:maxIter){
       ### expectations holding costs. Because we have the expected price in the equality.
       hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pc_expected + g * (beta^3) * ps_expected - pc_o)
       
-      #### Here we make sure that the holding costs are below the cull cow price
       while(hc_new > pc_o){
         hc_new <- hc_new - 0.01
       }
       
+      # hc_new <- (((g * (beta^3) * ps_o) + (beta - 1) * pc_o)/(1 + g * beta * (gamma0 + beta * gamma1)))
+      # 
+      # while(hc_new > pc_o){
+      #   hc_new <- hc_new - 0.01
+      # }
+      
       hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
       B <- ps_o - g * (beta^3) * ps_expected + hc_discounted
+      
+      # pc_expected <- (1/beta) * (pc_o - g * (beta^3) * ps_expected +  (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new)
+      
       
       ps_expected_lo <- ps_expected - 0.1
       
@@ -135,7 +143,7 @@ for(k in 1:maxIter){
       
     }
     
-    if( k == 2 ){
+    if( k > 1 ){
       
       m <- 1
       
@@ -149,6 +157,18 @@ for(k in 1:maxIter){
       A_node <- (sl_node + cl_node) * dShockNode
       
       Anodes[j,i] <- A_node
+      # slNodes[j,i] <- sl_node
+      # clNodes[j,i] <- cl_node
+      
+      #### getting the parameters from the optParamFunction
+      
+      # params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, ps = ps_new, pc = pc_new, thetas = c(1,1))
+      # 
+      # mu_Tilde <- params_mu_s[1]
+      # s_Tilde <- params_mu_s[2]
+      # 
+      # mu_Tildes[j,i] <- mu_Tilde
+      # s_Tildes[j,i] <- s_Tilde
       
       while(abs(fedDiff[j,i])>0.001 || abs(cullDiff[j,i])>0.001){
         
@@ -178,6 +198,12 @@ for(k in 1:maxIter){
         ps_up <- ps_n + 0.10929
         pc_up <- pc_n + 0.080153
         
+        # ps_lo <- ps_n  - 0.32417
+        # pc_lo <- pc_n - 0.386667
+        # 
+        # ps_up <- ps_n + 0.37750
+        # pc_up <- pc_n  + 0.371250
+        
         if(ps_lo < 0){
           ps_lo <- ps_n
         }
@@ -190,11 +216,18 @@ for(k in 1:maxIter){
           pc_lo <- pc_lo - 0.01
         }
         
-        ps_expected <- expected_PS[j,i]
-        pc_expected <- expected_PC[j,i]
+        # ps_expected <- sum(as.numeric(ps_n) * fedMeshCheb)
+        # 
+        # hc_new <- (((g * (beta^3) * ps_n) + (beta - 1) * pc_n)/(1 + g * beta * (gamma0 + beta * gamma1)))
+        # hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new
+        # 
+        # B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
         
         # ps_expected <- sum(as.numeric(ps_n) * fedMeshCheb)
         # pc_expected <- sum(as.numeric(pc_n) * cullMeshCheb)
+        
+        ps_expected <- expected_PS[j,i]
+        pc_expected <- expected_PC[j,i]
         
         ### This holding costs are derived from the fact that the farmers cull cows when they reach 9 yeards old. So, 
         ### we use the equality of that to get the holding costs. From my first observation this is greater than the naive 
@@ -205,8 +238,16 @@ for(k in 1:maxIter){
           hc_new <- hc_new - 0.01
         }
         
+        # hc_new <- (((g * (beta^3) * ps_n) + (beta - 1) * pc_n)/(1 + g * beta * (gamma0 + beta * gamma1)))
+        # 
+        # while(hc_new>pc_n){
+        #   hc_new <- hc_new - 0.01
+        # }
+        
         hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
         B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
+        
+        # pc_expected <- (1/beta) * (pc_n - g * (beta^3) * ps_expected + (1 + beta * (g * gamma0 + beta * g * gamma1)) * hc_new)
         
         ps_expected_lo <- ps_expected - 0.1
         
@@ -227,8 +268,9 @@ for(k in 1:maxIter){
         mu_Tilde <- params_mu_s[1]
         s_Tilde <- params_mu_s[2]
         
-        mu_Tildes_eq[j,i] <- mu_Tilde
-        s_Tildes_eq[j,i] <- s_Tilde
+        mu_Tildes[j,i] <- mu_Tilde
+        s_Tildes[j,i] <- s_Tilde
+        
         
         estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
                         hc_discounted = hc_discounted, lower = lo, upper = up)
@@ -243,12 +285,9 @@ for(k in 1:maxIter){
         expected_PS[j,i] <- ps_expected1
         expected_PC[j,i] <- pc_expected1
         prices_hc[j,i] <- hc_new
+        # slNodes[j,i] <- sl_node * adjFac
+        # clNodes[j,i] <- cl_node * adjFac
         
-        prices_ps_eq[j,i] <- ps1
-        prices_pc_eq[j,i] <- pc1
-        expected_PS_eq[j,i] <- ps_expected1
-        expected_PC_eq[j,i] <- pc_expected1
-        prices_hc_eq[j,i] <- hc_new
         
         ### Demand of the fed cattle meat under the new prices
         D_slPsPc[j,i] <- A_node *
@@ -264,6 +303,8 @@ for(k in 1:maxIter){
         
         #### Here we use sl+cl for A_node. Why? because we use the current quantities i.e., Stock_1t and k_9t + k_8t + k_7t
         #### That means the total derived demand should be sl+cl? Dunno Have to think more.....
+        # A_node <- (sl_node + cl_node)
+        
         estK <- BBoptim(par = K, fn = optKFunction, ps = ps1, pc = pc1, A = A_node)
         
         k_3t1 <- estK$par[1]
@@ -272,10 +313,8 @@ for(k in 1:maxIter){
         sl1 <- (g * Stock_1t - k_3t1)
         cl1 <- (k_9t + k_8t + k_7t - k_7_10t1) 
         
-        slNodes[j,i] <- sl1
-        clNodes[j,i] <- cl1
-        
-        A_nodes[j,i] <- A_node
+        slNodes[j,i] <- sl1 * adjFac
+        clNodes[j,i] <- cl1 * adjFac
         
         #### Total demand for the meat under new prices
         D_PsPc <- as.matrix(D_slPsPc[j,i] + D_clPsPc[j,i])
@@ -298,144 +337,34 @@ for(k in 1:maxIter){
         if((m %% 2 == 0)){
           A_node <- (sl1 + cl1) * dShockNode
         }else{
-          sl_node <- sl1
+          sl_node <- sl1 
           cl_node <- cl1 
         }
         m <- m+1
-        
       }
       
     }
     
-    if( k > 2){
-      
-      # cullCowNode <- cull_cartesian$cullNodes[j]
-      # dShockNode <- cull_cartesian$dShockNodes[j]
-      # fedCattleNode <- fed_cartesian$fedNodes[j]
-      # 
-      # sl_node <- fedCattleNode
-      # cl_node <- cullCowNode
-      # A_node <- (sl_node + cl_node) * dShockNode
-      
-      ps_n <- prices_ps[j,i]
-      pc_n <- prices_pc[j,i]
-      
-      ps_lo <- ps_n  - 0.35
-      pc_lo <- pc_n - 0.4
-      
-      ps_up <- ps_n + 0.10929
-      pc_up <- pc_n + 0.080153
-      
-      if(ps_lo < 0){
-        ps_lo <- ps_n
-      }
-      
-      if(pc_lo < 0){
-        pc_lo <- pc_n
-      }
-      
-      while(pc_lo>ps_lo){
-        pc_lo <- pc_lo - 0.01
-      }
-      
-      ps_expected <- expected_PS[j,i]
-      pc_expected <- expected_PC[j,i]
-      
-      # ps_expected <- sum(as.numeric(ps_n) * fedMeshCheb)
-      # pc_expected <- sum(as.numeric(pc_n) * cullMeshCheb)
-      
-      ### This holding costs are derived from the fact that the farmers cull cows when they reach 9 yeards old. So, 
-      ### we use the equality of that to get the holding costs. From my first observation this is greater than the naive 
-      ### expectations holding costs. Because we have the expected price in the equality.
-      hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pc_expected + g * (beta^3) * ps_expected - pc_n)
-      
-      while( hc_new > pc_n ){
-        hc_new <- hc_new - 0.01
-      }
-      
-      hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
-      B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
-      
-      ps_expected_lo <- ps_expected - 0.1
-      
-      ps_expected_up <- ps_expected + 0.1
-      
-      pc_expected_lo <- pc_expected - 0.1
-      
-      pc_expected_up <- pc_expected + 0.1
-      
-      p <- c(ps_n, pc_n, ps_expected, pc_expected)
-      
-      lo <- c(ps_lo, pc_lo, ps_expected_lo, pc_expected_lo)
-      up <- c(ps_up, pc_up, ps_expected_up, pc_expected_up)
-      
-      dShockNode <- cull_cartesian$dShockNodes[j]
-      
-      sl_node <- slNodes[j,i]
-      cl_node <- clNodes[j,i]
-      A_node <- Anodes[j,i]
-      
-      params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, 
-                                      ps = ps_n, pc = pc_n, thetas = c(1,1))
-      
-      mu_Tilde <- params_mu_s[1]
-      s_Tilde <- params_mu_s[2]
-      
-      mu_Tildes_itr[j,i] <- mu_Tilde
-      s_Tildes_itr[j,i] <- s_Tilde
-      
-      estP <- BBoptim(par = p, fn = optPriceFunction, sl = sl_node, cl = cl_node, A = A_node, B = B, 
-                      hc_discounted = hc_discounted, lower = lo, upper = up)
-      
-      ps1 <- estP$par[1]
-      pc1 <- estP$par[2]
-      ps_expected1 <- estP$par[3]
-      pc_expected1 <- estP$par[4]
-      
-      prices_ps[j,i] <- ps1
-      prices_pc[j,i] <- pc1
-      expected_PS[j,i] <- ps_expected1
-      expected_PC[j,i] <- pc_expected1
-      prices_hc[j,i] <- hc_new
-      
-      prices_ps_itr[j,i] <- ps1
-      prices_pc_itr[j,i] <- pc1
-      expected_PS_itr[j,i] <- ps_expected1
-      expected_PC_itr[j,i] <- pc_expected1
-      prices_hc_itr[j,i] <- hc_new
-      
-      ### Demand of the fed cattle meat under the new prices
-      D_slPsPc_itr[j,i] <- A_node *
-        ((exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))/
-           (1 + (exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde))))
-      
-      ### Demand of the cull cow meat under the new prices
-      D_clPsPc_itr[j,i] <- A_node * (1/(1+ exp((mu_Tilde - ((ps1/phi) - (pc1/phi)))/s_Tilde)))
-      
-      slNodes_itr[j,i] <- D_slPsPc_itr[j,i]
-      clNodes_itr[j,i] <- D_clPsPc_itr[j,i] 
-      
-      slNodes[j,i] <- D_slPsPc_itr[j,i]
-      clNodes[j,i] <- D_clPsPc_itr[j,i]
-      
-    }
+    
+    
+    
+    
+    
+    
+    
     
     fedPrice[[i]][j,k] <- ps1
     cullPrice[[i]][j,k] <- pc1
-    
-    fedProd[[i]][j,k] <- slNodes[j,i]
-    cullProd[[i]][j,k] <- clNodes[j,i]
-    
   }
   
   if(k==1){
     ### Demand of the fed cattle meat under the new prices
     D_slPsPc[,i] <- Anodes[,i] *
-      ((exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i]))/
-         (1 + (exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i]))))
+      ((exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))/
+         (1 + (exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde))))
     
     ### Demand of the cull cow meat under the new prices
-    D_clPsPc[,i] <- Anodes[,i] * (1/(1+ exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i])))
+    D_clPsPc[,i] <- Anodes[,i] * (1/(1+ exp((mu_Tilde - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tilde)))
     
     #### Total demand for the meat under new prices
     D_PsPc <- as.matrix(D_slPsPc[,i] + D_clPsPc[,i])
@@ -449,6 +378,16 @@ for(k in 1:maxIter){
     slNodes[,i] <- D_slPsPc[,i]
     clNodes[,i] <- D_clPsPc[,i]
     
+    # TS_TD_diff <- norm(x = (S_psPC- D_PsPc) , type = "f")
+    # TS_D_sl_diff <- norm(x = as.matrix(slNodes[,i] - D_slPsPc[,i]) , type = "f")
+    # TS_D_cl_diff <- norm(x =  as.matrix(clNodes[,i] - D_clPsPc[,i]) , type = "f")
+    
+    # cat("\n norm of supply and demand: ", fedDiff[,i])
+    
+    # cat("\n difference of fed supply and demand: ", as.matrix(fedDiff[,i]))
+    
+    # cat("\n difference of cull supply and demand: ", as.matrix(cullDiff[,i] ))
+    
     sdiff <- fedDiff[,i]
     cdiff <- cullDiff[,i]
   }
@@ -458,9 +397,6 @@ for(k in 1:maxIter){
   
   ps_m <- mean(prices_ps[,i])
   pc_m <- mean(prices_pc[,i])
-  
-  ps_exp_m <- mean(expected_PS[,i])
-  pc_exp_m <- mean(expected_PC[,i])
   
   fedDiff_m <- mean(fedDiff[,i])
   cullDiff_m <- mean(cullDiff[,i])
@@ -476,10 +412,5 @@ for(k in 1:maxIter){
   cat("\n Squared difference between old and new mean fed cattle prices: ", (ps_m - ps_old)^2)
   
   cat("\n Squared difference between old and new mean cull cattle prices: ", (pc_m - pc_old)^2)
-  
-  checkTol[k,1] <- norm(x = (c_fed - c_old_fed) , type = "f")
-  checkTol[k,2] <- norm(x = (c_cull - c_old_cull) , type = "f")
-  checkTol[k,3] <- (ps_m - ps_old)^2
-  checkTol[k,4] <- (pc_m - pc_old)^2
   
 }
