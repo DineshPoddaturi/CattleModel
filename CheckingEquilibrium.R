@@ -10,11 +10,19 @@ for(k in 1:maxIter){
   
   # k <- 2
   
-  if(norm(x = (c_cull - c_old_cull), type = "f") < 0.05 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.05){
-    if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
-      break
+  # if( norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
+  #   if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
+  #     break
+  #   }
+  # }
+  if(k>1){
+    if( round(checkTol[k-1,1],5) < 0.01 && round(checkTol[k-1,2],5) < 0.01){
+      if( round(checkTol[k-1,3],5) < 0.001 && round(checkTol[k-1,4],5) < 0.001){
+        break
+      }
     }
   }
+  
   
   if( k > 50 ){
     break
@@ -294,6 +302,10 @@ for(k in 1:maxIter){
         equilibriumCheck[[j]][m,6] <- expected_PS[j,i]
         equilibriumCheck[[j]][m,7] <- expected_PC[j,i]
         
+        slNodes_eq[j,i] <- sl1
+        clNodes_eq[j,i] <- cl1
+        A_nodes_eq[j,i] <- A_node
+        
         ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
         if((m %% 2 == 0)){
           A_node <- (sl1 + cl1) * dShockNode
@@ -415,8 +427,19 @@ for(k in 1:maxIter){
       slNodes_itr[j,i] <- D_slPsPc_itr[j,i]
       clNodes_itr[j,i] <- D_clPsPc_itr[j,i] 
       
-      slNodes[j,i] <- D_slPsPc_itr[j,i]
-      clNodes[j,i] <- D_clPsPc_itr[j,i]
+      # slNodes[j,i] <- D_slPsPc_itr[j,i]
+      # clNodes[j,i] <- D_clPsPc_itr[j,i]
+      
+    }
+    
+    
+    if(k>3){
+      
+      if( round(checkTol[k-2,],5) == round(checkTol[k-1,],5)){
+        if(round(checkTol[k-3,],5) == round(checkTol[k-2,],5)){
+          break
+        }
+      }
       
     }
     

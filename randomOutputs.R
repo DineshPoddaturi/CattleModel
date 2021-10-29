@@ -98,17 +98,17 @@
 # [16] 0.4788952 0.4795141 0.4797577 0.5171195 0.4249830
 # [21] 0.4794896 0.4794589 0.4797509 0.5169048 0.4808391
 
-pc_Nparam <- prices_pc[,i][1:25]
-ps_Nparam <- prices_ps[,i][1:25]
-
-pc_Yparam <- prices_pc[,i][1:25]
-ps_Yparam <- prices_ps[,i][1:25]
-
-mean(pc_Nparam)
+################# In the analysis I am changing the parameterxs every year
 
 
+slNodes_itr[,i][1:25]
+slNodes_eq[,i][1:25]
 
+mu_Tildes_itr[,i][1:25]
+s_Tildes_itr[,i][1:25]
 
+mu_Tildes_eq[,i][1:25]
+s_Tildes_eq[,i][1:25]
 
 
 
