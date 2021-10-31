@@ -19,7 +19,7 @@ names(pricePS) <- "ps"
 # mean(pricePS$ps)
 ggplot(data = pricePS, aes(x=ps)) + geom_density()
 
-prices_psLong <- melt(prices_ps[1:25,], id.vars= "refseq") %>% select(variable = Var2, ps = value) %>% filter(ps >0)
+prices_psLong <- melt(prices_ps_eq[1:25,], id.vars= "refseq") %>% select(variable = Var2, ps = value) %>% filter(ps >0)
 ggplot(prices_psLong, aes (ps)) + geom_density() + facet_wrap(~variable)
 
 prices_SlLong <- melt(slNodes[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)
@@ -33,7 +33,7 @@ pricePC <- prices_pc[,2][1:25] %>% as.data.frame()
 names(pricePC) <- "pc"
 ggplot(data = pricePC, aes(x=pc)) + geom_density()
 
-prices_pcLong <- melt(prices_pc[1:25,], id.vars= "refseq") %>% select(variable = Var2, pc = value) %>% filter(pc >0)
+prices_pcLong <- melt(prices_pc_eq[1:25,], id.vars= "refseq") %>% select(variable = Var2, pc = value) %>% filter(pc >0)
 ggplot(prices_pcLong, aes (pc)) + geom_density() + facet_wrap(~variable)
 
 prices_ClLong <- melt(clNodes[1:25,], id.vars= "refseq") %>% select(variable = Var2, value) %>% filter(value >0)

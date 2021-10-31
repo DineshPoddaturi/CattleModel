@@ -98,17 +98,34 @@
 # [16] 0.4788952 0.4795141 0.4797577 0.5171195 0.4249830
 # [21] 0.4794896 0.4794589 0.4797509 0.5169048 0.4808391
 
-################# In the analysis I am changing the parameterxs every year
+################# In the analysis I am changing the parameters every year
+
+prices_ps_eq[,i][1:25]
+
+prices_pc_eq[,i][1:25]
 
 
-slNodes_itr[,i][1:25]
-slNodes_eq[,i][1:25]
+prices_ps_itr[,i][1:25]
 
-mu_Tildes_itr[,i][1:25]
-s_Tildes_itr[,i][1:25]
+prices_pc_itr[,i][1:25]
+
 
 mu_Tildes_eq[,i][1:25]
-s_Tildes_eq[,i][1:25]
+
+mu_Tildes_itr[,i][1:25]
+
+
+
+
+
+
+apply(df1,2,median)
+
+
+
+
+
+
 
 
 

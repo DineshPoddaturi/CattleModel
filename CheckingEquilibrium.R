@@ -16,8 +16,8 @@ for(k in 1:maxIter){
   #   }
   # }
   if(k>1){
-    if( round(checkTol[k-1,1],5) < 0.01 && round(checkTol[k-1,2],5) < 0.01){
-      if( round(checkTol[k-1,3],5) < 0.001 && round(checkTol[k-1,4],5) < 0.001){
+    if( round(checkTol[k-1,1],3) < 0.01 && round(checkTol[k-1,2],3) < 0.01){
+      if( round(checkTol[k-1,3],3) < 0.001 && round(checkTol[k-1,4],3) < 0.001){
         break
       }
     }
@@ -385,7 +385,7 @@ for(k in 1:maxIter){
       
       sl_node <- slNodes[j,i]
       cl_node <- clNodes[j,i]
-      A_node <- Anodes[j,i]
+      A_node <- Anodes[j,i] * dShockNode
       
       params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, 
                                       ps = ps_n, pc = pc_n, thetas = c(1,1))
@@ -433,15 +433,15 @@ for(k in 1:maxIter){
     }
     
     
-    if(k>3){
-      
-      if( round(checkTol[k-2,],5) == round(checkTol[k-1,],5)){
-        if(round(checkTol[k-3,],5) == round(checkTol[k-2,],5)){
-          break
-        }
-      }
-      
-    }
+    # if(k>2){
+    #   
+    #   if( round(checkTol[k-2,],2) == round(checkTol[k-1,],2)){
+    #     # if(round(checkTol[k-3,],2) == round(checkTol[k-2,],2)){
+    #       break
+    #     }
+    #   # }
+    #   
+    # }
     
     fedPrice[[i]][j,k] <- ps1
     cullPrice[[i]][j,k] <- pc1
@@ -504,5 +504,14 @@ for(k in 1:maxIter){
   checkTol[k,2] <- norm(x = (c_cull - c_old_cull) , type = "f")
   checkTol[k,3] <- (ps_m - ps_old)^2
   checkTol[k,4] <- (pc_m - pc_old)^2
+  
+  if( k > 3 ){
+    if( round(checkTol[k-1,],2) == round(checkTol[k,],2)){
+      if(round(checkTol[k-2,],2) == round(checkTol[k-1,],2)){
+          break
+      }
+    }
+    
+  }
   
 }
