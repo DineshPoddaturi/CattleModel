@@ -215,6 +215,142 @@ params <- merge(mutildes_agg, stildes_agg)
 
 
 
+########################################################################################
+
+# Here I get the meand and median of the first 25 nodes of the equilibrium prices and quantities
+
+EQprices_ps_Means <- apply(prices_ps_eq[1:25,], 2, mean)
+EQestPS <- EQprices_ps_Means %>% as.data.frame()
+names(EQestPS) <- "fedPrice"
+EQestPS <- EQestPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+EQestObsPS <- left_join(EQestPS,quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
+EQestObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL (MEAN)")) +
+  geom_point(aes(y = fedPrice, color = "PS RATIONAL (MEAN)")) + geom_line(aes(y=ps, color = "PS OBS")) + 
+  geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsPS$Year[1],EQestObsPS$Year[nrow(EQestObsPS)]))) +
+  expand_limits(y = 0.5)
+
+EQprices_ps_Medians <- apply(prices_ps_eq[1:25,], 2, median)
+EQestPS_Medians <- EQprices_ps_Medians %>% as.data.frame()
+names(EQestPS_Medians) <- "fedPrice"
+EQprices_ps_Medians <- EQestPS_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+EQestObsPS_Medians <- left_join(EQprices_ps_Medians,quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
+EQestObsPS_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = fedPrice, color = "PS RATIONAL (MEDIAN)")) + geom_line(aes(y=ps, color = "PS OBS")) + 
+  geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsPS_Medians$Year[1],EQestObsPS_Medians$Year[nrow(EQestObsPS_Medians)]))) +
+  expand_limits(y = 0.5)
+
+
+EQprices_pc_Means <- apply(prices_pc_eq[1:25,], 2, mean)
+EQestPC <- EQprices_pc_Means %>% as.data.frame()
+names(EQestPC) <- "cullPrice"
+EQestPC <- EQestPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+EQestObsPC <- left_join(EQestPC,quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(err = (cullPrice - pc))
+EQestObsPC %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL (MEAN)")) +
+  geom_point(aes(y = cullPrice, color = "PC RATIONAL (MEAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
+  geom_point(aes(y=pc, color = "PC OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsPC$Year[1],EQestObsPC$Year[nrow(EQestObsPC)]))) +
+  expand_limits(y = 0.5)
+
+EQprices_pc_Medians <- apply(prices_pc_eq[1:25,], 2, median)
+EQestPC_Medians <- EQprices_pc_Medians %>% as.data.frame()
+names(EQestPC_Medians) <- "cullPrice"
+EQprices_PC_Medians <- EQestPC_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+EQestObsPC_Medians <- left_join(EQprices_PC_Medians,quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(err = (cullPrice - pc))
+EQestObsPC_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = cullPrice, color = "PC RATIONAL (MEDIAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
+  geom_point(aes(y=pc, color = "PC OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsPC$Year[1],EQestObsPC$Year[nrow(EQestObsPC)]))) +
+  expand_limits(y = 0.5)
+
+
+
+
+
+
+EQquantities_sl_Means <- apply(slNodes_eq[1:25,], 2, mean)
+
+EQquantities_sl_Medians <- apply(slNodes_eq[1:25,], 2, median)
+
+
+EQquantities_cl_Means <- apply(clNodes_eq[1:25,], 2, mean)
+
+EQquantities_cl_Medians <- apply(clNodes_eq[1:25,], 2, median)
+
+ITRprices_ps_Means <- apply(prices_ps_itr[1:25,], 2, mean)
+ITRestPS <- ITRprices_ps_Means %>% as.data.frame()
+names(ITRestPS) <- "fedPrice"
+ITRestPS <- ITRestPS %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestObsPS <- left_join(ITRestPS,quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
+ITRestObsPS %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL (MEAN)")) +
+  geom_point(aes(y = fedPrice, color = "PS RATIONAL (MEAN)")) + geom_line(aes(y=ps, color = "PS OBS")) + 
+  geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPS$Year[1],ITRestObsPS$Year[nrow(ITRestObsPS)]))) +
+  expand_limits(y = 0.5)
+
+ITRprices_ps_Medians <- apply(prices_ps_itr[1:25,], 2, median)
+ITRestPS_Medians <- ITRprices_ps_Medians %>% as.data.frame()
+names(ITRestPS_Medians) <- "fedPrice"
+ITRestPS_Medians <- ITRestPS_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestObsPS_Medians <- left_join(ITRestPS_Medians,quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))
+ITRestObsPS_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = fedPrice, color = "PS RATIONAL (MEDIAN)")) + geom_line(aes(y=ps, color = "PS OBS")) + 
+  geom_point(aes(y=ps, color = "PS OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPS_Medians$Year[1],ITRestObsPS_Medians$Year[nrow(ITRestObsPS_Medians)]))) +
+  expand_limits(y = 0.5)
+
+
+ITRprices_pc_Means <- apply(prices_pc_itr[1:25,], 2, mean)
+ITRestPC <- ITRprices_pc_Means %>% as.data.frame()
+names(ITRestPC) <- "cullPrice"
+ITRestPC <- ITRestPC %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestObsPC <- left_join(ITRestPC,quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(err = (cullPrice - pc))
+ITRestObsPC %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL (MEAN)")) +
+  geom_point(aes(y = cullPrice, color = "PC RATIONAL (MEAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
+  geom_point(aes(y=pc, color = "PC OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPC$Year[1],ITRestObsPC$Year[nrow(ITRestObsPC)]))) +
+  expand_limits(y = 0.5)
+
+ITRprices_pc_Medians <- apply(prices_pc_itr[1:25,], 2, median)
+ITRestPC_Medians <- ITRprices_pc_Medians %>% as.data.frame()
+names(ITRestPC_Medians) <- "cullPrice"
+ITRestPC_Medians <- ITRestPC_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestObsPC_Medians <- left_join(ITRestPC_Medians,quantities_prices_capK) %>% select(Year, cullPrice, pc) %>% mutate(err = (cullPrice - pc))
+ITRestObsPC_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = cullPrice, color = "PC RATIONAL (MEDIAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
+  geom_point(aes(y=pc, color = "PC OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPC$Year[1],ITRestObsPC$Year[nrow(ITRestObsPC)]))) +
+  expand_limits(y = 0.5)
+
+ITRquantities_sl_Means <- apply(slNodes_itr[1:25,], 2, mean)
+
+ITRquantities_sl_Medians <- apply(slNodes_itr[1:25,], 2, median)
+
+
+ITRquantities_cl_Means <- apply(clNodes_itr[1:25,], 2, mean)
+
+ITRquantities_cl_Medians <- apply(clNodes_itr[1:25,], 2, median)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
