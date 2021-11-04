@@ -173,5 +173,21 @@ fedPrice[[1]][, colSums(fedPrice[[1]])>0]
 # > unique(prices_pc[,i])
 # [1] 0.4199030 0.3864626 0.3397500 0.3665170 0.3646915
 # [6] 0.3757974 0.3974028 0.3670210
+diff <- matrix(data= 0, nrow = 25, ncol = ncol(prices_ps_eq))
+for(i in 1:ncol(prices_ps_eq)){
+  diff[,i] <- prices_ps_eq[1:25,i] - quantities_prices_capK$ps[i+3]
+}
+
+round(diff,2)
+
+
+
+
+
+
+
+
+
+
 
 

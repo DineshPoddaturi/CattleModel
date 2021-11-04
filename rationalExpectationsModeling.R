@@ -283,8 +283,16 @@ normalizedNodes <- function(d){
 
 #### For testing purposes I use n = 5 for now. 
 chebNodesN <- 5
-stateVarDemand <- merge(fedCattleProd_adj, cullCowsProd_adj) %>% transmute(Year = Year, demand = fedCattle + cullCows)
-stateVariablesList <- list(cornPrice, cullCowsProd_adj, fedCattleProd_adj, demandShockGaussian1, 
+
+supp_sl_adj_N <- supp_sl_adj %>% select(Year, fedCattle = Bill_meatLb_sl)
+supp_cl_adj_N <- supp_cl_adj %>% select(Year, cullCows = Bill_meatLb_cl)
+
+stateVarDemand <- merge(supp_sl_adj_N, supp_cl_adj_N) %>% transmute(Year = Year, demand = fedCattle + cullCows)
+
+# stateVarDemand <- merge(fedCattleProd_adj, cullCowsProd_adj) %>% transmute(Year = Year, demand = fedCattle + cullCows)
+# stateVariablesList <- list(cornPrice, cullCowsProd_adj, fedCattleProd_adj, demandShockGaussian1, 
+#                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
+stateVariablesList <- list(cornPrice, supp_sl_adj_N, supp_cl_adj_N, demandShockGaussian1, 
                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
 
 stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na()
@@ -456,7 +464,8 @@ optKFunction <- function(K, ps, pc, A, B){
   K1 <- K[1]
   K2 <- K[2]
   
-  fed <- g * Stock_1t - K1 - A * ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+  fed <- g * Stock_1t - K1 - A * 
+    ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
   cull <- k_9t + k_8t + k_7t - K2 - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
   
   F = fed^2 + cull^2
@@ -478,6 +487,9 @@ capK <- merge(K_1t, K_jt)
 
 sl_quant <- fedCattleProd_adj %>% transmute(Year = Year, sl = fedCattle)
 cl_quant <- cullCowsProd_adj %>% transmute(Year = Year, cl = cullCows)
+
+sl_quant <- supp_sl_adj_N %>% transmute(Year = Year, sl = fedCattle)
+cl_quant <- supp_cl_adj_N %>% transmute(Year = Year, cl = cullCows)
 
 # dShocks <- stateVars %>% select(Year, Shock)
 
@@ -600,7 +612,7 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   c_cull_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow=nrow(cullInterpolationMatrix), ncol=1)
   c_fed_opt <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow=nrow(fedCattleInterpolationMatrix), ncol=1)
   
-  maxIter <- 500
+  maxIter <- 750
   
   fedPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(fed_cartesian), ncol=maxIter)
   cullPrice <- lapply(1:nrow(quantities_prices_capK), matrix, data= 0, nrow = nrow(cull_cartesian), ncol=maxIter)

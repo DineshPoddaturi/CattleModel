@@ -219,6 +219,9 @@ params <- merge(mutildes_agg, stildes_agg)
 
 # Here I get the meand and median of the first 25 nodes of the equilibrium prices and quantities
 
+apply(prices_ps_eq[1:25,], 2, sd)
+
+
 EQprices_ps_Means <- apply(prices_ps_eq[1:25,], 2, mean)
 EQestPS <- EQprices_ps_Means %>% as.data.frame()
 names(EQestPS) <- "fedPrice"
@@ -264,14 +267,25 @@ EQestObsPC_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC 
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsPC$Year[1],EQestObsPC$Year[nrow(EQestObsPC)]))) +
   expand_limits(y = 0.5)
 
-
-
-
-
-
 EQquantities_sl_Means <- apply(slNodes_eq[1:25,], 2, mean)
+EQestSL <- EQquantities_sl_Means %>% as.data.frame()
+names(EQestSL) <- "fedProduction"
+EQestSL <- EQestSL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+EQestObsSL <- left_join(EQestSL,quantities_prices_capK) %>% select(Year, fedProduction, sl) %>% mutate(err = (fedProduction - sl))
+EQestObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=fedProduction, color="FED PRODUCTION RATIONAL (MEAN)")) +
+  geom_point(aes(y = fedProduction, color = "FED PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=sl, color = "FED PRODUCTION OBS")) + 
+  geom_point(aes(y=sl, color = "FED PRODUCTION OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsSL$Year[1],EQestObsSL$Year[nrow(EQestObsSL)]))) 
 
 EQquantities_sl_Medians <- apply(slNodes_eq[1:25,], 2, median)
+EQestSL_Medians <- EQquantities_sl_Medians %>% as.data.frame()
+names(EQestSL_Medians) <- "fedProduction"
+EQestSL_Medians <- EQestSL_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+EQestObsSL_Medians <- left_join(EQestSL,quantities_prices_capK) %>% select(Year, fedProduction, sl) %>% mutate(err = (fedProduction - sl))
+EQestObsSL_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=fedProduction, color="FED PRODUCTION RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = fedProduction, color = "FED PRODUCTION RATIONAL (MEDIAN)")) + geom_line(aes(y=sl, color = "FED PRODUCTION OBS")) + 
+  geom_point(aes(y=sl, color = "FED PRODUCTION OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsSL$Year[1],EQestObsSL$Year[nrow(EQestObsSL)]))) 
 
 
 EQquantities_cl_Means <- apply(clNodes_eq[1:25,], 2, mean)
@@ -300,7 +314,6 @@ ITRestObsPS_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=fedPrice, color="PS 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPS_Medians$Year[1],ITRestObsPS_Medians$Year[nrow(ITRestObsPS_Medians)]))) +
   expand_limits(y = 0.5)
 
-
 ITRprices_pc_Means <- apply(prices_pc_itr[1:25,], 2, mean)
 ITRestPC <- ITRprices_pc_Means %>% as.data.frame()
 names(ITRestPC) <- "cullPrice"
@@ -323,15 +336,51 @@ ITRestObsPC_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=cullPrice, color="PC
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPC$Year[1],ITRestObsPC$Year[nrow(ITRestObsPC)]))) +
   expand_limits(y = 0.5)
 
+
 ITRquantities_sl_Means <- apply(slNodes_itr[1:25,], 2, mean)
+ITRestSL <- ITRquantities_sl_Means %>% as.data.frame()
+names(ITRestSL) <- "fedProduction"
+ITRestSL <- ITRestSL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestObsSL <- left_join(ITRestSL,quantities_prices_capK) %>% select(Year, fedProduction, sl) %>% mutate(err = (fedProduction - sl))
+ITRestObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=fedProduction, color="FED PRODUCTION RATIONAL (MEAN)")) +
+  geom_point(aes(y = fedPrice, color = "FED PRODUCTION  RATIONAL (MEAN)")) + geom_line(aes(y=ps, color = "FED PRODUCTION  OBS")) + 
+  geom_point(aes(y=ps, color = "FED PRODUCTION  OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsSL$Year[1],ITRestObsSL$Year[nrow(ITRestObsSL)]))) +
+  expand_limits(y = 0.5)
 
 ITRquantities_sl_Medians <- apply(slNodes_itr[1:25,], 2, median)
+ITRestSL_Medians <- ITRquantities_sl_Medians %>% as.data.frame()
+names(ITRestSL_Medians) <- "fedProduction"
+ITRestSL_Medians <- ITRestSL_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestSL_Medians <- left_join(ITRestSL_Medians,quantities_prices_capK) %>% select(Year, fedProduction, sl) %>% mutate(err = (fedProduction - sl))
+ITRestSL_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=fedProduction, color="FED PRODUCTION RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = fedProduction, color = "FED PRODUCTION  RATIONAL (MEDIAN)")) + geom_line(aes(y=sl, color = "FED PRODUCTION  OBS")) + 
+  geom_point(aes(y=sl, color = "FED PRODUCTION  OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestSL_Medians$Year[1],ITRestSL_Medians$Year[nrow(ITRestSL_Medians)]))) +
+  expand_limits(y = 0.5)
 
 
 ITRquantities_cl_Means <- apply(clNodes_itr[1:25,], 2, mean)
+ITRestCL <- ITRquantities_cl_Means %>% as.data.frame()
+names(ITRestCL) <- "cullProduction"
+ITRestCL <- ITRestCL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestObsCL <- left_join(ITRestCL,quantities_prices_capK) %>% select(Year, cullProduction, cl) %>% mutate(err = (cullProduction - cl))
+ITRestObsCL %>% ggplot(aes(x=Year))+geom_line(aes(y=cullProduction, color="CULL PRODUCTION RATIONAL (MEAN)")) +
+  geom_point(aes(y = cullProduction, color = "CULL PRODUCTION  RATIONAL (MEAN)")) + geom_line(aes(y=cl, color = "CULL PRODUCTION  OBS")) + 
+  geom_point(aes(y=cl, color = "CULL PRODUCTION  OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsCL$Year[1],ITRestObsCL$Year[nrow(ITRestObsCL)]))) +
+  expand_limits(y = 0.5)
 
 ITRquantities_cl_Medians <- apply(clNodes_itr[1:25,], 2, median)
-
+ITRestCL_Medians <- ITRquantities_cl_Medians %>% as.data.frame()
+names(ITRestCL_Medians) <- "fedProduction"
+ITRestCL_Medians <- ITRestCL_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
+ITRestCL_Medians <- left_join(ITRestCL_Medians,quantities_prices_capK) %>% select(Year, cullProduction, cl) %>% mutate(err = (cullProduction - cl))
+ITRestCL_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=cullProduction, color="CULL PRODUCTION RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = cullProduction, color = "CULL PRODUCTION  RATIONAL (MEDIAN)")) + geom_line(aes(y=cl, color = "CULL PRODUCTION  OBS")) + 
+  geom_point(aes(y=cl, color = "CULL PRODUCTION  OBS")) + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestCL_Medians$Year[1],ITRestCL_Medians$Year[nrow(ITRestCL_Medians)]))) +
+  expand_limits(y = 0.5)
 
 
 
