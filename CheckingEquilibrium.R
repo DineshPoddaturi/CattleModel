@@ -1,7 +1,7 @@
 
 for(i in 1:nrow(quantities_prices_capK)){
   
-  i <- 18
+  i <- 20
   ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
   A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 
@@ -84,14 +84,15 @@ for(i in 1:nrow(quantities_prices_capK)){
   
   for(k in 1:maxIter){
     
-    k <- 2
+    # k <- 2
     
     # if( norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
     #   if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
     #     break
     #   }
     # }
-    if(k>1){
+    
+    if( k > 1 ){
       if( round(checkTol[k-1,1],3) < 0.01 && round(checkTol[k-1,2],3) < 0.01){
         if( round(checkTol[k-1,3],3) < 0.001 && round(checkTol[k-1,4],3) < 0.001){
           break
@@ -114,7 +115,7 @@ for(i in 1:nrow(quantities_prices_capK)){
     
     for(j in 1:nrow(cull_cartesian)){
       
-      j <- 1
+      # j <- 1
       
       if(k == 1){
         
@@ -250,7 +251,8 @@ for(i in 1:nrow(quantities_prices_capK)){
         
         sl_node <- slNodes[j,i]
         cl_node <- clNodes[j,i]
-        A_node <- (sl_node + cl_node) * dShockNode
+        # A_node <- (sl_node + cl_node) * dShockNode 
+        A_node <- Anodes[j,i]
         
         Anodes[j,i] <- A_node
         
@@ -409,6 +411,7 @@ for(i in 1:nrow(quantities_prices_capK)){
             sl_node <- sl1
             cl_node <- cl1 
           }
+          
           m <- m+1
           
         }

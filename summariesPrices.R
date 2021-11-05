@@ -343,8 +343,8 @@ names(ITRestSL) <- "fedProduction"
 ITRestSL <- ITRestSL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 ITRestObsSL <- left_join(ITRestSL,quantities_prices_capK) %>% select(Year, fedProduction, sl) %>% mutate(err = (fedProduction - sl))
 ITRestObsSL %>% ggplot(aes(x=Year))+geom_line(aes(y=fedProduction, color="FED PRODUCTION RATIONAL (MEAN)")) +
-  geom_point(aes(y = fedPrice, color = "FED PRODUCTION  RATIONAL (MEAN)")) + geom_line(aes(y=ps, color = "FED PRODUCTION  OBS")) + 
-  geom_point(aes(y=ps, color = "FED PRODUCTION  OBS")) + theme_classic() + 
+  geom_point(aes(y = fedProduction, color = "FED PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=sl, color = "FED PRODUCTION  OBS")) + 
+  geom_point(aes(y=sl, color = "FED PRODUCTION  OBS")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsSL$Year[1],ITRestObsSL$Year[nrow(ITRestObsSL)]))) +
   expand_limits(y = 0.5)
 
@@ -354,10 +354,9 @@ names(ITRestSL_Medians) <- "fedProduction"
 ITRestSL_Medians <- ITRestSL_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 ITRestSL_Medians <- left_join(ITRestSL_Medians,quantities_prices_capK) %>% select(Year, fedProduction, sl) %>% mutate(err = (fedProduction - sl))
 ITRestSL_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=fedProduction, color="FED PRODUCTION RATIONAL (MEDIAN)")) +
-  geom_point(aes(y = fedProduction, color = "FED PRODUCTION  RATIONAL (MEDIAN)")) + geom_line(aes(y=sl, color = "FED PRODUCTION  OBS")) + 
+  geom_point(aes(y = fedProduction, color = "FED PRODUCTION RATIONAL (MEDIAN)")) + geom_line(aes(y=sl, color = "FED PRODUCTION  OBS")) + 
   geom_point(aes(y=sl, color = "FED PRODUCTION  OBS")) + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(ITRestSL_Medians$Year[1],ITRestSL_Medians$Year[nrow(ITRestSL_Medians)]))) +
-  expand_limits(y = 0.5)
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestSL_Medians$Year[1],ITRestSL_Medians$Year[nrow(ITRestSL_Medians)]))) 
 
 
 ITRquantities_cl_Means <- apply(clNodes_itr[1:25,], 2, mean)
@@ -366,18 +365,17 @@ names(ITRestCL) <- "cullProduction"
 ITRestCL <- ITRestCL %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 ITRestObsCL <- left_join(ITRestCL,quantities_prices_capK) %>% select(Year, cullProduction, cl) %>% mutate(err = (cullProduction - cl))
 ITRestObsCL %>% ggplot(aes(x=Year))+geom_line(aes(y=cullProduction, color="CULL PRODUCTION RATIONAL (MEAN)")) +
-  geom_point(aes(y = cullProduction, color = "CULL PRODUCTION  RATIONAL (MEAN)")) + geom_line(aes(y=cl, color = "CULL PRODUCTION  OBS")) + 
+  geom_point(aes(y = cullProduction, color = "CULL PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=cl, color = "CULL PRODUCTION  OBS")) + 
   geom_point(aes(y=cl, color = "CULL PRODUCTION  OBS")) + theme_classic() + 
-  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsCL$Year[1],ITRestObsCL$Year[nrow(ITRestObsCL)]))) +
-  expand_limits(y = 0.5)
+  scale_x_continuous(name="Year", breaks=c(seq(ITRestObsCL$Year[1],ITRestObsCL$Year[nrow(ITRestObsCL)])))
 
 ITRquantities_cl_Medians <- apply(clNodes_itr[1:25,], 2, median)
 ITRestCL_Medians <- ITRquantities_cl_Medians %>% as.data.frame()
-names(ITRestCL_Medians) <- "fedProduction"
+names(ITRestCL_Medians) <- "cullProduction"
 ITRestCL_Medians <- ITRestCL_Medians %>% mutate(Year = quantities_prices_capK$Year+3) %>% select(Year, everything())
 ITRestCL_Medians <- left_join(ITRestCL_Medians,quantities_prices_capK) %>% select(Year, cullProduction, cl) %>% mutate(err = (cullProduction - cl))
 ITRestCL_Medians %>% ggplot(aes(x=Year))+geom_line(aes(y=cullProduction, color="CULL PRODUCTION RATIONAL (MEDIAN)")) +
-  geom_point(aes(y = cullProduction, color = "CULL PRODUCTION  RATIONAL (MEDIAN)")) + geom_line(aes(y=cl, color = "CULL PRODUCTION  OBS")) + 
+  geom_point(aes(y = cullProduction, color = "CULL PRODUCTION RATIONAL (MEDIAN)")) + geom_line(aes(y=cl, color = "CULL PRODUCTION  OBS")) + 
   geom_point(aes(y=cl, color = "CULL PRODUCTION  OBS")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestCL_Medians$Year[1],ITRestCL_Medians$Year[nrow(ITRestCL_Medians)]))) +
   expand_limits(y = 0.5)
