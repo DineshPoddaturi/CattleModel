@@ -217,6 +217,19 @@ P -> S,D -> P -> S -> P -> D -> P -> S -> D so on....
 
 * Right now use the mean and median statistics to compare with the historical data. Plot the history and the model estimates. Do it for prices and quantities. 
 
+11/8/2021:
+
+* Showed him the results of the model. Equilibrium prices, quantities as well as the converged prices and quantities. If we are using time $t$ price to project three periods ahead, then the prices are showing the same pattern. However, if we use the same periods best information, the model fits properly. 
+
+* I guess for projections, we use the model parameters, the estimated price to determine the future supply,  and the adjustment factor to estimate the derived demand. So by using the future supply, the derived demand, estimated price, fixed parameters, we get new price for that period. Do this process to project further ahead. 
+
+* See the scratch work for more details. I will do more detailed version of the scratch work soon. 
+
+
+
+
+
+
 
 
 

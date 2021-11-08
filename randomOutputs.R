@@ -443,9 +443,23 @@ mu_Tildes_itr[,i][1:25]
 
 
 
+mu_Tildes_eq
 
+mu_Tildes_Means <- apply(mu_Tildes_eq[1:25,], 2, mean)
+mu_TildesSL <- mu_Tildes_Means %>% as.data.frame()
+names(mu_TildesSL) <- "muMean"
+mu_TildesSL <- mu_TildesSL %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
+mu_Tildes_Medians <- apply(mu_Tildes_eq[1:25,], 2, median)
+mu_Tildes_Medians <- mu_Tildes_Medians %>% as.data.frame()
+names(mu_Tildes_Medians) <- "muMedian"
+mu_Tildes_Medians <- mu_Tildes_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
+mu_Tildes <- merge(mu_TildesSL, mu_Tildes_Medians)
+
+mu_TildesObs <- left_join(mu_Tildes,quantities_prices_capK) %>% select(Year, slMean, slMedian, slSM) %>% 
+  mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
+EQestObsSL
 
 
 

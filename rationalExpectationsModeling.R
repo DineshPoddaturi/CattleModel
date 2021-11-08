@@ -166,6 +166,13 @@ newSL <- allStockShocks %>%
   transmute(Year = Year+3, slt = (delta - 0.22 * g) * K * slShock + 
               (1 - 0.22 * g) * g * delta * (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
             slLbs = slt * Slaughter_avg/1000000000)
+# allStockShocks %>% 
+#   transmute(Year = Year +3, slt = lag(slHead)*(slShock^2) + g * delta * (1- 0.22 * g) * 
+#               ( (lag(K,2) - (delta - 0.22 * g) * lag(K,3) - (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2))) * slShock 
+#                                            + (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7) )),
+#             slLbs = slt * Slaughter_avg/1000000000)
+
+
 
 ### NOTE: we did not add any imports or exports in constructing the fed cattle production.
 #### CHECK THE ABOVE AGAIN!!!!! 
@@ -205,15 +212,17 @@ cornPrice <- pcorn
 cullCowsProd <- newCL %>% transmute(Year = Year, cullCows = clLbs)
 fedCattleProd <- newSL %>% transmute(Year = Year, fedCattle = slLbs)
 
-adjFactor_R <- adjFactor %>% mutate(Year = Year + 3)
+# adjFactor_R <- adjFactor %>% mutate(Year = Year + 3)
+# 
+# cullCowsProd_adj <- merge(cullCowsProd,adjFactor_R) %>% mutate(cullCows = 
+#                                                                  cullCows * AdjFactor) %>% select(Year, cullCows)
+# 
+# fedCattleProd_adj <- merge(fedCattleProd,adjFactor_R) %>% mutate(fedCattle = 
+#                                                                    fedCattle * AdjFactor) %>% select(Year, fedCattle)
+# 
+# prod_CornP <- merge(merge(fedCattleProd_adj, cullCowsProd_adj),cornPrice) %>% drop_na()
 
-cullCowsProd_adj <- merge(cullCowsProd,adjFactor_R) %>% mutate(cullCows = 
-                                                                 cullCows * AdjFactor) %>% select(Year, cullCows)
-
-fedCattleProd_adj <- merge(fedCattleProd,adjFactor_R) %>% mutate(fedCattle = 
-                                                                   fedCattle * AdjFactor) %>% select(Year, fedCattle)
-
-prod_CornP <- merge(merge(fedCattleProd_adj, cullCowsProd_adj),cornPrice) %>% drop_na()
+prod_CornP <- merge(merge(fedCattleProd, cullCowsProd),cornPrice) %>% drop_na()
 
 
 ### Here I am generating the shocks again such that when we merge all the dataframes we have enough data.
@@ -284,16 +293,16 @@ normalizedNodes <- function(d){
 #### For testing purposes I use n = 5 for now. 
 chebNodesN <- 5
 
-supp_sl_adj_N <- supp_sl_adj %>% select(Year, fedCattle = Bill_meatLb_sl)
-supp_cl_adj_N <- supp_cl_adj %>% select(Year, cullCows = Bill_meatLb_cl)
+# supp_sl_adj_N <- supp_sl_adj %>% select(Year, fedCattle = Bill_meatLb_sl)
+# supp_cl_adj_N <- supp_cl_adj %>% select(Year, cullCows = Bill_meatLb_cl)
+# 
+# stateVarDemand <- merge(supp_sl_adj_N, supp_cl_adj_N) %>% transmute(Year = Year, demand = fedCattle + cullCows)
 
-stateVarDemand <- merge(supp_sl_adj_N, supp_cl_adj_N) %>% transmute(Year = Year, demand = fedCattle + cullCows)
-
-# stateVarDemand <- merge(fedCattleProd_adj, cullCowsProd_adj) %>% transmute(Year = Year, demand = fedCattle + cullCows)
-# stateVariablesList <- list(cornPrice, cullCowsProd_adj, fedCattleProd_adj, demandShockGaussian1, 
-#                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
-stateVariablesList <- list(cornPrice, supp_sl_adj_N, supp_cl_adj_N, demandShockGaussian1, 
+stateVarDemand <- merge(fedCattleProd, cullCowsProd) %>% transmute(Year = Year, demand = fedCattle + cullCows)
+stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian1,
                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
+# stateVariablesList <- list(cornPrice, supp_sl_adj_N, supp_cl_adj_N, demandShockGaussian1, 
+#                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
 
 stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na()
 
@@ -485,11 +494,17 @@ K_1t <- Stock %>% transmute(Year = Year+1, K = K)
 
 capK <- merge(K_1t, K_jt)
 
-sl_quant <- fedCattleProd_adj %>% transmute(Year = Year, sl = fedCattle)
-cl_quant <- cullCowsProd_adj %>% transmute(Year = Year, cl = cullCows)
+# sl_quant_SM <- fedCattleProd_adj %>% transmute(Year = Year, slSM = fedCattle)
+# cl_quant_SM <- cullCowsProd_adj %>% transmute(Year = Year, clSM = cullCows)
 
-sl_quant <- supp_sl_adj_N %>% transmute(Year = Year, sl = fedCattle)
-cl_quant <- supp_cl_adj_N %>% transmute(Year = Year, cl = cullCows)
+sl_quant_SM <- fedCattleProd %>% transmute(Year = Year, slSM = fedCattle)
+cl_quant_SM <- cullCowsProd %>% transmute(Year = Year, clSM = cullCows)
+
+# sl_quant <- supp_sl_adj_N %>% transmute(Year = Year, sl = fedCattle)
+# cl_quant <- supp_cl_adj_N %>% transmute(Year = Year, cl = cullCows)
+
+sl_quant <- supp_sl %>% transmute(Year = Year, sl = Bill_meatLb_sl)
+cl_quant <- supp_cl %>% transmute(Year = Year, cl = Bill_meatLb_cl)
 
 # dShocks <- stateVars %>% select(Year, Shock)
 
@@ -513,7 +528,9 @@ A_quant <-  totalDisappearedNew  %>% transmute(Year = Year, A = total_meat_bill)
 
 # A_quant <- merge(A_quant, dShocks) %>% mutate(A = A * lag(Shock)) %>% select(Year, A)
 
-quantities <-  merge(merge(A_quant,sl_quant), cl_quant)
+quantList <- list(A_quant, sl_quant_SM, cl_quant_SM, sl_quant, cl_quant)
+
+quantities <-  Reduce(function(...) merge(...), quantList) %>% drop_na()
 
 hcosts <- prices_costs %>% select(Year, hc)
 

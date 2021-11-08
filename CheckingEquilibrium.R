@@ -1,15 +1,18 @@
 
 for(i in 1:nrow(quantities_prices_capK)){
   
-  i <- 20
+  # i <- 15
   ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
   A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 
   #                                  ## the total demand for that particular node. 
-  sl <- quantities_prices_capK$sl[i]
-  cl <- quantities_prices_capK$cl[i]
+  sl <- quantities_prices_capK$slSM[i]
+  cl <- quantities_prices_capK$clSM[i]
   
-  # adjFac <- A/(sl+cl)
+  # sl <- quantities_prices_capK$sl[i]
+  # cl <- quantities_prices_capK$cl[i]
+  
+  adjFac <- A/(sl+cl)
   
   #### Here I am trying another route. Take mean/median of the past prices and use it as the starting price for optimization
   ps <-   quantities_prices_capK$ps[i]
@@ -20,6 +23,10 @@ for(i in 1:nrow(quantities_prices_capK)){
   #   ps <-   median(quantities_prices_capK$ps[1:i])
   #   pc <-   median(quantities_prices_capK$pc[1:i])
   #   hc <-   median(quantities_prices_capK$hc[1:i])
+  #   A <- median(quantities_prices_capK$A[1:i]) 
+  #   sl <- median(quantities_prices_capK$sl[1:i])
+  #   cl <- median(quantities_prices_capK$cl[1:i])
+  #   adjFac <- A/(sl+cl)
   # }
   
   params_mu_s <- optParamFunction(sl = sl, cl = cl, ps = ps, pc = pc, thetas = c(1,1))
@@ -37,7 +44,7 @@ for(i in 1:nrow(quantities_prices_capK)){
   slDressed <- quantities_prices_capK$Slaughter_avg[i]
   clDressed <- quantities_prices_capK$Cull_avg[i]
   
-  adjFac <- quantities_prices_capK$AdjFactor[i]
+  # adjFac <- quantities_prices_capK$AdjFactor[i]
   
   #### For imports and exports I will take the mean/median of the past data.
   # importsObs <- median(quantities_prices_capK$Imports[1:i])
@@ -84,6 +91,7 @@ for(i in 1:nrow(quantities_prices_capK)){
   
   for(k in 1:maxIter){
     
+    
     # k <- 2
     
     # if( norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
@@ -127,7 +135,14 @@ for(i in 1:nrow(quantities_prices_capK)){
         
         sl_node <- (fedCattleNode) * adjFac
         cl_node <- (cullCowNode) * adjFac
-        A_node <- (fedCattleNode + cullCowNode) * (dShockNode)
+        
+        
+ ################################################ CHANGE TO THIS AND SEE ####################     
+        A_node <- (sl_node + cl_node) * (dShockNode)
+        
+        
+        
+        # A_node <- (fedCattleNode + cullCowNode) * (dShockNode)
         
         # A_node <- (fedCattleNode + cullCowNode) * (dShockNode)
         # sl_node <- (A_node * ((slShare_t)/(1 + slShare_t))) * adjFac
@@ -137,7 +152,7 @@ for(i in 1:nrow(quantities_prices_capK)){
         # slD <- A_node * ((slShare_t)/(1 + slShare_t))
         # clD <- A_node * (1/(1 + slShare_t))
         
-        Anodes[j,i] <- A_node
+        A_nodes[j,i] <- A_node
         slNodes[j,i] <- sl_node
         clNodes[j,i] <- cl_node
         
@@ -210,6 +225,14 @@ for(i in 1:nrow(quantities_prices_capK)){
         
         pc_expected_up <- pc_expected + 0.1
         
+        if(pc_expected_lo < 0){
+          pc_expected_lo <- pc_expected
+        }
+        
+        if(ps_expected_lo < 0){
+          ps_expected_lo <- ps_expected
+        }
+        
         p <- c(ps_o, pc_o, ps_expected, pc_expected)
         
         lo <- c(ps_lo, pc_lo, ps_expected_lo, pc_expected_lo)
@@ -251,10 +274,10 @@ for(i in 1:nrow(quantities_prices_capK)){
         
         sl_node <- slNodes[j,i]
         cl_node <- clNodes[j,i]
-        # A_node <- (sl_node + cl_node) * dShockNode 
-        A_node <- Anodes[j,i]
+        A_node <- (sl_node + cl_node) * dShockNode
+        # A_node <- A_nodes[j,i]
         
-        Anodes[j,i] <- A_node
+        A_nodes[j,i] <- A_node
         
         while(abs(fedDiff[j,i])>0.001 || abs(cullDiff[j,i])>0.001){
           
@@ -321,6 +344,14 @@ for(i in 1:nrow(quantities_prices_capK)){
           pc_expected_lo <- pc_expected - 0.5
           
           pc_expected_up <- pc_expected + 0.1
+          
+          if(pc_expected_lo < 0){
+            pc_expected_lo <- pc_expected
+          }
+          
+          if(ps_expected_lo < 0){
+            ps_expected_lo <- ps_expected
+          }
           
           p <- c(ps_n, pc_n, ps_expected, pc_expected)
           
@@ -467,13 +498,22 @@ for(i in 1:nrow(quantities_prices_capK)){
         hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
         B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
         
-        ps_expected_lo <- ps_expected - 0.1
+        ps_expected_lo <- ps_expected - 0.5
         
         ps_expected_up <- ps_expected + 0.1
         
-        pc_expected_lo <- pc_expected - 0.1
+        pc_expected_lo <- pc_expected - 0.5
         
         pc_expected_up <- pc_expected + 0.1
+        
+        if(pc_expected_lo < 0){
+          pc_expected_lo <- pc_expected
+        }
+        
+        if(ps_expected_lo < 0){
+          ps_expected_lo <- ps_expected
+        }
+        
         
         p <- c(ps_n, pc_n, ps_expected, pc_expected)
         
@@ -484,7 +524,7 @@ for(i in 1:nrow(quantities_prices_capK)){
         
         sl_node <- slNodes[j,i]
         cl_node <- clNodes[j,i]
-        A_node <- Anodes[j,i] * dShockNode
+        A_node <- A_nodes[j,i] * dShockNode
         
         params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, 
                                         ps = ps_n, pc = pc_n, thetas = c(1,1))
@@ -538,12 +578,12 @@ for(i in 1:nrow(quantities_prices_capK)){
     
     if(k==1){
       ### Demand of the fed cattle meat under the new prices
-      D_slPsPc[,i] <- Anodes[,i] *
+      D_slPsPc[,i] <- A_nodes[,i] *
         ((exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i]))/
            (1 + (exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i]))))
       
       ### Demand of the cull cow meat under the new prices
-      D_clPsPc[,i] <- Anodes[,i] * (1/(1+ exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i])))
+      D_clPsPc[,i] <- A_nodes[,i] * (1/(1+ exp((mu_Tildes[,i] - ((prices_ps[,i]/phi) - (prices_pc[,i]/phi)))/s_Tildes[,i])))
       
       #### Total demand for the meat under new prices
       D_PsPc <- as.matrix(D_slPsPc[,i] + D_clPsPc[,i])
@@ -590,12 +630,12 @@ for(i in 1:nrow(quantities_prices_capK)){
     checkTol[k,3] <- (ps_m - ps_old)^2
     checkTol[k,4] <- (pc_m - pc_old)^2
     
-    if( k > 2 ){
+    if( k > 3 ){
       if( all(round(checkTol[k-1,],2) == round(checkTol[k,],2)) ){
         if( all(round(checkTol[k-2,],2) == round(checkTol[k-1,],2)) ){
-          # if( all(round(checkTol[k-3,],2) == round(checkTol[k-2,],2)) ){
+          if( all(round(checkTol[k-3,],2) == round(checkTol[k-2,],2)) ){
             break
-          # }
+          }
         }
       }
 

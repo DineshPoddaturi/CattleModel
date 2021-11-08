@@ -1,0 +1,116 @@
+---
+title: "Some Results"
+output:
+  pdf_document: default
+---
+
+
+```{r}
+require(knitr)
+require(tidyverse)
+```
+
+```{r echo=FALSE}
+read_chunk('summariesPrices.R')
+```
+
+# Equilibrium prices and quantities
+
+
+### Fed cattle prices and quantities
+
+#### Prices
+```{r EQestObsPS}
+kable(EQestObsPS, align = 'c')
+```
+
+```{r EQestObsPS_plot}
+EQestObsPS_plot
+```
+
+
+
+
+#### Quantities
+```{r EQestObsSL}
+kable(EQestObsSL, align = 'c')
+```
+
+
+
+```{r EQestObsSL_plot}
+EQestObsSL_plot
+```
+
+
+
+### Cull cow prices and quantities
+
+#### Prices
+```{r EQestObsPC}
+kable(EQestObsPC, align = 'c')
+```
+
+
+```{r EQestObsPC_plot}
+EQestObsPC_plot
+```
+
+
+#### Quantities
+```{r EQestObsCL}
+kable(EQestObsCL, align = 'c')
+```
+
+```{r EQestObsCL_plot}
+EQestObsCL_plot
+```
+
+
+# Converged prices and quaantities
+
+
+### Fed cattle prices and quantities
+
+#### Prices
+```{r ITRestObsPS}
+kable(ITRestObsPS, align = 'c')
+```
+
+```{r ITRestObsPS_plot}
+ITRestObsPS_plot
+```
+
+
+#### Quantities
+```{r}
+kable(ITRestObsSL, align = 'c')
+```
+
+```{r warning=FALSE}
+ITRestObsSL_plot
+```
+
+### Cull cow prices and quantities
+
+#### Prices
+```{r}
+kable(ITRestObsPC, align = 'c')
+```
+
+```{r warning=FALSE}
+ITRestObsPC_plot
+```
+
+
+#### Quantities
+```{r}
+kable(ITRestObsCL, align = 'c')
+```
+
+```{r warning=FALSE}
+ITRestObsCL_plot
+```
+
+
+
