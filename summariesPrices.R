@@ -227,12 +227,12 @@ quantities_prices_capK <- quantities_prices_capK
 EQprices_ps_Means <- apply(prices_ps_eq[1:25,], 2, mean)
 EQestPS <- EQprices_ps_Means %>% as.data.frame()
 names(EQestPS) <- "psMean"
-EQestPS <- EQestPS %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQestPS <- EQestPS %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQprices_ps_Medians <- apply(prices_ps_eq[1:25,], 2, median)
 EQestPS_Medians <- EQprices_ps_Medians %>% as.data.frame()
 names(EQestPS_Medians) <- "psMedian"
-EQprices_ps_Medians <- EQestPS_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQprices_ps_Medians <- EQestPS_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestPS <- merge(EQestPS, EQprices_ps_Medians)
 
@@ -258,12 +258,12 @@ EQestObsPS_plot
 EQprices_pc_Means <- apply(prices_pc_eq[1:25,], 2, mean)
 EQestPC <- EQprices_pc_Means %>% as.data.frame()
 names(EQestPC) <- "pcMean"
-EQestPC <- EQestPC %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQestPC <- EQestPC %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQprices_pc_Medians <- apply(prices_pc_eq[1:25,], 2, median)
 EQestPC_Medians <- EQprices_pc_Medians %>% as.data.frame()
 names(EQestPC_Medians) <- "pcMedian"
-EQprices_pc_Medians <- EQestPC_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQprices_pc_Medians <- EQestPC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestPC <- merge(EQestPC, EQprices_pc_Medians)
 
@@ -286,12 +286,12 @@ EQestObsPC_plot
 EQquantities_sl_Means <- apply(slNodes_eq[1:25,], 2, mean)
 EQestSL <- EQquantities_sl_Means %>% as.data.frame()
 names(EQestSL) <- "slMean"
-EQestSL <- EQestSL %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQestSL <- EQestSL %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQquantities_sl_Medians <- apply(slNodes_eq[1:25,], 2, median)
 EQestSL_Medians <- EQquantities_sl_Medians %>% as.data.frame()
 names(EQestSL_Medians) <- "slMedian"
-EQestSL_Medians <- EQestSL_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQestSL_Medians <- EQestSL_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestSL <- merge(EQestSL, EQestSL_Medians)
 
@@ -312,12 +312,12 @@ EQestObsSL_plot
 EQquantities_cl_Means <- apply(clNodes_eq[1:25,], 2, mean)
 EQestCL <- EQquantities_cl_Means %>% as.data.frame()
 names(EQestCL) <- "clMean"
-EQestCL <- EQestCL %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQestCL <- EQestCL %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQquantities_cl_Medians <- apply(clNodes_eq[1:25,], 2, median)
 EQestCL_Medians <- EQquantities_cl_Medians %>% as.data.frame()
 names(EQestCL_Medians) <- "clMedian"
-EQestCL_Medians <- EQestCL_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+EQestCL_Medians <- EQestCL_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestCL <- merge(EQestCL, EQestCL_Medians)
 
@@ -342,12 +342,12 @@ EQestObsCL_plot
 ITRprices_ps_Means <- apply(prices_ps_itr[1:25,], 2, mean)
 ITRestPS <- ITRprices_ps_Means %>% as.data.frame()
 names(ITRestPS) <- "psMean"
-ITRestPS <- ITRestPS %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRestPS <- ITRestPS %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRprices_ps_Medians <- apply(prices_ps_itr[1:25,], 2, median)
 ITRestPS_Medians <- ITRprices_ps_Medians %>% as.data.frame()
 names(ITRestPS_Medians) <- "psMedian"
-ITRprices_ps_Medians <- ITRestPS_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRprices_ps_Medians <- ITRestPS_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRestPS <- merge(ITRestPS, ITRprices_ps_Medians)
 
@@ -373,12 +373,12 @@ ITRestObsPS_plot
 ITRprices_pc_Means <- apply(prices_pc_itr[1:25,], 2, mean)
 ITRestPC <- ITRprices_pc_Means %>% as.data.frame()
 names(ITRestPC) <- "pcMean"
-ITRestPC <- ITRestPC %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRestPC <- ITRestPC %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRprices_pc_Medians <- apply(prices_pc_itr[1:25,], 2, median)
 ITRestPC_Medians <- ITRprices_pc_Medians %>% as.data.frame()
 names(ITRestPC_Medians) <- "pcMedian"
-ITRprices_pc_Medians <- ITRestPC_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRprices_pc_Medians <- ITRestPC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRestPC <- merge(ITRestPC, ITRprices_pc_Medians)
 
@@ -402,12 +402,12 @@ ITRestObsPC_plot
 ITRquantities_sl_Means <- apply(slNodes_itr[1:25,], 2, mean)
 ITRestSL <- ITRquantities_sl_Means %>% as.data.frame()
 names(ITRestSL) <- "slMean"
-ITRestSL <- ITRestSL %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRestSL <- ITRestSL %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRquantities_sl_Medians <- apply(slNodes_itr[1:25,], 2, median)
 ITRestSL_Medians <- ITRquantities_sl_Medians %>% as.data.frame()
 names(ITRestSL_Medians) <- "slMedian"
-ITRestSL_Medians <- ITRestSL_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRestSL_Medians <- ITRestSL_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRestSL <- merge(ITRestSL, ITRestSL_Medians)
 
@@ -428,12 +428,12 @@ ITRestObsSL_plot
 ITRquantities_cl_Means <- apply(clNodes_itr[1:25,], 2, mean)
 ITRestCL <- ITRquantities_cl_Means %>% as.data.frame()
 names(ITRestCL) <- "clMean"
-ITRestCL <- ITRestCL %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRestCL <- ITRestCL %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRquantities_cl_Medians <- apply(clNodes_itr[1:25,], 2, median)
 ITRestCL_Medians <- ITRquantities_cl_Medians %>% as.data.frame()
 names(ITRestCL_Medians) <- "clMedian"
-ITRestCL_Medians <- ITRestCL_Medians %>% mutate(Year = quantities_prices_capK$Year+1) %>% select(Year, everything())
+ITRestCL_Medians <- ITRestCL_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRestCL <- merge(ITRestCL, ITRestCL_Medians)
 
