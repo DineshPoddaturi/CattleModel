@@ -6,11 +6,11 @@ for(i in 1:nrow(quantities_prices_capK)){
   A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 
   #                                  ## the total demand for that particular node. 
-  sl <- quantities_prices_capK$slSM[i]
-  cl <- quantities_prices_capK$clSM[i]
+  # sl <- quantities_prices_capK$slSM[i]
+  # cl <- quantities_prices_capK$clSM[i]
   
-  # sl <- quantities_prices_capK$sl[i]
-  # cl <- quantities_prices_capK$cl[i]
+  sl <- quantities_prices_capK$sl[i]
+  cl <- quantities_prices_capK$cl[i]
   
   adjFac <- A/(sl+cl)
   
@@ -23,7 +23,7 @@ for(i in 1:nrow(quantities_prices_capK)){
   #   ps <-   median(quantities_prices_capK$ps[1:i])
   #   pc <-   median(quantities_prices_capK$pc[1:i])
   #   hc <-   median(quantities_prices_capK$hc[1:i])
-  #   A <- median(quantities_prices_capK$A[1:i]) 
+  #   A <- median(quantities_prices_capK$A[1:i])
   #   sl <- median(quantities_prices_capK$sl[1:i])
   #   cl <- median(quantities_prices_capK$cl[1:i])
   #   adjFac <- A/(sl+cl)

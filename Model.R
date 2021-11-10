@@ -144,9 +144,9 @@ dressedWeights <- dressedWeights %>% filter(Year<2020)
 
 ############ Here we convert the number of head to pounds in weight from the dressed weights data ###############
 
-cowsSlaughtered <- cowsSlaughtered %>% mutate(cull_meat = (dressedWeights$Cows_avg)* CowsHead)
-heifersSlaughtered <- heifersSlaughtered %>% mutate(heifer_meat = dressedWeights$Heifers_avg * HeifersHead)
-steersSlaughtered <- steersSlaughtered %>% mutate(steer_meat = dressedWeights$Steers_avg * SteersHead)
+cowsSlaughtered <- merge(cowsSlaughtered,dressedWeights)  %>% transmute(Year = Year, Cowshead = CowsHead, cull_meat = CowsHead * Cows_avg )
+heifersSlaughtered <- merge(heifersSlaughtered,dressedWeights)  %>% transmute(Year = Year, HeifersHead = HeifersHead, heifer_meat = HeifersHead * Heifers_avg)
+steersSlaughtered <- merge(steersSlaughtered,dressedWeights)  %>% transmute(Year = Year, SteersHead = SteersHead, steer_meat = SteersHead * Steers_avg)
 
 totalDisappeared <- merge(cowsSlaughtered, merge(heifersSlaughtered,steersSlaughtered)) %>% mutate(total_meat = cull_meat + heifer_meat + steer_meat)
 
@@ -158,9 +158,6 @@ totalDisappeared <- totalDisappeared %>% mutate(total_meat_bill = total_meat/100
 dressedWeights_sl_cl <- dressedWeights %>% mutate(Slaughter_avg = Steers_avg, Cull_avg = Cows_avg)
 
 dressedWeights_sl_cl <- dressedWeights_sl_cl %>% select(Year, Slaughter_avg, Cull_avg)
-
-
-
 
 ################## reading beef inventory (This is K in our model) ##################
 beefInventory <- read_excel("Data/New/CowsBeefInventory.xlsx") %>% as.data.frame()
@@ -221,7 +218,7 @@ supp_sl <- NULL
 
 for(i in 1:nrow(Stock)){
   if(Stock$Year[i]>=1981){
-    supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]  + imports$Imports[i] - exports$Exports[i]
+    supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]
   }
 }
 
@@ -956,7 +953,7 @@ for(i in 1:(nrow(predict_df)-2)){
   slShare_t <- (exp((muTilde - ((ps_t - pc_t)/phi))/sTilde))
   shares_slcl$share_pre[i] <- slShare_t
   
-  demand_t1_hat <- (g * K_t - k3_t2 + imports_t - exports_t) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t) 
+  demand_t1_hat <- (g * K_t - k3_t2 ) * (dressed_t/1000000000) * ((1+slShare_t)/slShare_t) 
   sl_t1_hat <- (demand_t1_hat * ((slShare_t)/(1 + slShare_t))) * adj
   cl_t1_hat <- (demand_t1_hat * (1/(1+slShare_t))) * adj
   

@@ -219,11 +219,6 @@ params <- merge(mutildes_agg, stildes_agg)
 
 # Here I get the meand and median of the first 25 nodes of the equilibrium prices and quantities
 
-quantities_prices_capK <- quantities_prices_capK
-
-
-
-
 EQprices_ps_Means <- apply(prices_ps_eq[1:25,], 2, mean)
 EQestPS <- EQprices_ps_Means %>% as.data.frame()
 names(EQestPS) <- "psMean"
@@ -335,6 +330,19 @@ EQestObsCL_plot <- EQestObsCL %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, co
 
 EQestObsCL_plot
 
+
+
+EQcosts_hc_Means <- apply(prices_hc_eq[1:25,], 2, mean)
+EQestHC <- EQcosts_hc_Means %>% as.data.frame()
+names(EQestHC) <- "hcMean"
+EQestHC <- EQestHC %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQcosts_hc_Medians <- apply(prices_hc_eq[1:25,], 2, median)
+EQestHC_Medians <- EQcosts_hc_Medians %>% as.data.frame()
+names(EQestHC_Medians) <- "hcMedian"
+EQestHC_Medians <- EQestHC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQestHC <- merge(EQestHC, EQestHC_Medians)
 
 
 ## @knitr ITRestObsPS
@@ -449,6 +457,85 @@ ITRestObsCL_plot <- ITRestObsCL %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, 
   geom_point(aes(y = clMedian, color = "CULL PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsCL$Year[1],ITRestObsCL$Year[nrow(ITRestObsCL)]))) 
 ITRestObsCL_plot
+
+
+ITRcosts_hc_Means <- apply(prices_hc_itr[1:25,], 2, mean)
+ITRestHC <- ITRcosts_hc_Means %>% as.data.frame()
+names(ITRestHC) <- "hcMean"
+ITRestHC <- ITRestHC %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+ITRcosts_hc_Medians <- apply(prices_hc_itr[1:25,], 2, median)
+ITRestHC_Medians <- ITRcosts_hc_Medians %>% as.data.frame()
+names(ITRestHC_Medians) <- "hcMedian"
+ITRcosts_hc_Medians <- ITRestHC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+ITRestHC <- merge(ITRestHC, ITRcosts_hc_Medians)
+
+
+
+
+
+
+
+
+mu_Tildes_Means <- apply(mu_Tildes_eq[1:25,], 2, mean)
+mu_Tildes_Means <- mu_Tildes_Means %>% as.data.frame()
+names(mu_Tildes_Means) <- "muMean"
+mu_Tildes_Means <- mu_Tildes_Means %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+mu_Tildes_Medians <- apply(mu_Tildes_eq[1:25,], 2, median)
+mu_Tildes_Medians <- mu_Tildes_Medians %>% as.data.frame()
+names(mu_Tildes_Medians) <- "muMedian"
+mu_Tildes_Medians <- mu_Tildes_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+mu_Tildes_MM <- merge(mu_Tildes_Means, mu_Tildes_Medians)
+
+
+s_Tildes_Means <- apply(s_Tildes_eq[1:25,], 2, mean)
+s_Tildes_Means <- s_Tildes_Means %>% as.data.frame()
+names(s_Tildes_Means) <- "sMean"
+s_Tildes_Means <- s_Tildes_Means %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+s_Tildes_Medians <- apply(s_Tildes_eq[1:25,], 2, median)
+s_Tildes_Medians <- s_Tildes_Medians %>% as.data.frame()
+names(s_Tildes_Medians) <- "sMedian"
+s_Tildes_Medians <- s_Tildes_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+s_Tildes_MM <- merge(s_Tildes_Means, s_Tildes_Medians)
+
+
+
+
+mu_Tildes_Means_itr <- apply(mu_Tildes_itr[1:25,], 2, mean)
+mu_Tildes_Means_itr <- mu_Tildes_Means_itr %>% as.data.frame()
+names(mu_Tildes_Means_itr) <- "muMean"
+mu_Tildes_Means_itr <- mu_Tildes_Means_itr %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+mu_Tildes_Medians_itr <- apply(mu_Tildes_itr[1:25,], 2, median)
+mu_Tildes_Medians_itr <- mu_Tildes_Medians_itr %>% as.data.frame()
+names(mu_Tildes_Medians_itr) <- "muMedian"
+mu_Tildes_Medians_itr <- mu_Tildes_Medians_itr %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+mu_Tildes_MM_itr <- merge(mu_Tildes_Means_itr, mu_Tildes_Medians_itr)
+
+
+s_Tildes_Means_itr <- apply(s_Tildes_itr[1:25,], 2, mean)
+s_Tildes_Means_itr <- s_Tildes_Means_itr %>% as.data.frame()
+names(s_Tildes_Means_itr) <- "sMean"
+s_Tildes_Means_itr <- s_Tildes_Means_itr %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+s_Tildes_Medians_itr <- apply(s_Tildes_itr[1:25,], 2, median)
+s_Tildes_Medians_itr <- s_Tildes_Medians_itr %>% as.data.frame()
+names(s_Tildes_Medians_itr) <- "sMedian"
+s_Tildes_Medians_itr <- s_Tildes_Medians_itr %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+s_Tildes_MM_itr <- merge(s_Tildes_Means_itr, s_Tildes_Medians_itr)
+
+
+
+
+
+
 
 
 # EQestObsPS_Medians <- left_join(EQprices_ps_Medians,quantities_prices_capK) %>% select(Year, fedPrice, ps) %>% mutate(err = (fedPrice - ps))

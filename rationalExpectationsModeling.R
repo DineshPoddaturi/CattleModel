@@ -46,6 +46,7 @@ meat_bill <- merge(supp_sl, merge(supp_cl, merge(totalSupply, totalDisappearedNe
 
 prices_quant <- merge(allPrices, meat_bill)
 
+
 # In order to construct the shocks I need to estimate the quantities and see the observed ones. 
 
 ### But first I will construct the nodes for corn price, fed cattle supply, and cull cow supply.
@@ -243,8 +244,8 @@ set.seed(4)
 clSupply_Shock <- rnorm(n = nrow(prod_CornP), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 clSupplyShockgaussian1$clShock <- clSupply_Shock
 
-# fedCattleProd <- supp_sl_adj %>% transmute(Year = Year, fedcattle = Bill_meatLb_sl)
-# cullCowsProd <- supp_cl_adj %>% transmute(Year = Year, cullCows = Bill_meatLb_cl)
+# fedCattleProd <- supp_sl %>% transmute(Year = Year, fedCattle = Bill_meatLb_sl)
+# cullCowsProd <- supp_cl %>% transmute(Year = Year, cullCows = Bill_meatLb_cl)
 
 
 #### NOTE: We constructed fed cattle supply and cull cow supply for three years ahead which includes gaussian shocks as well. 
@@ -295,10 +296,13 @@ chebNodesN <- 5
 
 # supp_sl_adj_N <- supp_sl_adj %>% select(Year, fedCattle = Bill_meatLb_sl)
 # supp_cl_adj_N <- supp_cl_adj %>% select(Year, cullCows = Bill_meatLb_cl)
-# 
+
 # stateVarDemand <- merge(supp_sl_adj_N, supp_cl_adj_N) %>% transmute(Year = Year, demand = fedCattle + cullCows)
 
-stateVarDemand <- merge(fedCattleProd, cullCowsProd) %>% transmute(Year = Year, demand = fedCattle + cullCows)
+# stateVarDemand <- merge(fedCattleProd, cullCowsProd) %>% transmute(Year = Year, demand = fedCattle + cullCows)
+
+stateVarDemand <- totalDisappeared %>% transmute(Year = Year, demand = total_meat_bill)
+
 stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian1,
                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
 # stateVariablesList <- list(cornPrice, supp_sl_adj_N, supp_cl_adj_N, demandShockGaussian1, 
