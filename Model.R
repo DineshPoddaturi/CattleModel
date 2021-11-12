@@ -197,13 +197,13 @@ k8 <- k8 %>% mutate(Year = k7$Year+1) %>% select(Year,k8) %>% arrange(Year) %>% 
 
 Stock <- merge(merge(merge(merge(merge(merge(K,k3,all=TRUE),k4, all=TRUE),k5,all=TRUE),k6,all=TRUE),k7,all=TRUE),k8,all=TRUE) %>% as.data.frame()
 
-k9 <- Stock %>% filter(Year>1926) %>% select(K,k3,k4,k5,k6,k7,k8) %>% mutate(k9 = K -(k3+k4+k5+k6+k7+k8) ) %>% select(k9) %>% as.data.frame()
+k9 <- Stock %>% filter(Year>1926) %>% select(K,k3,k4,k5,k6,k7,k8) %>% mutate(k9 = K - (k3+k4+k5+k6+k7+k8) ) %>% select(k9) %>% as.data.frame()
 k9 <- k9 %>% mutate(Year = seq(from=1927, to=2019)) %>% select(Year,k9)
 k9$Year <- as.numeric(k9$Year)
 
 Stock <- merge(Stock,k9, all=TRUE)
 
-k10 <- Stock %>% filter(Year>1927) %>% select(K,k3,k4,k5,k6,k7,k8,k9) %>% mutate(k10 = K -(k3+k4+k5+k6+k7+k8+k9) ) %>% select(k10) %>% round() %>% as.data.frame()
+k10 <- Stock %>% filter(Year>1927) %>% select(K,k3,k4,k5,k6,k7,k8,k9) %>% mutate(k10 = K - (k3+k4+k5+k6+k7+k8+k9) ) %>% select(k10) %>% round() %>% as.data.frame()
 k10 <- k10 %>% mutate(Year = seq(from=1928, to=2019)) %>% select(Year,k10)
 
 Stock <- merge(merge(Stock,k9,all=TRUE),k10,all=TRUE) %>% select(Year,K,k3,k4,k5,k6,k7,k8,k9,k10) %>% mutate(k9=round(k9))
