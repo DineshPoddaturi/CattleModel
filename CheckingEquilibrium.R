@@ -1,7 +1,7 @@
 
 for(i in 1:nrow(quantities_prices_capK)){
   
-  # i <- 15
+  # i <- 1
   ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
   A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 
