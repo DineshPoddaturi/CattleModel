@@ -696,6 +696,10 @@ s_Tildes_MM_itr <- merge(s_Tildes_Means_itr, s_Tildes_Medians_itr)
 # 
 # 
 
+shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = proj2016$psMean, pc = proj2016$pcMean)
 
+ANew <- (g * K1 - k3_est) * (1/shrT)
+
+slNew <- ANew *  shrT * proj2016$AdjFactor
 
 
