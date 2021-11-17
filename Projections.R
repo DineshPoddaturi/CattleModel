@@ -6,13 +6,13 @@ proj_adjFac <- adjFactor
 
 proj_muTildes <- mu_Tildes_MM
 proj_sTildes <- s_Tildes_MM
-proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPS,EQestPC,EQestHC))
+proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPS,EQestPC,EQestHC, EQestEPS, EQestEPC))
 
 
 
 proj_muTildes1 <- mu_Tildes_MM_itr
 proj_sTildes1 <- s_Tildes_MM_itr
-proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC))
+proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC, ITRestEPS, ITRestEPC))
 
 #### We use the following to get the t+1 supply of the fed cattle
 ##### See the work in the binder
@@ -115,17 +115,33 @@ gamma_k3 <- 1.0104
 
 proj2016 <- proj_AllDF_EQ %>% filter(Year == 2016)
 
+proj2016 <- proj_AllDF_CONV %>% filter(Year == 2016)
 
 ################################## CHANGE THE ADJUSTMENT FACTOR #######################################
 
+      
+      slaughterAvg <- proj2016$Slaughter_avg
+
+      MUtilde <- proj2016$muMedian
+      Stilde <- proj2016$sMedian
+      
+      psM <- proj2016$psMedian
+      pcM <- proj2016$pcMedian
+      hcM <- proj2016$hcMedian
+      
+      EpsM <- proj2016$EpsMedian
+      EpcM <- proj2016$EpcMedian
+      
+      capA <- proj2016$A
+      adjF <- proj2016$AdjFactor
+      
+      capK <- proj2016$K
+      
       k <- 0
-      K1 <- (proj2016$K * proj2016$Slaughter_avg)/1000000000
-
-      MUtilde <- proj2016$muMean
-      Stilde <- proj2016$sMean
-
+      K1 <- (capK * slaughterAvg)/1000000000
+      
       estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
-                ps = proj2016$psMean, pc = proj2016$pcMean, K1 = K1, A = proj2016$A, gamma_k3 = gamma_k3)
+                ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3)
 
       k3_est <- estQ$par
 
@@ -135,15 +151,15 @@ proj2016 <- proj_AllDF_EQ %>% filter(Year == 2016)
       # 
       # ANew <- (slNew + clNew) * (1/proj2016$AdjFactor)
       
-      shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = proj2016$psMean, pc = proj2016$pcMean)
+      shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = psM, pc = pcM)
       
       ANew <- (g * K1 - k3_est) * (1/shrT)
       
-      slNew <- ANew *  shrT * proj2016$AdjFactor
-      clNew <- ANew * (1-shrT) * proj2016$AdjFactor
+      slNew <- ANew *  shrT * adjF
+      clNew <- ANew * (1-shrT) * adjF
 
-      psNew <- proj2016$psMean
-      pcNew <- proj2016$pcMean
+      psNew <- psM
+      pcNew <- pcM
       
       psNew_lo <- psNew  - 0.35
       pcNew_lo <- pcNew - 0.4
@@ -165,14 +181,13 @@ proj2016 <- proj_AllDF_EQ %>% filter(Year == 2016)
         pcNew_lo <- pcNew_lo - 0.01
       }
       
-      psNew_expected <- sum(as.numeric(psNew) * fedMeshCheb)
-      pcNew_expected <- sum(as.numeric(pcNew) * cullMeshCheb)
+      psNew_expected <- EpsM
+      pcNew_expected <- EpcM
       
-      hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
-        (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
+      hc_new <- hcM
       
       #### Here we make sure that the holding costs are below the cull cow price
-      while(hc_new > pc_o){
+      while(hc_new > pcNew){
         hc_new <- hc_new - 0.01
       }
       
@@ -217,7 +232,7 @@ proj2016 <- proj_AllDF_EQ %>% filter(Year == 2016)
       proj_Q_P$A[1] <- ANew
       
       
-      quantities_prices_capK %>% filter(Year == 2016)  
+      quantities_prices_capK %>% filter(Year == 2017) %>% select(Year, ps, pc, A, slSM, clSM, sl, cl)
       
       
       
@@ -404,56 +419,7 @@ proj2016 <- proj_AllDF_EQ %>% filter(Year == 2016)
 
 
 
-################## Here I fit a time series model for replacement heifers
-require(tseries)
-require(forecast)
-require(artfima)
-require(arfima)
 
-replacementHeifers_k3 <- replacementInventory %>% arrange(Year)
-
-replacementHeifers_k3 <- replacementHeifers_k3 %>% mutate(ratio = k3/lag(k3))
-
-summary(replacementHeifers_k3$ratio)
-#     Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-#  0.6766  0.9703  1.0104  1.0062  1.0451  1.1658       1
-
-replacementHeifers_k3_ts <- ts(replacementHeifers_k3$k3, start = replacementHeifers_k3$Year[1], 
-                               end = replacementHeifers_k3$Year[nrow(replacementHeifers_k3)], frequency = 1)
-
-plot_time_series(replacementHeifers_k3_ts, "Replacement Heifers")
-
-adf.test(replacementHeifers_k3_ts)
-
-# Augmented Dickey-Fuller Test
-# 
-# data:  replacementHeifers_k3_ts
-# Dickey-Fuller = -1.3771, Lag order = 4, p-value =
-#   0.8349
-# alternative hypothesis: stationary
-
-auto.arima(replacementHeifers_k3_ts)
-
-#### The series in not stationary. So I am differencing 
-tsDiff <- diff(x = replacementHeifers_k3$k3, lag = 1) %>% na.omit()
-
-zz <- ts(tsDiff, start = replacementHeifers_k3$Year[1], 
-         end = replacementHeifers_k3$Year[nrow(replacementHeifers_k3)], frequency = 1)
-
-plot_time_series(zz,"Differenced time")
-
-adf.test(zz)
-
-# Augmented Dickey-Fuller Test
-# 
-# data:  zz
-# Dickey-Fuller = -6.5601, Lag order = 4, p-value =
-#   0.01
-# alternative hypothesis: stationary
-
-auto.arima(zz)
-
-Box.test(replacementHeifers_k3_ts, lag=4, type = "Ljung-Box")
 
 
 

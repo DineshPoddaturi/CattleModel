@@ -330,8 +330,6 @@ EQestObsCL_plot <- EQestObsCL %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, co
 
 EQestObsCL_plot
 
-
-
 EQcosts_hc_Means <- apply(prices_hc_eq[1:25,], 2, mean)
 EQestHC <- EQcosts_hc_Means %>% as.data.frame()
 names(EQestHC) <- "hcMean"
@@ -343,6 +341,38 @@ names(EQestHC_Medians) <- "hcMedian"
 EQestHC_Medians <- EQestHC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestHC <- merge(EQestHC, EQestHC_Medians)
+
+
+
+###### Expected prices Equilibrium
+EQprices_Eps_Means <- apply(expected_PS_eq[1:25,], 2, mean)
+EQestEPS <- EQprices_Eps_Means %>% as.data.frame()
+names(EQestEPS) <- "EpsMean"
+EQestEPS <- EQestEPS %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQprices_Eps_Medians <- apply(expected_PS_eq[1:25,], 2, median)
+EQestEPS_Medians <- EQprices_Eps_Medians %>% as.data.frame()
+names(EQestEPS_Medians) <- "EpsMedian"
+EQprices_Eps_Medians <- EQestEPS_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQestEPS <- merge(EQestEPS, EQprices_Eps_Medians)
+
+
+EQprices_Epc_Means <- apply(expected_PC_eq[1:25,], 2, mean)
+EQestEPC <- EQprices_Epc_Means %>% as.data.frame()
+names(EQestEPC) <- "EpcMean"
+EQestEPC <- EQestEPC %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQprices_Epc_Medians <- apply(expected_PC_eq[1:25,], 2, median)
+EQestEPC_Medians <- EQprices_Epc_Medians %>% as.data.frame()
+names(EQestEPC_Medians) <- "EpcMedian"
+EQprices_Epc_Medians <- EQestEPC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQestEPC <- merge(EQestEPC, EQprices_Epc_Medians)
+
+
+
+
 
 
 ## @knitr ITRestObsPS
@@ -471,7 +501,31 @@ ITRcosts_hc_Medians <- ITRestHC_Medians %>% mutate(Year = quantities_prices_capK
 
 ITRestHC <- merge(ITRestHC, ITRcosts_hc_Medians)
 
+###### Expected prices Converged
+ITRprices_Eps_Means <- apply(expected_PS_itr[1:25,], 2, mean)
+ITRestEPS <- ITRprices_Eps_Means %>% as.data.frame()
+names(ITRestEPS) <- "EpsMean"
+ITRestEPS <- ITRestEPS %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
+ITRprices_Eps_Medians <- apply(expected_PS_itr[1:25,], 2, median)
+ITRestEPS_Medians <- ITRprices_Eps_Medians %>% as.data.frame()
+names(ITRestEPS_Medians) <- "EpsMedian"
+ITRprices_Eps_Medians <- ITRestEPS_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+ITRestEPS <- merge(ITRestEPS, ITRprices_Eps_Medians)
+
+
+ITRprices_Epc_Means <- apply(expected_PC_itr[1:25,], 2, mean)
+ITRestEPC <- ITRprices_Epc_Means %>% as.data.frame()
+names(ITRestEPC) <- "EpcMean"
+ITRestEPC <- ITRestEPC %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+ITRprices_Epc_Medians <- apply(expected_PC_itr[1:25,], 2, median)
+ITRestEPC_Medians <- ITRprices_Epc_Medians %>% as.data.frame()
+names(ITRestEPC_Medians) <- "EpcMedian"
+ITRprices_Epc_Medians <- ITRestEPC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+ITRestEPC <- merge(ITRestEPC, ITRprices_Epc_Medians)
 
 
 
