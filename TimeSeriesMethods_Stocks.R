@@ -79,7 +79,7 @@ Box.test(Kfit$residuals, type = "Ljung-Box")
 
 # KfitPredict <- predict(Kfit , n.ahead = 5)
 
-beefINV_FORECAST <- forecast(object = Kfit, h = 8, level = 95) %>% as.data.frame()
+beefINV_FORECAST <- forecast(object = Kfit, h = 12, level = 95) %>% as.data.frame()
 
 beefINV_FORECAST <- beefINV_FORECAST %>% transmute(Year =  as.double(row.names(beefINV_FORECAST)), 
                                                    Kcast = `Point Forecast`, lo95 = `Lo 95`, hi95 = `Hi 95`)

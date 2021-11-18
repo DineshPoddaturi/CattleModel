@@ -443,23 +443,20 @@ mu_Tildes_itr[,i][1:25]
 
 
 
-mu_Tildes_eq
-
-mu_Tildes_Means <- apply(mu_Tildes_eq[1:25,], 2, mean)
-mu_Tildes_Means <- mu_Tildes_Means %>% as.data.frame()
-names(mu_Tildes_Means) <- "muMean"
-mu_Tildes_Means <- mu_Tildes_Means %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
-
-mu_Tildes_Medians <- apply(mu_Tildes_eq[1:25,], 2, median)
-mu_Tildes_Medians <- mu_Tildes_Medians %>% as.data.frame()
-names(mu_Tildes_Medians) <- "muMedian"
-mu_Tildes_Medians <- mu_Tildes_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
-
-mu_Tildes_MM <- merge(mu_Tildes_Means, mu_Tildes_Medians)
-
-mu_TildesObs <- left_join(mu_Tildes_MM,quantities_prices_capK) %>% select(Year, muMean, muMedian, slSM) %>% 
-  mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
-EQestObsSL
+# Year       Ps        Pc       Sl       Cl        A
+# 1  2018 1.206493 0.7295760 22.78709 2.823417 24.90621
+# 2  2019 1.210795 0.6837192 22.96442 3.176343 25.42189
+# 3  2020 1.200358 0.6543128 22.97870 3.314562 25.57020
+# 4  2021 1.213137 0.6683482 22.87306 3.293772 25.44725
+# 5  2022 1.211483 0.6698220 22.75674 3.250793 25.29233
+# 6  2023 1.212389 0.6660670 22.68547 3.274477 25.24605
+# 7  2024 1.214699 0.6580683 22.65008 3.345302 25.28051
+# 8  2025 1.220482 0.6541859 22.61305 3.413599 25.31091
+# 9  2026 1.226913 0.6538395 22.55908 3.457142 25.30078
+# 10 2027 1.232567 0.6542710 22.49516 3.487680 25.26831
+# 11 2028 1.238400 0.6545232 22.43396 3.521833 25.24200
+# 12 2029 1.240272 0.6498007 22.37910 3.564314 25.22997
+# 13 2030 1.246672 0.6494855 22.32563 3.610850 25.22322
 
 
 

@@ -93,8 +93,7 @@ estPFunction <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
 #### Here I create chebyshev nodes for total stock
 stockNodes <- chebyshevNodes(d = proj_AllDF$K, n = chebNodesN)
 
-proj_Q_P <- data.frame(Year = numeric(5), Ps = numeric(5), Pc = numeric(5), Sl = numeric(5), Cl = numeric(5),
-                       A = numeric(5))
+
 
 ############ NEED TO FIGURE OUT HOW TO WRITE k7, k8, k9 in terms of k3
 
@@ -137,8 +136,18 @@ capK <- modelParamsEQ$K
 
 adjF <- modelParamsEQ$AdjFactor
 
+# stock_K <- beefInventory %>% arrange(Year) %>% filter(Year >=2017)
 
-for(i in 1:nrow(beefINV_FORECAST)){
+beefINV_FORECAST
+
+nProj <- nrow(beefINV_FORECAST) + 1
+
+proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
+                       Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj))
+
+for(i in 1:nrow(proj_Q_P)){
+  
+  # i <- 1
   
   k <- 0
   K1 <- (capK * slaughterAvg)/1000000000
@@ -148,12 +157,17 @@ for(i in 1:nrow(beefINV_FORECAST)){
   
   k3_est <- estQ$par
   
-  shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = psM, pc = pcM)
+  slNew <- (g * K1 - k3_est)
+
+  clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
+
+  ANew <- (slNew + clNew) * (1/adjF)
   
-  ANew <- (g * K1 - k3_est) * (1/shrT)
-  
-  slNew <- ANew *  shrT * adjF
-  clNew <- ANew * (1-shrT) * adjF
+  # shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = psM, pc = pcM)
+  # 
+  # ANew <- (g * K1 - k3_est) * (1/shrT)
+  # slNew <- ANew *  shrT * adjF
+  # clNew <- ANew * (1-shrT) * adjF
   
   psNew <- psM
   pcNew <- pcM
@@ -222,6 +236,11 @@ for(i in 1:nrow(beefINV_FORECAST)){
   pc_expected1N <- estPNew$par[4]
   
   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
+  
+  if(i>1){
+    proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
+  }
+  
   proj_Q_P$Ps[i] <- ps1N
   proj_Q_P$Pc[i] <- pc1N
   proj_Q_P$Sl[i] <- slNew
@@ -238,14 +257,23 @@ for(i in 1:nrow(beefINV_FORECAST)){
     (beta * EpcM + g * (beta^3) * EpsM - pcM)
   
   capA <- ANew
-  capK <- beefINV_FORECAST$Kcast[i]
   
+  capK <- beefINV_FORECAST$K[i]
   
 }
       
+
+
+
+
+####### WILL HAVE TO DO THE CONFIDENCE INTERVALS AS WELL ########
      
       
-      
+# Year       Ps        Pc       Sl       Cl        A
+# 1 2018 1.190612 0.7303366 23.43145 2.800085 25.51017
+# 2 2019 1.152914 0.7495325 23.90089 2.527175 25.70129
+# 3 2020 1.109663 0.7726350 24.41474 2.244440 25.92605
+# 4 2021 1.059102 0.8016011 24.77356 1.934528 25.97362      
       
       
       
