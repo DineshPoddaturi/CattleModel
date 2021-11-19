@@ -1,33 +1,4 @@
-##### Projections
-
-proj_adjFac <- adjFactor_New
-
-proj_adjFac <- adjFactor
-
-proj_muTildes <- mu_Tildes_MM
-proj_sTildes <- s_Tildes_MM
-proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPS,EQestPC,EQestHC, EQestEPS, EQestEPC))
-
-
-
-proj_muTildes1 <- mu_Tildes_MM_itr
-proj_sTildes1 <- s_Tildes_MM_itr
-proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC, ITRestEPS, ITRestEPC))
-
-#### We use the following to get the t+1 supply of the fed cattle
-##### See the work in the binder
-proj_K_t <- Stock %>% transmute(Year = Year, K = K)
-proj_A <- A_quant
-proj_Dshocks <- stateVars %>% transmute(Year = Year, dShock = Shock)
-
-proj_AllDF_EQ <- Reduce(function(...) merge(...), 
-                   list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes,proj_sTildes,proj_PricesCosts, 
-                        dressedWeights_sl_cl))
-
-proj_AllDF_CONV <- Reduce(function(...) merge(...), 
-                        list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes1,proj_sTildes1,proj_PricesCosts1, 
-                             dressedWeights_sl_cl))
-
+####################### GLOBAL FUNCTIONS ####################
 shareMetric <- function(paramMu, paramS, ps, pc){
   
   share <- ((exp((paramMu - ((ps/phi) - (pc/phi)))/paramS))/(1 + (exp((paramMu - ((ps/phi) - (pc/phi)))/paramS))))
@@ -89,88 +60,27 @@ estPFunction <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
   
 }
 
-
-#### Here I create chebyshev nodes for total stock
-stockNodes <- chebyshevNodes(d = proj_AllDF$K, n = chebNodesN)
-
-
-
-############ NEED TO FIGURE OUT HOW TO WRITE k7, k8, k9 in terms of k3
-
-replacementHeifers_k3 <- replacementInventory %>% arrange(Year)
-
-replacementHeifers_k3 <- replacementHeifers_k3 %>% mutate(ratio = k3/lag(k3))
-
-summary(replacementHeifers_k3$ratio)
-#     Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-#  0.6766  0.9703  1.0104  1.0062  1.0451  1.1658       1
-
-#### Using the above relationship i.e., relationship between the replacement heifers at t to t-1. 
-#### The median is 1.0104. So I will fix this and use this as the relationship. 
-
-gamma_k3 <- 1.0104
-
-modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
-
-modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
-
-
-beefINV_FORECAST
-
-################################## CHANGE THE ADJUSTMENT FACTOR #######################################
-
-slaughterAvg <- modelParamsEQ$Slaughter_avg
-
-MUtilde <- modelParamsEQ$muMedian
-Stilde <- modelParamsEQ$sMedian
-
-psM <- modelParamsEQ$psMedian
-pcM <- modelParamsEQ$pcMedian
-hcM <- modelParamsEQ$hcMedian
-
-EpsM <- modelParamsEQ$EpsMedian
-EpcM <- modelParamsEQ$EpcMedian
-
-capA <- modelParamsEQ$A
-capK <- modelParamsEQ$K
-
-adjF <- modelParamsEQ$AdjFactor
-
-# stock_K <- beefInventory %>% arrange(Year) %>% filter(Year >=2017)
-
-beefINV_FORECAST
-
-nProj <- nrow(beefINV_FORECAST) + 1
-
-proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
-                       Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj))
-
-for(i in 1:nrow(proj_Q_P)){
+getSlClA <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, adjF){
   
-  # i <- 1
-  
-  k <- 0
-  K1 <- (capK * slaughterAvg)/1000000000
-  
-  estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
-                  ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3)
+  estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = params[1], tilde_s = params[2],
+                  ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3)
   
   k3_est <- estQ$par
   
   slNew <- (g * K1 - k3_est)
-
+  
   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
-
+  
   ANew <- (slNew + clNew) * (1/adjF)
   
-  # shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = psM, pc = pcM)
-  # 
-  # ANew <- (g * K1 - k3_est) * (1/shrT)
-  # slNew <- ANew *  shrT * adjF
-  # clNew <- ANew * (1-shrT) * adjF
+  return(c(slNew, clNew, ANew))
   
-  psNew <- psM
-  pcNew <- pcM
+}
+
+getPsPcEpsEpc <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
+  
+  psNew <- PsM
+  pcNew <- PcM
   
   psNew_lo <- psNew  - 0.35
   pcNew_lo <- pcNew - 0.4
@@ -192,10 +102,10 @@ for(i in 1:nrow(proj_Q_P)){
     pcNew_lo <- pcNew_lo - 0.01
   }
   
-  psNew_expected <- EpsM
-  pcNew_expected <- EpcM
+  psNew_expected <- EPsM
+  pcNew_expected <- EPcM
   
-  hc_new <- hcM
+  hc_new <- HcM
   
   #### Here we make sure that the holding costs are below the cull cow price
   while(hc_new > pcNew){
@@ -228,52 +138,256 @@ for(i in 1:nrow(proj_Q_P)){
   
   estPNew <- BBoptim(par = p, fn = estPFunction, sl = slNew, cl = clNew, A = ANew, 
                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
-                     tilde_MU = MUtilde, tilde_s = Stilde)
+                     tilde_MU = params[1], tilde_s = params[2])
   
   ps1N <- estPNew$par[1]
   pc1N <- estPNew$par[2]
   ps_expected1N <- estPNew$par[3]
   pc_expected1N <- estPNew$par[4]
   
-  proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
+  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
   
-  if(i>1){
-    proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
-  }
+  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
   
-  proj_Q_P$Ps[i] <- ps1N
-  proj_Q_P$Pc[i] <- pc1N
+}
+
+
+
+##### Projections
+
+proj_adjFac <- adjFactor_New
+
+proj_adjFac <- adjFactor
+
+proj_muTildes <- mu_Tildes_MM
+proj_sTildes <- s_Tildes_MM
+proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPS,EQestPC,EQestHC, EQestEPS, EQestEPC))
+
+proj_muTildes1 <- mu_Tildes_MM_itr
+proj_sTildes1 <- s_Tildes_MM_itr
+proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC, ITRestEPS, ITRestEPC))
+
+#### We use the following to get the t+1 supply of the fed cattle
+##### See the work in the binder
+proj_K_t <- Stock %>% transmute(Year = Year, K = K)
+proj_A <- A_quant
+proj_Dshocks <- stateVars %>% transmute(Year = Year, dShock = Shock)
+
+proj_AllDF_EQ <- Reduce(function(...) merge(...), 
+                   list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes,proj_sTildes,proj_PricesCosts, 
+                        dressedWeights_sl_cl))
+
+proj_AllDF_CONV <- Reduce(function(...) merge(...), 
+                        list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes1,proj_sTildes1,proj_PricesCosts1, 
+                             dressedWeights_sl_cl))
+
+
+
+############ NEED TO FIGURE OUT HOW TO WRITE k7, k8, k9 in terms of k3
+
+replacementHeifers_k3 <- replacementInventory %>% arrange(Year)
+
+replacementHeifers_k3 <- replacementHeifers_k3 %>% mutate(ratio = k3/lag(k3))
+
+summary(replacementHeifers_k3$ratio)
+#     Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#  0.6766  0.9703  1.0104  1.0062  1.0451  1.1658       1
+
+#### Using the above relationship i.e., relationship between the replacement heifers at t to t-1. 
+#### The median is 1.0104. So I will fix this and use this as the relationship. 
+
+gamma_k3 <- 1.0104
+
+modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
+
+modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
+
+################################## CHANGE THE ADJUSTMENT FACTOR #######################################
+
+slaughterAvg <- modelParamsEQ$Slaughter_avg
+
+MUtilde <- modelParamsEQ$muMedian
+Stilde <- modelParamsEQ$sMedian
+
+psM <- modelParamsEQ$psMedian
+pcM <- modelParamsEQ$pcMedian
+hcM <- modelParamsEQ$hcMedian
+
+EpsM <- modelParamsEQ$EpsMedian
+EpcM <- modelParamsEQ$EpcMedian
+
+capA <- modelParamsEQ$A
+capK <- modelParamsEQ$K
+
+adjF <- modelParamsEQ$AdjFactor
+
+# stock_K <- beefInventory %>% arrange(Year) %>% filter(Year >=2017)
+
+# beefINV_FORECAST
+
+nProj <- nrow(beefINV_FORECAST) + 1
+
+proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
+                       EPs = numeric(nProj), EPc = numeric(nProj), Hc = numeric(nProj), 
+                       Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj))
+
+####### Here we are projecting the prices and quantities from the forecasted capK or total stock
+for(i in 1:nrow(proj_Q_P)){
+
+  # i <- 9
+  
+  k <- 0
+  K1 <- (capK * slaughterAvg)/1000000000
+
+  Qs <- getSlClA(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
+                 k = k, CapA = capA, gamma_k3 = gamma_k3, adjF = adjF)
+  slNew <- Qs[1]
+  clNew <- Qs[2]
+  ANew <- Qs[3]
+
+  Ps <- getPsPcEpsEpc(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
+                      HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
+                      params = c(MUtilde, Stilde))
+  psM <- Ps[1]
+  pcM <- Ps[2]
+  hcM <- Ps[3]
+  EpsM <- Ps[4]
+  EpcM <- Ps[5]
+
+  proj_Q_P$Ps[i] <- psM
+  proj_Q_P$Pc[i] <- pcM
+  proj_Q_P$Hc[i] <- hcM
+  proj_Q_P$EPs[i] <- EpsM
+  proj_Q_P$EPc[i] <- EpcM
+
   proj_Q_P$Sl[i] <- slNew
   proj_Q_P$Cl[i] <- clNew
   proj_Q_P$A[i] <- ANew
-  
-  psM <- ps1N
-  pcM <- pc1N
-  
-  EpsM <- ps_expected1N
-  EpcM <- pc_expected1N
-  
-  hcM <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
-    (beta * EpcM + g * (beta^3) * EpsM - pcM)
-  
+
+  proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
+
+  if(i>1){
+    proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
+  }
+
   capA <- ANew
-  
+
   capK <- beefINV_FORECAST$K[i]
+
+}
+  
+
+
+nProj <- nProj -1
+proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo = numeric(nProj),
+                          EPs_lo = numeric(nProj), EPc_lo = numeric(nProj), Hc_lo = numeric(nProj),
+                          Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj))
+
+proj_Q_P_up <- data.frame(Year = numeric(nProj), Ps_up = numeric(nProj), Pc_up = numeric(nProj),
+                          EPs_up = numeric(nProj), EPc_up = numeric(nProj), Hc_up = numeric(nProj),
+                          Sl_up = numeric(nProj), Cl_up = numeric(nProj), A_up = numeric(nProj))    
+
+####### Here we are projecting the prices and quantities from the forecasted capK or total stock lower 95%
+psM_lo <- modelParamsEQ$psMedian
+pcM_lo <- modelParamsEQ$pcMedian
+hcM_lo <- modelParamsEQ$hcMedian
+
+EpsM_lo <- modelParamsEQ$EpsMedian
+EpcM_lo <- modelParamsEQ$EpcMedian
+
+capA_lo <- modelParamsEQ$A
+
+for(i in 1:nrow(proj_Q_P_lo)){
+  
+  i <- 2
+  capK_lo <- beefINV_FORECAST$lo95[i]
+  
+  k <- 0
+  K1_lo <- (capK_lo * slaughterAvg)/1000000000
+  
+  Qs_lo <- getSlClA(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
+                    k = k, CapA = capA_lo, gamma_k3 = gamma_k3, adjF = adjF)
+  
+  slNew_lo <- Qs_lo[1]
+  clNew_lo <- Qs_lo[2]
+  ANew_lo <- Qs_lo[3]
+  
+  Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+                         HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                         params = c(MUtilde, Stilde))
+  
+  psM_lo <- Ps_lo[1]
+  pcM_lo <- Ps_lo[2]
+  hcM_lo <- Ps_lo[3]
+  EpsM_lo <- Ps_lo[4]
+  EpcM_lo <- Ps_lo[5]
+  
+  proj_Q_P_lo$Ps_lo[i] <- psM_lo
+  proj_Q_P_lo$Pc_lo[i] <- pcM_lo
+  proj_Q_P_lo$Hc_lo[i] <- hcM_lo
+  proj_Q_P_lo$EPs_lo[i] <- EpsM_lo
+  proj_Q_P_lo$EPc_lo[i] <- EpcM_lo
+  
+  proj_Q_P_lo$Sl_lo[i] <- slNew_lo
+  proj_Q_P_lo$Cl_lo[i] <- clNew_lo
+  proj_Q_P_lo$A_lo[i] <- ANew_lo
+  
+  proj_Q_P_lo$Year[i] <- beefINV_FORECAST$Year[i]
+  
+  capA_lo <- ANew_lo
   
 }
-      
 
+####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
 
+psM_up <- modelParamsEQ$psMedian
+pcM_up <- modelParamsEQ$pcMedian
+hcM_up <- modelParamsEQ$hcMedian
 
+EpsM_up <- modelParamsEQ$EpsMedian
+EpcM_up <- modelParamsEQ$EpcMedian
 
-####### WILL HAVE TO DO THE CONFIDENCE INTERVALS AS WELL ########
-     
-      
-# Year       Ps        Pc       Sl       Cl        A
-# 1 2018 1.190612 0.7303366 23.43145 2.800085 25.51017
-# 2 2019 1.152914 0.7495325 23.90089 2.527175 25.70129
-# 3 2020 1.109663 0.7726350 24.41474 2.244440 25.92605
-# 4 2021 1.059102 0.8016011 24.77356 1.934528 25.97362      
+capA_up <- modelParamsEQ$A
+
+for(i in 1:nrow(proj_Q_P_up)){
+  
+  capK_up <- beefINV_FORECAST$hi95[i]
+  
+  k <- 0
+  K1_up <- (capK_up * slaughterAvg)/1000000000
+  
+  Qs_up <- getSlClA(Mutilde = MUtilde, Stilde = Stilde, psM = psM_up, pcM = pcM_up,
+                    K1 = K1_up, capA = capA_up, gamma_k3 = gamma_k3, k = k, adjF = adjF)
+  slNew_up <- Qs_up[1]
+  clNew_up <- Qs_up[2]
+  ANew_up <- Qs_up[3]
+  
+  Ps_up <- getPsPcEpsEpc(psM = psM_up, pcM = pcM_up, EpsM = EpsM_up, EpcM = EpcM_up, hcM = hcM_up,
+                         slNew = slNew_up, clNew = clNew_up, ANew = ANew_up, 
+                         Mutilde = Mutilde, Stilde = Stilde)
+  
+  psM_up <- Ps_up[1]
+  pcM_up <- Ps_up[2]
+  hcM_up <- Ps_up[3]
+  EpsM_up <- Ps_up[4]
+  EpcM_up <- Ps_up[5]
+  
+  proj_Q_P_up$Ps[i] <- psM_up
+  proj_Q_P_up$Pc[i] <- pcM_up
+  proj_Q_P_up$Hc[i] <- hcM_up
+  proj_Q_P_up$EPs[i] <- EpsM_up
+  proj_Q_P_up$EPc[i] <- EpcM_up
+  
+  proj_Q_P_up$Sl[i] <- slNew_up
+  proj_Q_P_up$Cl[i] <- clNew_up
+  proj_Q_P_up$A[i] <- ANew_up
+  
+  proj_Q_P_up$Year[i] <- beefINV_FORECAST$Year[i]
+  
+  capA_up <- ANew_up
+  
+}
       
       
       

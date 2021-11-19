@@ -443,29 +443,289 @@ mu_Tildes_itr[,i][1:25]
 
 
 
-# Year       Ps        Pc       Sl       Cl        A
-# 1  2018 1.206493 0.7295760 22.78709 2.823417 24.90621
-# 2  2019 1.210795 0.6837192 22.96442 3.176343 25.42189
-# 3  2020 1.200358 0.6543128 22.97870 3.314562 25.57020
-# 4  2021 1.213137 0.6683482 22.87306 3.293772 25.44725
-# 5  2022 1.211483 0.6698220 22.75674 3.250793 25.29233
-# 6  2023 1.212389 0.6660670 22.68547 3.274477 25.24605
-# 7  2024 1.214699 0.6580683 22.65008 3.345302 25.28051
-# 8  2025 1.220482 0.6541859 22.61305 3.413599 25.31091
-# 9  2026 1.226913 0.6538395 22.55908 3.457142 25.30078
-# 10 2027 1.232567 0.6542710 22.49516 3.487680 25.26831
-# 11 2028 1.238400 0.6545232 22.43396 3.521833 25.24200
-# 12 2029 1.240272 0.6498007 22.37910 3.564314 25.22997
-# 13 2030 1.246672 0.6494855 22.32563 3.610850 25.22322
+#     Year       Ps        Pc EPs EPc Hc       Sl       Cl        A
+# 1  2018 1.206493 0.7295760   0   0  0 22.78709 2.823417 24.90621
+# 2  2019 1.210795 0.6837192   0   0  0 22.96442 3.176343 25.42189
+# 3  2020 1.200358 0.6543128   0   0  0 22.97870 3.314562 25.57020
+# 4  2021 1.213137 0.6683482   0   0  0 22.87306 3.293772 25.44725
+# 5  2022 1.211483 0.6698220   0   0  0 22.75674 3.250793 25.29233
+# 6  2023 1.212389 0.6660670   0   0  0 22.68547 3.274477 25.24605
+# 7  2024 1.214699 0.6580683   0   0  0 22.65008 3.345302 25.28051
+# 8  2025 1.220482 0.6541859   0   0  0 22.61305 3.413599 25.31091
+# 9  2026 1.226913 0.6538395   0   0  0 22.55908 3.457142 25.30078
+# 10 2027 1.232567 0.6542710   0   0  0 22.49516 3.487680 25.26831
+# 11 2028 1.238400 0.6545232   0   0  0 22.43396 3.521833 25.24200
+# 12 2029 1.240272 0.6498007   0   0  0 22.37910 3.564314 25.22997
+# 13 2030 1.246672 0.6494855   0   0  0 22.32563 3.610850 25.22322
 
 
 
 
+# Qs <- getSlClA(Mutilde = MUtilde, Stilde = Stilde, psM = psM, pcM = pcM,
+#                K1 = K1, capA = capA, gamma_k3 = gamma_k3, k = k, adjF = adjF)
+# slNew <- Qs[1]
+# clNew <- Qs[2]
+# ANew <- Qs[3]
+# 
+# Ps <- getPsPcEpsEpc(psM = psM, pcM = pcM, EpsM = EpsM, EpcM = EpcM, hcM = hcM,
+#                     slNew = slNew, clNew = clNew, ANew = ANew, Mutilde = Mutilde, Stilde = Stilde)
+# 
+# psM <- Ps[1]
+# pcM <- Ps[2]
+# hcM <- Ps[3]
+# EpsM <- Ps[4]
+# EpcM <- Ps[5]
+
+
+# k <- 0
+# K1 <- (capK * slaughterAvg)/1000000000
+# 
+# estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
+#                 ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3)
+# 
+# k3_est <- estQ$par
+# 
+# slNew <- (g * K1 - k3_est)
+# 
+# clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
+# 
+# ANew <- (slNew + clNew) * (1/adjF)
+
+# shrT <- shareMetric(paramMu = MUtilde, paramS = Stilde, ps = psM, pc = pcM)
+# 
+# ANew <- (g * K1 - k3_est) * (1/shrT)
+# slNew <- ANew *  shrT * adjF
+# clNew <- ANew * (1-shrT) * adjF
 
 
 
+# if(i>1){
+#   k <- 0
+#   K1 <- (capK * slaughterAvg)/1000000000
+#   K1 <- (capK * slaughterAvg)/1000000000
+#   
+#   estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
+#                   ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3)
+#   
+#   estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
+#                   ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3)
+#   
+#   k3_est <- estQ$par
+#   k3_est <- estQ$par
+#   
+#   slNew <- (g * K1 - k3_est)
+#   slNew <- (g * K1 - k3_est)
+#   
+#   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1))
+#   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1))
+#   
+#   ANew <- (slNew + clNew) * (1/adjF)
+#   ANew <- (slNew + clNew) * (1/adjF)
+#   
+# }
 
+# psNew <- psM
+# pcNew <- pcM
+# 
+# psNew_lo <- psNew  - 0.35
+# pcNew_lo <- pcNew - 0.4
+# 
+# psNew_up <- psNew + 0.10929
+# pcNew_up <- pcNew + 0.080153
+# 
+# #### Here we are making sure the lower bound for the prices isn't negative
+# if(psNew_lo < 0){
+#   psNew_lo <- psNew
+# }
+# 
+# if(pcNew_lo < 0){
+#   pcNew_lo <- pcNew
+# }
+# 
+# #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+# while( pcNew_lo > psNew_lo ){
+#   pcNew_lo <- pcNew_lo - 0.01
+# }
+# 
+# psNew_expected <- EpsM
+# pcNew_expected <- EpcM
+# 
+# hc_new <- hcM
+# 
+# #### Here we make sure that the holding costs are below the cull cow price
+# while(hc_new > pcNew){
+#   hc_new <- hc_new - 0.01
+# }
+# 
+# hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+# B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+# 
+# psNew_expected_lo <- psNew_expected - 0.5
+# 
+# psNew_expected_up <- psNew_expected + 0.1
+# 
+# pcNew_expected_lo <- pcNew_expected - 0.5
+# 
+# pcNew_expected_up <- pcNew_expected + 0.1
+# 
+# if(pcNew_expected_lo < 0){
+#   pcNew_expected_lo <- pcNew_expected
+# }
+# 
+# if(ps_expected_lo < 0){
+#   psNew_expected_lo <- psNew_expected
+# }
+# 
+# p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+# 
+# lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+# up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+# 
+# estPNew <- BBoptim(par = p, fn = estPFunction, sl = slNew, cl = clNew, A = ANew, 
+#                    B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+#                    tilde_MU = MUtilde, tilde_s = Stilde)
+# 
+# ps1N <- estPNew$par[1]
+# pc1N <- estPNew$par[2]
+# ps_expected1N <- estPNew$par[3]
+# pc_expected1N <- estPNew$par[4]
+# 
+# proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
+# 
+# if(i>1){
+#   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
+# }
+# 
+# proj_Q_P$Ps[i] <- ps1N
+# proj_Q_P$Pc[i] <- pc1N
+# proj_Q_P$Sl[i] <- slNew
+# proj_Q_P$Cl[i] <- clNew
+# proj_Q_P$A[i] <- ANew
+# 
+# psM <- ps1N
+# pcM <- pc1N
+# 
+# EpsM <- ps_expected1N
+# EpcM <- pc_expected1N
+# 
+# hcM <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+#   (beta * EpcM + g * (beta^3) * EpsM - pcM)
+# 
+# capA <- ANew
+# 
+# capK <- beefINV_FORECAST$K[i]
+# 
+# capK_low <- beefINV_FORECAST$lo95[i]
+# capK_hi <- beefINV_FORECAST$hi95[i]
 
-
+# for(i in 1:nrow(proj_Q_P)){
+#   
+#   k <- 0
+#   K1 <- (capK * slaughterAvg)/1000000000
+#   
+#   estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
+#                   ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3)
+#   
+#   k3_est <- estQ$par
+#   
+#   slNew <- (g * K1 - k3_est)
+#   
+#   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
+#   
+#   ANew <- (slNew + clNew) * (1/adjF)
+#   
+#   
+#   psNew <- psM
+#   pcNew <- pcM
+#   
+#   psNew_lo <- psNew  - 0.35
+#   pcNew_lo <- pcNew - 0.4
+#   
+#   psNew_up <- psNew + 0.10929
+#   pcNew_up <- pcNew + 0.080153
+#   
+#   #### Here we are making sure the lower bound for the prices isn't negative
+#   if(psNew_lo < 0){
+#     psNew_lo <- psNew
+#   }
+#   
+#   if(pcNew_lo < 0){
+#     pcNew_lo <- pcNew
+#   }
+#   
+#   #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+#   while( pcNew_lo > psNew_lo ){
+#     pcNew_lo <- pcNew_lo - 0.01
+#   }
+#   
+#   psNew_expected <- EpsM
+#   pcNew_expected <- EpcM
+#   
+#   hc_new <- hcM
+#   
+#   #### Here we make sure that the holding costs are below the cull cow price
+#   while(hc_new > pcNew){
+#     hc_new <- hc_new - 0.01
+#   }
+#   
+#   hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+#   B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+#   
+#   psNew_expected_lo <- psNew_expected - 0.5
+#   
+#   psNew_expected_up <- psNew_expected + 0.1
+#   
+#   pcNew_expected_lo <- pcNew_expected - 0.5
+#   
+#   pcNew_expected_up <- pcNew_expected + 0.1
+#   
+#   if(pcNew_expected_lo < 0){
+#     pcNew_expected_lo <- pcNew_expected
+#   }
+#   
+#   if(ps_expected_lo < 0){
+#     psNew_expected_lo <- psNew_expected
+#   }
+#   
+#   p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+#   
+#   lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+#   up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+#   
+#   estPNew <- BBoptim(par = p, fn = estPFunction, sl = slNew, cl = clNew, A = ANew,
+#                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+#                      tilde_MU = MUtilde, tilde_s = Stilde)
+#   
+#   ps1N <- estPNew$par[1]
+#   pc1N <- estPNew$par[2]
+#   ps_expected1N <- estPNew$par[3]
+#   pc_expected1N <- estPNew$par[4]
+#   
+#   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
+#   
+#   if(i>1){
+#     proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
+#   }
+#   
+#   proj_Q_P$Ps[i] <- ps1N
+#   proj_Q_P$Pc[i] <- pc1N
+#   proj_Q_P$Sl[i] <- slNew
+#   proj_Q_P$Cl[i] <- clNew
+#   proj_Q_P$A[i] <- ANew
+#   
+#   psM <- ps1N
+#   pcM <- pc1N
+#   
+#   EpsM <- ps_expected1N
+#   EpcM <- pc_expected1N
+#   
+#   hcM <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) *
+#     (beta * EpcM + g * (beta^3) * EpsM - pcM)
+#   
+#   capA <- ANew
+#   
+#   capK <- beefINV_FORECAST$K[i]
+#   
+# }
 
 

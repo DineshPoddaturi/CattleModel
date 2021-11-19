@@ -77,7 +77,7 @@ Box.test(Kfit$residuals, type = "Ljung-Box")
 #   ggplot2::ggtitle("Non-Standardized Residuals")
 
 
-# KfitPredict <- predict(Kfit , n.ahead = 5)
+# KfitPredict <- predict(Kfit , n.ahead = 12)
 
 beefINV_FORECAST <- forecast(object = Kfit, h = 12, level = 95) %>% as.data.frame()
 
@@ -89,8 +89,6 @@ row.names(beefINV_FORECAST) <- NULL
 beefInventory_test <- beefInventory %>% arrange(Year) %>% filter(Year > 2010)
 
 combinedK <- left_join(beefINV_FORECAST, beefInventory_test) %>% mutate(err = K - Kcast)
-
-
 
 
 # Year    Kcast     lo95     hi95        K       err
@@ -125,10 +123,10 @@ summary(replacementHeifers_k3$ratio)
 #  0.6766  0.9703  1.0104  1.0062  1.0451  1.1658       1
 
 
-replacementHeifers_k3 <- replacementHeifers_k3 %>% filter(Year <= 2012)
+replacementHeifers_k311 <- replacementHeifers_k31 %>% filter(Year < 2012)
 
-replacementHeifers_k3_ts <- ts(replacementHeifers_k3$k3, start = replacementHeifers_k3$Year[1], 
-                               end = replacementHeifers_k3$Year[nrow(replacementHeifers_k3)], frequency = 1)
+replacementHeifers_k3_ts <- ts(replacementHeifers_k311$k3, start = replacementHeifers_k311$Year[1], 
+                               end = replacementHeifers_k311$Year[nrow(replacementHeifers_k311)], frequency = 1)
 
 plot_time_series(replacementHeifers_k3_ts, "Replacement Heifers")
 
@@ -151,14 +149,14 @@ Box.test(replacementHeifersModelFit$residuals, type = "Ljung-Box")
 # data:  replacementHeifersModelFit$residuals
 # X-squared = 0.0043575, df = 1, p-value = 0.9474
 
-replacementHeifers_FORECAST <- forecast(object = replacementHeifersModelFit, h = 8, level = 95) %>% as.data.frame()
+replacementHeifers_FORECAST <- forecast(object = replacementHeifersModelFit, h = 15, level = 95) %>% as.data.frame()
 
 replacementHeifers_FORECAST <- replacementHeifers_FORECAST %>% transmute(Year =  as.double(row.names(replacementHeifers_FORECAST)), 
                                                    k3cast = `Point Forecast`, lo95 = `Lo 95`, hi95 = `Hi 95`)
 
 row.names(replacementHeifers_FORECAST) <- NULL
 
-replacementHeifers_test <- replacementHeifers_k31 %>% arrange(Year) %>% filter(Year > 2012)
+replacementHeifers_test <- replacementHeifers_k31 %>% arrange(Year) %>% filter(Year > 2011)
 
 combinedK3 <- left_join(replacementHeifers_FORECAST, replacementHeifers_test) %>% mutate(err = k3 - k3cast)
 
