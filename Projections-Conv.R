@@ -67,10 +67,6 @@ getSlClA <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, adjF){
   
   k3_est <- estQ$par
   
-  # if(k3_est < 0){
-  #   k3_est <- 0.01
-  # }
-  
   slNew <- (g * K1 - k3_est)
   
   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
@@ -182,12 +178,12 @@ proj_A <- A_quant
 proj_Dshocks <- stateVars %>% transmute(Year = Year, dShock = Shock)
 
 proj_AllDF_EQ <- Reduce(function(...) merge(...), 
-                   list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes,proj_sTildes,proj_PricesCosts, 
-                        dressedWeights_sl_cl))
+                        list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes,proj_sTildes,proj_PricesCosts, 
+                             dressedWeights_sl_cl))
 
 proj_AllDF_CONV <- Reduce(function(...) merge(...), 
-                        list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes1,proj_sTildes1,proj_PricesCosts1, 
-                             dressedWeights_sl_cl))
+                          list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes1,proj_sTildes1,proj_PricesCosts1, 
+                               dressedWeights_sl_cl))
 
 
 
@@ -212,22 +208,22 @@ modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
 
 ################################## CHANGE THE ADJUSTMENT FACTOR #######################################
 
-slaughterAvg <- modelParamsEQ$Slaughter_avg
+slaughterAvg <- modelParamsCONV$Slaughter_avg
 
-MUtilde <- modelParamsEQ$muMedian
-Stilde <- modelParamsEQ$sMedian
+MUtilde <- modelParamsCONV$muMedian
+Stilde <- modelParamsCONV$sMedian
 
-psM <- modelParamsEQ$psMedian
-pcM <- modelParamsEQ$pcMedian
-hcM <- modelParamsEQ$hcMedian
+psM <- modelParamsCONV$psMedian
+pcM <- modelParamsCONV$pcMedian
+hcM <- modelParamsCONV$hcMedian
 
-EpsM <- modelParamsEQ$EpsMedian
-EpcM <- modelParamsEQ$EpcMedian
+EpsM <- modelParamsCONV$EpsMedian
+EpcM <- modelParamsCONV$EpcMedian
 
-capA <- modelParamsEQ$A
-capK <- modelParamsEQ$K
+capA <- modelParamsCONV$A
+capK <- modelParamsCONV$K
 
-adjF <- modelParamsEQ$AdjFactor
+adjF <- modelParamsCONV$AdjFactor
 
 # stock_K <- beefInventory %>% arrange(Year) %>% filter(Year >=2017)
 
@@ -243,12 +239,12 @@ k_old <- 0
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock
 for(i in 1:nrow(proj_Q_P)){
-
+  
   # i <- 1
   
   k <- k_old
   K1 <- (capK * slaughterAvg)/1000000000
-
+  
   Qs <- getSlClA(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
                  k = k, CapA = capA, gamma_k3 = gamma_k3, adjF = adjF)
   slNew <- Qs[1]
@@ -256,7 +252,7 @@ for(i in 1:nrow(proj_Q_P)){
   ANew <- Qs[3]
   
   k_old <- Qs[4]
-
+  
   Ps <- getPsPcEpsEpc(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
                       HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
                       params = c(MUtilde, Stilde))
@@ -265,34 +261,34 @@ for(i in 1:nrow(proj_Q_P)){
   hcM <- Ps[3]
   EpsM <- Ps[4]
   EpcM <- Ps[5]
-
+  
   proj_Q_P$Ps[i] <- psM
   proj_Q_P$Pc[i] <- pcM
   proj_Q_P$Hc[i] <- hcM
   proj_Q_P$EPs[i] <- EpsM
   proj_Q_P$EPc[i] <- EpcM
-
+  
   proj_Q_P$Sl[i] <- slNew
   proj_Q_P$Cl[i] <- clNew
   proj_Q_P$A[i] <- ANew
-
+  
   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
-
+  
   if(i>1){
     proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
   }
-
+  
   capA <- ANew
-
+  
   capK <- beefINV_FORECAST$K[i]
   
   # params_Mu_S <- optParamFunction(sl = slNew, cl = clNew, ps = psM, pc = pcM, thetas = c(1,1))
   # 
   # MUtilde <- params_mu_s[1]
   # Stilde <- params_mu_s[2]
-
-}
   
+}
+
 
 
 nProj <- nProj
@@ -315,7 +311,7 @@ k_old <- 0
 
 for(i in 1:nrow(proj_Q_P_lo)){
   
-  # i <- 5
+  # i <- 2
   
   k <- k_old
   K1_lo <- (capK_lo * slaughterAvg)/1000000000
@@ -358,11 +354,11 @@ for(i in 1:nrow(proj_Q_P_lo)){
   capA_lo <- ANew_lo
   capK_lo <- beefINV_FORECAST$lo95[i]
   
-  params_Mu_S <- optParamFunction(sl = slNew_lo, cl = clNew_lo,
-                                  ps = psM_lo, pc = pcM_lo, thetas = c(1,1))
-
-  MUtilde <- params_mu_s[1]
-  Stilde <- params_mu_s[2]
+  # params_Mu_S <- optParamFunction(sl = slNew_lo, cl = clNew_lo, 
+  #                                 ps = psM_lo, pc = pcM_lo, thetas = c(1,1))
+  # 
+  # MUtilde <- params_mu_s[1]
+  # Stilde <- params_mu_s[2]
   
 }
 
@@ -429,193 +425,193 @@ for(i in 1:nrow(proj_Q_P_up)){
   capK_up <- beefINV_FORECAST$hi95[i]
   
 }
-      
-      
-      
+
+
+
 round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),3) %>%
   select(Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up,
-          Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up,
-          A_lo, A, A_up)
-         
-         
-      
-      
-      
-      
-      
-      
-      # D_slPsPcN <- ANew *
-      #   ((exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))/
-      #      (1 + (exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))))
-      # 
-      # ### Demand of the cull cow meat under the new prices
-      # D_clPsPcN <- ANew * (1/(1+ exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde)))
-      # 
-      # #### Total demand for the meat under new prices
-      # D_PsPcN <- D_slPsPcN + D_clPsPcN
-      # 
-      # #### Total supply of meat (this is by adding the nodes)
-      # S_psPCN <- slNew + clNew
-      # 
-      # fedDiffN <- slNew - D_slPsPcN
-      # cullDiffN <- clNew - D_clPsPcN
-      # 
-      # slNew <- D_slPsPcN
-      # clNew <- D_clPsPcN
-      # 
-      # # m <- 1
-      # 
-      # ANew <- (slNew + clNew) * (1/proj2016$AdjFactor)
-      
-      # while(abs(fedDiffN)>0.001 || abs(cullDiffN)>0.001){
-      #   
-      #   k3_estOld <- k3_est
-      #   
-      #   if( fedDiffN < 0){
-      #     ps_n <- ps1N + 0.001
-      #   } else if( fedDiffN > 0){
-      #     ps_n <- ps1N - 0.001
-      #   }
-      #   
-      #   if(ps_n < 0){
-      #     ps_n <- ps1N
-      #   }
-      #   
-      #   if( cullDiffN < 0){
-      #     pc_n <- pc1N + 0.001
-      #   } else if( cullDiffN > 0){
-      #     pc_n <- pc1N - 0.001
-      #   }
-      #   
-      #   if(pc_n < 0){
-      #     pc_n <- pc1N
-      #   }
-      #   
-      #   ps_lo <- ps_n  - 0.35
-      #   pc_lo <- pc_n - 0.4
-      #   
-      #   ps_up <- ps_n + 0.10929
-      #   pc_up <- pc_n + 0.080153
-      #   
-      #   if(ps_lo < 0){
-      #     ps_lo <- ps_n
-      #   }
-      #   
-      #   if(pc_lo < 0){
-      #     pc_lo <- pc_n
-      #   }
-      #   
-      #   while(pc_lo>ps_lo){
-      #     pc_lo <- pc_lo - 0.01
-      #   }
-      #   
-      #   ps_expected <- ps_expected1N
-      #   pc_expected <- pc_expected1N
-      #   
-      #   # ps_expected <- sum(as.numeric(ps_n) * fedMeshCheb)
-      #   # pc_expected <- sum(as.numeric(pc_n) * cullMeshCheb)
-      #   
-      #   ### This holding costs are derived from the fact that the farmers cull cows when they reach 9 yeards old. So, 
-      #   ### we use the equality of that to get the holding costs. From my first observation this is greater than the naive 
-      #   ### expectations holding costs. Because we have the expected price in the equality.
-      #   hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
-      #     (beta * pc_expected + g * (beta^3) * ps_expected - pc_n)
-      #   
-      #   while(hc_new>pc_n){
-      #     hc_new <- hc_new - 0.01
-      #   }
-      #   
-      #   hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
-      #   B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
-      #   
-      #   ps_expected_lo <- ps_expected - 0.5
-      #   
-      #   ps_expected_up <- ps_expected + 0.1
-      #   
-      #   pc_expected_lo <- pc_expected - 0.5
-      #   
-      #   pc_expected_up <- pc_expected + 0.1
-      #   
-      #   if(pc_expected_lo < 0){
-      #     pc_expected_lo <- pc_expected
-      #   }
-      #   
-      #   if(ps_expected_lo < 0){
-      #     ps_expected_lo <- ps_expected
-      #   }
-      #   
-      #   p <- c(ps_n, pc_n, ps_expected, pc_expected)
-      #   
-      #   lo <- c(ps_lo, pc_lo, ps_expected_lo, pc_expected_lo)
-      #   up <- c(ps_up, pc_up, ps_expected_up, pc_expected_up)
-      #   
-      #   estPNew_EQ <- BBoptim(par = p, fn = estPFunction, sl = slNew, cl = clNew, A = ANew, 
-      #                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
-      #                      tilde_MU = MUtilde, tilde_s = Stilde)
-      #   
-      #   ps1N <- estPNew_EQ$par[1]
-      #   pc1N <- estPNew_EQ$par[2]
-      #   ps_expected1N <- estPNew_EQ$par[3]
-      #   pc_expected1N <- estPNew_EQ$par[4]
-      #   
-      #   ### Demand of the fed cattle meat under the new prices
-      #   D_slPsPcN <- ANew *
-      #     ((exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))/
-      #        (1 + (exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))))
-      #   
-      #   ### Demand of the cull cow meat under the new prices
-      #   D_clPsPcN <- ANew * (1/(1+ exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde)))
-      #   
-      #   ### Here we get the "optimal" supply of the meat by solving for k_{3,t+1} and k_{j,t+1} where j = [7,8,9]. Note we get
-      #   ### these quantities seperately i.e., k_{3,t+1} and sum k_{j,t+1} where j = [7,8,9]
-      #   k <- k3_estOld
-      # 
-      #   #### Here we use sl+cl for A_node. Why? because we use the current quantities i.e., Stock_1t and k_9t + k_8t + k_7t
-      #   #### That means the total derived demand should be sl+cl? Dunno Have to think more.....
-      #   estQNew <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
-      #                   ps = ps1N, pc = pc1N, K1 = K1, A = ANew, gamma_k3 = gamma_k3)
-      # 
-      #   k3_est <- estQNew$par
-      # 
-      #   slNew <- g * K1 - k3_est
-      # 
-      #   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
-      # 
-      # 
-      #   # slN <- slNew
-      #   # clN <- clNew
-      #   
-      #   # slNew <- D_slPsPcN
-      #   # clNew <- D_clPsPcN
-      #   # 
-      #   # slN <- slNew
-      #   # clN <- clNew
-      #   
-      #   #### Total demand for the meat under new prices
-      #   D_PsPcN <-  D_slPsPcN + D_clPsPcN
-      #   
-      #   #### Total supply of meat (this is by adding the results)
-      #   S_psPCN <- slNew + clNew
-      #   
-      #   fedDiffN <- slNew - D_slPsPcN
-      #   cullDiffN <- clNew - D_clPsPcN
-      #   
-      #   # slNodes_eq[j,i] <- sl1
-      #   # clNodes_eq[j,i] <- cl1
-      #   # A_nodes_eq[j,i] <- A_node
-      #   
-      #   ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
-      #   if((m %% 2 == 0)){
-      #     ANew <- (slNew + clNew)  * (1/proj2016$AdjFactor) 
-      #   }else{
-      #     slNew <- slNew
-      #     clNew <- clNew
-      #   }
-      #   
-      #   m <- m+1
-      #   
-      # }
-      
+         Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up,
+         A_lo, A, A_up)
+
+
+
+
+
+
+
+
+# D_slPsPcN <- ANew *
+#   ((exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))/
+#      (1 + (exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))))
+# 
+# ### Demand of the cull cow meat under the new prices
+# D_clPsPcN <- ANew * (1/(1+ exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde)))
+# 
+# #### Total demand for the meat under new prices
+# D_PsPcN <- D_slPsPcN + D_clPsPcN
+# 
+# #### Total supply of meat (this is by adding the nodes)
+# S_psPCN <- slNew + clNew
+# 
+# fedDiffN <- slNew - D_slPsPcN
+# cullDiffN <- clNew - D_clPsPcN
+# 
+# slNew <- D_slPsPcN
+# clNew <- D_clPsPcN
+# 
+# # m <- 1
+# 
+# ANew <- (slNew + clNew) * (1/proj2016$AdjFactor)
+
+# while(abs(fedDiffN)>0.001 || abs(cullDiffN)>0.001){
+#   
+#   k3_estOld <- k3_est
+#   
+#   if( fedDiffN < 0){
+#     ps_n <- ps1N + 0.001
+#   } else if( fedDiffN > 0){
+#     ps_n <- ps1N - 0.001
+#   }
+#   
+#   if(ps_n < 0){
+#     ps_n <- ps1N
+#   }
+#   
+#   if( cullDiffN < 0){
+#     pc_n <- pc1N + 0.001
+#   } else if( cullDiffN > 0){
+#     pc_n <- pc1N - 0.001
+#   }
+#   
+#   if(pc_n < 0){
+#     pc_n <- pc1N
+#   }
+#   
+#   ps_lo <- ps_n  - 0.35
+#   pc_lo <- pc_n - 0.4
+#   
+#   ps_up <- ps_n + 0.10929
+#   pc_up <- pc_n + 0.080153
+#   
+#   if(ps_lo < 0){
+#     ps_lo <- ps_n
+#   }
+#   
+#   if(pc_lo < 0){
+#     pc_lo <- pc_n
+#   }
+#   
+#   while(pc_lo>ps_lo){
+#     pc_lo <- pc_lo - 0.01
+#   }
+#   
+#   ps_expected <- ps_expected1N
+#   pc_expected <- pc_expected1N
+#   
+#   # ps_expected <- sum(as.numeric(ps_n) * fedMeshCheb)
+#   # pc_expected <- sum(as.numeric(pc_n) * cullMeshCheb)
+#   
+#   ### This holding costs are derived from the fact that the farmers cull cows when they reach 9 yeards old. So, 
+#   ### we use the equality of that to get the holding costs. From my first observation this is greater than the naive 
+#   ### expectations holding costs. Because we have the expected price in the equality.
+#   hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+#     (beta * pc_expected + g * (beta^3) * ps_expected - pc_n)
+#   
+#   while(hc_new>pc_n){
+#     hc_new <- hc_new - 0.01
+#   }
+#   
+#   hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+#   B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
+#   
+#   ps_expected_lo <- ps_expected - 0.5
+#   
+#   ps_expected_up <- ps_expected + 0.1
+#   
+#   pc_expected_lo <- pc_expected - 0.5
+#   
+#   pc_expected_up <- pc_expected + 0.1
+#   
+#   if(pc_expected_lo < 0){
+#     pc_expected_lo <- pc_expected
+#   }
+#   
+#   if(ps_expected_lo < 0){
+#     ps_expected_lo <- ps_expected
+#   }
+#   
+#   p <- c(ps_n, pc_n, ps_expected, pc_expected)
+#   
+#   lo <- c(ps_lo, pc_lo, ps_expected_lo, pc_expected_lo)
+#   up <- c(ps_up, pc_up, ps_expected_up, pc_expected_up)
+#   
+#   estPNew_EQ <- BBoptim(par = p, fn = estPFunction, sl = slNew, cl = clNew, A = ANew, 
+#                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+#                      tilde_MU = MUtilde, tilde_s = Stilde)
+#   
+#   ps1N <- estPNew_EQ$par[1]
+#   pc1N <- estPNew_EQ$par[2]
+#   ps_expected1N <- estPNew_EQ$par[3]
+#   pc_expected1N <- estPNew_EQ$par[4]
+#   
+#   ### Demand of the fed cattle meat under the new prices
+#   D_slPsPcN <- ANew *
+#     ((exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))/
+#        (1 + (exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))))
+#   
+#   ### Demand of the cull cow meat under the new prices
+#   D_clPsPcN <- ANew * (1/(1+ exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde)))
+#   
+#   ### Here we get the "optimal" supply of the meat by solving for k_{3,t+1} and k_{j,t+1} where j = [7,8,9]. Note we get
+#   ### these quantities seperately i.e., k_{3,t+1} and sum k_{j,t+1} where j = [7,8,9]
+#   k <- k3_estOld
+# 
+#   #### Here we use sl+cl for A_node. Why? because we use the current quantities i.e., Stock_1t and k_9t + k_8t + k_7t
+#   #### That means the total derived demand should be sl+cl? Dunno Have to think more.....
+#   estQNew <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
+#                   ps = ps1N, pc = pc1N, K1 = K1, A = ANew, gamma_k3 = gamma_k3)
+# 
+#   k3_est <- estQNew$par
+# 
+#   slNew <- g * K1 - k3_est
+# 
+#   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
+# 
+# 
+#   # slN <- slNew
+#   # clN <- clNew
+#   
+#   # slNew <- D_slPsPcN
+#   # clNew <- D_clPsPcN
+#   # 
+#   # slN <- slNew
+#   # clN <- clNew
+#   
+#   #### Total demand for the meat under new prices
+#   D_PsPcN <-  D_slPsPcN + D_clPsPcN
+#   
+#   #### Total supply of meat (this is by adding the results)
+#   S_psPCN <- slNew + clNew
+#   
+#   fedDiffN <- slNew - D_slPsPcN
+#   cullDiffN <- clNew - D_clPsPcN
+#   
+#   # slNodes_eq[j,i] <- sl1
+#   # clNodes_eq[j,i] <- cl1
+#   # A_nodes_eq[j,i] <- A_node
+#   
+#   ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
+#   if((m %% 2 == 0)){
+#     ANew <- (slNew + clNew)  * (1/proj2016$AdjFactor) 
+#   }else{
+#     slNew <- slNew
+#     clNew <- clNew
+#   }
+#   
+#   m <- m+1
+#   
+# }
+
 
 
 
