@@ -227,8 +227,18 @@ P -> S,D -> P -> S -> P -> D -> P -> S -> D so on....
 
 
 
+11/22/2021:
 
+* Talked with Chad about the projections and how they are odd looking. Especially lower bounds of the fed cattle prices. I was told to investigate that closely. 
 
+* when I told Chad about the assumption of the relationship between $k_{3,t}$ and $k_{3,t+1}$ as $k_{3,t+1} = \gamma k_{3,t} + \epsilon$. He said it's extremely simplified assumption and I agree with him. Instead Chad suggested me to use calf-crop data. Basically calf-crop is $k_0$, new born babies. 
+
+Once they get older, Calf-crop are futher categorized into Replacement Heifers, Slaughter, and some die with natural causes. 
+So we build a relationship between the calf-crop and replacement heifers. 
+
+$k_{3,t+1} = \gamma k_{3,t} + \eta k_{0,t-3} + \epsilon$
+
+By fitting this relationship with data, we get the coefficients and then we can use the coefficients to further solve for $k_{3,t+1}$ in the model. Simply fit a simple OLS for this. I know prices will have to come into play but for now this is what we do. 
 
 
 

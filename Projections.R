@@ -60,7 +60,7 @@ estPFunction <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
   
 }
 
-getSlClA <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, adjF){
+getSlClA <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, adjF, Dshock){
   
   estQ <- BBoptim(par = k, fn = estQFunction, tilde_MU = params[1], tilde_s = params[2],
                   ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3)
@@ -89,11 +89,11 @@ getPsPcEpsEpc <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params)
   psNew_lo <- psNew  - 0.35
   pcNew_lo <- pcNew - 0.4
   
-  psNew_up <- psNew + 0.37750
-  pcNew_up <- pcNew + 0.371250
+  # psNew_up <- psNew + 0.37750
+  # pcNew_up <- pcNew + 0.371250
   
-  # psNew_up <- psNew + 0.10929
-  # pcNew_up <- pcNew + 0.080153
+  psNew_up <- psNew + 0.10929
+  pcNew_up <- pcNew + 0.080153
   
   #### Here we are making sure the lower bound for the prices isn't negative
   if(psNew_lo < 0){
@@ -214,15 +214,15 @@ modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
 
 slaughterAvg <- modelParamsEQ$Slaughter_avg
 
-MUtilde <- modelParamsEQ$muMedian
-Stilde <- modelParamsEQ$sMedian
+MUtilde <- modelParamsEQ$muMean
+Stilde <- modelParamsEQ$sMean
 
-psM <- modelParamsEQ$psMedian
-pcM <- modelParamsEQ$pcMedian
-hcM <- modelParamsEQ$hcMedian
+psM <- modelParamsEQ$psMean
+pcM <- modelParamsEQ$pcMean
+hcM <- modelParamsEQ$hcMean
 
-EpsM <- modelParamsEQ$EpsMedian
-EpcM <- modelParamsEQ$EpcMedian
+EpsM <- modelParamsEQ$EpsMean
+EpcM <- modelParamsEQ$EpcMean
 
 capA <- modelParamsEQ$A
 capK <- modelParamsEQ$K
@@ -286,6 +286,9 @@ for(i in 1:nrow(proj_Q_P)){
 
   capK <- beefINV_FORECAST$K[i]
   
+  EpsM <- sum(as.numeric(psM) * fedMeshCheb)
+  EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
+  
   # params_Mu_S <- optParamFunction(sl = slNew, cl = clNew, ps = psM, pc = pcM, thetas = c(1,1))
   # 
   # MUtilde <- params_mu_s[1]
@@ -301,12 +304,12 @@ proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo =
                           Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj))
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock lower 95%
-psM_lo <- modelParamsEQ$psMedian
-pcM_lo <- modelParamsEQ$pcMedian
-hcM_lo <- modelParamsEQ$hcMedian
+psM_lo <- modelParamsEQ$psMean
+pcM_lo <- modelParamsEQ$pcMean
+hcM_lo <- modelParamsEQ$hcMean
 
-EpsM_lo <- modelParamsEQ$EpsMedian
-EpcM_lo <- modelParamsEQ$EpcMedian
+EpsM_lo <- modelParamsEQ$EpsMean
+EpcM_lo <- modelParamsEQ$EpcMean
 
 capA_lo <- modelParamsEQ$A
 capK_lo <- modelParamsEQ$K
@@ -358,11 +361,14 @@ for(i in 1:nrow(proj_Q_P_lo)){
   capA_lo <- ANew_lo
   capK_lo <- beefINV_FORECAST$lo95[i]
   
-  params_Mu_S <- optParamFunction(sl = slNew_lo, cl = clNew_lo,
-                                  ps = psM_lo, pc = pcM_lo, thetas = c(1,1))
-
-  MUtilde <- params_mu_s[1]
-  Stilde <- params_mu_s[2]
+  EpsM_lo <- sum(as.numeric(psM_lo) * fedMeshCheb)
+  EpcM_lo <- sum(as.numeric(pcM_lo) * cullMeshCheb)
+  
+  # params_Mu_S <- optParamFunction(sl = slNew_lo, cl = clNew_lo,
+  #                                 ps = psM_lo, pc = pcM_lo, thetas = c(1,1))
+  # 
+  # MUtilde <- params_mu_s[1]
+  # Stilde <- params_mu_s[2]
   
 }
 
@@ -371,12 +377,12 @@ proj_Q_P_up <- data.frame(Year = numeric(nProj), Ps_up = numeric(nProj), Pc_up =
                           EPs_up = numeric(nProj), EPc_up = numeric(nProj), Hc_up = numeric(nProj),
                           Sl_up = numeric(nProj), Cl_up = numeric(nProj), A_up = numeric(nProj)) 
 
-psM_up <- modelParamsEQ$psMedian
-pcM_up <- modelParamsEQ$pcMedian
-hcM_up <- modelParamsEQ$hcMedian
+psM_up <- modelParamsEQ$psMean
+pcM_up <- modelParamsEQ$pcMean
+hcM_up <- modelParamsEQ$hcMean
 
-EpsM_up <- modelParamsEQ$EpsMedian
-EpcM_up <- modelParamsEQ$EpcMedian
+EpsM_up <- modelParamsEQ$EpsMean
+EpcM_up <- modelParamsEQ$EpcMean
 
 capA_up <- modelParamsEQ$A
 capK_up <- modelParamsEQ$K
@@ -428,199 +434,65 @@ for(i in 1:nrow(proj_Q_P_up)){
   capA_up <- ANew_up
   capK_up <- beefINV_FORECAST$hi95[i]
   
+  EpsM_up <- sum(as.numeric(psM_up) * fedMeshCheb)
+  EpcM_up <- sum(as.numeric(pcM_up) * cullMeshCheb)
+  
 }
       
       
       
-round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),3) %>%
-  select(Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up,
-          Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up,
-          A_lo, A, A_up)
+
          
          
-      
-      
-      
-      
-      
-      
-      # D_slPsPcN <- ANew *
-      #   ((exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))/
-      #      (1 + (exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))))
-      # 
-      # ### Demand of the cull cow meat under the new prices
-      # D_clPsPcN <- ANew * (1/(1+ exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde)))
-      # 
-      # #### Total demand for the meat under new prices
-      # D_PsPcN <- D_slPsPcN + D_clPsPcN
-      # 
-      # #### Total supply of meat (this is by adding the nodes)
-      # S_psPCN <- slNew + clNew
-      # 
-      # fedDiffN <- slNew - D_slPsPcN
-      # cullDiffN <- clNew - D_clPsPcN
-      # 
-      # slNew <- D_slPsPcN
-      # clNew <- D_clPsPcN
-      # 
-      # # m <- 1
-      # 
-      # ANew <- (slNew + clNew) * (1/proj2016$AdjFactor)
-      
-      # while(abs(fedDiffN)>0.001 || abs(cullDiffN)>0.001){
-      #   
-      #   k3_estOld <- k3_est
-      #   
-      #   if( fedDiffN < 0){
-      #     ps_n <- ps1N + 0.001
-      #   } else if( fedDiffN > 0){
-      #     ps_n <- ps1N - 0.001
-      #   }
-      #   
-      #   if(ps_n < 0){
-      #     ps_n <- ps1N
-      #   }
-      #   
-      #   if( cullDiffN < 0){
-      #     pc_n <- pc1N + 0.001
-      #   } else if( cullDiffN > 0){
-      #     pc_n <- pc1N - 0.001
-      #   }
-      #   
-      #   if(pc_n < 0){
-      #     pc_n <- pc1N
-      #   }
-      #   
-      #   ps_lo <- ps_n  - 0.35
-      #   pc_lo <- pc_n - 0.4
-      #   
-      #   ps_up <- ps_n + 0.10929
-      #   pc_up <- pc_n + 0.080153
-      #   
-      #   if(ps_lo < 0){
-      #     ps_lo <- ps_n
-      #   }
-      #   
-      #   if(pc_lo < 0){
-      #     pc_lo <- pc_n
-      #   }
-      #   
-      #   while(pc_lo>ps_lo){
-      #     pc_lo <- pc_lo - 0.01
-      #   }
-      #   
-      #   ps_expected <- ps_expected1N
-      #   pc_expected <- pc_expected1N
-      #   
-      #   # ps_expected <- sum(as.numeric(ps_n) * fedMeshCheb)
-      #   # pc_expected <- sum(as.numeric(pc_n) * cullMeshCheb)
-      #   
-      #   ### This holding costs are derived from the fact that the farmers cull cows when they reach 9 yeards old. So, 
-      #   ### we use the equality of that to get the holding costs. From my first observation this is greater than the naive 
-      #   ### expectations holding costs. Because we have the expected price in the equality.
-      #   hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
-      #     (beta * pc_expected + g * (beta^3) * ps_expected - pc_n)
-      #   
-      #   while(hc_new>pc_n){
-      #     hc_new <- hc_new - 0.01
-      #   }
-      #   
-      #   hc_discounted <- ((1-beta^7)/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
-      #   B <- ps_n - g * (beta^3) * ps_expected + hc_discounted
-      #   
-      #   ps_expected_lo <- ps_expected - 0.5
-      #   
-      #   ps_expected_up <- ps_expected + 0.1
-      #   
-      #   pc_expected_lo <- pc_expected - 0.5
-      #   
-      #   pc_expected_up <- pc_expected + 0.1
-      #   
-      #   if(pc_expected_lo < 0){
-      #     pc_expected_lo <- pc_expected
-      #   }
-      #   
-      #   if(ps_expected_lo < 0){
-      #     ps_expected_lo <- ps_expected
-      #   }
-      #   
-      #   p <- c(ps_n, pc_n, ps_expected, pc_expected)
-      #   
-      #   lo <- c(ps_lo, pc_lo, ps_expected_lo, pc_expected_lo)
-      #   up <- c(ps_up, pc_up, ps_expected_up, pc_expected_up)
-      #   
-      #   estPNew_EQ <- BBoptim(par = p, fn = estPFunction, sl = slNew, cl = clNew, A = ANew, 
-      #                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
-      #                      tilde_MU = MUtilde, tilde_s = Stilde)
-      #   
-      #   ps1N <- estPNew_EQ$par[1]
-      #   pc1N <- estPNew_EQ$par[2]
-      #   ps_expected1N <- estPNew_EQ$par[3]
-      #   pc_expected1N <- estPNew_EQ$par[4]
-      #   
-      #   ### Demand of the fed cattle meat under the new prices
-      #   D_slPsPcN <- ANew *
-      #     ((exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))/
-      #        (1 + (exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde))))
-      #   
-      #   ### Demand of the cull cow meat under the new prices
-      #   D_clPsPcN <- ANew * (1/(1+ exp((MUtilde - ((ps1N/phi) - (pc1N/phi)))/Stilde)))
-      #   
-      #   ### Here we get the "optimal" supply of the meat by solving for k_{3,t+1} and k_{j,t+1} where j = [7,8,9]. Note we get
-      #   ### these quantities seperately i.e., k_{3,t+1} and sum k_{j,t+1} where j = [7,8,9]
-      #   k <- k3_estOld
-      # 
-      #   #### Here we use sl+cl for A_node. Why? because we use the current quantities i.e., Stock_1t and k_9t + k_8t + k_7t
-      #   #### That means the total derived demand should be sl+cl? Dunno Have to think more.....
-      #   estQNew <- BBoptim(par = k, fn = estQFunction, tilde_MU = MUtilde, tilde_s = Stilde,
-      #                   ps = ps1N, pc = pc1N, K1 = K1, A = ANew, gamma_k3 = gamma_k3)
-      # 
-      #   k3_est <- estQNew$par
-      # 
-      #   slNew <- g * K1 - k3_est
-      # 
-      #   clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
-      # 
-      # 
-      #   # slN <- slNew
-      #   # clN <- clNew
-      #   
-      #   # slNew <- D_slPsPcN
-      #   # clNew <- D_clPsPcN
-      #   # 
-      #   # slN <- slNew
-      #   # clN <- clNew
-      #   
-      #   #### Total demand for the meat under new prices
-      #   D_PsPcN <-  D_slPsPcN + D_clPsPcN
-      #   
-      #   #### Total supply of meat (this is by adding the results)
-      #   S_psPCN <- slNew + clNew
-      #   
-      #   fedDiffN <- slNew - D_slPsPcN
-      #   cullDiffN <- clNew - D_clPsPcN
-      #   
-      #   # slNodes_eq[j,i] <- sl1
-      #   # clNodes_eq[j,i] <- cl1
-      #   # A_nodes_eq[j,i] <- A_node
-      #   
-      #   ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
-      #   if((m %% 2 == 0)){
-      #     ANew <- (slNew + clNew)  * (1/proj2016$AdjFactor) 
-      #   }else{
-      #     slNew <- slNew
-      #     clNew <- clNew
-      #   }
-      #   
-      #   m <- m+1
-      #   
-      # }
-      
+##### USING MEDIANS
+
+PQs_MEDIANS <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% select(
+  Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
+  A_lo, A, A_up)
+
+PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up)
+PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
+PQs_MEDIANS_SL <- PQs_MEDIANS %>% select(Year, Sl_lo, Sl, Sl_up)
+PQs_MEDIANS_CL <- PQs_MEDIANS %>% select(Year, Cl_lo, Cl, Cl_up)
+PQs_MEDIANS_A  <- PQs_MEDIANS %>% select(Year, A_lo, A, A_up) 
 
 
 
+PQs_MEDIANS_EP  <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% select(
+  Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
+  A_lo, A, A_up)
 
 
+PQs_MEDIANS_PS_EP <- PQs_MEDIANS_EP %>% select(Year, Ps_lo, Ps, Ps_up)
+PQs_MEDIANS_PC_EP <- PQs_MEDIANS_EP %>% select(Year, Pc_lo, Pc, Pc_up)
+PQs_MEDIANS_SL_EP <- PQs_MEDIANS_EP %>% select(Year, Sl_lo, Sl, Sl_up)
+PQs_MEDIANS_CL_EP <- PQs_MEDIANS_EP %>% select(Year, Cl_lo, Cl, Cl_up)
+PQs_MEDIANS_A_EP  <- PQs_MEDIANS_EP  %>% select(Year, A_lo, A, A_up)      
+      
+      
+##### USING MEANS  
+
+PQs_MEANS <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% select(
+  Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
+  A_lo, A, A_up)
+
+PQs_MEANS_PS  <- PQs_MEANS  %>% select(Year, Ps_lo, Ps, Ps_up)
+PQs_MEANS_PC  <- PQs_MEANS  %>% select(Year, Pc_lo, Pc, Pc_up)
+PQs_MEANS_SL  <- PQs_MEANS  %>% select(Year, Sl_lo, Sl, Sl_up)
+PQs_MEANS_CL  <- PQs_MEANS  %>% select(Year, Cl_lo, Cl, Cl_up)
+PQs_MEANS_A  <- PQs_MEANS  %>% select(Year, A_lo, A, A_up)
+
+
+PQs_MEANS_EP  <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% select(
+  Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
+  A_lo, A, A_up)    
+      
+
+PQs_MEANS_PS_EP <- PQs_MEANS_EP %>% select(Year, Ps_lo, Ps, Ps_up)
+PQs_MEANS_PC_EP <- PQs_MEANS_EP %>% select(Year, Pc_lo, Pc, Pc_up)
+PQs_MEANS_SL_EP <- PQs_MEANS_EP %>% select(Year, Sl_lo, Sl, Sl_up)
+PQs_MEANS_CL_EP <- PQs_MEANS_EP %>% select(Year, Cl_lo, Cl, Cl_up)
+PQs_MEANS_A_EP  <- PQs_MEANS_EP  %>% select(Year, A_lo, A, A_up)
 
 
 
