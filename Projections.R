@@ -73,7 +73,7 @@ getSlClA <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, adjF, Dshock){
   
   slNew <- (g * K1 - k3_est)
   
-  clNew <- k3_est * (delta^4) * (1/(gamma_k3^6)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
+  clNew <- k3_est * (delta^4) * (1/(gamma_k3^5)) * ( (delta/gamma_k3)^2 + (1-delta) * ((delta/gamma_k3) + 1) )
   
   ANew <- (slNew + clNew) * (1/adjF)
   
@@ -205,6 +205,7 @@ summary(replacementHeifers_k3$ratio)
 #### The median is 1.0104. So I will fix this and use this as the relationship. 
 
 gamma_k3 <- 1.0104
+eta_k3  
 
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
@@ -229,6 +230,7 @@ capK <- modelParamsEQ$K
 
 adjF <- modelParamsEQ$AdjFactor
 
+
 # stock_K <- beefInventory %>% arrange(Year) %>% filter(Year >=2017)
 
 # beefINV_FORECAST
@@ -244,7 +246,13 @@ k_old <- 0
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock
 for(i in 1:nrow(proj_Q_P)){
 
-  # i <- 1
+  i <- 1
+  
+  getYear <- beefINV_FORECAST$Year[i]
+  
+  k0 <- calf_crop_proj %>% filter(Year <= getYear - 2 & Year >= getYear - 8) %>% select(k0) %>% as.vector()
+  
+  k0s <- c(k0$k0)
   
   k <- k_old
   K1 <- (capK * slaughterAvg)/1000000000
