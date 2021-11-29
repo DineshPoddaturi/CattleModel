@@ -28,6 +28,9 @@ estPFunction <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
   Eps3 <- p[3]
   Epc1 <- p[4]
   
+  slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
+  clShare <- (1-slShare)
+  
   # hc_new <- hc
   # hc_discounted <- hc_dis
   
