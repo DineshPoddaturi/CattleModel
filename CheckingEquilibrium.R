@@ -644,3 +644,11 @@ for(i in 1:nrow(quantities_prices_capK)){
   }
   
 }
+
+
+
+
+
+
+
+

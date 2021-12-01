@@ -8,41 +8,28 @@ replacementInventory_proj <- replacementInventory %>% arrange(Year)
 
 CC_RH <- merge(calf_crop_proj, replacementInventory_proj, by="Year",all=TRUE)
 
-CC_RH_Fit <- lm(formula = lead(k3,1) ~ k3 + lag(k0,3) - 1, data = CC_RH)
+CC_RH_Fit <- lm(formula = lead(k3,1) ~ k3 + lag(k0,3) - 1 , data = CC_RH)
 
 fitSummary <- summary(CC_RH_Fit)
 
-
+# int_k3 <- fitSummary$coefficients[1]
 gamma_k3 <- fitSummary$coefficients[1]
-eta <- fitSummary$coefficients[2]
-
-predict(CC_RH_Fit)
-
-
-
-# cowsSlaughtered <- merge(cowsSlaughtered,dressedWeights)  %>% transmute(Year = Year, Cowshead = CowsHead, cull_meat = CowsHead * Cows_avg )
-# heifersSlaughtered <- merge(heifersSlaughtered,dressedWeights)  %>% transmute(Year = Year, HeifersHead = HeifersHead, heifer_meat = HeifersHead * Heifers_avg)
-# steersSlaughtered <- merge(steersSlaughtered,dressedWeights)  %>% transmute(Year = Year, SteersHead = SteersHead, steer_meat = SteersHead * Steers_avg)
-
-
-
-
-
+eta_k3 <- fitSummary$coefficients[2]
   
-getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, eta_k3 , adjF, Dshock, k0s, slAvg, clAvg){
+getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, 
+                          eta_k3 , int_k3, adjF, Dshock, k0s, slAvg, clAvg){
   
   estQ <- BBoptim(par = k, fn = estQFunction_test, tilde_MU = params[1], tilde_s = params[2],
-                  ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3, eta = eta_k3, k0s = k0s,
-                  slAvg = slAvg, clAvg = clAvg)
+                  ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3, eta_k3 = eta_k3, 
+                  int = int_k3, k0s = k0s, slAvg = slAvg, clAvg = clAvg)
   
-  k08 <- k0s[7]
-  k07 <- k0s[6]
-  k06 <- k0s[5]
-  k05 <- k0s[4]
-  k04 <- k0s[3]
-  k03 <- k0s[2]
-  k02 <- k0s[1]
-  
+  k08 <- k0s$k08
+  k07 <- k0s$k07
+  k06 <- k0s$k06
+  k05 <- k0s$k05
+  k04 <- k0s$k04
+  k03 <- k0s$k03
+  k02 <- k0s$k02
   
   k3_est <- estQ$par
   
@@ -50,9 +37,15 @@ getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, eta_k3 , adjF
   
   gamma <- gamma_k3
   eta <- eta_k3
+  int <- int_k3
   
-  clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) * 
-    (k3_est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) - 
+  # clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+  #   (k3_est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
+  #   (int/(1-gamma)) * ((delta^4)/(gamma^7)) * (delta^2 * (1-gamma^7) + gamma * (1-delta) * (delta * (1-gamma^6) + gamma * (1-gamma^5)) )
+  
+  clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+    (k3_est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02)) -
     ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07)
   
   clNew <- (clNew * clAvg)/1000000000
@@ -65,65 +58,132 @@ getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, eta_k3 , adjF
   
 }  
 
-estQFunction_test <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_k3, eta_k3 , k0s, slAvg, clAvg){
+estQFunction_test <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_k3, 
+                              eta_k3 , int_k3, k0s, slAvg, clAvg){
   
   k3t2 <- k
   
-  k08 <- k0s[7]
-  k07 <- k0s[6]
-  k06 <- k0s[5]
-  k05 <- k0s[4]
-  k04 <- k0s[3]
-  k03 <- k0s[2]
-  k02 <- k0s[1]
+  k08 <- k0s$k08
+  k07 <- k0s$k07
+  k06 <- k0s$k06
+  k05 <- k0s$k05
+  k04 <- k0s$k04
+  k03 <- k0s$k03
+  k02 <- k0s$k02
   
   slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
   clShare <- (1-slShare)
   
   gamma <- gamma_k3
   eta <- eta_k3
+  int <- int_k3
   
   slHead <- (A * slShare) * (1000000000/slAvg)  
   clHead <- (A * clShare) * (1000000000/clAvg)
   
   F1 <- g * K1 - k3t2 - slHead
-  F2 <-  ( ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) * 
-    (k3t2 - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) - 
-    ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) ) - clHead
+  
+  F2 <-  ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+    (k3t2 - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+    ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
+    clHead
+  
+  # F2 <-  ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+  #   (k3t2 - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
+  #   (int/(1-gamma)) * ((delta^4)/(gamma^7)) * (delta^2 * (1-gamma^7) + gamma * (1-delta) * (delta * (1-gamma^6) + gamma * (1-gamma^5)) ) -
+  #   clHead
   
   F <- F1^2 + F2^2
   
 }
 
+get_k0s <- function(Yr, lag){
+  
+  if(nrow(calf_crop_proj %>% filter( Year == getYear - lag  ) %>% select(k0)) == 0){
+    k0 <- 0 
+  }else{
+    k0 <- calf_crop_proj %>% filter( Year == Yr - lag  ) %>% select(k0) %>% unlist()
+  }
+  
+  return(k0)
 
-
-
-get_k0s <- function(getYear){
-  
-  
-  k02 <- calf_crop_proj %>% filter( Year == getYear - 2  ) %>% select(k0) %>% as.list()
-  k03 <- calf_crop_proj %>% filter( Year == getYear - 3  ) %>% select(k0) %>% as.list()
-  k04 <- calf_crop_proj %>% filter( Year == getYear - 4  ) %>% select(k0) %>% as.list()
-  k05 <- calf_crop_proj %>% filter( Year == getYear - 5  ) %>% select(k0) %>% as.list()
-  k06 <- calf_crop_proj %>% filter( Year == getYear - 6  ) %>% select(k0) %>% as.list()
-  k07 <- calf_crop_proj %>% filter( Year == getYear - 7  ) %>% select(k0) %>% as.list()
-  k08 <- calf_crop_proj %>% filter( Year == getYear - 8  ) %>% select(k0) %>% as.list()
-  
-  return(as.data.frame(getYear, k02, k03, k04, k05, k06, k07, k08))
-  
-  # return(c(getYear, k02, k03, k04, k05, k06, k07, k08))
 }
 
 
 
-gamma_k3 <- fitSummary$coefficients[1]
-eta_k3 <- fitSummary$coefficients[2]
+# int_k3 <- fitSummary$coefficients[1]
+# gamma_k3 <- fitSummary$coefficients[2]
+# eta_k3 <- fitSummary$coefficients[3]
 
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
 modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
 
 ################################## CHANGE THE ADJUSTMENT FACTOR #######################################
+
+
+####### Here I get all the calf crop data for all the years
+k0s_df <- data.frame(Year = numeric(nProj), k02 = numeric(nProj) , k03 = numeric(nProj), 
+                     k04 = numeric(nProj), k05 = numeric(nProj), k06 = numeric(nProj), 
+                     k07 = numeric(nProj), k08 = numeric(nProj))
+
+k02 <- rep(0, nProj)
+k03 <- rep(0, nProj)
+k04 <- rep(0, nProj)
+k05 <- rep(0, nProj)
+k06 <- rep(0, nProj)
+k07 <- rep(0, nProj)
+k08 <- rep(0, nProj)
+
+
+for (i in 1:nrow(proj_Q_P)){
+  
+  getYear <- beefINV_FORECAST$Year[i]
+  
+  if(i>1){
+    getYear <- beefINV_FORECAST$Year[i-1] + 1
+  }
+  
+  k02[i] <- get_k0s(Yr = getYear, lag = 2)
+  k03[i] <- get_k0s(Yr = getYear, lag = 3)
+  k04[i] <- get_k0s(Yr = getYear, lag = 4)
+  k05[i] <- get_k0s(Yr = getYear, lag = 5)
+  k06[i] <- get_k0s(Yr = getYear, lag = 6)
+  k07[i] <- get_k0s(Yr = getYear, lag = 7)  
+  k08[i] <- get_k0s(Yr = getYear, lag = 8) 
+  
+  if(i>1){
+    
+    if( k02[i] == 0 ){
+      k02[i] <- k02[i-1]
+    }
+    if( k03[i] == 0 ){
+      k03[i] <- k03[i-1]
+    }
+    if( k04[i] == 0 ){
+      k04[i] <- k04[i-1]
+    }
+    if( k05[i] == 0 ){
+      k05[i] <- k05[i-1]
+    }
+    if( k06[i] == 0 ){
+      k06[i] <- k06[i-1]
+    }
+    if( k07[i] == 0 ){
+      k07[i] <- k07[i-1]
+    }
+    if( k08[i] == 0 ){
+      k08[i] <- k08[i-1]
+    }
+    
+  }
+  
+  k0s_df[i,] <- c(getYear, k02[i], k03[i], k04[i], k05[i], k06[i], k07[i], k08[i])
+  
+}
+
+
 
 slaughterAvg <- modelParamsEQ$Slaughter_avg
 cullAvg <-  modelParamsEQ$Cull_avg
@@ -147,141 +207,54 @@ nProj <- nrow(beefINV_FORECAST) + 1
 
 proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
                        EPs = numeric(nProj), EPc = numeric(nProj), Hc = numeric(nProj), 
-                       Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj))
+                       Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj),
+                       repHeif = numeric(nProj))
 
 k_old <- 0
-
-
-k0s_df <- data.frame(Year = numeric(nProj), k02 = numeric(nProj) , k03 = numeric(nProj), 
-                     k04 = numeric(nProj), k05 = numeric(nProj), k06 = numeric(nProj), 
-                     k07 = numeric(nProj), k08 = numeric(nProj))
-
-
-for (i in 1:nrow(proj_Q_P)){
-  
-  i <- 2
-  
-  getYear <- beefINV_FORECAST$Year[i]
-  
-  k02[i] <- calf_crop_proj %>% filter( Year == getYear - 2  ) %>% select(k0) 
-  k03[i] <- calf_crop_proj %>% filter( Year == getYear - 3  ) %>% select(k0) 
-  k04[i] <- calf_crop_proj %>% filter( Year == getYear - 4  ) %>% select(k0) 
-  k05[i] <- calf_crop_proj %>% filter( Year == getYear - 5  ) %>% select(k0) 
-  k06[i] <- calf_crop_proj %>% filter( Year == getYear - 6  ) %>% select(k0)  
-  k07[i] <- calf_crop_proj %>% filter( Year == getYear - 7  ) %>% select(k0)  
-  k08[i] <- calf_crop_proj %>% filter( Year == getYear - 8  ) %>% select(k0) 
-  
-  
-  if(i>1){
-    
-    if( length(k02[i]) == 0 ){
-      k02[i]$k0 <- k02[i-1]$k0
-    }
-    if( length(k03[i]$k0) == 0 ){
-      k03[i]$k0 <- k03[i-1]$k0
-    }
-    if( length(k04[i]$k0) == 0 ){
-      k04[i]$k0 <- k04[i-1]$k0
-    }
-    if( length(k05[i]$k0) == 0 ){
-      k05[i]$k0 <- k05[i-1]$k0
-    }
-    if( length(k06[i]$k0) == 0 ){
-      k06[i]$k0 <- k06[i-1]$k0
-    }
-    if( length(k07[i]$k0) == 0 ){
-      k07[i]$k0 <- k07[i-1]$k0
-    }
-    if( length(k08[i]$k0) == 0 ){
-      k08[i]$k0 <- k08[i-1]$k0
-    }
-    
-  }
-  
-  k0s_df[i,] <- c(getYear, k02[i]$k0, k03[i]$k0, k04[i]$k0, k05[i]$k0, k06[i]$k0, k07[i]$k0, k08[i]$k0)
-  
-  
-}
-
-
-
-
-
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock
 for(i in 1:nrow(proj_Q_P)){
   
-  i <- 1
-  
-  getYear <- beefINV_FORECAST$Year[i]
-  
-  k02[i] <- calf_crop_proj %>% filter( Year == getYear - 2  ) %>% select(k0) 
-  k03[i] <- calf_crop_proj %>% filter( Year == getYear - 3  ) %>% select(k0) 
-  k04[i] <- calf_crop_proj %>% filter( Year == getYear - 4  ) %>% select(k0) 
-  k05[i] <- calf_crop_proj %>% filter( Year == getYear - 5  ) %>% select(k0) 
-  k06[i] <- calf_crop_proj %>% filter( Year == getYear - 6  ) %>% select(k0)  
-  k07[i] <- calf_crop_proj %>% filter( Year == getYear - 7  ) %>% select(k0)  
-  k08[i] <- calf_crop_proj %>% filter( Year == getYear - 8  ) %>% select(k0) 
-  
-  
-  if(i>1){
-
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( length(k02[i]$k0) == 0 ){
-      k02[i] <- k02[i-1]
-    }
-
-  }
-  
-  k0s_df[i,] <- c(getYear, k02[i], k03[i], k04[i], k05[i], k06[i], k07[i], k08[i])
-  
-  k0s <- c(k0s_df[i,] %>% select(k02, k03, k04, k05, k06, k07, k08))
+  # i <- 1
   
   k <- k_old
   K1 <- capK
   
-  gamma <- gamma_k3
-  eta <- eta_k3
+  k0s <- k0s_df[i,-1]
   
+  
+  # gamma <- gamma_k3
+  # eta <- eta_k3
+  # int <- int_k3
+  # 
   # estQ <- BBoptim(par = k, fn = estQFunction_test, tilde_MU = MUtilde, tilde_s = Stilde,
-  #                 ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3, eta = eta_k3, k0s = k0s,
+  #                 ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3, int = int_k3, k0s = k0s,
   #                 slAvg = slaughterAvg, clAvg = cullAvg)
   # 
   # k3est <- estQ$par
   # 
   # slNew <- (g * K1 - k3est)
   # 
-  # gamma <- gamma_k3
-  # eta <- eta_k3
+  # k08 <- k0s$k08
+  # k07 <- k0s$k07
+  # k06 <- k0s$k06
+  # k05 <- k0s$k05
+  # k04 <- k0s$k04
+  # k03 <- k0s$k03
+  # k02 <- k0s$k02
   # 
-  # clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) * 
-  #   (k3est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) - 
-  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07)
+  # clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+  #   (k3est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) - 
+  #   (int/(1-gamma)) * ((delta^4)/(gamma^7)) * (delta^2 * (1-gamma^7) + gamma * (1-delta) * (delta * (1-gamma^6) + gamma * (1-gamma^5)) )
   # 
-  # slNew <- ((slNew * slaughterAvg)/1000000000)  
-  # clNew <- ((clNew * cullAvg)/1000000000) 
+  # slNew <- ((slNew * slaughterAvg)/1000000000)
+  # clNew <- ((clNew * cullAvg)/1000000000)
   # 
   # Anew <- (slNew + clNew) * (1/adjF)
   
   Qs <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
-                 k = k, CapA = capA, gamma_k3 = gamma_k3, eta_k3 =eta_k3 , adjF = adjF, k0s = k0s,
+                 k = k, CapA = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF, k0s = k0s,
                  slAvg = slaughterAvg, clAvg = cullAvg)
   slNew <- Qs[1]
   clNew <- Qs[2]
@@ -307,6 +280,7 @@ for(i in 1:nrow(proj_Q_P)){
   proj_Q_P$Sl[i] <- slNew
   proj_Q_P$Cl[i] <- clNew
   proj_Q_P$A[i] <- ANew
+  proj_Q_P$repHeif[i] <- k_old
   
   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
   
@@ -327,3 +301,192 @@ for(i in 1:nrow(proj_Q_P)){
   # Stilde <- params_mu_s[2]
   
 }
+
+
+####### Here we are projecting the prices and quantities from the forecasted capK or total stock lower 95%
+
+proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo = numeric(nProj),
+                          EPs_lo = numeric(nProj), EPc_lo = numeric(nProj), Hc_lo = numeric(nProj),
+                          Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj),
+                          repHeif_lo = numeric(nProj))
+
+psM_lo <- modelParamsEQ$psMedian
+pcM_lo <- modelParamsEQ$pcMedian
+hcM_lo <- modelParamsEQ$hcMedian
+
+EpsM_lo <- modelParamsEQ$EpsMedian
+EpcM_lo <- modelParamsEQ$EpcMedian
+
+capA_lo <- modelParamsEQ$A
+capK_lo <- modelParamsEQ$K
+
+k_old_lo <- 0
+
+for(i in 1:nrow(proj_Q_P_lo)){
+  
+  # i <- 5
+  
+  k <- k_old_lo
+  K1_lo <- capK_lo
+  
+  k0s <- k0s_df[i,-1]
+  
+  Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
+                k = k, CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 , int_k3 = 0, adjF = adjF, k0s = k0s,
+                slAvg = slaughterAvg, clAvg = cullAvg)
+  
+  # Qs_lo <- getSlClA(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
+  #                   k = k, CapA = capA_lo, gamma_k3 = gamma_k3, adjF = adjF)
+  
+  slNew_lo <- Qs_lo[1]
+  clNew_lo <- Qs_lo[2]
+  ANew_lo <- Qs_lo[3]
+  
+  k_old_lo <-  Qs_lo[4]
+  
+  Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+                         HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                         params = c(MUtilde, Stilde))
+  
+  psM_lo <- Ps_lo[1]
+  pcM_lo <- Ps_lo[2]
+  hcM_lo <- Ps_lo[3]
+  EpsM_lo <- Ps_lo[4]
+  EpcM_lo <- Ps_lo[5]
+  
+  ####### Need to figure this out
+    # counter <- 0
+    # while(psM_lo < pcM_lo){
+    #   
+    #   if(counter == 0){
+    #     pcM_lo <-  proj_Q_P_lo$Ps_lo[i-2]
+    #     psM_lo <- proj_Q_P_lo$Pc_lo[i-2]
+    #   }else{
+    #     pcM_lo <- pcM_lo - 0.3
+    #     # psM_lo <- psM_lo + 0.5
+    #   }
+    #   
+    #   Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+    #                          HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+    #                          params = c(MUtilde, Stilde))
+    #   psM_lo <- Ps_lo[1]
+    #   pcM_lo <- Ps_lo[2]
+    #   hcM_lo <- Ps_lo[3]
+    #   EpsM_lo <- Ps_lo[4]
+    #   EpcM_lo <- Ps_lo[5]
+    #   
+    #   counter <- counter + 1
+    #   
+    # }
+  
+  
+  proj_Q_P_lo$Ps_lo[i] <- psM_lo
+  proj_Q_P_lo$Pc_lo[i] <- pcM_lo
+  proj_Q_P_lo$Hc_lo[i] <- hcM_lo
+  proj_Q_P_lo$EPs_lo[i] <- EpsM_lo
+  proj_Q_P_lo$EPc_lo[i] <- EpcM_lo
+  
+  proj_Q_P_lo$Sl_lo[i] <- slNew_lo
+  proj_Q_P_lo$Cl_lo[i] <- clNew_lo
+  proj_Q_P_lo$A_lo[i] <- ANew_lo
+  proj_Q_P_lo$repHeif_lo[i] <- k_old_lo
+  
+  proj_Q_P_lo$Year[i] <- beefINV_FORECAST$Year[i]
+  
+  if(i>1){
+    proj_Q_P_lo$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
+  }
+  
+  capA_lo <- ANew_lo
+  capK_lo <- beefINV_FORECAST$lo95[i]
+  
+  # EpsM_lo <- sum(as.numeric(psM_lo) * fedMeshCheb)
+  # EpcM_lo <- sum(as.numeric(pcM_lo) * cullMeshCheb)
+  
+  # params_Mu_S <- optParamFunction(sl = slNew_lo, cl = clNew_lo,
+  #                                 ps = psM_lo, pc = pcM_lo, thetas = c(1,1))
+  # 
+  # MUtilde <- params_mu_s[1]
+  # Stilde <- params_mu_s[2]
+  
+}
+
+####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
+proj_Q_P_up <- data.frame(Year = numeric(nProj), Ps_up = numeric(nProj), Pc_up = numeric(nProj),
+                          EPs_up = numeric(nProj), EPc_up = numeric(nProj), Hc_up = numeric(nProj),
+                          Sl_up = numeric(nProj), Cl_up = numeric(nProj), A_up = numeric(nProj),
+                          repHeif_up = numeric(nProj)) 
+
+psM_up <- modelParamsEQ$psMedian
+pcM_up <- modelParamsEQ$pcMedian
+hcM_up <- modelParamsEQ$hcMedian
+
+EpsM_up <- modelParamsEQ$EpsMedian
+EpcM_up <- modelParamsEQ$EpcMedian
+
+capA_up <- modelParamsEQ$A
+capK_up <- modelParamsEQ$K
+
+k_old_up <- 0
+
+for(i in 1:nrow(proj_Q_P_up)){
+  
+  # i <- 1
+  
+  k <- k_old_up
+  
+  K1_up <- capK_up 
+  
+  Qs_up <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_up, PcM = pcM_up, K1 = K1_up,
+                         k = k, CapA = capA_up, gamma_k3 = gamma_k3, eta_k3 = eta_k3 , int_k3 = int_k3, 
+                         adjF = adjF, k0s = k0s,slAvg = slaughterAvg, clAvg = cullAvg)
+  slNew_up <- Qs_up[1]
+  clNew_up <- Qs_up[2]
+  ANew_up <- Qs_up[3]
+  
+  k_old_up <-  Qs_up[4]
+  
+  Ps_up <- getPsPcEpsEpc(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
+                         HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
+                         params = c(MUtilde, Stilde))
+  
+  psM_up <- Ps_up[1]
+  pcM_up <- Ps_up[2]
+  hcM_up <- Ps_up[3]
+  EpsM_up <- Ps_up[4]
+  EpcM_up <- Ps_up[5]
+  
+  proj_Q_P_up$Ps_up[i] <- psM_up
+  proj_Q_P_up$Pc_up[i] <- pcM_up
+  proj_Q_P_up$Hc_up[i] <- hcM_up
+  proj_Q_P_up$EPs_up[i] <- EpsM_up
+  proj_Q_P_up$EPc_up[i] <- EpcM_up
+  
+  proj_Q_P_up$Sl_up[i] <- slNew_up
+  proj_Q_P_up$Cl_up[i] <- clNew_up
+  proj_Q_P_up$A_up[i] <- ANew_up
+  proj_Q_P_up$repHeif_up[i] <- k_old_up
+  
+  proj_Q_P_up$Year[i] <- beefINV_FORECAST$Year[i]
+  
+  if(i>1){
+    proj_Q_P_up$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
+  }
+  
+  capA_up <- ANew_up
+  capK_up <- beefINV_FORECAST$hi95[i]
+  
+  # EpsM_up <- sum(as.numeric(psM_up) * fedMeshCheb)
+  # EpcM_up <- sum(as.numeric(pcM_up) * cullMeshCheb)
+  
+}
+
+
+
+
+
+
+
+
+
+

@@ -89,14 +89,19 @@ getPsPcEpsEpc <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params)
   psNew <- PsM
   pcNew <- PcM
   
-  psNew_lo <- psNew  - 0.35
-  pcNew_lo <- pcNew - 0.4
+  # while(psNew<pcNew){
+  #   psNew <- psNew + 0.01
+  # }
   
-  # psNew_up <- psNew + 0.37750
-  # pcNew_up <- pcNew + 0.371250
   
-  psNew_up <- psNew + 0.10929
-  pcNew_up <- pcNew + 0.080153
+  psNew_lo <- psNew  - 0.27667
+  pcNew_lo <- pcNew - 0.29217
+  
+  psNew_up <- psNew + 0.28000
+  pcNew_up <- pcNew + 0.25933
+  
+  # psNew_up <- psNew + 0.10929
+  # pcNew_up <- pcNew + 0.080153
   
   #### Here we are making sure the lower bound for the prices isn't negative
   if(psNew_lo < 0){
@@ -127,11 +132,11 @@ getPsPcEpsEpc <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params)
   
   psNew_expected_lo <- psNew_expected - 0.5
   
-  psNew_expected_up <- psNew_expected + 0.1
+  psNew_expected_up <- psNew_expected + 0.5
   
   pcNew_expected_lo <- pcNew_expected - 0.5
   
-  pcNew_expected_up <- pcNew_expected + 0.1
+  pcNew_expected_up <- pcNew_expected + 0.5
   
   if(pcNew_expected_lo < 0){
     pcNew_expected_lo <- pcNew_expected
