@@ -1,5 +1,5 @@
 
-EQestObsPS_Medians <- EQestObsPS %>% select(Year, psMedian, ps) %>% filter(Year > 2012)
+EQestObsPS_Medians <- EQestObsPS %>% select(Year, psMedian, ps) %>% filter(Year > 2009)
 
 PQs_MEDIANS_proj <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up)
 
@@ -14,14 +14,13 @@ EQestObsPS_Medians_proj_plot <- EQestObsPS_Medians_proj %>% ggplot(aes(x=Year)) 
   geom_line(aes(y=Ps, color="PS PROJECTION")) +
   geom_point(aes(y=Ps, color="PS PROJECTION")) + 
   geom_line(aes(y=Ps_up, color="PS_UP PROJECTION"))  +
-  geom_point(aes(y=Ps_up, color="PS_UP PROJECTION")) + theme_classic() + 
+  geom_point(aes(y=Ps_up, color="PS_UP PROJECTION"))  + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPS_Medians_proj$Year[1],
-                                  EQestObsPS_Medians_proj$Year[nrow(EQestObsPS_Medians_proj)]))) +
-  expand_limits(y = 0.5)
+                                  EQestObsPS_Medians_proj$Year[nrow(EQestObsPS_Medians_proj)])))
 
 
-EQestObsPC_Medians <- EQestObsPC %>% select(Year, pcMedian, pc) %>% filter(Year >2009)
+EQestObsPC_Medians <- EQestObsPC %>% select(Year, pcMedian, pc) %>% filter(Year > 2009)
 
 PQs_MEDIANS_proj <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
 
@@ -36,11 +35,10 @@ EQestObsPC_Medians_proj_plot <- EQestObsPC_Medians_proj %>% ggplot(aes(x=Year)) 
   geom_line(aes(y=Pc, color="PC PROJECTION")) +
   geom_point(aes(y=Pc, color="PC PROJECTION")) + 
   geom_line(aes(y=Pc_up, color="PS_LO PROJECTION"))  +
-  geom_point(aes(y=Pc_up, color="PS_LO PROJECTION")) + theme_classic() + 
+  geom_point(aes(y=Pc_up, color="PS_LO PROJECTION")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPC_Medians_proj$Year[1],
-                                  EQestObsPC_Medians_proj$Year[nrow(EQestObsPC_Medians_proj)]))) +
-  expand_limits(y = 0.5)
+                                  EQestObsPC_Medians_proj$Year[nrow(EQestObsPC_Medians_proj)])))
 
 
 EQestObsSL1 <- EQestObsSL %>% select(Year, slMedian)
@@ -62,16 +60,53 @@ EQestObsA_Medians_proj_plot <- EQestObsA_Medians_proj %>% ggplot(aes(x=Year)) + 
   geom_line(aes(y=A_proj, color="A PROJECTION")) +
   geom_point(aes(y=A_proj, color="A PROJECTION")) + 
   geom_line(aes(y=A_up, color="A_UP PROJECTION"))  +
-  geom_point(aes(y=A_up, color="A_UP PROJECTION")) + theme_classic() + 
+  geom_point(aes(y=A_up, color="A_UP PROJECTION"))  + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsA_Medians_proj$Year[1],
-                                  EQestObsA_Medians_proj$Year[nrow(EQestObsA_Medians_proj)]))) +
-  expand_limits(y = 0.5)
+                                  EQestObsA_Medians_proj$Year[nrow(EQestObsA_Medians_proj)])))
 
 
+EQestSl_Medians <- EQestObsSL1
+supp_sl_OBS <- supp_sl_adj %>% select(Year, SlObs = Bill_meatLb_sl)
+EQestObsSL_Medians <- merge(EQestSl_Medians, supp_sl_OBS) %>% filter(Year > 2009)
 
+PQs_MEDIANS_SL_proj <- PQs_MEDIANS %>% transmute(Year = Year, Sl_lo, Sl, Sl_up)
 
+EQestObsSL_Medians_proj <- merge(EQestObsSL_Medians,PQs_MEDIANS_SL_proj,by="Year",all=TRUE)
 
+EQestObsSL_Medians_proj_plot <- EQestObsSL_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=SlObs, color = "SL OBS")) + 
+  geom_point(aes(y=SlObs, color = "SL OBS")) + geom_line(aes(y=slMedian, color="SL RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = slMedian, color = "SL RATIONAL (MEDIAN)")) + 
+  geom_line(aes(y=Sl_lo, color="SL_LO PROJECTION")) +
+  geom_point(aes(y=Sl_lo, color="SL_LO PROJECTION")) + 
+  geom_line(aes(y=Sl, color="SL PROJECTION")) +
+  geom_point(aes(y=Sl, color="SL PROJECTION")) + 
+  geom_line(aes(y=Sl_up, color="SL_UP PROJECTION"))  +
+  geom_point(aes(y=Sl_up, color="SL_UP PROJECTION")) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsSL_Medians_proj$Year[1],
+                                  EQestObsSL_Medians_proj$Year[nrow(EQestObsSL_Medians_proj)])))
+
+EQestCl_Medians <- EQestObsCL1
+supp_cl_OBS <- supp_cl_adj %>% select(Year, ClObs = Bill_meatLb_cl)
+EQestObsCL_Medians <- merge(EQestCl_Medians, supp_cl_OBS) %>% filter(Year > 2009)
+
+PQs_MEDIANS_CL_proj <- PQs_MEDIANS %>% transmute(Year = Year, Cl_lo, Cl, Cl_up)
+
+EQestObsCL_Medians_proj <- merge(EQestObsCL_Medians,PQs_MEDIANS_CL_proj,by="Year",all=TRUE)
+
+EQestObsCL_Medians_proj_plot <- EQestObsCL_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=ClObs, color = "CL OBS")) + 
+  geom_point(aes(y=ClObs, color = "CL OBS")) + geom_line(aes(y=clMedian, color="CL RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = clMedian, color = "CL RATIONAL (MEDIAN)")) + 
+  geom_line(aes(y=Cl_lo, color="CL_LO PROJECTION")) +
+  geom_point(aes(y=Cl_lo, color="CL_LO PROJECTION")) + 
+  geom_line(aes(y=Cl, color="CL PROJECTION")) +
+  geom_point(aes(y=Cl, color="CL PROJECTION")) + 
+  geom_line(aes(y=Cl_up, color="CL_UP PROJECTION"))  +
+  geom_point(aes(y=Cl_up, color="CL_UP PROJECTION"))  + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsCL_Medians_proj$Year[1],
+                                  EQestObsCL_Medians_proj$Year[nrow(EQestObsCL_Medians_proj)])))
 
 
 

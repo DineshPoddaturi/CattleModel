@@ -217,7 +217,7 @@ params <- merge(mutildes_agg, stildes_agg)
 
 ########################################################################################
 
-# Here I get the meand and median of the first 25 nodes of the equilibrium prices and quantities
+# Here I get the means and median of the first 25 nodes of the equilibrium prices and quantities
 
 EQprices_ps_Means <- apply(prices_ps_eq[1:25,], 2, mean)
 EQestPS <- EQprices_ps_Means %>% as.data.frame()

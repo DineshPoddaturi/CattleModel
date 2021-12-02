@@ -28,8 +28,8 @@ estPFunction <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
   Eps3 <- p[3]
   Epc1 <- p[4]
   
-  slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
-  clShare <- (1-slShare)
+  # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
+  # clShare <- (1-slShare)
   
   # hc_new <- hc
   # hc_discounted <- hc_dis
@@ -89,11 +89,6 @@ getPsPcEpsEpc <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params)
   psNew <- PsM
   pcNew <- PcM
   
-  # while(psNew<pcNew){
-  #   psNew <- psNew + 0.01
-  # }
-  
-  
   psNew_lo <- psNew  - 0.27667
   pcNew_lo <- pcNew - 0.29217
   
@@ -130,13 +125,13 @@ getPsPcEpsEpc <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params)
   hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
   B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
   
-  psNew_expected_lo <- psNew_expected - 0.5
+  psNew_expected_lo <- psNew_expected - 0.1
   
-  psNew_expected_up <- psNew_expected + 0.5
+  psNew_expected_up <- psNew_expected + 0.1
   
-  pcNew_expected_lo <- pcNew_expected - 0.5
+  pcNew_expected_lo <- pcNew_expected - 0.1
   
-  pcNew_expected_up <- pcNew_expected + 0.5
+  pcNew_expected_up <- pcNew_expected + 0.1
   
   if(pcNew_expected_lo < 0){
     pcNew_expected_lo <- pcNew_expected

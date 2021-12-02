@@ -11,7 +11,7 @@ stock_K_ts <- ts(stock_K$K, start = stock_K$Year[1],
 plot_time_series(stock_K_ts, "Total Stock")
 
 adf.test(stock_K_ts)
-
+############################################################################################
 # Augmented Dickey-Fuller Test
 # 
 # data:  stock_K_ts
@@ -20,14 +20,14 @@ adf.test(stock_K_ts)
 # alternative hypothesis: stationary
 
 #### The series in not stationary. So I am differencing 
-tsDiffK <- diff(x = stock_K$K, lag = 1) %>% na.omit()
-
-zzK <- ts(tsDiffK, start = stock_K$Year[1], 
-         end = stock_K$Year[nrow(stock_K)], frequency = 1)
-
-plot_time_series(zzK,"Differenced time series")
-
-adf.test(zzK)
+# tsDiffK <- diff(x = stock_K$K, lag = 1) %>% na.omit()
+# 
+# zzK <- ts(tsDiffK, start = stock_K$Year[1], 
+#          end = stock_K$Year[nrow(stock_K)], frequency = 1)
+# 
+# plot_time_series(zzK,"Differenced time series")
+# 
+# adf.test(zzK)
 
 # Augmented Dickey-Fuller Test
 # 
@@ -42,7 +42,7 @@ adf.test(zzK)
 # seriesK <- auto.arima(zzK)
 # 
 # Kfit <- arima(zzK, order = c(2,0,3))
-
+############################################################################################
 seriesK <- auto.arima(stock_K_ts)
 
 Kfit <- arima(stock_K_ts, order = c(2,1,3))
@@ -66,8 +66,6 @@ Box.test(Kfit$residuals, type = "Ljung-Box")
 #         panel.grid.minor = element_blank(),
 #         axis.line.y = element_line(colour="gray"),
 #         axis.line.x = element_line(colour="gray"))
-# 
-# 
 # ggplot2::autoplot(Kfit, na.action = stats::na.pass,
 #                   colour = 'turquoise4', size = 1.05) +
 #   ggplot2::geom_hline(yintercept = 0,
