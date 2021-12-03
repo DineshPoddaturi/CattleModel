@@ -405,7 +405,7 @@ k_old_lo <- 0
 
 for(i in 1:nrow(proj_Q_P_lo)){
   
-  # i <- 13
+  # i <- 6
   
   k <- 0
   
@@ -426,8 +426,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   # while(clNew_lo < 1.0){
   #   clNew_lo <- clNew_lo + 0.5
   # }
-  
-  ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
+  # ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
   
   
   Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
@@ -445,11 +444,11 @@ for(i in 1:nrow(proj_Q_P_lo)){
     while(psM_lo < pcM_lo){
 
       if(counter == 0){
-        psM_lo <- proj_Q_P_lo$Ps_lo[i-1]
-        pcM_lo <- proj_Q_P_lo$Pc_lo[i-1] - 0.1
+        psM_lo <- proj_Q_P_lo$Ps_lo[i-1] + 0.08
+        pcM_lo <- proj_Q_P_lo$Pc_lo[i-1] - 0.05
       }else{
-        psM_lo <- psM_lo
-        pcM_lo <- pcM_lo - 0.1
+        psM_lo <- psM_lo + 0.08
+        pcM_lo <- pcM_lo - 0.05
       }
 
       Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
