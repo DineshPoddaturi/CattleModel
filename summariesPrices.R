@@ -290,7 +290,14 @@ EQestSL_Medians <- EQestSL_Medians %>% mutate(Year = quantities_prices_capK$Year
 
 EQestSL <- merge(EQestSL, EQestSL_Medians)
 
-EQestObsSL <- left_join(EQestSL,quantities_prices_capK) %>% select(Year, slMean, slMedian, slSM) %>% 
+# EQestObsSL <- left_join(EQestSL,quantities_prices_capK) %>% select(Year, slMean, slMedian, slSM) %>% 
+#   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
+# EQestObsSL
+
+
+supp_sl_OBS <- supp_sl_adj %>% select(Year, slSM = Bill_meatLb_sl)
+
+EQestObsSL <- left_join(EQestSL,supp_sl_OBS) %>% select(Year, slMean, slMedian, slSM) %>% 
   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
 EQestObsSL
 
@@ -316,8 +323,14 @@ EQestCL_Medians <- EQestCL_Medians %>% mutate(Year = quantities_prices_capK$Year
 
 EQestCL <- merge(EQestCL, EQestCL_Medians)
 
-EQestObsCL <- left_join(EQestCL,quantities_prices_capK) %>% select(Year, clMean, clMedian, clSM) %>% 
+# EQestObsCL <- left_join(EQestCL,quantities_prices_capK) %>% select(Year, clMean, clMedian, clSM) %>% 
+#   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
+
+
+supp_cl_OBS <- supp_cl_adj %>% select(Year, clSM = Bill_meatLb_cl)
+EQestObsCL <- left_join(EQestCL,supp_cl_OBS) %>% select(Year, clMean, clMedian, clSM) %>% 
   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
+
 
 EQestObsCL
 
@@ -329,6 +342,32 @@ EQestObsCL_plot <- EQestObsCL %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, co
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsCL$Year[1],EQestObsCL$Year[nrow(EQestObsCL)])))
 
 EQestObsCL_plot
+
+
+#### Plotting the observed and total derived demand
+
+
+EQestTS <- merge(EQestCL, EQestSL) %>% transmute(Year = Year, TSmean = slMean + clMean, 
+                                                TSmedian = slMedian + clMedian)
+
+# EQestObsA <- left_join(EQestA,A_quant) %>% select(Year, Amean, Amedian, A) %>% 
+#   mutate(errMean = (A - Amean), errmedian = (A- Amedian)) %>% round(4)
+
+
+totalSupply <- totalSupply_adj %>% transmute(Year = Year, TS = TotalSupply)
+
+EQestObsTS <- left_join(EQestTS,totalSupply) %>% select(Year, TSmean, TSmedian, TS) %>% 
+  mutate(errMean = (TS - TSmean), errmedian = (TS- TSmedian)) %>% round(4)
+
+EQestObsTS_plot <- EQestObsTS %>% ggplot(aes(x=Year))+geom_line(aes(y=TSmean, color="TOTAL PRODUCTION RATIONAL (MEAN)")) +
+  geom_point(aes(y = TSmean, color = "TOTAL PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=TS, color = "TOTAL PRODUCTION OBS")) + 
+  geom_point(aes(y= TS, color = "TOTAL PRODUCTION OBS")) + geom_line(aes(y=TSmedian, color="TOTAL PRODUCTION RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = TSmedian, color = "TOTAL PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
+  scale_x_continuous(name="Year", breaks=c(seq(EQestObsA$Year[1],EQestObsA$Year[nrow(EQestObsA)])))
+
+EQestObsTS_plot
+
+
 
 EQcosts_hc_Means <- apply(prices_hc_eq[1:25,], 2, mean)
 EQestHC <- EQcosts_hc_Means %>% as.data.frame()

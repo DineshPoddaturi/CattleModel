@@ -56,9 +56,14 @@ getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   k3_est <- (k3_est * slAvg)/1000000000
   
-  
   ANew <- (slNew + clNew) * (1/adjF)
   
+  
+  # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
+  # ANew <- (((g * K1 - k3_est) * slAvg)/1000000000) * (1/slShare)
+  # 
+  # slNew <- ANew * slShare * adjF
+  # clNew <- ANew * (1-slShare) * adjF
   
   return(c(slNew, clNew, ANew, k3_est))
   
@@ -221,6 +226,8 @@ k_old <- 0
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock
 for(i in 1:nrow(proj_Q_P)){
   
+  # i <- 1
+  
   k <- k_old
   
   K1 <- capK
@@ -229,12 +236,11 @@ for(i in 1:nrow(proj_Q_P)){
   
   # gamma <- gamma_k3
   # eta <- eta_k3
-  # int <- int_k3
   # 
-  # estQ <- BBoptim(par = k,fn = estQFunction_test, tilde_MU = MUtilde, 
+  # estQ <- BBoptim(par = k,fn = estQFunction_test, tilde_MU = MUtilde,
   #                 tilde_s = Stilde,
-  #                 ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3, 
-  #                 int = int_k3, k0s = k0s,
+  #                 ps = psM, pc = pcM, K1 = K1, A = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3,
+  #                 int = 0, k0s = k0s,
   #                 slAvg = slaughterAvg, clAvg = cullAvg)
   # 
   # k3est <- estQ$par
@@ -251,8 +257,7 @@ for(i in 1:nrow(proj_Q_P)){
   # 
   # clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
   #   (k3est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
-  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
-  #   (int/(1-gamma)) * ((delta^4)/(gamma^7)) * (delta^2 * (1-gamma^7) + gamma * (1-delta) * (delta * (1-gamma^6) + gamma * (1-gamma^5)) )
+  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) 
   # 
   # slNew <- ((slNew * slaughterAvg)/1000000000)
   # clNew <- ((clNew * cullAvg)/1000000000)
@@ -355,6 +360,7 @@ for(i in 1:nrow(proj_Q_P_up)){
   hcM_up <- Ps_up[3]
   EpsM_up <- Ps_up[4]
   EpcM_up <- Ps_up[5]
+        
   
   proj_Q_P_up$Ps_up[i] <- psM_up
   proj_Q_P_up$Pc_up[i] <- pcM_up
@@ -375,9 +381,6 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   capA_up <- ANew_up
   capK_up <- beefINV_FORECAST$hi95[i]
-  
-  # EpsM_up <- sum(as.numeric(psM_up) * fedMeshCheb)
-  # EpcM_up <- sum(as.numeric(pcM_up) * cullMeshCheb)
   
 }
 
@@ -420,6 +423,13 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   k_old_lo <-  Qs_lo[4]
   
+  # while(clNew_lo < 1.0){
+  #   clNew_lo <- clNew_lo + 0.5
+  # }
+  
+  ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
+  
+  
   Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
                          HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
                          params = c(MUtilde, Stilde))
@@ -435,23 +445,23 @@ for(i in 1:nrow(proj_Q_P_lo)){
     while(psM_lo < pcM_lo){
 
       if(counter == 0){
-        psM_lo <- proj_Q_P_lo$Ps_lo[i-1] + 0.08
+        psM_lo <- proj_Q_P_lo$Ps_lo[i-1]
         pcM_lo <- proj_Q_P_lo$Pc_lo[i-1] - 0.1
       }else{
-        psM_lo <- psM_lo + 0.08
+        psM_lo <- psM_lo
         pcM_lo <- pcM_lo - 0.1
       }
-      
+
       Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
                              k = k,CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
                              int_k3 = 0, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
-      
+
       slNew_lo <- Qs_lo[1]
       clNew_lo <- Qs_lo[2]
       ANew_lo <- Qs_lo[3]
-      
+
       k_old_lo <-  Qs_lo[4]
-      
+
 
       Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
                              HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
@@ -465,7 +475,6 @@ for(i in 1:nrow(proj_Q_P_lo)){
       counter <- counter + 1
 
     }
-  
   
   proj_Q_P_lo$Ps_lo[i] <- psM_lo
   proj_Q_P_lo$Pc_lo[i] <- pcM_lo
@@ -486,8 +495,6 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   capA_lo <- ANew_lo
   capK_lo <- beefINV_FORECAST$lo95[i]
-  
-  
   
 }
 
