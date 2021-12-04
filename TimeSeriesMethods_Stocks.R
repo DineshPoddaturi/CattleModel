@@ -121,7 +121,7 @@ summary(replacementHeifers_k3$ratio)
 #  0.6766  0.9703  1.0104  1.0062  1.0451  1.1658       1
 
 
-replacementHeifers_k311 <- replacementHeifers_k31 %>% filter(Year < 2012)
+replacementHeifers_k311 <- replacementHeifers_k31
 
 replacementHeifers_k3_ts <- ts(replacementHeifers_k311$k3, start = replacementHeifers_k311$Year[1], 
                                end = replacementHeifers_k311$Year[nrow(replacementHeifers_k311)], frequency = 1)

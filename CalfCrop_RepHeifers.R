@@ -10,6 +10,12 @@ summary( lead(replacementInventory_proj$k3)-replacementInventory_proj$k3)
 #     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.     NA's 
 # -3073100  -158825    64200    17849   264575   849000        1 
 
+summary(replacementInventory_proj$k3)
+#     Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 2569000 4636000 5588200 5544433 6363200 9503700 
+
+k3_lo_rep <- min(replacementInventory_proj$k3)
+
 CC_RH <- merge(calf_crop_proj, replacementInventory_proj, by="Year",all=TRUE)
 
 CC_RH_Fit <- lm(formula = lead(k3,1) ~ k3 + lag(k0,3) - 1 , data = CC_RH)
@@ -58,6 +64,8 @@ getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   ANew <- (slNew + clNew) * (1/adjF)
   
+  k3_est_Head <- estQ$par
+  
   
   # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
   # ANew <- (((g * K1 - k3_est) * slAvg)/1000000000) * (1/slShare)
@@ -65,7 +73,7 @@ getSlClA_test <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   # slNew <- ANew * slShare * adjF
   # clNew <- ANew * (1-slShare) * adjF
   
-  return(c(slNew, clNew, ANew, k3_est))
+  return(c(slNew, clNew, ANew, k3_est, k3_est_Head))
   
 }  
 
@@ -219,7 +227,7 @@ nProj <- nrow(beefINV_FORECAST) + 1
 proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
                        EPs = numeric(nProj), EPc = numeric(nProj), Hc = numeric(nProj), 
                        Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj),
-                       repHeif = numeric(nProj))
+                       repHeif = numeric(nProj), repHeif_Head = numeric(nProj))
 
 k_old <- 0
 
@@ -275,6 +283,8 @@ for(i in 1:nrow(proj_Q_P)){
 
   k_old <- Qs[4]
   
+  k_old_Head <- Qs[5]
+  
   Ps <- getPsPcEpsEpc(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
                       HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
                       params = c(MUtilde, Stilde))
@@ -294,6 +304,7 @@ for(i in 1:nrow(proj_Q_P)){
   proj_Q_P$Cl[i] <- clNew
   proj_Q_P$A[i] <- ANew
   proj_Q_P$repHeif[i] <- k_old
+  proj_Q_P$repHeif_Head[i] <- k_old_Head
   
   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
   
@@ -320,7 +331,7 @@ for(i in 1:nrow(proj_Q_P)){
 proj_Q_P_up <- data.frame(Year = numeric(nProj), Ps_up = numeric(nProj), Pc_up = numeric(nProj),
                           EPs_up = numeric(nProj), EPc_up = numeric(nProj), Hc_up = numeric(nProj),
                           Sl_up = numeric(nProj), Cl_up = numeric(nProj), A_up = numeric(nProj),
-                          repHeif_up = numeric(nProj)) 
+                          repHeif_up = numeric(nProj), repHeif_Head_up = numeric(nProj)) 
 
 psM_up <- modelParamsEQ$psMedian
 pcM_up <- modelParamsEQ$pcMedian
@@ -351,6 +362,8 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   k_old_up <-  Qs_up[4]
   
+  k_old_head_up <- Qs_up[5]
+  
   Ps_up <- getPsPcEpsEpc(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
                          HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
                          params = c(MUtilde, Stilde))
@@ -372,6 +385,7 @@ for(i in 1:nrow(proj_Q_P_up)){
   proj_Q_P_up$Cl_up[i] <- clNew_up
   proj_Q_P_up$A_up[i] <- ANew_up
   proj_Q_P_up$repHeif_up[i] <- k_old_up
+  proj_Q_P_up$repHeif_Head_up[i] <- k_old_head_up
   
   proj_Q_P_up$Year[i] <- beefINV_FORECAST$Year[i]
   
@@ -389,7 +403,7 @@ for(i in 1:nrow(proj_Q_P_up)){
 proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo = numeric(nProj),
                           EPs_lo = numeric(nProj), EPc_lo = numeric(nProj), Hc_lo = numeric(nProj),
                           Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj),
-                          repHeif_lo = numeric(nProj))
+                          repHeif_lo = numeric(nProj), repHeif_Head_lo = numeric(nProj))
 
 psM_lo <- modelParamsEQ$psMedian
 pcM_lo <- modelParamsEQ$pcMedian
@@ -405,7 +419,7 @@ k_old_lo <- 0
 
 for(i in 1:nrow(proj_Q_P_lo)){
   
-  # i <- 6
+  # i <- 13
   
   k <- 0
   
@@ -423,10 +437,17 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   k_old_lo <-  Qs_lo[4]
   
-  # while(clNew_lo < 1.0){
-  #   clNew_lo <- clNew_lo + 0.5
+  k_old_head_lo <-  Qs_lo[5]
+  
+  # while(clNew_lo < 1.01){
+  #   clNew_lo <- clNew_lo + 0.05
   # }
-  # ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
+  
+  # while(slNew_lo < 20.01){
+  #   slNew_lo <- slNew_lo + 0.25
+  # }
+  
+  ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
   
   
   Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
@@ -485,6 +506,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   proj_Q_P_lo$Cl_lo[i] <- clNew_lo
   proj_Q_P_lo$A_lo[i] <- ANew_lo
   proj_Q_P_lo$repHeif_lo[i] <- k_old_lo
+  proj_Q_P_lo$repHeif_Head_lo[i] <- k_old_head_lo
   
   proj_Q_P_lo$Year[i] <- beefINV_FORECAST$Year[i]
   
@@ -494,6 +516,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   capA_lo <- ANew_lo
   capK_lo <- beefINV_FORECAST$lo95[i]
+  
   
 }
 

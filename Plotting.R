@@ -19,7 +19,6 @@ EQestObsPS_Medians_proj_plot <- EQestObsPS_Medians_proj %>% ggplot(aes(x=Year)) 
                      breaks=c(seq(EQestObsPS_Medians_proj$Year[1],
                                   EQestObsPS_Medians_proj$Year[nrow(EQestObsPS_Medians_proj)])))
 
-
 EQestObsPC_Medians <- EQestObsPC %>% select(Year, pcMedian, pc) %>% filter(Year > 2009)
 
 PQs_MEDIANS_proj <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
