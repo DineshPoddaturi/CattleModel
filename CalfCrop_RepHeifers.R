@@ -417,6 +417,11 @@ capK_lo <- modelParamsEQ$K
 
 k_old_lo <- 0
 
+
+# CLmin <- min(supp_cl_adj$Bill_meatLb_cl)
+# SLmin <- min(supp_sl_adj$Bill_meatLb_sl)
+
+
 for(i in 1:nrow(proj_Q_P_lo)){
   
   # i <- 13
@@ -429,7 +434,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
                 k = k,CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-                int_k3 = 0, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
+                int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
   
   slNew_lo <- Qs_lo[1]
   clNew_lo <- Qs_lo[2]
@@ -439,16 +444,18 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   k_old_head_lo <-  Qs_lo[5]
   
-  # while(clNew_lo < 1.01){
-  #   clNew_lo <- clNew_lo + 0.05
-  # }
   
-  # while(slNew_lo < 20.01){
-  #   slNew_lo <- slNew_lo + 0.25
-  # }
+  ###### changing the quantities such that they match the historical quantities. Don't know if this is required.
+  ###### If I change this the prices are projected properly i.e., fed cattle price is always greater than cull cow price
+  
+  while(clNew_lo < 1.05){
+    clNew_lo <- clNew_lo + 0.05
+  }
+  while(slNew_lo < 20.01){
+    slNew_lo <- slNew_lo + 0.05
+  }
   
   ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
-  
   
   Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
                          HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
@@ -461,40 +468,40 @@ for(i in 1:nrow(proj_Q_P_lo)){
   EpcM_lo <- Ps_lo[5]
   
   ####### Need to figure this out
-    counter <- 0
-    while(psM_lo < pcM_lo){
-
-      if(counter == 0){
-        psM_lo <- proj_Q_P_lo$Ps_lo[i-1] + 0.08
-        pcM_lo <- proj_Q_P_lo$Pc_lo[i-1] - 0.05
-      }else{
-        psM_lo <- psM_lo + 0.08
-        pcM_lo <- pcM_lo - 0.05
-      }
-
-      Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
-                             k = k,CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-                             int_k3 = 0, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
-
-      slNew_lo <- Qs_lo[1]
-      clNew_lo <- Qs_lo[2]
-      ANew_lo <- Qs_lo[3]
-
-      k_old_lo <-  Qs_lo[4]
-
-
-      Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
-                             HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
-                             params = c(MUtilde, Stilde))
-      psM_lo <- Ps_lo[1]
-      pcM_lo <- Ps_lo[2]
-      hcM_lo <- Ps_lo[3]
-      EpsM_lo <- Ps_lo[4]
-      EpcM_lo <- Ps_lo[5]
-
-      counter <- counter + 1
-
-    }
+    # counter <- 0
+    # while(psM_lo < pcM_lo){
+    # 
+    #   if(counter == 0){
+    #     psM_lo <- proj_Q_P_lo$Ps_lo[i-1] + 0.1
+    #     pcM_lo <- proj_Q_P_lo$Pc_lo[i-1] - 0.1
+    #   }else{
+    #     psM_lo <- psM_lo + 0.1
+    #     pcM_lo <- pcM_lo - 0.1
+    #   }
+    # 
+    #   Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
+    #                          k = k,CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+    #                          int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
+    # 
+    #   slNew_lo <- Qs_lo[1]
+    #   clNew_lo <- Qs_lo[2]
+    #   ANew_lo <- Qs_lo[3]
+    # 
+    #   k_old_lo <-  Qs_lo[4]
+    # 
+    # 
+    #   Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+    #                          HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+    #                          params = c(MUtilde, Stilde))
+    #   psM_lo <- Ps_lo[1]
+    #   pcM_lo <- Ps_lo[2]
+    #   hcM_lo <- Ps_lo[3]
+    #   EpsM_lo <- Ps_lo[4]
+    #   EpcM_lo <- Ps_lo[5]
+    # 
+    #   counter <- counter + 1
+    # 
+    # }
   
   proj_Q_P_lo$Ps_lo[i] <- psM_lo
   proj_Q_P_lo$Pc_lo[i] <- pcM_lo
@@ -517,12 +524,10 @@ for(i in 1:nrow(proj_Q_P_lo)){
   capA_lo <- ANew_lo
   capK_lo <- beefINV_FORECAST$lo95[i]
   
-  
 }
 
 
-
-PQs_MEDIANS <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% select(
+PQs_MEDIANS <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),3) %>% select(
   Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
   A_lo, A, A_up)
 
@@ -531,19 +536,6 @@ PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
 PQs_MEDIANS_SL <- PQs_MEDIANS %>% select(Year, Sl_lo, Sl, Sl_up)
 PQs_MEDIANS_CL <- PQs_MEDIANS %>% select(Year, Cl_lo, Cl, Cl_up)
 PQs_MEDIANS_A  <- PQs_MEDIANS %>% select(Year, A_lo, A, A_up) 
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
