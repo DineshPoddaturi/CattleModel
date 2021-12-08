@@ -241,9 +241,33 @@ $k_{3,t+1} = \gamma k_{3,t} + \eta k_{0,t-3} + \epsilon$
 By fitting this relationship with data, we get the coefficients and then we can use the coefficients to further solve for $k_{3,t+1}$ in the model. Simply fit a simple OLS for this. I know prices will have to come into play but for now this is what we do. 
 
 
+12/08/2021:
 
+* Showed the projections, upper and lower bounds of the projections. I said I am fixing the $k_0$s for the data that are nto available. Chad said, use the estimated/projected $k_3$s to get the $k_0$s. We know the total stock in any year. 
+    at $t$, we have $K$, $k_0$s, we estimate $k_3$. Now at $t+1$, $k_3$s become $k_4$s and $k_0$s become $k_1$ and so on. So using this infomation, and using the birthrate we can always get the $k_0$s at any time. 
 
+* I said about how I put a floor to the lower bounds. Note that since the stock are low the number of animals sent to slaughter house is also low. This is true for cull cows. So by following the histocal data I set a floor to cull cows production to 1.01 billion pounds and for fed cattle a 20.01 billion pounds. Basically I am assuming in case of low production, we import enough animals/meat to match the demand for that specific meat. I am also increasing the production in increments of 10 million pounds instead of 1 billion directly. 
 
+Chad asked me to further decrease the floor of the fed cattle production. Right now it is sitting at 20.01 which was observed recently in the data. So maybe change it to 19 billion and see the changes in the price. 
+
+* I told him about the linear model I fitted to get the coefficients for the cull cow supply equation. I fitted the linear model without intercept. My rational for this is if the independent variables are zero then the dependent variable is zero as well i.e., if x is zero then y is zero in the model y = xb. Chad said it's okay to have no intercept in the linear model and the rational makes sense. 
+
+* Regarding the abstract for the paper:
+
+Look into the past research for what happens when FMD hits. Specifically what parameters we should be effected because of the disease.  
+
+My ideas were: 1. death rate will be effected for sure i.e., the stock will be reduced for that year. 2. Export markets will close their borders. Hence there will be more meat left in the country. 3. The literature also says consumers preferences to consume meat will change as they associate disease with human health (even though FMD is not a threat to human). So the demand for the meat might decrease which will increase the price. However, since the exports are stopped there is more meat left, so this might impact the prices as well. 4. In an even of the vaccination there will be costs for the vaccination. In the absence of the government help this might increase costs for the producers.
+
+We can change these parameters in the model and see how the impacts would look like. We need to be vary about the disease it self. This is treatable disease.
+
+Chads' suggestions: Look into recent previous disease outbreaks in the United States. Specifically BSE in 2003. See the impacts of the disease. Like, how the demand, death rate, exports and such. We can use them either as a benchmark or literally take them as given in the model.
+
+UK had FMD recently, so look at the impacts of FMD on UK market and borrow some of their quantities. 
+
+Currently I am reading the Red book of USDA for immediate action that needs to be taken if there is a disease outbreak tomorrow. 
+Chad told me to read Secure Beef Plan. This is a government plan about their steps in case of disease outbreak. 
+
+When I asked him about the model vs disease, Chad and Lee both told me to highlight the disease outbreak. This is about the disease and simulating different scenarios and different scenario work. 
 
 
 

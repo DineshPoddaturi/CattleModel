@@ -1,116 +1,250 @@
 ---
-title: "Some Results"
 output:
   pdf_document: default
+  html_document: default
 ---
 
-
-```{r}
-require(knitr)
-require(tidyverse)
-```
-
-```{r echo=FALSE}
-read_chunk('summariesPrices.R')
-```
-
-# Equilibrium prices and quantities
-
-
-### Fed cattle prices and quantities
-
-#### Prices
-```{r EQestObsPS}
-kable(EQestObsPS, align = 'c')
-```
-
-```{r EQestObsPS_plot}
-EQestObsPS_plot
-```
+\begin{table}[!ht]
+\centering
+\caption{Fed cattle price projections}
+\begin{tabular}{llll}
+\hline
+Year &   PsLo &   Ps &  PsUp\\\hline
+2018 & 123.608 & 123.608 & 123.514\\
+2019 & 126.515 & 133.920 & 134.443\\
+2020 & 119.839 & 136.590 & 138.683\\
+2021 & 107.103 & 135.431 & 139.229\\
+2022 & 104.284 & 134.104 & 139.444\\
+2023 & 104.441 & 133.284 & 139.641\\
+2024 & 104.481 & 132.837 & 139.853\\
+2025 & 104.380 & 132.392 & 139.938\\
+2026 & 104.326 & 131.650 & 139.955\\
+2027 & 104.311 & 130.829 & 140.025\\
+2028 & 104.357 & 130.014 & 140.078\\
+2029 & 104.350 & 129.232 & 140.095\\
+2030 & 104.127 & 128.449 & 140.102\\ \hline
+\end{tabular}
+\end{table}
 
 
 
-
-#### Quantities
-```{r EQestObsSL}
-kable(EQestObsSL, align = 'c')
-```
-
-
-
-```{r EQestObsSL_plot}
-EQestObsSL_plot
-```
-
-
-
-### Cull cow prices and quantities
-
-#### Prices
-```{r EQestObsPC}
-kable(EQestObsPC, align = 'c')
-```
-
-
-```{r EQestObsPC_plot}
-EQestObsPC_plot
-```
+\begin{table}[ht!]
+\centering
+\caption{Cull cow price projections}
+\begin{tabular}{l l  l l}\hline
+Year&Pc-up&Pc&Pc-lo\\hline
+2018&81.369&81.369&81.369\\
+2019&89.385&89.385&84.092\\
+2020&92.322&92.089&83.400\\
+2021&98.257&92.723&80.658\\
+2022&101.803&93.521&78.358\\
+2023&101.343&94.093&76.769\\
+2024&101.113&94.458&75.725\\
+2025&101.178&94.821&74.952\\
+2026&101.220&95.222&74.331\\
+2027&101.232&95.799&73.877\\
+2028&100.987&96.359&73.460\\
+2029&100.994&96.850&73.126\\
+2030&101.175&97.341&72.812\\\hline
+\end{tabular}
+\end{table}
 
 
-#### Quantities
-```{r EQestObsCL}
-kable(EQestObsCL, align = 'c')
-```
-
-```{r EQestObsCL_plot}
-EQestObsCL_plot
-```
 
 
-# Converged prices and quaantities
+\begin{table}[ht!]
+\centering
+\caption{Total meat production projections}
+\begin{tabular}{l l  l  l}\hline
+Year&ALo&A&AUp\\\hline
+2018&24.16030&24.16030&24.14646\\
+2019&23.68583&24.72987&25.76345\\
+2020&22.80335&24.91658&27.02281\\
+2021&21.56424&24.81618&28.06589\\
+2022&20.75774&24.67970&28.99030\\
+2023&20.44764&24.65758&29.76837\\
+2024&20.45818&24.72194&30.42193\\
+2025&20.44858&24.78439&30.98264\\
+2026&20.45353&24.80600&31.48373\\
+2027&20.45274&24.80615&31.95581\\
+2028&20.45861&24.81038&32.41107\\
+2029&20.45121&24.82803&32.85037\\
+2030&20.45134&24.85172&33.26678\\\hline
+\end{tabular}
+\end{table}
 
 
-### Fed cattle prices and quantities
 
-#### Prices
-```{r ITRestObsPS}
-kable(ITRestObsPS, align = 'c')
-```
-
-```{r ITRestObsPS_plot}
-ITRestObsPS_plot
-```
-
-
-#### Quantities
-```{r}
-kable(ITRestObsSL, align = 'c')
-```
-
-```{r warning=FALSE}
-ITRestObsSL_plot
-```
-
-### Cull cow prices and quantities
-
-#### Prices
-```{r}
-kable(ITRestObsPC, align = 'c')
-```
-
-```{r warning=FALSE}
-ITRestObsPC_plot
-```
+\begin{table}[ht!]
+\centering
+\caption{Fed cattle meat production projections}
+\begin{tabular}{l l  l l}\hline
+Year&SlLo&Sl&SlUp\\\hline
+2018&22.37027&22.37027&22.36201\\
+2019&22.15170&22.77304&23.39588\\
+2020&21.69230&22.96114&24.23044\\
+2021&21.00309&22.96352&24.92998\\
+2022&20.32674&22.93940&25.55052\\
+2023&20.01118&22.98330&26.08325\\
+2024&20.01685&23.08016&26.54289\\
+2025&20.01032&23.17465&26.95204\\
+2026&20.01682&23.24504&27.32654\\
+2027&20.01651&23.30496&27.68466\\
+2028&20.01724&23.36606&28.03169\\
+2029&20.01025&23.43414&28.37561\\
+2030&20.01732&23.50669&28.70166\\\hline
+\end{tabular}
+\end{table}
 
 
-#### Quantities
-```{r}
-kable(ITRestObsCL, align = 'c')
-```
+\begin{table}[ht!]
+\centering
+\caption{Cull cow meat production projections}
+\begin{tabular}{l l  l l}\hline
+Year&ClLo&Cl&ClUp\\\hline
+2018&2.47322&2.47322&2.46725\\
+2019&2.20391&2.65614&3.09610\\
+2020&1.75587&2.66003&3.55652\\
+2021&1.17095&2.55441&3.92955\\
+2022&1.01797&2.43819&4.25956\\
+2023&1.01467&2.37154&4.52690\\
+2024&1.01984&2.34086&4.73930\\
+2025&1.01650&2.31058&4.90672\\
+2026&1.01509&2.26241&5.04748\\
+2027&1.01458&2.20265&5.17479\\
+2028&1.01989&2.14590&5.29589\\
+2029&1.01927&2.09597&5.40368\\
+2030&1.01233&2.04778&5.50583\\\hline
+\end{tabular}
+\label{Table:AgeDist}
+\end{table}
 
-```{r warning=FALSE}
-ITRestObsCL_plot
-```
+\begin{figure}
+\caption{Fed cattle price projection (dollar/Lb)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/FedCattlePriceProj.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Cull cows price projection (dollar/Lb)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowPriceProj.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Total production projection(Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/TotalProductionProj.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Fed cattle production projection (Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/FedCattleProductionProj.jpeg}
+\end{figure}
+
+
+\begin{figure}
+\caption{Cull cows production projection (Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowProductionProj.jpeg}
+\end{figure}
+<!-- ```{r} -->
+<!-- read_chunk('summariesPrices.R') -->
+<!-- ``` -->
+
+<!-- # Equilibrium prices and quantities -->
+
+
+<!-- ### Fed cattle prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r EQestObsPS} -->
+<!-- kable(EQestObsPS, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r EQestObsPS_plot} -->
+<!-- EQestObsPS_plot -->
+<!-- ``` -->
+
+
+
+
+<!-- #### Quantities -->
+<!-- ```{r EQestObsSL} -->
+<!-- kable(EQestObsSL, align = 'c') -->
+<!-- ``` -->
+
+
+
+<!-- ```{r EQestObsSL_plot} -->
+<!-- EQestObsSL_plot -->
+<!-- ``` -->
+
+
+
+<!-- ### Cull cow prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r EQestObsPC} -->
+<!-- kable(EQestObsPC, align = 'c') -->
+<!-- ``` -->
+
+
+<!-- ```{r EQestObsPC_plot} -->
+<!-- EQestObsPC_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r EQestObsCL} -->
+<!-- kable(EQestObsCL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r EQestObsCL_plot} -->
+<!-- EQestObsCL_plot -->
+<!-- ``` -->
+
+
+<!-- # Converged prices and quaantities -->
+
+
+<!-- ### Fed cattle prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r ITRestObsPS} -->
+<!-- kable(ITRestObsPS, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r ITRestObsPS_plot} -->
+<!-- ITRestObsPS_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsSL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsSL_plot -->
+<!-- ``` -->
+
+<!-- ### Cull cow prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsPC, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsPC_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsCL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsCL_plot -->
+<!-- ``` -->
 
 
 
