@@ -172,31 +172,31 @@ for (i in 1:nrow(proj_Q_P)){
   k07[i] <- get_k0s(Yr = getYear, lag = 7)  
   k08[i] <- get_k0s(Yr = getYear, lag = 8) 
   
-  # if(i>1){
-  #   
-  #   if( k02[i] == 0 ){
-  #     k02[i] <- k02[i-1]
-  #   }
-  #   if( k03[i] == 0 ){
-  #     k03[i] <- k03[i-1]
-  #   }
-  #   if( k04[i] == 0 ){
-  #     k04[i] <- k04[i-1]
-  #   }
-  #   if( k05[i] == 0 ){
-  #     k05[i] <- k05[i-1]
-  #   }
-  #   if( k06[i] == 0 ){
-  #     k06[i] <- k06[i-1]
-  #   }
-  #   if( k07[i] == 0 ){
-  #     k07[i] <- k07[i-1]
-  #   }
-  #   if( k08[i] == 0 ){
-  #     k08[i] <- k08[i-1]
-  #   }
-  #   
-  # }
+  if(i>1){
+
+    if( k02[i] == 0 ){
+      k02[i] <- k02[i-1]
+    }
+    if( k03[i] == 0 ){
+      k03[i] <- k03[i-1]
+    }
+    if( k04[i] == 0 ){
+      k04[i] <- k04[i-1]
+    }
+    if( k05[i] == 0 ){
+      k05[i] <- k05[i-1]
+    }
+    if( k06[i] == 0 ){
+      k06[i] <- k06[i-1]
+    }
+    if( k07[i] == 0 ){
+      k07[i] <- k07[i-1]
+    }
+    if( k08[i] == 0 ){
+      k08[i] <- k08[i-1]
+    }
+
+  }
   
   k0s_df[i,] <- c(getYear, k02[i], k03[i], k04[i], k05[i], k06[i], k07[i], k08[i])
   
@@ -451,7 +451,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   while(clNew_lo < 1.01){
     clNew_lo <- clNew_lo + 0.01
   }
-  while(slNew_lo < 20.01){
+  while(slNew_lo < 19.01){
     slNew_lo <- slNew_lo + 0.01
   }
   
@@ -531,15 +531,17 @@ PQs_MEDIANS <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% sele
   Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
   A_lo, A, A_up)
 
-PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_lo = Ps_lo * 100, 
-                                                                               Ps = Ps * 100, Ps_up = Ps_up * 100)
-PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_lo = Pc_lo * 100, 
-                                                                              Pc = Pc * 100, Pc_up = Pc_up * 100)
+PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up)
+PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
+
 PQs_MEDIANS_SL <- PQs_MEDIANS %>% select(Year, Sl_lo, Sl, Sl_up)
 PQs_MEDIANS_CL <- PQs_MEDIANS %>% select(Year, Cl_lo, Cl, Cl_up)
 PQs_MEDIANS_A  <- PQs_MEDIANS %>% select(Year, A_lo, A, A_up) 
 
-
+PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_lo = Ps_lo * 100, 
+                                                                               Ps = Ps * 100, Ps_up = Ps_up * 100)
+PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_lo = Pc_lo * 100, 
+                                                                               Pc = Pc * 100, Pc_up = Pc_up * 100)
 
 
 
