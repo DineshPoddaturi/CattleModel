@@ -243,10 +243,10 @@ By fitting this relationship with data, we get the coefficients and then we can 
 
 12/08/2021:
 
-* Showed the projections, upper and lower bounds of the projections. I said I am fixing the $k_0$s for the data that are nto available. Chad said, use the estimated/projected $k_3$s to get the $k_0$s. We know the total stock in any year. 
+* Showed the projections, upper and lower bounds of the projections. I said I am fixing the $k_0$s for the data that are not available. Chad said, use the estimated/projected $k_3$s to get the $k_0$s. We know the total stock in any year. 
     at $t$, we have $K$, $k_0$s, we estimate $k_3$. Now at $t+1$, $k_3$s become $k_4$s and $k_0$s become $k_1$ and so on. So using this infomation, and using the birthrate we can always get the $k_0$s at any time. 
 
-* I said about how I put a floor to the lower bounds. Note that since the stock are low the number of animals sent to slaughter house is also low. This is true for cull cows. So by following the histocal data I set a floor to cull cows production to 1.01 billion pounds and for fed cattle a 20.01 billion pounds. Basically I am assuming in case of low production, we import enough animals/meat to match the demand for that specific meat. I am also increasing the production in increments of 10 million pounds instead of 1 billion directly. 
+* I said about how I put a floor to the lower bounds. Note that since the stock are low the number of animals sent to slaughter house is also low. This is true for cull cows. So by following the historical data I set a floor to cull cows production to 1.01 billion pounds and for fed cattle a 20.01 billion pounds. Basically I am assuming in case of low production, we import enough animals/meat to match the demand for that specific meat. I am also increasing the production in increments of 10 million pounds instead of 1 billion directly. 
 
 Chad asked me to further decrease the floor of the fed cattle production. Right now it is sitting at 20.01 which was observed recently in the data. So maybe change it to 19 billion and see the changes in the price. 
 
