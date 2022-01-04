@@ -22,6 +22,17 @@ CC_RH_Fit <- lm(formula = lead(k3,1) ~ k3 + lag(k0,3) - 1 , data = CC_RH)
 
 fitSummary <- summary(CC_RH_Fit)
 
+
+# plot(CC_RH_Fit, 3)
+# 
+# plot(CC_RH_Fit$resid ~ CC_RH_Fit$fitted.values)
+# #add horizental line from 0
+# abline(h = 0, lty = 2)
+# require(car)
+# avPlots(CC_RH_Fit)
+# 
+# infIndexPlot(CC_RH_Fit)
+
 # int_k3 <- fitSummary$coefficients[1]
 gamma_k3 <- fitSummary$coefficients[1]
 eta_k3 <- fitSummary$coefficients[2]
@@ -119,10 +130,10 @@ estQFunction_test <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_k3,
 
 get_k0s <- function(Yr, lag){
   
-  if(nrow(calf_crop_proj %>% filter( Year == getYear - lag  ) %>% select(k0)) == 0){
+  if(nrow(calf_crop_proj_N %>% filter( Year == getYear - lag  ) %>% select(k0)) == 0){
     k0 <- 0 
   }else{
-    k0 <- calf_crop_proj %>% filter( Year == Yr - lag  ) %>% select(k0) %>% unlist()
+    k0 <- calf_crop_proj_N %>% filter( Year == Yr - lag  ) %>% select(k0) %>% unlist()
   }
   
   return(k0)
@@ -141,6 +152,12 @@ modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
 
 ################################## CHANGE THE ADJUSTMENT FACTOR #######################################
 
+
+calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * Kcast) %>% 
+  filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
+
+
+calf_crop_proj_N <- rbind(calf_crop_proj, calf_crop_proj1)
 
 ####### Here I get all the calf crop data for all the years
 k0s_df <- data.frame(Year = numeric(nProj), k02 = numeric(nProj) , k03 = numeric(nProj), 
@@ -172,35 +189,40 @@ for (i in 1:nrow(proj_Q_P)){
   k07[i] <- get_k0s(Yr = getYear, lag = 7)  
   k08[i] <- get_k0s(Yr = getYear, lag = 8) 
   
-  if(i>1){
-
-    if( k02[i] == 0 ){
-      k02[i] <- k02[i-1]
-    }
-    if( k03[i] == 0 ){
-      k03[i] <- k03[i-1]
-    }
-    if( k04[i] == 0 ){
-      k04[i] <- k04[i-1]
-    }
-    if( k05[i] == 0 ){
-      k05[i] <- k05[i-1]
-    }
-    if( k06[i] == 0 ){
-      k06[i] <- k06[i-1]
-    }
-    if( k07[i] == 0 ){
-      k07[i] <- k07[i-1]
-    }
-    if( k08[i] == 0 ){
-      k08[i] <- k08[i-1]
-    }
-
-  }
+  # if(i>1){
+  # 
+  #   if( k02[i] == 0 ){
+  #     k02[i] <- k02[i-1]
+  #   }
+  #   if( k03[i] == 0 ){
+  #     k03[i] <- k03[i-1]
+  #   }
+  #   if( k04[i] == 0 ){
+  #     k04[i] <- k04[i-1]
+  #   }
+  #   if( k05[i] == 0 ){
+  #     k05[i] <- k05[i-1]
+  #   }
+  #   if( k06[i] == 0 ){
+  #     k06[i] <- k06[i-1]
+  #   }
+  #   if( k07[i] == 0 ){
+  #     k07[i] <- k07[i-1]
+  #   }
+  #   if( k08[i] == 0 ){
+  #     k08[i] <- k08[i-1]
+  #   }
+  # 
+  # }
   
   k0s_df[i,] <- c(getYear, k02[i], k03[i], k04[i], k05[i], k06[i], k07[i], k08[i])
   
 }
+
+
+
+
+
 
 
 

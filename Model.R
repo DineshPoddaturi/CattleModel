@@ -159,7 +159,7 @@ dressedWeights_sl_cl <- dressedWeights %>% mutate(Slaughter_avg = Steers_avg, Cu
 
 dressedWeights_sl_cl <- dressedWeights_sl_cl %>% select(Year, Slaughter_avg, Cull_avg)
 
-################## reading beef inventory (This is K in our model) ##################
+################## reading beef inventory (This is K in our model)  This is beef cows inventory data (so basically sum(k3 to k10))##################
 beefInventory <- read_excel("Data/New/CowsBeefInventory.xlsx") %>% as.data.frame()
 beefInventory <- beefInventory %>% select(Year, Period, Value) %>% mutate(K = Value) %>% select(Year,K)
 
