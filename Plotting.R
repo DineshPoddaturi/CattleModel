@@ -29,13 +29,13 @@ EQestObsPC_Medians_proj <- merge(EQestObsPC_Medians,PQs_MEDIANS_proj,by="Year",a
 
 EQestObsPC_Medians_proj_plot <- EQestObsPC_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + geom_line(aes(y=pcMedian, color="PC RATIONAL (MEDIAN)")) +
-  geom_point(aes(y = pcMedian, color = "PC RATIONAL (MEDIAN)")) + 
+  geom_point(aes(y = pcMedian, color = "PC RATIONAL (MEDIAN)")) +
+  geom_line(aes(y=Pc_up, color="PS_LO PROJECTION"))  +
+  geom_point(aes(y=Pc_up, color="PS_LO PROJECTION")) +
   geom_line(aes(y=Pc_lo, color="PC_UP PROJECTION")) +
   geom_point(aes(y=Pc_lo, color="PC_UP PROJECTION")) + 
   geom_line(aes(y=Pc, color="PC PROJECTION")) +
   geom_point(aes(y=Pc, color="PC PROJECTION")) + 
-  geom_line(aes(y=Pc_up, color="PS_LO PROJECTION"))  +
-  geom_point(aes(y=Pc_up, color="PS_LO PROJECTION")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPC_Medians_proj$Year[1],
                                   EQestObsPC_Medians_proj$Year[nrow(EQestObsPC_Medians_proj)])))

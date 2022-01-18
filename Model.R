@@ -223,15 +223,9 @@ for(i in 1:nrow(Stock)){
 }
 
 # supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]  + imports$Imports[i] - exports$Exports[i]
-
-
-
 supp_sl <- supp_sl %>% na.omit() %>% as.data.frame() 
 names(supp_sl) <- "Slaughter"
 supp_sl <- supp_sl %>% mutate(Year = seq(from=1981, to = 2017)) %>% select(Year,everything()) %>% filter(Year>=1994)
-
-
-
 
 # supply of the cull animals
 
@@ -272,7 +266,7 @@ supp_diss %>% ggplot(aes(x=Year))+ geom_line(aes(y=total_meat_bill,color="Demand
   geom_line(aes(y=TotalSupply, color="Supply")) + geom_point(aes(y=TotalSupply, color="Supply")) +
   labs(x="Year", y="Meat (in billion pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1994,2017)))
 
-################## Here we find the adjustment factor to adjust for demand and supply meat ###############
+################## Here we find the adjustment factor to adjust for demand and supply of meat ###############
 # Taking ratio of demand and supply
 
 adjFactor <- (supp_diss%>%select(total_meat_bill)/supp_diss%>%select(TotalSupply))
@@ -909,13 +903,7 @@ predict_df <- cbind(Stock_temp$Year, Stock_temp$K, Stock_temp$k3 , imports_temp$
                     totalDisappearedNew %>% filter(Year>=1994) %>% select(total_meat_bill)) %>% as.data.frame()
 names(predict_df) <- c("Year", "K", "k3", "imports", "exports", "dressedWeight", "ps", "pc", "hc", "sl", "cl", "Dissappear")
 
-# predict_df$pc <- predict_df$pc + 1
-# predict_df$hc <- (((g * (beta^3) * predict_df$ps) + (beta - 1) * predict_df$pc)/(1 + g * beta * (gamma0 + beta * gamma1)))
-
-
 demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)), sl_est = numeric(nrow(predict_df)), cl_est = numeric(nrow(predict_df)))
-
-# demand_predict <- data.frame(Year = predict_df$Year+1, demand_est = numeric(nrow(predict_df)))
 
 prices_predict <- data.frame(Year = predict_df$Year+1, ps_hat = numeric(nrow(predict_df)), pc_hat = numeric(nrow(predict_df)), hc_hat = numeric(nrow(predict_df)))
 
@@ -923,7 +911,6 @@ parameters <- data.frame(Year = predict_df$Year+1, mu_tilde = numeric(nrow(predi
 adj_factor <- data.frame(Year = predict_df$Year+1, adj = numeric(nrow(predict_df)))
 shares_slcl <- data.frame(Year = predict_df$Year+1, share_pre = numeric(nrow(predict_df)), 
                           share_post = numeric(nrow(predict_df)))
-
 
 for(i in 1:(nrow(predict_df)-2)){
   
