@@ -573,10 +573,10 @@ PQs_MEDIANS_SL <- PQs_MEDIANS %>% select(Year, Sl_lo, Sl, Sl_up)
 PQs_MEDIANS_CL <- PQs_MEDIANS %>% select(Year, Cl_lo, Cl, Cl_up)
 PQs_MEDIANS_A  <- PQs_MEDIANS %>% select(Year, A_lo, A, A_up) 
 
-PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_lo = Ps_lo * 100, 
-                                                                               Ps = Ps * 100, Ps_up = Ps_up * 100)
-PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_lo = Pc_lo * 100, 
-                                                                               Pc = Pc * 100, Pc_up = Pc_up * 100)
+PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_LO = Ps_lo * 100, 
+                                                                               Ps = Ps * 100, Ps_UP = Ps_up * 100)
+PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_LO = Pc_up * 100, 
+                                                                               Pc = Pc * 100, Pc_UP = Pc_lo * 100)
 
 
 

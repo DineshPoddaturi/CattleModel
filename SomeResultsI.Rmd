@@ -1,0 +1,249 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+\begin{table}[!ht]
+\centering
+\caption{Fed cattle price projections}
+\begin{tabular}{llll}
+\hline
+Year &   PsLo &   Ps &  PsUp\\\hline
+2018 & 123.608 & 123.608 & 123.608\\
+2019 & 126.515 & 133.864 & 134.537\\
+2020 & 119.839 & 136.536 & 138.719\\
+2021 & 107.103 & 135.373 & 139.269\\
+2022 & 104.284 & 134.044 & 139.470\\
+2023 & 104.488 & 133.246 & 139.648\\
+2024 & 104.803 & 132.842 & 139.831\\
+2025 & 104.664 & 132.429 & 139.910\\
+2026 & 104.673 & 131.905 & 140.009\\
+2027 & 104.677 & 131.132 & 140.073\\
+2028 & 104.684 & 130.361 & 140.111\\
+2029 & 104.706 & 129.602 & 140.130\\
+2030 & 104.710 & 128.825 & 140.159\\ \hline
+\end{tabular}
+\end{table}
+
+
+
+\begin{table}[ht!]
+\centering
+\caption{Cull cow price projections}
+\begin{tabular}{l l  l l}\hline
+Year &   PcLo &   Pc &  PcUp\\\hline
+2018 & 81.369 & 81.369  & 81.369\\
+2019 & 84.417 & 89.385  & 89.385\\
+2020 & 83.657 & 92.090  & 92.322\\
+2021 & 80.852 & 92.731  & 98.257\\
+2022 & 78.572 & 93.530  & 101.803\\
+2023 & 77.028 & 94.055  & 100.550\\
+2024 & 76.048 & 94.328  & 98.714\\
+2025 & 75.289 & 94.618  & 98.863\\
+2026 & 74.772 & 95.153  & 98.774\\
+2027 & 74.334 & 95.624  & 98.729\\
+2028 & 73.952 & 96.090  & 98.679\\
+2029 & 73.612 & 96.528  & 98.560\\
+2030 & 73.393 & 97.007  & 98.515\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{Total meat production projections}
+\begin{tabular}{l l  l  l}\hline
+Year & ALo & A & AUp\\\hline
+2018 & 24.16030 & 24.16030 & 24.16030\\
+2019 & 23.68583 & 24.73075 & 25.78161\\
+2020 & 22.80335 & 24.91744 & 27.03659\\
+2021 & 21.56424 & 24.81719 & 28.07416\\
+2022 & 20.75774 & 24.68070 & 28.99499\\
+2023 & 20.07448 & 24.67433 & 29.76488\\
+2024 & 19.48654 & 24.75317 & 30.40944\\
+2025 & 19.48128 & 24.82976 & 30.95919\\
+2026 & 19.47920 & 24.86516 & 31.44891\\
+2027 & 19.47944 & 24.87776 & 31.90890\\
+2028 & 19.47793 & 24.89373 & 32.34931\\
+2029 & 19.48257 & 24.92296 & 32.76937\\
+2030 & 19.48744 & 24.94657 & 33.17188\\\hline
+\end{tabular}
+\end{table}
+
+
+
+\begin{table}[ht!]
+\centering
+\caption{Fed cattle meat production projections}
+\begin{tabular}{l l  l l}\hline
+Year  & SlLo  & Sl &  SlUp\\\hline
+2018 & 22.37027 & 22.37027 & 22.37027\\
+2019 & 22.15170 & 22.77670 & 23.42635\\
+2020 & 21.69230 & 22.96471 & 24.25810\\
+2021 & 21.00309 & 22.96770 & 24.94901\\
+2022 & 20.32674 & 22.94355 & 25.57002\\
+2023 & 19.63166 & 22.99892 & 26.10201\\
+2024 & 19.01985 & 23.10322 & 26.56324\\
+2025 & 19.01975 & 23.20631 & 26.96578\\
+2026 & 19.01601 & 23.28632 & 27.33355\\
+2027 & 19.01538 & 23.35193 & 27.68429\\
+2028 & 19.01293 & 23.41909 & 28.02453\\
+2029 & 19.01498 & 23.49586 & 28.35183\\
+2030 & 19.01885 & 23.56852 & 28.67434\\\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[ht!]
+\centering
+\caption{Cull cow meat production projections}
+\begin{tabular}{l l  l l}\hline
+Year &  ClLo    & Cl    & ClUp\\\hline
+2018 & 2.47322 & 2.47322 & 2.47322\\
+2019 & 2.20391 & 2.65338 & 3.08430\\
+2020 & 1.75587 & 2.65734 & 3.54302\\
+2021 & 1.17095 & 2.55127 & 3.91902\\
+2022 & 1.01797 & 2.43507 & 4.24488\\
+2023 & 1.01048 & 2.37314 & 4.50455\\
+2024 & 1.01772 & 2.34991 & 4.70611\\
+2025 & 1.01242 & 2.32557 & 4.86887\\
+2026 & 1.01402 & 2.28198 & 5.00466\\
+2027 & 1.01490 & 2.22932 & 5.12692\\
+2028 & 1.01580 & 2.17858 & 5.23955\\
+2029 & 1.01852 & 2.13187 & 5.34418\\
+2030 & 1.01965 & 2.08348 & 5.43555\\\hline
+\end{tabular}
+\label{Table:AgeDist}
+\end{table}
+
+\newpage
+
+\begin{figure}
+\caption{Fed cattle price projection (dollar/Lb)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/FedCattlePriceProjI.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Cull cows price projection (dollar/Lb)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowPriceProjI.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Total production projection(Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/TotalProductionProjI.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Fed cattle production projection (Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/FedCattleProductionProjI.jpeg}
+\end{figure}
+
+
+\begin{figure}
+\caption{Cull cows production projection (Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowProductionProjI.jpeg}
+\end{figure}
+<!-- ```{r} -->
+<!-- read_chunk('summariesPrices.R') -->
+<!-- ``` -->
+
+<!-- # Equilibrium prices and quantities -->
+
+
+<!-- ### Fed cattle prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r EQestObsPS} -->
+<!-- kable(EQestObsPS, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r EQestObsPS_plot} -->
+<!-- EQestObsPS_plot -->
+<!-- ``` -->
+
+
+
+
+<!-- #### Quantities -->
+<!-- ```{r EQestObsSL} -->
+<!-- kable(EQestObsSL, align = 'c') -->
+<!-- ``` -->
+
+
+
+<!-- ```{r EQestObsSL_plot} -->
+<!-- EQestObsSL_plot -->
+<!-- ``` -->
+
+
+
+<!-- ### Cull cow prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r EQestObsPC} -->
+<!-- kable(EQestObsPC, align = 'c') -->
+<!-- ``` -->
+
+
+<!-- ```{r EQestObsPC_plot} -->
+<!-- EQestObsPC_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r EQestObsCL} -->
+<!-- kable(EQestObsCL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r EQestObsCL_plot} -->
+<!-- EQestObsCL_plot -->
+<!-- ``` -->
+
+
+<!-- # Converged prices and quaantities -->
+
+
+<!-- ### Fed cattle prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r ITRestObsPS} -->
+<!-- kable(ITRestObsPS, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r ITRestObsPS_plot} -->
+<!-- ITRestObsPS_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsSL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsSL_plot -->
+<!-- ``` -->
+
+<!-- ### Cull cow prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsPC, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsPC_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsCL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsCL_plot -->
+<!-- ``` -->
+
+
+

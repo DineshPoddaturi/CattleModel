@@ -795,4 +795,8 @@ ANew <- (g * K1 - k3_est) * (1/shrT)
 
 slNew <- ANew *  shrT * proj2016$AdjFactor
 
+merge(proj_Q_P_lo,merge(proj_Q_P,proj_Q_P_up)) %>% select(Year, repHeif_Head_lo, repHeif_Head, repHeif_Head_up)
+
+
+
 
