@@ -2,6 +2,7 @@
 require(tseries)
 require(forecast)
 require(arfima)
+require(lmtest)
 
 
 stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2017)
@@ -43,9 +44,16 @@ adf.test(stock_K_ts)
 # 
 # Kfit <- arima(zzK, order = c(2,0,3))
 ############################################################################################
-seriesK <- auto.arima(stock_K_ts)
+seriesK <- auto.arima(stock_K_ts, trace=TRUE)
 
 Kfit <- arima(stock_K_ts, order = c(2,1,3))
+
+# Arima(stock_K_ts, order=c(2,1,3), seasonal=c(2,1,3), xreg=seq_along(stock_K_ts)) %>%
+#   autoplot()
+# 
+# coeftest(Kfit)
+# 
+# Kfit %>% forecast() %>% autoplot()
 
 Kfit_Residuals <- ts(Kfit$res, 
                      start = stock_K$Year[1], 

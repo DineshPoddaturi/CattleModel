@@ -116,6 +116,8 @@ Year &  ClLo    & Cl    & ClUp\\\hline
 \label{Table:AgeDist}
 \end{table}
 
+
+
 \newpage
 
 \begin{figure}
@@ -143,6 +145,8 @@ Year &  ClLo    & Cl    & ClUp\\\hline
 \caption{Cull cows production projection (Billion Lbs)}
   \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowProductionProjI.jpeg}
 \end{figure}
+
+
 <!-- ```{r} -->
 <!-- read_chunk('summariesPrices.R') -->
 <!-- ``` -->
