@@ -9,8 +9,8 @@ for(i in 1:nrow(quantities_prices_capK)){
   # sl <- quantities_prices_capK$slSM[i]
   # cl <- quantities_prices_capK$clSM[i]
   
-  sl <- quantities_prices_capK$sl[i]
-  cl <- quantities_prices_capK$cl[i]
+  sl <- quantities_prices_capK$slSM[i]
+  cl <- quantities_prices_capK$clSM[i]
   
   adjFac <- A/(sl+cl)
   

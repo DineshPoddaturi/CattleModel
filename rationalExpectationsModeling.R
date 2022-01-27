@@ -163,15 +163,16 @@ newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
 
 #### 0.22 comes from the fact that approximately a maximum of 22% of the progeny is added to the breeding stock
 
-newSL <- allStockShocks %>%
-  transmute(Year = Year+3, slt = (g - 0.22 * g) * K * slShock + 
-              (1 - 0.22 * g) * g * delta * (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
+newSL_1 <- allStockShocks %>%
+  transmute(Year = Year+1, slt = (g - 0.22 * g) * lag(K,2) * lag(slShock,1) + 
+              (1 - 0.22 * g) * g * delta * (lag(K,2) - (g - 0.22 * g) * lag(K,3) - 
+                                          (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2))),
             slLbs = slt * Slaughter_avg/1000000000)
-# allStockShocks %>% 
-#   transmute(Year = Year +3, slt = lag(slHead)*(slShock^2) + g * delta * (1- 0.22 * g) * 
-#               ( (lag(K,2) - (delta - 0.22 * g) * lag(K,3) - (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2))) * slShock 
-#                                            + (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7) )),
-#             slLbs = slt * Slaughter_avg/1000000000)
+
+newSL_3 <- allStockShocks %>%
+  transmute(Year = Year+3, slt = (g - 0.22 * g) * K * slShock +
+              (1 - 0.22 * g) * g * delta * (K - (g - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
+            slLbs = slt * Slaughter_avg/1000000000)
 
 
 
@@ -181,13 +182,18 @@ newSL <- allStockShocks %>%
 #### production this period with shock and storage.
 
 
-newCL <- allStockShocks %>% transmute(Year = Year + 3, clStock = 0, clLbs = 0)
+# newCL <- allStockShocks %>% transmute(Year = Year + 3, clStock = 0, clLbs = 0)
 
 
 #### Since the production of fed cattle is computed for three periods ahead, we construct the production of cull 
 #### cows in the similar fashion
 
-newCL <- allStockShocks %>%
+newCL_1 <- allStockShocks %>%
+  transmute(Year = Year + 1, clt = (k9 + (1-delta) * k8 + (1-delta) * k7) * clShock +
+             (delta * (k8 + k7 + k6) - (k7 + k8 + k9)),
+            clLbs = clt * Cull_avg/1000000000)
+
+newCL_3 <- allStockShocks %>%
   transmute(Year = Year + 3, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock +
               (delta^2) * (delta * (k6 + k5 + k4) - (k5 + k6 + k7)),
             clLbs = clt * Cull_avg/1000000000)
@@ -210,8 +216,11 @@ newCL <- allStockShocks %>%
 #   Year = Year, clHead = clHead, clLbsEst = clHead * clDressed/1000000000)
 
 cornPrice <- pcorn
-cullCowsProd <- newCL %>% transmute(Year = Year, cullCows = clLbs)
-fedCattleProd <- newSL %>% transmute(Year = Year, fedCattle = slLbs)
+cullCowsProd_3 <- newCL_3 %>% transmute(Year = Year, cullCows = clLbs)
+fedCattleProd_3 <- newSL_3 %>% transmute(Year = Year, fedCattle = slLbs)
+
+cullCowsProd_1 <- newCL_1 %>% transmute(Year = Year, cullCows = clLbs)
+fedCattleProd_1 <- newSL_1 %>% transmute(Year = Year, fedCattle = slLbs)
 
 # adjFactor_R <- adjFactor %>% mutate(Year = Year + 3)
 # 
@@ -223,7 +232,7 @@ fedCattleProd <- newSL %>% transmute(Year = Year, fedCattle = slLbs)
 # 
 # prod_CornP <- merge(merge(fedCattleProd_adj, cullCowsProd_adj),cornPrice) %>% drop_na()
 
-prod_CornP <- merge(merge(fedCattleProd, cullCowsProd),cornPrice) %>% drop_na()
+prod_CornP <- merge(merge(fedCattleProd_1, cullCowsProd_1),cornPrice) %>% drop_na()
 
 
 ### Here I am generating the shocks again such that when we merge all the dataframes we have enough data.
@@ -501,8 +510,8 @@ capK <- merge(K_1t, K_jt)
 # sl_quant_SM <- fedCattleProd_adj %>% transmute(Year = Year, slSM = fedCattle)
 # cl_quant_SM <- cullCowsProd_adj %>% transmute(Year = Year, clSM = cullCows)
 
-sl_quant_SM <- fedCattleProd %>% transmute(Year = Year, slSM = fedCattle)
-cl_quant_SM <- cullCowsProd %>% transmute(Year = Year, clSM = cullCows)
+sl_quant_SM <- fedCattleProd_1 %>% transmute(Year = Year, slSM = fedCattle)
+cl_quant_SM <- cullCowsProd_1 %>% transmute(Year = Year, clSM = cullCows)
 
 # sl_quant <- supp_sl_adj_N %>% transmute(Year = Year, sl = fedCattle)
 # cl_quant <- supp_cl_adj_N %>% transmute(Year = Year, cl = cullCows)
@@ -547,17 +556,13 @@ variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_export
 
 quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% filter(Year>1994)
 
-
-
-
-
 ################################### IMPORTANT ##################################
 ####### We have the constructed quantities and shocks from 1998 to 2020 ########
 ####### So the prices we use are from 1995 to 2017. ############################
 ################################################################################
 
 
-valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
+# valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCorn, TSCull, dShock, TSFed){
   
   prices_ps <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
   prices_pc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
@@ -1163,11 +1168,11 @@ valueFunction <- function(cornNode, cullCowNode, dShockNode, fedCattleNode, pCor
   
   
   
-  return(c(prices, Ks))
+  # return(c(prices, Ks))
   
   # return(c(ps_new, pc_new))
   
-}
+# }
  
 
 

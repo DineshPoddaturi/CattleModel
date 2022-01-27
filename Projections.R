@@ -170,9 +170,9 @@ proj_adjFac <- adjFactor_New
 
 proj_adjFac <- adjFactor
 
-proj_muTildes <- mu_Tildes_MM
-proj_sTildes <- s_Tildes_MM
-proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPS,EQestPC,EQestHC, EQestEPS, EQestEPC))
+proj_muTildes <- mu_Tildes_MMN
+proj_sTildes <- s_Tildes_MMN
+proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPSN,EQestPCN,EQestHCN, EQestEPSN, EQestEPCN))
 
 proj_muTildes1 <- mu_Tildes_MM_itr
 proj_sTildes1 <- s_Tildes_MM_itr
@@ -207,8 +207,8 @@ summary(replacementHeifers_k3$ratio)
 #### Using the above relationship i.e., relationship between the replacement heifers at t to t-1. 
 #### The median is 1.0104. So I will fix this and use this as the relationship. 
 
-gamma_k3 <- 1.0104
-eta_k3  
+# gamma_k3 <- 1.0104
+# eta_k3  
 
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
@@ -249,7 +249,7 @@ k_old <- 0
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock
 for(i in 1:nrow(proj_Q_P)){
 
-  i <- 1
+  # i <- 1
   
   getYear <- beefINV_FORECAST$Year[i]
   

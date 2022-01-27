@@ -218,7 +218,8 @@ supp_sl <- NULL
 
 for(i in 1:nrow(Stock)){
   if(Stock$Year[i]>=1981){
-    supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]
+    # supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]
+    supp_sl[i] <- g * Stock$K[i-1] - Stock$k3[i+1]  + imports$Imports[i] - exports$Exports[i]
   }
 }
 
