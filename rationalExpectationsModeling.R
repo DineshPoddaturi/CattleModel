@@ -15,7 +15,7 @@ summary(calfCrop_replacementHeifers$calfCrop_repHeifers_Percent)
 
 #### Here I am getting an approximate percentage of the progeny of the total stock that are added into 
 #### breeding stock as replacement heifers. Note that here I am taking replacement heifers two periods ahead
-#### Because if the cow gives birth thsi period the heifers are added into the breeding stock two periods from now
+#### Because if the cow gives birth this period the heifers are added into the breeding stock two periods from now
 summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>% select(ratios))
 
 # ratios      
@@ -164,7 +164,7 @@ newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
 #### 0.22 comes from the fact that approximately a maximum of 22% of the progeny is added to the breeding stock
 
 newSL <- allStockShocks %>%
-  transmute(Year = Year+3, slt = (delta - 0.22 * g) * K * slShock + 
+  transmute(Year = Year+3, slt = (g - 0.22 * g) * K * slShock + 
               (1 - 0.22 * g) * g * delta * (K - (delta - 0.22 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
             slLbs = slt * Slaughter_avg/1000000000)
 # allStockShocks %>% 
