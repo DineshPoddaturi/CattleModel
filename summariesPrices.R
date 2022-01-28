@@ -411,9 +411,6 @@ EQestEPC <- merge(EQestEPC, EQprices_Epc_Medians)
 
 
 
-
-
-
 ## @knitr ITRestObsPS
 
 ITRprices_ps_Means <- apply(prices_ps_itr[1:25,], 2, mean)
