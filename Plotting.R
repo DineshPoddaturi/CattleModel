@@ -30,8 +30,8 @@ EQestObsPC_Medians_proj <- merge(EQestObsPC_Medians,PQs_MEDIANS_proj,by="Year",a
 EQestObsPC_Medians_proj_plot <- EQestObsPC_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + geom_line(aes(y=pcMedian, color="PC RATIONAL (MEDIAN)")) +
   geom_point(aes(y = pcMedian, color = "PC RATIONAL (MEDIAN)")) +
-  geom_line(aes(y=Pc_up, color="PS_LO PROJECTION"))  +
-  geom_point(aes(y=Pc_up, color="PS_LO PROJECTION")) +
+  geom_line(aes(y=Pc_up, color="PC_LO PROJECTION"))  +
+  geom_point(aes(y=Pc_up, color="PC_LO PROJECTION")) +
   geom_line(aes(y=Pc_lo, color="PC_UP PROJECTION")) +
   geom_point(aes(y=Pc_lo, color="PC_UP PROJECTION")) + 
   geom_line(aes(y=Pc, color="PC PROJECTION")) +
@@ -52,9 +52,9 @@ PQs_MEDIANS_A_proj <- PQs_MEDIANS %>% transmute(Year = Year, A_lo, A_proj = A, A
 
 EQestObsA_Medians_proj <- merge(EQestObsA_Medians,PQs_MEDIANS_A_proj,by="Year",all=TRUE)
 
-EQestObsA_Medians_proj_plot <- EQestObsA_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=A, color = "Demand OBS")) + 
-  geom_point(aes(y=A, color = "Demand OBS")) + geom_line(aes(y=AMedian, color="Demand RATIONAL (MEDIAN)")) +
-  geom_point(aes(y = AMedian, color = "Demand RATIONAL (MEDIAN)")) + 
+EQestObsA_Medians_proj_plot <- EQestObsA_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=A, color = "A OBS")) + 
+  geom_point(aes(y=A, color = "A OBS")) + geom_line(aes(y=AMedian, color="A RATIONAL (MEDIAN)")) +
+  geom_point(aes(y = AMedian, color = "A RATIONAL (MEDIAN)")) + 
   geom_line(aes(y=A_lo, color="A_LO PROJECTION")) +
   geom_point(aes(y=A_lo, color="A_LO PROJECTION")) + 
   geom_line(aes(y=A_proj, color="A PROJECTION")) +

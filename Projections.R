@@ -297,8 +297,8 @@ for(i in 1:nrow(proj_Q_P)){
 
   capK <- beefINV_FORECAST$K[i]
   
-  EpsM <- sum(as.numeric(psM) * fedMeshCheb)
-  EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
+  # EpsM <- sum(as.numeric(psM) * fedMeshCheb)
+  # EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
   
   # params_Mu_S <- optParamFunction(sl = slNew, cl = clNew, ps = psM, pc = pcM, thetas = c(1,1))
   # 

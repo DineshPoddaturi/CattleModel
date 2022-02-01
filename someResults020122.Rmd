@@ -1,0 +1,249 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+<!-- \begin{table}[!ht] -->
+<!-- \centering -->
+<!-- \caption{Fed cattle price projections} -->
+<!-- \begin{tabular}{llll} -->
+<!-- \hline -->
+<!-- Year &   PsLo &   Ps &  PsUp\\\hline -->
+<!-- 2018 & 128.533 & 128.533 & 128.533\\ -->
+<!-- 2019 & 132.043 & 135.247 & 137.890\\ -->
+<!-- 2020 & 126.233 & 136.289 & 140.782\\ -->
+<!-- 2021 & 114.560 & 135.179 & 140.550\\ -->
+<!-- 2022 & 106.091 & 134.198 & 140.897\\ -->
+<!-- 2023 & 106.254 & 133.421 & 141.037\\ -->
+<!-- 2024 & 106.460 & 132.997 & 141.204\\ -->
+<!-- 2025 & 106.639 & 132.561 & 141.266\\ -->
+<!-- 2026 & 106.759 & 132.031 & 141.357\\ -->
+<!-- 2027 & 106.688 & 131.252 & 141.410\\ -->
+<!-- 2028 & 106.712 & 130.477 & 141.439\\ -->
+<!-- 2029 & 106.517 & 129.727 & 141.452\\ -->
+<!-- 2030 & 106.535 & 128.981 & 141.491\\ \hline -->
+<!-- \end{tabular} -->
+<!-- \end{table} -->
+
+
+
+<!-- \begin{table}[ht!] -->
+<!-- \centering -->
+<!-- \caption{Cull cow price projections} -->
+<!-- \begin{tabular}{l l  l l}\hline -->
+<!-- Year &   PcLo &   Pc &  PcUp\\\hline -->
+<!-- 2018 & 81.274 & 81.274  & 81.274\\ -->
+<!-- 2019 & 83.358 & 86.008  & 89.217\\ -->
+<!-- 2020 & 81.861 & 87.112  & 91.547\\ -->
+<!-- 2021 & 78.704 & 87.637  & 94.947\\ -->
+<!-- 2022 & 76.790 & 88.563 & 102.677\\ -->
+<!-- 2023 & 75.328 & 89.039 & 101.861\\ -->
+<!-- 2024 & 74.376 & 89.354 & 100.265\\ -->
+<!-- 2025 & 73.654 & 89.695  & 99.298\\ -->
+<!-- 2026 & 73.161 & 90.244  & 98.463\\ -->
+<!-- 2027 & 72.744 & 90.727  & 98.539\\ -->
+<!-- 2028 & 72.382 & 91.199  & 98.415\\ -->
+<!-- 2029 & 72.051 & 91.619  & 98.537\\ -->
+<!-- 2030 & 71.815 & 92.029  & 98.353\\ \hline -->
+<!-- \end{tabular} -->
+<!-- \end{table} -->
+
+<!-- \begin{table}[ht!] -->
+<!-- \centering -->
+<!-- \caption{Total meat production projections} -->
+<!-- \begin{tabular}{l l  l  l}\hline -->
+<!-- Year & ALo & A & AUp\\\hline -->
+<!-- 2018 & 24.94169 & 24.94169 & 24.94169\\ -->
+<!-- 2019 & 24.46984 & 25.51524 & 26.56008\\ -->
+<!-- 2020 & 23.59196 & 25.70596 & 27.81815\\ -->
+<!-- 2021 & 22.35733 & 25.61002 & 28.86131\\ -->
+<!-- 2022 & 21.30440 & 25.47880 & 29.78568\\ -->
+<!-- 2023 & 20.77570 & 25.46166 & 30.56429\\ -->
+<!-- 2024 & 20.21918 & 25.52887 & 31.21856\\ -->
+<!-- 2025 & 19.67338 & 25.59186 & 31.77907\\ -->
+<!-- 2026 & 19.48602 & 25.61228 & 32.28000\\ -->
+<!-- 2027 & 19.47628 & 25.60934 & 32.75217\\ -->
+<!-- 2028 & 19.48155 & 25.61280 & 33.20854\\ -->
+<!-- 2029 & 19.47586 & 25.63118 & 33.64684\\ -->
+<!-- 2030 & 19.47582 & 25.65539 & 34.06369\\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{table} -->
+
+
+
+<!-- \begin{table}[ht!] -->
+<!-- \centering -->
+<!-- \caption{Fed cattle meat production projections} -->
+<!-- \begin{tabular}{l l  l l}\hline -->
+<!-- Year  & SlLo  & Sl &  SlUp\\\hline -->
+<!-- 2018 & 22.91366 & 22.91366 & 22.91366\\ -->
+<!-- 2019 & 22.70166 & 23.32868 & 23.95333\\ -->
+<!-- 2020 & 22.24600 & 23.51802 & 24.78251\\ -->
+<!-- 2021 & 21.56111 & 23.52467 & 25.48242\\ -->
+<!-- 2022 & 20.89612 & 23.50705 & 26.10277\\ -->
+<!-- 2023 & 20.34807 & 23.55658 & 26.63774\\ -->
+<!-- 2024 & 19.77188 & 23.65666 & 27.10034\\ -->
+<!-- 2025 & 19.21822 & 23.75440 & 27.50866\\ -->
+<!-- 2026 & 19.01832 & 23.82696 & 27.88246\\ -->
+<!-- 2027 & 19.01143 & 23.88541 & 28.24099\\ -->
+<!-- 2028 & 19.01394 & 23.94755 & 28.59262\\ -->
+<!-- 2029 & 19.01402 & 24.01867 & 28.93240\\ -->
+<!-- 2030 & 19.01039 & 24.09338 &29.26029\\\hline -->
+<!-- \end{tabular} -->
+<!-- \end{table} -->
+
+
+<!-- \begin{table}[ht!] -->
+<!-- \centering -->
+<!-- \caption{Cull cow meat production projections} -->
+<!-- \begin{tabular}{l l  l l}\hline -->
+<!-- Year &  ClLo    & Cl    & ClUp\\\hline -->
+<!-- 2018 & 2.73332 & 2.73332 & 2.73332\\ -->
+<!-- 2019 & 2.46012 & 2.90807 & 3.35781\\ -->
+<!-- 2020 & 2.01308 & 2.91485 & 3.82227\\ -->
+<!-- 2021 & 1.42843 & 2.80954 & 4.19502\\ -->
+<!-- 2022 & 1.01072 & 2.69222 & 4.52518\\ -->
+<!-- 2023 & 1.01511 & 2.62507 & 4.79083\\ -->
+<!-- 2024 & 1.01906 & 2.59411 & 5.00101\\ -->
+<!-- 2025 & 1.01148 & 2.56114 & 5.16905\\ -->
+<!-- 2026 & 1.01872 & 2.50957 & 5.31034\\ -->
+<!-- 2027 & 1.01560 & 2.44810 & 5.43733\\ -->
+<!-- 2028 & 1.01851 & 2.38952 & 5.55498\\ -->
+<!-- 2029 & 1.01257 & 2.33730 & 5.66589\\ -->
+<!-- 2030 & 1.01616 & 2.28749 & 5.76665\\\hline -->
+<!-- \end{tabular} -->
+<!-- \label{Table:AgeDist} -->
+<!-- \end{table} -->
+
+\begin{figure}
+\caption{Fed cattle price projection (dollar/Lb)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/FedCattlePriceProjII.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Cull cows price projection (dollar/Lb)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowPriceProjII.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Total production projection(Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/TotalProductionProjII.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Fed cattle production projection (Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/FedCattleProductionProjII.jpeg}
+\end{figure}
+
+
+\begin{figure}
+\caption{Cull cows production projection (Billion Lbs)}
+  \includegraphics[width=1.2\linewidth]{ProjectionImages/CullCowProductionProjII.jpeg}
+\end{figure}
+
+
+<!-- ```{r} -->
+<!-- read_chunk('summariesPrices.R') -->
+<!-- ``` -->
+
+<!-- # Equilibrium prices and quantities -->
+
+
+<!-- ### Fed cattle prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r EQestObsPS} -->
+<!-- kable(EQestObsPS, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r EQestObsPS_plot} -->
+<!-- EQestObsPS_plot -->
+<!-- ``` -->
+
+
+
+
+<!-- #### Quantities -->
+<!-- ```{r EQestObsSL} -->
+<!-- kable(EQestObsSL, align = 'c') -->
+<!-- ``` -->
+
+
+
+<!-- ```{r EQestObsSL_plot} -->
+<!-- EQestObsSL_plot -->
+<!-- ``` -->
+
+
+
+<!-- ### Cull cow prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r EQestObsPC} -->
+<!-- kable(EQestObsPC, align = 'c') -->
+<!-- ``` -->
+
+
+<!-- ```{r EQestObsPC_plot} -->
+<!-- EQestObsPC_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r EQestObsCL} -->
+<!-- kable(EQestObsCL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r EQestObsCL_plot} -->
+<!-- EQestObsCL_plot -->
+<!-- ``` -->
+
+
+<!-- # Converged prices and quaantities -->
+
+
+<!-- ### Fed cattle prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r ITRestObsPS} -->
+<!-- kable(ITRestObsPS, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r ITRestObsPS_plot} -->
+<!-- ITRestObsPS_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsSL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsSL_plot -->
+<!-- ``` -->
+
+<!-- ### Cull cow prices and quantities -->
+
+<!-- #### Prices -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsPC, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsPC_plot -->
+<!-- ``` -->
+
+
+<!-- #### Quantities -->
+<!-- ```{r} -->
+<!-- kable(ITRestObsCL, align = 'c') -->
+<!-- ``` -->
+
+<!-- ```{r warning=FALSE} -->
+<!-- ITRestObsCL_plot -->
+<!-- ``` -->
+
+
+
