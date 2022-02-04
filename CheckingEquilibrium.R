@@ -91,7 +91,6 @@ for(i in 1:nrow(quantities_prices_capK)){
   
   for(k in 1:maxIter){
     
-    
     # k <- 2
     
     # if( norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
@@ -215,7 +214,7 @@ for(i in 1:nrow(quantities_prices_capK)){
         }
         
         hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
-        B <- ps_o - g * (beta^3) * ps_expected + hc_discounted
+        B <- ps_o - g * (beta^3) * ps_expected + hc_discounted ## Comes from the model
         
         ps_expected_lo <- ps_expected - 0.5
         
@@ -252,15 +251,6 @@ for(i in 1:nrow(quantities_prices_capK)){
         expected_PC[j,i] <- pc_expected1
         prices_hc[j,i] <- hc_new
         
-        #### Here I am trying something different. 
-        #### At every node we get prices correct? 
-        #### Now we use the estimated price from node 1 as inputs to node 2 and so on
-        # ps_old <- ps1
-        # pc_old <- pc1
-        # hc_old <- hc_new
-        # ps_expected <- ps_expected1
-        # pc_expected <- pc_expected1
-        
       }
       
       if( k == 2 ){
@@ -270,7 +260,6 @@ for(i in 1:nrow(quantities_prices_capK)){
         cullCowNode <- cull_cartesian$cullNodes[j]
         dShockNode <- cull_cartesian$dShockNodes[j]
         fedCattleNode <- fed_cartesian$fedNodes[j]
-        # A_node <- (cullCowNode + fedCattleNode) * dShockNode
         
         sl_node <- slNodes[j,i]
         cl_node <- clNodes[j,i]
@@ -406,7 +395,7 @@ for(i in 1:nrow(quantities_prices_capK)){
           k_3t1 <- estK$par[1]
           k_7_10t1 <- estK$par[2]
           
-          sl1 <- (g * Stock_1t - k_3t1)
+          sl1 <- (g * Stock_1t - k_3t1) 
           cl1 <- (k_9t + k_8t + k_7t - k_7_10t1)
           
           slNodes[j,i] <- sl1
@@ -431,7 +420,7 @@ for(i in 1:nrow(quantities_prices_capK)){
           equilibriumCheck[[j]][m,6] <- expected_PS[j,i]
           equilibriumCheck[[j]][m,7] <- expected_PC[j,i]
           
-          slNodes_eq[j,i] <- sl1
+          slNodes_eq[j,i] <- sl1 
           clNodes_eq[j,i] <- cl1
           A_nodes_eq[j,i] <- A_node
           
@@ -446,6 +435,12 @@ for(i in 1:nrow(quantities_prices_capK)){
           m <- m+1
           
         }
+        
+        # if(abs(fedDiff[j,i])<0.001 && abs(cullDiff[j,i])<0.001){
+          slNodes_eq[j,i] <- slNodes_eq[j,i] * adjFac
+          clNodes_eq[j,i] <- clNodes_eq[j,i] * adjFac
+          # A_nodes_eq[j,i] <- A_nodes_eq[j,i] * (1/dShockNode)
+        # }
         
       }
       

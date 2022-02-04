@@ -270,17 +270,25 @@ Chad told me to read Secure Beef Plan. This is a government plan about their ste
 When I asked him about the model vs disease, Chad and Lee both told me to highlight the disease outbreak. This is about the disease and simulating different scenarios and different scenario work. 
 
 
+02/04/2021:
 
+* Showed him the projections of the model. He said they are looking as they are supposed to look like. 
+* Also asked me to reach out to FAPRI people to get their stochastic outcomes. All of their projections are averages across 500 stochastic outcomes. So if we have those we can see how well our model is projecting. 
+* Asked him about the ARIMA model for the total breeding stock. Also told him this linear model is consistent with Cattle Cycles paper. But our linear model has additional MA terms. He said, that's okay. 
 
+** Regarding FMD paper:
 
+* Chad suggested if I am simulating the depopulation rates (20% to 90%), I don't have to consider the mortality rates of the adult cows and young cattle (depopulation already includes the mortality rates). 
 
-
-
-
-
-
-
-
+* When it comes to the demand side, we must include the domestic and exports together. Since we don't have those demands seperately, we are including them together. 
+  ** For export demand decline use the current share of exports (look for numbers). Mostly we will get the animal numbers in head. So we convert them to meat in pounds. 
+  ** For domestic demand decline we rely on the literature. 
+  
+  ** So in our simulation, we add the export ban and domestic decline as the changes in the total demand for beef.
+  ** We also include the number of years it will take for the demand to bounce back. 
+  ** In an optimistic case we assume all the exports bounce back and the domestic demand also bounce back
+  ** In a pessimistic case, exports do not bounce back.
+  ** Under these scenarios, we simulate the model to see the changes.
 
 
 

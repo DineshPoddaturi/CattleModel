@@ -136,22 +136,34 @@ allStockShocks <- Reduce(function(...) merge(...), dataList)
 #### Note: this includes the gaussian shocks we generated which has mean 1 and standard deviation according to the historical data
 
 fedProduction <- function(stockShocks){
-  newSL <- stockShocks %>%
+  
+  newSL_3 <- stockShocks %>%
     transmute(Year = Year+3, slt = (delta - 0.19) * K * slShock + 
                 (1-0.19) * g * delta * (K - (delta - 0.19) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
               slLbs = slt * Slaughter_avg/1000000000) 
   
-  return(newSL)
+  newSL_1 <- stockShocks %>%
+    transmute(Year = Year+1, slt = (g - 0.22 * g) * lag(K,2) * lag(slShock,1) + 
+                (1 - 0.22 * g) * g * delta * (lag(K,2) - (g - 0.22 * g) * lag(K,3) - 
+                                                (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2))),
+              slLbs = slt * Slaughter_avg/1000000000) 
+  
+  return(c(newSL_3,newSL_1))
 }
 
 cullProduction <- function(stockShocks){
   
-  newCL <- stockShocks %>%
+  newCL_3 <- stockShocks %>%
     transmute(Year = Year + 3, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock +
                 (delta^2) * (delta * (k6 + k5 + k4) - (k5 + k6 + k7)),
               clLbs = clt * Cull_avg/1000000000)
   
-  return(newCL)
+  newCL_1 <- allStockShocks %>%
+    transmute(Year = Year + 1, clt = (k9 + (1-delta) * k8 + (1-delta) * k7) * clShock +
+                (delta * (k8 + k7 + k6) - (k7 + k8 + k9)),
+              clLbs = clt * Cull_avg/1000000000)
+  
+  return(c(newCL_3, newCL_1))
 }
 
 newSL <- allStockShocks %>% transmute(Year = Year + 3, slStock = 0, slLbs = 0)
@@ -252,6 +264,9 @@ slSupplyShockGaussian1$slShock <- slSupply_Shock
 set.seed(4)
 clSupply_Shock <- rnorm(n = nrow(prod_CornP), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 clSupplyShockgaussian1$clShock <- clSupply_Shock
+
+fedCattleProd <- fedCattleProd_1
+cullCowsProd <-  cullCowsProd_1
 
 # fedCattleProd <- supp_sl %>% transmute(Year = Year, fedCattle = Bill_meatLb_sl)
 # cullCowsProd <- supp_cl %>% transmute(Year = Year, cullCows = Bill_meatLb_cl)
@@ -557,8 +572,8 @@ variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_export
 quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% filter(Year>1994)
 
 ################################### IMPORTANT ##################################
-####### We have the constructed quantities and shocks from 1998 to 2020 ########
-####### So the prices we use are from 1995 to 2017. ############################
+####### We have the constructed quantities and shocks from 1998 to 2017 ########
+####### So the prices we use are from 1998 to 2017. ############################
 ################################################################################
 
 

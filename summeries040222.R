@@ -219,108 +219,108 @@ params <- merge(mutildes_agg, stildes_agg)
 
 # Here I get the means and median of the first 25 nodes of the equilibrium prices and quantities
 
-EQprices_ps_MeansN <- apply(prices_ps_eq[1:25,], 2, mean)
-EQestPSN <- EQprices_ps_MeansN %>% as.data.frame()
-names(EQestPSN) <- "psMean"
-EQestPSN <- EQestPSN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_ps_MeansNI <- apply(prices_ps_eq[1:25,], 2, mean)
+EQestPSNI <- EQprices_ps_MeansNI %>% as.data.frame()
+names(EQestPSNI) <- "psMean"
+EQestPSNI <- EQestPSNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQprices_ps_MediansN <- apply(prices_ps_eq[1:25,], 2, median)
-EQestPS_MediansN <- EQprices_ps_MediansN %>% as.data.frame()
-names(EQestPS_MediansN) <- "psMedian"
-EQprices_ps_MediansN <- EQestPS_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_ps_MediansNI <- apply(prices_ps_eq[1:25,], 2, median)
+EQestPS_MediansNI <- EQprices_ps_MediansNI %>% as.data.frame()
+names(EQestPS_MediansNI) <- "psMedian"
+EQprices_ps_MediansNI <- EQestPS_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestPSN <- merge(EQestPSN, EQprices_ps_MediansN)
+EQestPSNI <- merge(EQestPSNI, EQprices_ps_MediansNI)
 
 ## @knitr EQestObsPS
 
-EQestObsPSN <- left_join(EQestPSN,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
+EQestObsPSNI <- left_join(EQestPSNI,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
   mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
 
-EQestObsPSN
+EQestObsPSNI
 
 ## @knitr EQestObsPS_plot
 
-EQestObsPS_plotN <- EQestObsPSN %>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="PS RATIONAL (MEAN)")) +
+EQestObsPS_plotNI <- EQestObsPSNI %>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="PS RATIONAL (MEAN)")) +
   geom_point(aes(y = psMean, color = "PS RATIONAL (MEAN)")) + geom_line(aes(y=ps, color = "PS OBS")) + 
   geom_point(aes(y=ps, color = "PS OBS")) + geom_line(aes(y=psMedian, color="PS RATIONAL (MEDIAN)")) +
   geom_point(aes(y = psMedian, color = "PS RATIONAL (MEDIAN)")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsPS$Year[1],EQestObsPS$Year[nrow(EQestObsPS)]))) +
   expand_limits(y = 0.5)
 
-EQestObsPS_plotN
+EQestObsPS_plotNI
 
 ## @knitr EQestObsPC
-EQprices_pc_MeansN <- apply(prices_pc_eq[1:25,], 2, mean)
-EQestPCN <- EQprices_pc_MeansN %>% as.data.frame()
-names(EQestPCN) <- "pcMean"
-EQestPCN <- EQestPCN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_pc_MeansNI <- apply(prices_pc_eq[1:25,], 2, mean)
+EQestPCNI <- EQprices_pc_MeansNI %>% as.data.frame()
+names(EQestPCNI) <- "pcMean"
+EQestPCNI <- EQestPCNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQprices_pc_MediansN <- apply(prices_pc_eq[1:25,], 2, median)
-EQestPC_MediansN <- EQprices_pc_MediansN %>% as.data.frame()
-names(EQestPC_MediansN) <- "pcMedian"
-EQprices_pc_MediansN <- EQestPC_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_pc_MediansNI <- apply(prices_pc_eq[1:25,], 2, median)
+EQestPC_MediansNI <- EQprices_pc_MediansNI %>% as.data.frame()
+names(EQestPC_MediansNI) <- "pcMedian"
+EQprices_pc_MediansNI <- EQestPC_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestPCN <- merge(EQestPCN, EQprices_pc_MediansN)
+EQestPCNI <- merge(EQestPCNI, EQprices_pc_MediansNI)
 
-EQestObsPCN <- left_join(EQestPCN,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
+EQestObsPCNI <- left_join(EQestPCNI,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
   mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
 
-EQestObsPCN
+EQestObsPCNI
 
 ## @knitr EQestObsPC_plot
-EQestObsPC_plotN <- EQestObsPCN %>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, color="PC RATIONAL (MEAN)")) +
+EQestObsPC_plotNI <- EQestObsPCNI %>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, color="PC RATIONAL (MEAN)")) +
   geom_point(aes(y = pcMean, color = "PC RATIONAL (MEAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + geom_line(aes(y=pcMedian, color="PC RATIONAL (MEDIAN)")) +
   geom_point(aes(y = pcMedian, color = "PC RATIONAL (MEDIAN)")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsPC$Year[1],EQestObsPC$Year[nrow(EQestObsPC)]))) +
   expand_limits(y = 0.5)
 
-EQestObsPC_plotN
+EQestObsPC_plotNI
 
 ## @knitr EQestObsSL
-EQquantities_sl_MeansN <- apply(slNodes_eq[1:25,], 2, mean)
-EQestSLN <- EQquantities_sl_MeansN %>% as.data.frame()
-names(EQestSLN) <- "slMean"
-EQestSLN <- EQestSLN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQquantities_sl_MeansNI <- apply(slNodes_eq[1:25,], 2, mean)
+EQestSLNI <- EQquantities_sl_MeansNI %>% as.data.frame()
+names(EQestSLNI) <- "slMean"
+EQestSLNI <- EQestSLNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQquantities_sl_MediansN <- apply(slNodes_eq[1:25,], 2, median)
-EQestSL_MediansN <- EQquantities_sl_MediansN %>% as.data.frame()
-names(EQestSL_MediansN) <- "slMedian"
-EQestSL_MediansN <- EQestSL_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQquantities_sl_MediansNI <- apply(slNodes_eq[1:25,], 2, median)
+EQestSL_MediansNI <- EQquantities_sl_MediansNI %>% as.data.frame()
+names(EQestSL_MediansNI) <- "slMedian"
+EQestSL_MediansNI <- EQestSL_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestSLN <- merge(EQestSLN, EQestSL_MediansN)
+EQestSLNI <- merge(EQestSLNI, EQestSL_MediansNI)
 
-# EQestObsSL <- left_join(EQestSL,quantities_prices_capK) %>% select(Year, slMean, slMedian, slSM) %>% 
+# EQestObsSLNI <- left_join(EQestSLNI,quantities_prices_capK) %>% select(Year, slMean, slMedian, slSM) %>%
 #   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
-# EQestObsSL
+# EQestObsSLNI
 
 supp_sl_OBS <- supp_sl_adj %>% select(Year, slSM = Bill_meatLb_sl)
 
-EQestObsSLN <- left_join(EQestSLN,supp_sl_OBS) %>% select(Year, slMean, slMedian, slSM) %>% 
+EQestObsSLNI <- left_join(EQestSLNI,supp_sl_OBS) %>% select(Year, slMean, slMedian, slSM) %>% 
   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
-EQestObsSLN
+EQestObsSLNI
 
 
 ## @knitr EQestObsSL_plot
-EQestObsSL_plotN <- EQestObsSLN %>% ggplot(aes(x=Year))+geom_line(aes(y=slMean, color="FED PRODUCTION RATIONAL (MEAN)")) +
+EQestObsSL_plotNI <- EQestObsSLNI %>% ggplot(aes(x=Year))+geom_line(aes(y=slMean, color="FED PRODUCTION RATIONAL (MEAN)")) +
   geom_point(aes(y = slMean, color = "FED PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=slSM, color = "FED PRODUCTION OBS")) + 
   geom_point(aes(y=slSM, color = "FED PRODUCTION OBS")) + geom_line(aes(y=slMedian, color="FED PRODUCTION RATIONAL (MEDIAN)")) +
   geom_point(aes(y = slMedian, color = "FED PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsSL$Year[1],EQestObsSL$Year[nrow(EQestObsSL)]))) 
-EQestObsSL_plotN
+EQestObsSL_plotNI
 
 ## @knitr EQestObsCL
-EQquantities_cl_MeansN <- apply(clNodes_eq[1:25,], 2, mean)
-EQestCLN <- EQquantities_cl_MeansN %>% as.data.frame()
-names(EQestCLN) <- "clMean"
-EQestCLN <- EQestCLN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQquantities_cl_MeansNI <- apply(clNodes_eq[1:25,], 2, mean)
+EQestCLNI <- EQquantities_cl_MeansNI %>% as.data.frame()
+names(EQestCLNI) <- "clMean"
+EQestCLNI <- EQestCLNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQquantities_cl_MediansN <- apply(clNodes_eq[1:25,], 2, median)
-EQestCL_MediansN <- EQquantities_cl_MediansN %>% as.data.frame()
-names(EQestCL_MediansN) <- "clMedian"
-EQestCL_MediansN <- EQestCL_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQquantities_cl_MediansNI <- apply(clNodes_eq[1:25,], 2, median)
+EQestCL_MediansNI <- EQquantities_cl_MediansNI %>% as.data.frame()
+names(EQestCL_MediansNI) <- "clMedian"
+EQestCL_MediansNI <- EQestCL_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestCLN <- merge(EQestCLN, EQestCL_MediansN)
+EQestCLNI <- merge(EQestCLNI, EQestCL_MediansNI)
 
 # EQestObsCL <- left_join(EQestCL,quantities_prices_capK) %>% select(Year, clMean, clMedian, clSM) %>% 
 #   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
@@ -328,204 +328,216 @@ EQestCLN <- merge(EQestCLN, EQestCL_MediansN)
 
 supp_cl_OBS <- supp_cl_adj %>% select(Year, clSM = Bill_meatLb_cl)
 
-EQestObsCLN <- left_join(EQestCLN,supp_cl_OBS) %>% select(Year, clMean, clMedian, clSM) %>% 
+EQestObsCLNI <- left_join(EQestCLNI,supp_cl_OBS) %>% select(Year, clMean, clMedian, clSM) %>% 
   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
 
 
-EQestObsCLN
+EQestObsCLNI
 
 ## @knitr EQestObsCL_plot
-EQestObsCL_plotN <- EQestObsCLN %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, color="CULL PRODUCTION RATIONAL (MEAN)")) +
+EQestObsCL_plotNI <- EQestObsCLNI %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, color="CULL PRODUCTION RATIONAL (MEAN)")) +
   geom_point(aes(y = clMean, color = "CULL PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=clSM, color = "CULL PRODUCTION OBS")) + 
   geom_point(aes(y=clSM, color = "CULL PRODUCTION OBS")) + geom_line(aes(y=clMedian, color="CULL PRODUCTION RATIONAL (MEDIAN)")) +
   geom_point(aes(y = clMedian, color = "CULL PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsCL$Year[1],EQestObsCL$Year[nrow(EQestObsCL)])))
 
-EQestObsCL_plotN
+EQestObsCL_plotNI
 
 
 #### Plotting the observed and total derived demand
 
-EQestTSN <- merge(EQestCLN, EQestSLN) %>% transmute(Year = Year, TSmean = slMean + clMean, 
-                                                 TSmedian = slMedian + clMedian)
+EQestTSNI <- merge(EQestCLNI, EQestSLNI) %>% transmute(Year = Year, TSmean = slMean + clMean, 
+                                                    TSmedian = slMedian + clMedian)
+
+EQquantities_A_MeansNI <- apply(A_nodes_eq[1:25,], 2, mean)
+EQestANI <- EQquantities_A_MeansNI %>% as.data.frame()
+names(EQestANI) <- "AMean"
+EQestANI <- EQestANI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQquantities_A_MediansNI <- apply(A_nodes_eq[1:25,], 2, median)
+EQestA_MediansNI <- EQquantities_A_MediansNI %>% as.data.frame()
+names(EQestA_MediansNI) <- "AMedian"
+EQestA_MediansNI <- EQestA_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+
+EQestANI <- merge(EQestANI, EQestA_MediansNI) %>% mutate(TSmean = AMean, TSmedian = AMedian)
 
 # EQestObsA <- left_join(EQestA,A_quant) %>% select(Year, Amean, Amedian, A) %>% 
 #   mutate(errMean = (A - Amean), errmedian = (A- Amedian)) %>% round(4)
 
-# totalSupply <- totalSupply_adj %>% transmute(Year = Year, TS = TotalSupply)
+totalSupply <- totalSupply_adj %>% transmute(Year = Year, TS = TotalSupply)
 
 totalSupply <- totalDisappearedNew %>% transmute(Year = Year, TS = total_meat_bill)
 
-EQestObsTSN <- left_join(EQestTSN,totalSupply) %>% select(Year, TSmean, TSmedian, TS) %>% 
+EQestObsTSNI <- left_join(EQestANI,totalSupply) %>% select(Year, TSmean, TSmedian, TS) %>% 
   mutate(errMean = (TS - TSmean), errmedian = (TS- TSmedian)) %>% round(4)
 
-EQestObsTS_plotN <- EQestObsTSN %>% ggplot(aes(x=Year))+ geom_line(aes(y=TS, color = "TOTAL PRODUCTION OBS")) + 
+EQestObsTS_plotNI <- EQestObsTSNI %>% ggplot(aes(x=Year))+ geom_line(aes(y=TS, color = "TOTAL PRODUCTION OBS")) + 
   geom_point(aes(y= TS, color = "TOTAL PRODUCTION OBS")) + geom_line(aes(y=TSmedian, color="TOTAL PRODUCTION RATIONAL (MEDIAN)")) +
   geom_point(aes(y = TSmedian, color = "TOTAL PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(EQestObsA$Year[1],EQestObsA$Year[nrow(EQestObsA)])))
 
-EQestObsTS_plotN
+EQestObsTS_plotNI
 
 
 
-EQcosts_hc_MeansN <- apply(prices_hc_eq[1:25,], 2, mean)
-EQestHCN <- EQcosts_hc_MeansN %>% as.data.frame()
-names(EQestHCN) <- "hcMean"
-EQestHCN <- EQestHCN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQcosts_hc_MeansNI <- apply(prices_hc_eq[1:25,], 2, mean)
+EQestHCNI <- EQcosts_hc_MeansNI %>% as.data.frame()
+names(EQestHCNI) <- "hcMean"
+EQestHCNI <- EQestHCNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQcosts_hc_MediansN <- apply(prices_hc_eq[1:25,], 2, median)
-EQestHC_MediansN <- EQcosts_hc_MediansN %>% as.data.frame()
-names(EQestHC_MediansN) <- "hcMedian"
-EQestHC_MediansN <- EQestHC_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQcosts_hc_MediansNI <- apply(prices_hc_eq[1:25,], 2, median)
+EQestHC_MediansNI <- EQcosts_hc_MediansNI %>% as.data.frame()
+names(EQestHC_MediansNI) <- "hcMedian"
+EQestHC_MediansNI <- EQestHC_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestHCN <- merge(EQestHCN, EQestHC_MediansN)
+EQestHCN <- merge(EQestHCNI, EQestHC_MediansNI)
 
 
 
 ###### Expected prices Equilibrium
-EQprices_Eps_MeansN <- apply(expected_PS_eq[1:25,], 2, mean)
-EQestEPSN <- EQprices_Eps_MeansN %>% as.data.frame()
-names(EQestEPSN) <- "EpsMean"
-EQestEPSN <- EQestEPSN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_Eps_MeansNI <- apply(expected_PS_eq[1:25,], 2, mean)
+EQestEPSNI <- EQprices_Eps_MeansNI %>% as.data.frame()
+names(EQestEPSNI) <- "EpsMean"
+EQestEPSNI <- EQestEPSNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQprices_Eps_MediansN <- apply(expected_PS_eq[1:25,], 2, median)
-EQestEPS_MediansN <- EQprices_Eps_MediansN %>% as.data.frame()
-names(EQestEPS_MediansN) <- "EpsMedian"
-EQprices_Eps_MediansN <- EQestEPS_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_Eps_MediansNI <- apply(expected_PS_eq[1:25,], 2, median)
+EQestEPS_MediansNI <- EQprices_Eps_MediansNI %>% as.data.frame()
+names(EQestEPS_MediansNI) <- "EpsMedian"
+EQprices_Eps_MediansNI <- EQestEPS_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestEPSN <- merge(EQestEPSN, EQprices_Eps_MediansN)
+EQestEPSNI <- merge(EQestEPSNI, EQprices_Eps_MediansNI)
 
 
-EQprices_Epc_MeansN <- apply(expected_PC_eq[1:25,], 2, mean)
-EQestEPCN <- EQprices_Epc_MeansN %>% as.data.frame()
-names(EQestEPCN) <- "EpcMean"
-EQestEPCN <- EQestEPCN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_Epc_MeansNI <- apply(expected_PC_eq[1:25,], 2, mean)
+EQestEPCNI <- EQprices_Epc_MeansNI %>% as.data.frame()
+names(EQestEPCNI) <- "EpcMean"
+EQestEPCNI <- EQestEPCNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQprices_Epc_MediansN <- apply(expected_PC_eq[1:25,], 2, median)
-EQestEPC_MediansN <- EQprices_Epc_MediansN %>% as.data.frame()
-names(EQestEPC_MediansN) <- "EpcMedian"
-EQprices_Epc_MediansN <- EQestEPC_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+EQprices_Epc_MediansNI <- apply(expected_PC_eq[1:25,], 2, median)
+EQestEPC_MediansNI <- EQprices_Epc_MediansNI %>% as.data.frame()
+names(EQestEPC_MediansNI) <- "EpcMedian"
+EQprices_Epc_MediansNI <- EQestEPC_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQestEPCN <- merge(EQestEPCN, EQprices_Epc_MediansN)
+EQestEPCN <- merge(EQestEPCNI, EQprices_Epc_MediansNI)
 
 
 
 ## @knitr ITRestObsPS
 
-ITRprices_ps_MeansN <- apply(prices_ps_itr[1:25,], 2, mean)
-ITRestPSN <- ITRprices_ps_MeansN %>% as.data.frame()
-names(ITRestPSN) <- "psMean"
-ITRestPSN <- ITRestPSN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRprices_ps_MeansNI <- apply(prices_ps_itr[1:25,], 2, mean)
+ITRestPSNI <- ITRprices_ps_MeansNI %>% as.data.frame()
+names(ITRestPSNI) <- "psMean"
+ITRestPSNI <- ITRestPSNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRprices_ps_MediansN <- apply(prices_ps_itr[1:25,], 2, median)
-ITRestPS_MediansN <- ITRprices_ps_MediansN %>% as.data.frame()
-names(ITRestPS_MediansN) <- "psMedian"
-ITRprices_ps_MediansN <- ITRestPS_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRprices_ps_MediansNI <- apply(prices_ps_itr[1:25,], 2, median)
+ITRestPS_MediansNI <- ITRprices_ps_MediansNI %>% as.data.frame()
+names(ITRestPS_MediansNI) <- "psMedian"
+ITRprices_ps_MediansNI <- ITRestPS_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRestPSN <- merge(ITRestPSN, ITRprices_ps_MediansN)
+ITRestPSNI <- merge(ITRestPSNI, ITRprices_ps_MediansNI)
 
-ITRestObsPSN <- left_join(ITRestPSN,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
+ITRestObsPSNI <- left_join(ITRestPSNI,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
   mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
 
-ITRestObsPSN
+ITRestObsPSNI
 
 
 ## @knitr ITRestObsPS_plot
-ITRestObsPS_plotN <- ITRestObsPSN %>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="PS RATIONAL (MEAN)")) +
+ITRestObsPS_plotNI <- ITRestObsPSNI %>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="PS RATIONAL (MEAN)")) +
   geom_point(aes(y = psMean, color = "PS RATIONAL (MEAN)")) + geom_line(aes(y=ps, color = "PS OBS")) + 
   geom_point(aes(y=ps, color = "PS OBS")) + geom_line(aes(y=psMedian, color="PS RATIONAL (MEDIAN)")) +
   geom_point(aes(y = psMedian, color = "PS RATIONAL (MEDIAN)")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPS$Year[1],ITRestObsPS$Year[nrow(ITRestObsPS)]))) +
   expand_limits(y = 0.5)
 
-ITRestObsPS_plotN
+ITRestObsPS_plotNI
 
 
 ## @knitr ITRestObsPC
 
-ITRprices_pc_MeansN <- apply(prices_pc_itr[1:25,], 2, mean)
-ITRestPCN <- ITRprices_pc_MeansN %>% as.data.frame()
-names(ITRestPCN) <- "pcMean"
-ITRestPCN <- ITRestPCN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRprices_pc_MeansNI <- apply(prices_pc_itr[1:25,], 2, mean)
+ITRestPCNI <- ITRprices_pc_MeansNI %>% as.data.frame()
+names(ITRestPCNI) <- "pcMean"
+ITRestPCNI <- ITRestPCNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRprices_pc_MediansN <- apply(prices_pc_itr[1:25,], 2, median)
-ITRestPC_MediansN <- ITRprices_pc_MediansN %>% as.data.frame()
-names(ITRestPC_MediansN) <- "pcMedian"
-ITRprices_pc_MediansN <- ITRestPC_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRprices_pc_MediansNI <- apply(prices_pc_itr[1:25,], 2, median)
+ITRestPC_MediansNI <- ITRprices_pc_MediansNI %>% as.data.frame()
+names(ITRestPC_MediansNI) <- "pcMedian"
+ITRprices_pc_MediansNI <- ITRestPC_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRestPCN <- merge(ITRestPCN, ITRprices_pc_Medians)
+ITRestPCNI <- merge(ITRestPCNI, ITRprices_pc_Medians)
 
-ITRestObsPCN <- left_join(ITRestPCN,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
+ITRestObsPCNI <- left_join(ITRestPCNI,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
   mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
 
-ITRestObsPCN
+ITRestObsPCNI
 
 
 ## @knitr ITRestObsPC_plot
-ITRestObsPC_plotN <- ITRestObsPCN %>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, color="PC RATIONAL (MEAN)")) +
+ITRestObsPC_plotNI <- ITRestObsPCNI %>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, color="PC RATIONAL (MEAN)")) +
   geom_point(aes(y = pcMean, color = "PC RATIONAL (MEAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + geom_line(aes(y=pcMedian, color="PC RATIONAL (MEDIAN)")) +
   geom_point(aes(y = pcMedian, color = "PC RATIONAL (MEDIAN)")) + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsPC$Year[1],ITRestObsPC$Year[nrow(ITRestObsPC)]))) +
   expand_limits(y = 0.5)
-ITRestObsPC_plotN
+ITRestObsPC_plotNI
 
 
 ## @knitr ITRestObsSL
-ITRquantities_sl_MeansN <- apply(slNodes_itr[1:25,], 2, mean)
-ITRestSLN <- ITRquantities_sl_MeansN %>% as.data.frame()
-names(ITRestSLN) <- "slMean"
-ITRestSLN <- ITRestSLN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRquantities_sl_MeansNI <- apply(slNodes_itr[1:25,], 2, mean)
+ITRestSLNI <- ITRquantities_sl_MeansNI %>% as.data.frame()
+names(ITRestSLNI) <- "slMean"
+ITRestSLNI <- ITRestSLNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRquantities_sl_MediansN <- apply(slNodes_itr[1:25,], 2, median)
-ITRestSL_MediansN <- ITRquantities_sl_MediansN %>% as.data.frame()
-names(ITRestSL_MediansN) <- "slMedian"
-ITRestSL_MediansN <- ITRestSL_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRquantities_sl_MediansNI <- apply(slNodes_itr[1:25,], 2, median)
+ITRestSL_MediansNI <- ITRquantities_sl_MediansNI %>% as.data.frame()
+names(ITRestSL_MediansNI) <- "slMedian"
+ITRestSL_MediansNI <- ITRestSL_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRestSLN <- merge(ITRestSLN, ITRestSL_MediansN)
+ITRestSLNI <- merge(ITRestSLNI, ITRestSL_MediansN)
 
 supp_sl_OBS <- supp_sl_adj %>% select(Year, slSM = Bill_meatLb_sl)
 
-ITRestObsSLN <- left_join(ITRestSLN,supp_sl_OBS) %>% select(Year, slMean, slMedian, slSM) %>% 
+ITRestObsSLNI <- left_join(ITRestSLNI,supp_sl_OBS) %>% select(Year, slMean, slMedian, slSM) %>% 
   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
 
-ITRestObsSLN
+ITRestObsSLNI
 
 ## @knitr ITRestObsSL_plot
-ITRestObsSL_plotN <- ITRestObsSLN %>% ggplot(aes(x=Year))+geom_line(aes(y=slMean, color="FED PRODUCTION RATIONAL (MEAN)")) +
+ITRestObsSL_plotNI <- ITRestObsSLNI %>% ggplot(aes(x=Year))+geom_line(aes(y=slMean, color="FED PRODUCTION RATIONAL (MEAN)")) +
   geom_point(aes(y = slMean, color = "FED PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=slSM, color = "FED PRODUCTION OBS")) + 
   geom_point(aes(y=slSM, color = "FED PRODUCTION OBS")) + geom_line(aes(y=slMedian, color="FED PRODUCTION RATIONAL (MEDIAN)")) +
   geom_point(aes(y = slMedian, color = "FED PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsSL$Year[1],ITRestObsSL$Year[nrow(ITRestObsSL)]))) 
-ITRestObsSL_plotN
+ITRestObsSL_plotNI
 
 ## @knitr ITRestObsCL
-ITRquantities_cl_MeansN <- apply(clNodes_itr[1:25,], 2, mean)
-ITRestCLN <- ITRquantities_cl_MeansN %>% as.data.frame()
-names(ITRestCLN) <- "clMean"
-ITRestCLN <- ITRestCLN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRquantities_cl_MeansNI <- apply(clNodes_itr[1:25,], 2, mean)
+ITRestCLNI <- ITRquantities_cl_MeansNI %>% as.data.frame()
+names(ITRestCLNI) <- "clMean"
+ITRestCLNI <- ITRestCLNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRquantities_cl_MediansN <- apply(clNodes_itr[1:25,], 2, median)
-ITRestCL_MediansN <- ITRquantities_cl_MediansN %>% as.data.frame()
-names(ITRestCL_MediansN) <- "clMedian"
-ITRestCL_MediansN <- ITRestCL_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+ITRquantities_cl_MediansNI <- apply(clNodes_itr[1:25,], 2, median)
+ITRestCL_MediansNI <- ITRquantities_cl_MediansNI %>% as.data.frame()
+names(ITRestCL_MediansNI) <- "clMedian"
+ITRestCL_MediansNI <- ITRestCL_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-ITRestCLN <- merge(ITRestCLN, ITRestCL_MediansN)
+ITRestCLNI <- merge(ITRestCLNI, ITRestCL_MediansNI)
 
 supp_cl_OBS <- supp_cl_adj %>% select(Year, clSM = Bill_meatLb_cl)
 
-ITRestObsCLN <- left_join(ITRestCLN,supp_cl_OBS) %>% select(Year, clMean, clMedian, clSM) %>% 
+ITRestObsCLNI <- left_join(ITRestCLNI,supp_cl_OBS) %>% select(Year, clMean, clMedian, clSM) %>% 
   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
 
-ITRestObsCLN
+ITRestObsCLNI
 
 ## @knitr ITRestObsCL_plot
-ITRestObsCL_plotN <- ITRestObsCLN %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, color="CULL PRODUCTION RATIONAL (MEAN)")) +
+ITRestObsCL_plotNI <- ITRestObsCLNI %>% ggplot(aes(x=Year))+geom_line(aes(y=clMean, color="CULL PRODUCTION RATIONAL (MEAN)")) +
   geom_point(aes(y = clMean, color = "CULL PRODUCTION RATIONAL (MEAN)")) + geom_line(aes(y=clSM, color = "CULL PRODUCTION OBS")) + 
   geom_point(aes(y=clSM, color = "CULL PRODUCTION OBS")) + geom_line(aes(y=clMedian, color="CULL PRODUCTION RATIONAL (MEDIAN)")) +
   geom_point(aes(y = clMedian, color = "CULL PRODUCTION RATIONAL (MEDIAN)"))  + theme_classic() + 
   scale_x_continuous(name="Year", breaks=c(seq(ITRestObsCL$Year[1],ITRestObsCL$Year[nrow(ITRestObsCL)]))) 
-ITRestObsCL_plotN
+ITRestObsCL_plotNI
 
 
 ITRcosts_hc_Means <- apply(prices_hc_itr[1:25,], 2, mean)
@@ -571,30 +583,30 @@ ITRestEPC <- merge(ITRestEPC, ITRprices_Epc_Medians)
 
 
 
-mu_Tildes_MeansN <- apply(mu_Tildes_eq[1:25,], 2, mean)
-mu_Tildes_MeansN <- mu_Tildes_MeansN %>% as.data.frame()
-names(mu_Tildes_MeansN) <- "muMean"
-mu_Tildes_MeansN <- mu_Tildes_MeansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+mu_Tildes_MeansNI <- apply(mu_Tildes_eq[1:25,], 2, mean)
+mu_Tildes_MeansNI <- mu_Tildes_MeansNI %>% as.data.frame()
+names(mu_Tildes_MeansNI) <- "muMean"
+mu_Tildes_MeansNI <- mu_Tildes_MeansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-mu_Tildes_MediansN <- apply(mu_Tildes_eq[1:25,], 2, median)
-mu_Tildes_MediansN <- mu_Tildes_MediansN %>% as.data.frame()
-names(mu_Tildes_MediansN) <- "muMedian"
-mu_Tildes_MediansN <- mu_Tildes_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+mu_Tildes_MediansNI <- apply(mu_Tildes_eq[1:25,], 2, median)
+mu_Tildes_MediansNI <- mu_Tildes_MediansNI %>% as.data.frame()
+names(mu_Tildes_MediansNI) <- "muMedian"
+mu_Tildes_MediansNI <- mu_Tildes_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-mu_Tildes_MMN<- merge(mu_Tildes_MeansN, mu_Tildes_MediansN)
+mu_Tildes_MMNI <- merge(mu_Tildes_MeansNI, mu_Tildes_MediansNI)
 
 
-s_Tildes_MeansN <- apply(s_Tildes_eq[1:25,], 2, mean)
-s_Tildes_MeansN <- s_Tildes_MeansN %>% as.data.frame()
-names(s_Tildes_MeansN) <- "sMean"
-s_Tildes_MeansN <- s_Tildes_MeansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+s_Tildes_MeansNI <- apply(s_Tildes_eq[1:25,], 2, mean)
+s_Tildes_MeansNI <- s_Tildes_MeansNI %>% as.data.frame()
+names(s_Tildes_MeansNI) <- "sMean"
+s_Tildes_MeansNI <- s_Tildes_MeansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-s_Tildes_MediansN <- apply(s_Tildes_eq[1:25,], 2, median)
-s_Tildes_MediansN <- s_Tildes_MediansN %>% as.data.frame()
-names(s_Tildes_MediansN) <- "sMedian"
-s_Tildes_MediansN <- s_Tildes_MediansN %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+s_Tildes_MediansNI <- apply(s_Tildes_eq[1:25,], 2, median)
+s_Tildes_MediansNI <- s_Tildes_MediansNI %>% as.data.frame()
+names(s_Tildes_MediansNI) <- "sMedian"
+s_Tildes_MediansNI <- s_Tildes_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-s_Tildes_MMN <- merge(s_Tildes_MeansN, s_Tildes_MediansN)
+s_Tildes_MMNI <- merge(s_Tildes_MeansNI, s_Tildes_MediansNI)
 
 
 
