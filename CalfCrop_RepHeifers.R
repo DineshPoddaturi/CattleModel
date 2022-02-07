@@ -60,7 +60,7 @@ get_k0s_Global <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
   k0s_df <- data.frame(Year = numeric(nProj), k02 = numeric(nProj) , k03 = numeric(nProj), 
                        k04 = numeric(nProj), k05 = numeric(nProj), k06 = numeric(nProj), 
                        k07 = numeric(nProj), k08 = numeric(nProj))
-  
+  # calfCrop <- calf_crop_proj_N
   for (i in 1:nrow(proj_Q_P)){
     
     getYear <- beefINV_FORECAST$Year[i]

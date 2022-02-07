@@ -1,5 +1,16 @@
 
+##### Previous work
+# Study 1. Inventories and prices of year 2000 (Invasive Species Management: Foot-and-Mouth Disease in the U.S. Beef Industry)
 
+# Study 2. The losses are reported with 2006 baseline (Economic Impacts of Potential Foot and Mouth Disease Agroterrorism in
+# the USA: A General Equilibrium Analysis)
+
+# Study 3. The percent changes in the endogenous variables are then applied to a
+# baseline defined by the observed data for the first quarter of 2009 through the fourth quarter of
+# 2018 of no-disease. (Economic Assessment of FMDv Releases from
+# the National Bio and Agro Defense Facility)
+
+#### I think I will use 3 to compare the results. Need to figure out a way to compare the other work as well. 
 
 ##### FMD SIMULATIONS
 
@@ -22,7 +33,23 @@ dePop <- function(stock, dePopRate){
 
 ##### 20% depopulation
 Stock2009_20 <- dePop(stock = Stock2009, dePopRate = 20)
-Stock2009_20 <- rbind(Stock_2008L, Stock2009_20)
+Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
+
+calfCrop2009 <- Stock2009_20 %>% filter(Year == 2009) %>% select(Year, K) %>% transmute(Year = Year, calfCrop = K)
+calfCrop2009_depop <- calfCrop2009 %>% mutate(calfCrop = (1-(20/100)) * calfCrop )
+  
+### Knowing from the historical relationship k_{3,t+1} = gamma k_{3,t} + eta k_{0,t-3}, we have gamma = 0.966625, 
+### and eta = 0.004717145.
+
+
+
+
+
+
+
+
+
+
 
 ##### 30% depopulation
 Stock2009_30 <- dePop(stock = Stock2009, dePopRate = 30)

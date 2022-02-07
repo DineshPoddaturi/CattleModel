@@ -1,0 +1,82 @@
+
+02/07/2022:
+
+Dissertation Chapters meeting with Lee and Chad:
+
+I gave Lee and Chad an outline of what I am envisioning of this dessertation.
+So far they gave a thumbs up for me. Here is the outline for my dessertation chapters and work
+
+CHAPTER I:
+
+    * Introduction
+    * Literature Review 
+      This contains the expectation formation in agriculture industries specifically focusing on the 
+    cattle stocks, past policy studies.
+    * Need for a new model 
+        This I argue why there is a need for a new model and why our model can be used for policy 
+    analysis and can be used to advice policy makers)
+    
+CHAPTER II:
+
+  THE MODEL
+  
+      * Model Framework 
+          This include model premitives, arbitrage conditions, micro-foundations to derive the demand,
+      and distributional assumptions to get the consumers share for the meat.
+      
+      * Solution to the model
+          Analytical Solution - Naive expectations
+          Analytical Solution and Numerical Solution Algorithm - Rational Expectations (More emphasis on this)
+          
+      * Projections Framework
+          Projections framework set up and cyclical-algorithm for the projections
+          
+      * Data 
+          Data from multiple sources NASS, WASDE, PSD etc. Total Breeding Inventory, Replacement Heifer Inventory,
+          Calf Crop, Prices, Imports, Exports, Dressed Weights
+          Constructed Data we use in the model (these data are constructed from the model assumptions)
+          
+      * Numerical Solution
+            This includes the model estimated parameters, prices, and quantities
+            
+      * Projection Results
+            This includes plots and tables of long-term projections. I compare the model projections with 
+            USDA long-term projections and FAPRI projections
+            
+CHAPTER III:
+
+        Application of the model to Foot-and-Mouth-Disease (FMD).
+            This includes scenario work that mirrors the USDA mitigation strategies
+                Depopulation Levels: 20%, 50%, 90%
+                Decrease in domestic demand: Optimistic Case 1 year, Pessimistic Case 3 years
+                Export bans: Optimistic Case 2 years, Pessimistic Case 5 years
+      
+CHAPTER IV:
+
+      A conclusion tying everything together
+ 
+
+
+Suggestions they gave me:
+
+1. Get prelims done. Sooner the better. We are looking at a time frame late APRIL until early JUNE (After early June people will be traveling and won't be available). So make sure I do that soon. They will give comments and suggestions for the model. You can use those to change the model. Also if they agree on the model now, you can tell them later on that they agreed to the model and that's what you are delivering. 
+
+2. Reach out to writing center to get suggestions about writing, editing. Lee and Chad can only give comments not grammer and other stuff. (Personal note, THIS IS A PRIORITY).
+
+3. Get dissertation layout document from grad college and fill that out as you continue to work.
+
+4. Again share the document in peer review groups, writing centers 
+
+5. Nate Cook who works in CARD can help with editing. Since this work is going to be in CARD, he might be able to help.
+
+
+
+
+
+
+
+
+      
+      
+      
+      
