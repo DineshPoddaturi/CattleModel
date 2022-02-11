@@ -164,6 +164,8 @@ EQestObsTS_plotNI
 
 
 
+
+
 EQcosts_hc_MeansNI <- apply(prices_hc_eq[1:25,], 2, mean)
 EQestHCNI <- EQcosts_hc_MeansNI %>% as.data.frame()
 names(EQestHCNI) <- "hcMean"
@@ -361,11 +363,6 @@ names(ITRestEPC_Medians) <- "EpcMedian"
 ITRprices_Epc_Medians <- ITRestEPC_Medians %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 ITRestEPC <- merge(ITRestEPC, ITRprices_Epc_Medians)
-
-
-
-
-
 
 mu_Tildes_MeansNI <- apply(mu_Tildes_eq[1:25,], 2, mean)
 mu_Tildes_MeansNI <- mu_Tildes_MeansNI %>% as.data.frame()
