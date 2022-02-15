@@ -1,67 +1,3 @@
-
-##### Previous work
-# Study 1. Inventories and prices of year 2000 (Invasive Species Management: Foot-and-Mouth Disease in the U.S. Beef Industry)
-
-# Study 2. The losses are reported with 2006 baseline (Economic Impacts of Potential Foot and Mouth Disease Agroterrorism in
-# the USA: A General Equilibrium Analysis)
-
-# Study 3. The percent changes in the endogenous variables are then applied to a
-# baseline defined by the observed data for the first quarter of 2009 through the fourth quarter of
-# 2018 of no-disease. (Economic Assessment of FMDv Releases from
-# the National Bio and Agro Defense Facility)
-
-#### I think I will use 3 to compare the results. Need to figure out a way to compare the other work as well. 
-
-##### FMD SIMULATIONS
-
-##### Depopulation scenarios
-
-## 20% depopulation
-# In this scenario, I remove 20% of the breeding stock from the inventory
-# This would change the age distribution. So if I introduce the disease let's say 2009, then in that year I remove a%
-# of all the animals. 
-
-Stock_2009L <- Stock %>% filter(Year <= 2009)
-Stock_2010 <- Stock %>% filter(Year == 2010)
-
-#### Function returning the data with depopulated inventory
-dePop <- function(stock, dePopRate){
-  stock[,-1] <- stock[,-1] - stock[,-1] * (dePopRate/100)
-  return(stock)
-}
-
-
-##### 20% depopulation
-dePopR <- 20
-Stock2010_20 <- dePop(stock = Stock_2010, dePopRate = dePopR)
-Stock2010_20 <- rbind(Stock_2009L, Stock2010_20) %>% as.data.frame()
-
-##### Now I have calf-crop until 2009
-calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year <= 2009)
-calf_crop_2010 <- calf_crop %>% filter(Year == 2010) %>% transmute(Year = Year, k0 = (1-20/100) * calfCrop)
-calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2010)
-
-modelParamsEQ_PreFMD <- proj_AllDF_EQ %>% filter(Year == 2008)
-
-slaughterAvg_pre <- modelParamsEQ_PreFMD$Slaughter_avg
-cullAvg_pre <-  modelParamsEQ_PreFMD$Cull_avg
-
-MUtilde_pre <- modelParamsEQ_PreFMD$muMedian
-Stilde_pre <- modelParamsEQ_PreFMD$sMedian
-
-psM_pre <- modelParamsEQ_PreFMD$psMedian
-pcM_pre <- modelParamsEQ_PreFMD$pcMedian
-hcM_pre <- modelParamsEQ_PreFMD$hcMedian
-
-EpsM_pre <- modelParamsEQ_PreFMD$EpsMedian
-EpcM_pre <- modelParamsEQ_PreFMD$EpcMedian
-
-capA_pre <- modelParamsEQ_PreFMD$A
-capK_pre <- modelParamsEQ_PreFMD$K
-
-adjF_pre <- modelParamsEQ_PreFMD$AdjFactor
-
-
 get_k0s_Global_FMD <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
   
   k0s_df <- data.frame(Year = numeric(nrow(proj_Q_P)), k02 = numeric(nrow(proj_Q_P)) , k03 = numeric(nrow(proj_Q_P)), 
@@ -91,6 +27,245 @@ get_k0s_Global_FMD <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
   return(k0s_df)
 }
 
+getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, 
+                              eta_k3 , int_k3, adjF, Dshock, k0s, slAvg, clAvg){
+  
+  estQ <- BBoptim(par = k, fn = estQFunction_test_FMD, tilde_MU = params[1], 
+                  tilde_s = params[2], ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3, 
+                  eta_k3 = eta_k3, int = int_k3, k0s = k0s, slAvg = slAvg, clAvg = clAvg)
+  
+  k08 <- k0s$k08
+  k07 <- k0s$k07
+  k06 <- k0s$k06
+  k05 <- k0s$k05
+  k04 <- k0s$k04
+  k03 <- k0s$k03
+  k02 <- k0s$k02
+  
+  # k3_est <- estQ$par
+  
+  k3_est <- abs(estQ$par)
+  
+  slNew <- ((g * K1 - k3_est) * slAvg)/1000000000
+  
+  gamma <- gamma_k3
+  eta <- eta_k3
+  int <- int_k3
+  
+  # clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+  #   (k3_est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
+  #   (int/(1-gamma)) * ((delta^4)/(gamma^7)) * (delta^2 * (1-gamma^7) + gamma * (1-delta) * (delta * (1-gamma^6) + gamma * (1-gamma^5)) )
+  
+  clNew <- ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+    (k3_est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02)) -
+    ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07)
+  
+  clNew <- (clNew * clAvg)/1000000000
+  
+  k3_est <- (k3_est * slAvg)/1000000000
+  
+  ANew <- (slNew + clNew) * (1/adjF)
+  
+  k3_est_Head <- abs(estQ$par)
+  
+  # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
+  # ANew <- (((g * K1 - k3_est) * slAvg)/1000000000) * (1/slShare)
+  # 
+  # slNew <- ANew * slShare * adjF
+  # clNew <- ANew * (1-slShare) * adjF
+  
+  return(c(slNew, clNew, ANew, k3_est, k3_est_Head))
+  
+}  
+
+estQFunction_test_FMD <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_k3, 
+                                  eta_k3 , int_k3, k0s, slAvg, clAvg){
+  
+  k3t2 <- k
+  
+  k08 <- k0s$k08
+  k07 <- k0s$k07
+  k06 <- k0s$k06
+  k05 <- k0s$k05
+  k04 <- k0s$k04
+  k03 <- k0s$k03
+  k02 <- k0s$k02
+  
+  slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
+  clShare <- (1-slShare)
+  
+  gamma <- gamma_k3
+  eta <- eta_k3
+  int <- int_k3
+  
+  slHead <- (A * slShare) * (1000000000/slAvg)  
+  clHead <- (A * clShare) * (1000000000/clAvg)
+  
+  F1 <- g * K1 - k3t2 - slHead
+  
+  F2 <-  ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+    (k3t2 - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+    ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
+    clHead
+  
+  # F2 <-  ((delta^4)/(gamma^7)) * (delta^2 + (1-delta) * gamma * (delta + gamma)) *
+  #   (k3t2 - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02  ) ) -
+  #   ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07) -
+  #   (int/(1-gamma)) * ((delta^4)/(gamma^7)) * (delta^2 * (1-gamma^7) + gamma * (1-delta) * (delta * (1-gamma^6) + gamma * (1-gamma^5)) ) -
+  #   clHead
+  
+  F <- F1^2 + F2^2
+  
+}
+
+getPsPcEpsEpc_FMD <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, 
+                              ANew, params){
+  
+  psNew <- PsM
+  pcNew <- PcM
+  
+  psNew_lo <- psNew  - 0.27667
+  pcNew_lo <- pcNew - 0.29217
+  
+  # psNew_up <- psNew + 0.28000
+  # pcNew_up <- pcNew + 0.25933
+  
+  psNew_up <- psNew + 0.10929
+  pcNew_up <- pcNew + 0.080153
+  
+  #### Here we are making sure the lower bound for the prices isn't negative
+  if(psNew_lo < 0){
+    psNew_lo <- psNew
+  }
+  
+  if(pcNew_lo < 0){
+    pcNew_lo <- pcNew
+  }
+  
+  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+  while( pcNew_lo > psNew_lo ){
+    pcNew_lo <- pcNew_lo - 0.01
+  }
+  
+  psNew_expected <- EPsM
+  pcNew_expected <- EPcM
+  
+  hc_new <- HcM
+  
+  #### Here we make sure that the holding costs are below the cull cow price
+  while(hc_new > pcNew){
+    hc_new <- hc_new - 0.01
+  }
+  
+  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+  
+  psNew_expected_lo <- psNew_expected - 0.1
+  
+  psNew_expected_up <- psNew_expected + 0.1
+  
+  pcNew_expected_lo <- pcNew_expected - 0.1
+  
+  pcNew_expected_up <- pcNew_expected + 0.1
+  
+  if(pcNew_expected_lo < 0){
+    pcNew_expected_lo <- pcNew_expected
+  }
+  
+  if(ps_expected_lo < 0){
+    psNew_expected_lo <- psNew_expected
+  }
+  
+  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+  
+  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+  
+  estPNew <- BBoptim(par = p, fn = estPFunction, sl = SlNew, cl = ClNew, A = ANew,
+                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+                     tilde_MU = params[1], tilde_s = params[2])
+  
+  # estPNew <- BBoptim(par = p, fn = estPFunction, sl = SlNew, cl = ClNew, A = ANew, 
+  #                    B = B, hc_discounted = hc_discounted,
+  #                    tilde_MU = params[1], tilde_s = params[2])
+  
+  ps1N <- estPNew$par[1]
+  pc1N <- estPNew$par[2]
+  ps_expected1N <- estPNew$par[3]
+  pc_expected1N <- estPNew$par[4]
+  
+  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
+  
+  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
+  
+}
+##### Previous work
+# Study 1. Inventories and prices of year 2000 (Invasive Species Management: Foot-and-Mouth Disease in the U.S. Beef Industry)
+
+# Study 2. The losses are reported with 2006 baseline (Economic Impacts of Potential Foot and Mouth Disease Agroterrorism in
+# the USA: A General Equilibrium Analysis)
+
+# Study 3. The percent changes in the endogenous variables are then applied to a
+# baseline defined by the observed data for the first quarter of 2009 through the fourth quarter of
+# 2018 of no-disease. (Economic Assessment of FMDv Releases from
+# the National Bio and Agro Defense Facility)
+
+#### I think I will use 3 to compare the results. Need to figure out a way to compare the other work as well. 
+
+##### FMD SIMULATIONS
+
+##### Depopulation scenarios
+
+## 20% depopulation
+# In this scenario, I remove 20% of the breeding stock from the inventory
+# This would change the age distribution. So if I introduce the disease let's say 2009, then in that year I remove a%
+# of all the animals. 
+
+repHeifersMin <- merge(proj_AllDF_EQ, Stock) %>% 
+  mutate(repHeifersLB = (Slaughter_avg * k3)/1000000000) %>% select(repHeifersLB) %>% 
+  summarise(minim = min(repHeifersLB, na.rm = T)) %>% unlist() %>% unname()
+
+Stock_2008L <- Stock %>% filter(Year < 2009)
+Stock_2009 <- Stock %>% filter(Year == 2009)
+
+#### Function returning the data with depopulated inventory
+dePop <- function(stock, dePopRate){
+  stock[,-1] <- stock[,-1] - stock[,-1] * (dePopRate/100)
+  return(stock)
+}
+
+
+##### 20% depopulation
+dePopR <- 20
+Stock2009_20 <- dePop(stock = Stock_2009, dePopRate = dePopR)
+Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
+
+##### Now I have calf-crop until 2009
+calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
+calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-20/100) * calfCrop)
+calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
+
+modelParamsEQ_PreFMD <- proj_AllDF_EQ %>% filter(Year == 2009)
+
+slaughterAvg_pre <- modelParamsEQ_PreFMD$Slaughter_avg
+cullAvg_pre <-  modelParamsEQ_PreFMD$Cull_avg
+
+MUtilde_pre <- modelParamsEQ_PreFMD$muMedian
+Stilde_pre <- modelParamsEQ_PreFMD$sMedian
+
+psM_pre <- modelParamsEQ_PreFMD$psMedian
+pcM_pre <- modelParamsEQ_PreFMD$pcMedian
+hcM_pre <- modelParamsEQ_PreFMD$hcMedian
+
+EpsM_pre <- modelParamsEQ_PreFMD$EpsMedian
+EpcM_pre <- modelParamsEQ_PreFMD$EpcMedian
+
+capA_pre <- modelParamsEQ_PreFMD$A
+capK_pre <- modelParamsEQ_PreFMD$K
+
+adjF_pre <- modelParamsEQ_PreFMD$AdjFactor
 
 
 nn <- 5
@@ -99,7 +274,7 @@ beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 
                                         k7 = numeric(nn), k8 = numeric(nn), k9 = numeric(nn),
                                         k10 = numeric(nn))
 
-beefINV_FORECAST_PostFMD[1,] <- Stock2010_20 %>% filter(Year == 2010)
+beefINV_FORECAST_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), dePopRate = dePopR)
 
 
 proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeric(nn), 
@@ -118,7 +293,7 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 1
+  # i <- 5
   
   if(i>1){
     
@@ -132,8 +307,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     beefINV_FORECAST_PostFMD$k9[i] <- delta * beefINV_FORECAST_PostFMD$k8[i-1]
     beefINV_FORECAST_PostFMD$K[i] <- sum(beefINV_FORECAST_PostFMD[i,-1:-2])
     
-    calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i], 
-                                                       k0 = g * beefINV_FORECAST_PostFMD$K[i])
+    calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i-1], 
+                                                       k0 = g * beefINV_FORECAST_PostFMD$K[i-1])
     
     k0s_PostFMD[i, ] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[i,], 
                                             beefINV_FORECAST = beefINV_FORECAST_PostFMD[i,], 
@@ -157,9 +332,10 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   
   ### Here I assume a 5% decrease in domestic demand and the exports are banned (assume a 10%)
   capA_pre1 <- (1 - (5/100) + (10/100)) * capA_pre
+  K11 <- capK_pre * (1-0.2)
   
-  Qs <- getSlClA_test(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
-                      k = k, CapA = capA_pre1, gamma_k3 = gamma_k3, 
+  Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K11,
+                      k = k, CapA = capA_pre, gamma_k3 = gamma_k3, 
                       eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF_pre, k0s = k0s,
                       slAvg = slaughterAvg_pre, clAvg = cullAvg_pre)
   
@@ -167,33 +343,60 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   clNew <- Qs[2]
   ANew <- Qs[3]
   
+  ### I take the absolute value of the replacement heifers. This is to avoid negative values. It's written inside the 
+  ### function. 
+  ### Note: by making the negative values positive we can make sure that they are imports?
+  
   k_old <- Qs[4]
   
   k_old_Head <- Qs[5]
   
-  if(i<3){
-    ANew1 <- (1 - (5/100) + (10/100)) * ANew
+  while(clNew < 1.01){
+    clNew <- clNew + 0.01
   }
-  
-  if(i==3){
-    ANew1 <- (1 + (10/100)) * ANew
+  while(slNew < 19.01){
+    slNew <- slNew + 0.01
   }
+  # 
+  # ANew <- (slNew + clNew) * (1/adjF_pre)
   
-  if(i>3){
+  ##### I am assuming all the export meat is of high quality so the loss of exports means
+  ##### there is excess high quality meat in the country i.e., more supply. 
+  ##### Economic theory simply says high supply means the price is low. 
+  # slExports <- slNew * 0.1
+  # slNew <- slNew + slExports
+  
+  if(i < 3){
     
-    ANew1 <-  ANew
+    #### Exports are banned that means the production stays in the country. So I assign equal weights to 
+    #### both high quality and low quality meat. This might change but for now this is what I do. 
+    slExports <- slNew * 0.1
+    clExports <- clNew * 0.1
+    
+    ### Here we are changing the total demand for meat. Domestic decline for meat is incorporated
+    
+    ANew1 <- ( 1 - (5/100) ) * ANew + slExports + clExports
+    
   }
   
-  # ANew <- ANew1
+  if(i == 3){
+    
+    ### Here I am assuming after two years the domestic demand for meat climbs back up
+    slExports <- slNew * 0.1
+    clExports <- clNew * 0.1
+    
+    ANew1 <- ANew + slExports + clExports
+    
+  }
   
-  # while(clNew < 1.01){
-  #   clNew <- clNew + 0.01
-  # }
-  # while(slNew < 19.01){
-  #   slNew <- slNew + 0.01
-  # }
+  if(i > 3){
+    
+    ### After three years everything is back to normal
+    ANew1 <-  ANew
+    
+  }
   
-  Ps <- getPsPcEpsEpc(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
+  Ps <- getPsPcEpsEpc_FMD(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
                       HcM = hcM_pre, SlNew = slNew, ClNew = clNew, ANew = ANew1, 
                       params = c(Stilde_pre, Stilde_pre))
   psM_pre <- Ps[1]
