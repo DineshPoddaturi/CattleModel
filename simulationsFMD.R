@@ -182,6 +182,15 @@ getPsPcEpsEpc_FMD <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     psNew_expected_lo <- psNew_expected
   }
   
+  while(pcNew_expected<0){
+    pcNew_expected <- pcNew_expected + 0.01
+  }
+  
+  while(psNew_expected<0){
+    psNew_expected <- psNew_expected + 0.01
+  }
+  
+  
   p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
   
   lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
@@ -232,6 +241,12 @@ repHeifersMin <- merge(proj_AllDF_EQ, Stock) %>%
   mutate(repHeifersLB = (Slaughter_avg * k3)/1000000000) %>% select(repHeifersLB) %>% 
   summarise(minim = min(repHeifersLB, na.rm = T)) %>% unlist() %>% unname()
 
+#### For simplicity I take the 2008 exports as the exports in 2009 and so on
+exports_2008 <- cattle_tot %>% select(Year, Exports) %>% filter(Year == 2008) 
+rownames(exports_2008) <- seq(1,nrow(exports_2008))
+exports_2008$Year <- as.numeric(exports_2008$Year)
+exports_2008 <- exports_2008$Exports
+
 Stock_2008L <- Stock %>% filter(Year < 2009)
 Stock_2009 <- Stock %>% filter(Year == 2009)
 
@@ -243,13 +258,13 @@ dePop <- function(stock, dePopRate){
 
 
 ##### 20% depopulation
-dePopR <- 20
+dePopR <- 90
 Stock2009_20 <- dePop(stock = Stock_2009, dePopRate = dePopR)
 Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
 
 ##### Now I have calf-crop until 2009
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
-calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-20/100) * calfCrop)
+calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
 calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
 
 modelParamsEQ_PreFMD <- proj_AllDF_EQ %>% filter(Year == 2009)
@@ -272,8 +287,13 @@ capK_pre <- modelParamsEQ_PreFMD$K
 
 adjF_pre <- modelParamsEQ_PreFMD$AdjFactor
 
+exports_2009 <- exports_2008
+exports_2009_meat <- exports_2009 * (slaughterAvg_pre/1000000000)
+exports_percent <- (exports_2009_meat/capA_pre) * 100
 
-nn <- 14
+
+
+nn <- 10
 beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
                                         k4 = numeric(nn), k5 = numeric(nn), k6 = numeric(nn), 
                                         k7 = numeric(nn), k8 = numeric(nn), k9 = numeric(nn),
@@ -298,7 +318,7 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 2
+  # i <- 1
   
   if(i>1){
 
@@ -336,8 +356,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   
   ### Here I assume a 5% decrease in domestic demand and the exports are banned (assume a 10%)
   if(i==1){
-    capA_pre <- (1 - (5/100) + (10/100)) * capA_pre
-    K1 <- capK_pre * (1 - 0.2)
+    capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percent/100)
+    K1 <- capK_pre * (1 - (dePopR/100))
   }
   
   Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
@@ -376,17 +396,17 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     
     #### Exports are banned that means the production stays in the country. So I assign equal weights to 
     #### both high quality and low quality meat. This might change but for now this is what I do. 
-    slExports <- slNew * 0.1
-    clExports <- clNew * 0.1
+    slExports <- slNew * (exports_percent/100)
+    clExports <- clNew * (exports_percent/100)
     
     ### Here we are changing the total demand for meat. Domestic decline for meat is incorporated
     
-    ANew1 <- ( 1 - 0.05 ) * ANew + slExports + clExports
+    ANew1 <- ( 1 - (5/100) ) * ANew + slExports + clExports
     
   } else if(i == 3){
     ### Here I am assuming after two years the domestic demand for meat climbs back up
-    slExports <- slNew * 0.1
-    clExports <- clNew * 0.1
+    slExports <- slNew * (exports_percent/100)
+    clExports <- clNew * (exports_percent/100)
     
     ANew1 <- ANew + slExports + clExports
   } else{
@@ -476,14 +496,14 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 
           if(i<3){
 
-            slExp1 <- slNew_Eq * 0.1
-            clExp1 <- clNew_Eq * 0.1
-            ANew1 <- (1 - 0.05) * ANew_Eq + slExp1 + clExp1
+            slExp1 <- slNew_Eq * (exports_percent/100)
+            clExp1 <- clNew_Eq * (exports_percent/100)
+            ANew1 <- (1 - (5/100)) * ANew_Eq + slExp1 + clExp1
 
           } else if(i == 3){
 
-            slExp1 <- slNew_Eq * 0.1
-            clExp1 <- clNew_Eq * 0.1
+            slExp1 <- slNew_Eq * (exports_percent/100)
+            clExp1 <- clNew_Eq * (exports_percent/100)
 
             ANew1 <- ANew_Eq + slExp1 + clExp1
 
