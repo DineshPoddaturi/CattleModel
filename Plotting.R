@@ -120,6 +120,16 @@ EQestObsSL_Medians_proj_plot
 EQestObsCL_Medians_proj_plot
 
 
+
+
+
+projections_BKP <- cbind(EQestObsPS_Medians_proj, EQestObsPC_Medians_proj, EQestObsA_Medians_proj, EQestObsSL_Medians_proj,
+                         EQestObsCL_Medians_proj)
+
+projectionsPlots_BKP <- c(EQestObsPS_Medians_proj_plot, EQestObsPC_Medians_proj_plot, EQestObsA_Medians_proj_plot, 
+                          EQestObsSL_Medians_proj_plot, EQestObsCL_Medians_proj_plot)
+
+
 # PQs_MEDIANS_proj_EP <- PQs_MEDIANS_EP %>% select(Year, Ps_lo, Ps, Ps_up)
 # 
 # EQestObsPS_Medians_proj_EP <- merge(EQestObsPS_Medians,PQs_MEDIANS_proj_EP,by="Year",all=TRUE)

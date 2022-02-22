@@ -164,3 +164,79 @@
 # 9  2018 13686774 1307230 1114216  998906.7 1065603.8 1392511.3 3241708.5 4566597.1   0
 # 10 2019  9971875 1307707 1241869 1058505.2  948961.4 1012323.6 1322885.8 3079623.1   0
 
+
+######### The below results are by the following assumptions
+# 1. 5% Decline in domestic demand for two years
+# 2. In year 3 domestic demand goes back up
+# 3. Exports banned for three years
+# 4. In year 4 exports ban is lifted and everything is back to normal
+#### All under equillibrium simulation continues
+
+### 20% depopulation
+proj_Q_P_PostFMD_20_I <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_I <- beefINV_FORECAST_PostFMD
+
+### 50% depopulation
+proj_Q_P_PostFMD_50_I <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_I <- beefINV_FORECAST_PostFMD
+
+### 90% depopulation
+proj_Q_P_PostFMD_90_I <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_I <- beefINV_FORECAST_PostFMD
+
+
+
+######### The below results are by the following assumptions (Optimistic case)
+# 1. 5% Decline in domestic demand for 1 year
+# 2. In year 2 domestic demand goes back up
+# 3. Exports banned for 2 years
+# 4. In year 3 exports ban is lifted and everything is back to normal
+#### All under equillibrium simulation continues
+
+### 20% depopulation (I do this simulation for 7 years)
+proj_Q_P_PostFMD_20_II <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_II <- beefINV_FORECAST_PostFMD
+
+### 50% depopulation
+proj_Q_P_PostFMD_50_II <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_II <- beefINV_FORECAST_PostFMD
+
+### 90% depopulation
+proj_Q_P_PostFMD_90_II <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_II <- beefINV_FORECAST_PostFMD
+
+
+
+######### The below results are by the following assumptions (Pessimistic scenario)
+# 1. 5% Decline in domestic demand for 3 years
+# 2. In year 4 domestic demand goes back up
+# 3. Exports banned for 5 years
+# 4. In year 6 exports ban is lifted and everything is back to normal
+#### All under equillibrium simulation continues
+
+### 20% depopulation 
+proj_Q_P_PostFMD_20_III <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_III <- beefINV_FORECAST_PostFMD
+
+### 50% depopulation
+proj_Q_P_PostFMD_50_III <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_III <- beefINV_FORECAST_PostFMD
+
+### 90% depopulation
+proj_Q_P_PostFMD_90_III <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_III <- beefINV_FORECAST_PostFMD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

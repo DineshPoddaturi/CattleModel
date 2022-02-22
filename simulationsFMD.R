@@ -258,7 +258,7 @@ dePop <- function(stock, dePopRate){
 
 
 ##### 20% depopulation
-dePopR <- 90
+dePopR <- 20
 Stock2009_20 <- dePop(stock = Stock_2009, dePopRate = dePopR)
 Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
 
@@ -305,7 +305,8 @@ beefINV_FORECAST_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), de
 proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeric(nn), 
                                EPs = numeric(nn), EPc = numeric(nn), Hc = numeric(nn), 
                                Sl = numeric(nn), Cl = numeric(nn), A = numeric(nn),
-                               repHeif = numeric(nn), repHeif_Head = numeric(nn))
+                               repHeif = numeric(nn), repHeif_Head = numeric(nn),
+                               boundCond = numeric(nn))
 
 k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
                           k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
@@ -318,7 +319,6 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 1
   
   if(i>1){
 
@@ -392,7 +392,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   # slExports <- slNew * 0.1
   # slNew <- slNew + slExports
   
-  if(i < 3){
+  if(i < 4){
     
     #### Exports are banned that means the production stays in the country. So I assign equal weights to 
     #### both high quality and low quality meat. This might change but for now this is what I do. 
@@ -403,7 +403,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     
     ANew1 <- ( 1 - (5/100) ) * ANew + slExports + clExports
     
-  } else if(i == 3){
+  } else if( i >= 4 && i <= 5){
     ### Here I am assuming after two years the domestic demand for meat climbs back up
     slExports <- slNew * (exports_percent/100)
     clExports <- clNew * (exports_percent/100)
@@ -428,7 +428,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   #### I simply get the demand for fed cattle meat and cull cow meat.
   #### Substract that from the supply of the corresponding meat and then give direction 
   #### to prices
-  if(i < 4){
+  # if(i < 3){
+    
     D_sl <- ANew1 *
       ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
          (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
@@ -494,13 +495,13 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 
           ANew_Eq <- (slNew_Eq + clNew_Eq) * (1/adjF_pre)
 
-          if(i<3){
+          if(i < 4){
 
             slExp1 <- slNew_Eq * (exports_percent/100)
             clExp1 <- clNew_Eq * (exports_percent/100)
             ANew1 <- (1 - (5/100)) * ANew_Eq + slExp1 + clExp1
 
-          } else if(i == 3){
+          } else if(i >= 4 && i <= 5){
 
             slExp1 <- slNew_Eq * (exports_percent/100)
             clExp1 <- clNew_Eq * (exports_percent/100)
@@ -549,7 +550,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           m <- m+1
 
         }
-  }
+  # }
   
   proj_Q_P_PostFMD$Ps[i] <- psM_pre
   proj_Q_P_PostFMD$Pc[i] <- pcM_pre
@@ -562,6 +563,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   proj_Q_P_PostFMD$A[i] <- ANew1
   proj_Q_P_PostFMD$repHeif[i] <- abs(k_old)
   proj_Q_P_PostFMD$repHeif_Head[i] <- abs(k_old_Head)
+  
+  proj_Q_P_PostFMD$boundCond[i] <- k_old_Head <= 0.5 * g * K1
   
   proj_Q_P_PostFMD$Year[i] <- beefINV_FORECAST_PostFMD$Year[i]
   

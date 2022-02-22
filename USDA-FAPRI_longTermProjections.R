@@ -101,3 +101,9 @@ CARD_USDA_FAPRI_TS_Proj_plot_temp <- CARD_USDA_FAPRI_TS_Proj_temp %>% ggplot(aes
                                   CARD_USDA_FAPRI_TS_Proj_temp$Year[nrow(CARD_USDA_FAPRI_TS_Proj_temp)])))
 
 
+
+
+CARD_USDA_FAPRI_proj_BKP <- cbind(CARD_USDA_FAPRI_PS_Proj, CARD_USDA_FAPRI_TS_Proj, CARD_USDA_FAPRI_TS_Proj_temp)
+
+CARD_USDA_FAPRI_plots_BKP <- c(CARD_USDA_FAPRI_PS_Proj_Plot, CARD_USDA_FAPRI_TS_Proj_plot, CARD_USDA_FAPRI_TS_Proj_plot_temp)
+
