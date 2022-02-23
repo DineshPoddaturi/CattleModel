@@ -15,6 +15,9 @@ EQprices_ps_MediansNI <- EQestPS_MediansNI %>% mutate(Year = quantities_prices_c
 
 EQestPSNI <- merge(EQestPSNI, EQprices_ps_MediansNI)
 
+EQprices_ps_MediansNI_paper <- EQprices_ps_MediansNI %>% mutate(psMedianCWT = psMedian * 100) %>% 
+  filter(Year >=2006) %>% select(Year, psMedianCWT) %>% round(3)
+
 ## @knitr EQestObsPS
 
 EQestObsPSNI <- left_join(EQestPSNI,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
@@ -51,6 +54,9 @@ EQestObsPCNI <- left_join(EQestPCNI,quantities_prices_capK) %>% select(Year,pcMe
 
 EQestObsPCNI
 
+EQprices_pc_MediansNI_paper <- EQprices_pc_MediansNI %>% mutate(pcMedianCWT = pcMedian * 100) %>% 
+  filter(Year >=2006) %>% select(Year, pcMedianCWT) %>% round(3)
+
 ## @knitr EQestObsPC_plot
 EQestObsPC_plotNI <- EQestObsPCNI %>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, color="PC RATIONAL (MEAN)")) +
   geom_point(aes(y = pcMean, color = "PC RATIONAL (MEAN)")) + geom_line(aes(y=pc, color = "PC OBS")) + 
@@ -73,6 +79,8 @@ names(EQestSL_MediansNI) <- "slMedian"
 EQestSL_MediansNI <- EQestSL_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestSLNI <- merge(EQestSLNI, EQestSL_MediansNI)
+
+EQestSL_MediansNI_paper <- EQestSL_MediansNI %>% filter(Year >= 2006) %>% round(3)
 
 # EQestObsSLNI <- left_join(EQestSLNI,quantities_prices_capK) %>% select(Year, slMean, slMedian, slSM) %>%
 #   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
@@ -105,6 +113,8 @@ names(EQestCL_MediansNI) <- "clMedian"
 EQestCL_MediansNI <- EQestCL_MediansNI %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
 EQestCLNI <- merge(EQestCLNI, EQestCL_MediansNI)
+
+EQestCL_MediansNI_paper <- EQestCL_MediansNI %>% filter(Year >= 2006) %>% round(3)
 
 # EQestObsCL <- left_join(EQestCL,quantities_prices_capK) %>% select(Year, clMean, clMedian, clSM) %>% 
 #   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
@@ -376,6 +386,9 @@ mu_Tildes_MediansNI <- mu_Tildes_MediansNI %>% mutate(Year = quantities_prices_c
 
 mu_Tildes_MMNI <- merge(mu_Tildes_MeansNI, mu_Tildes_MediansNI)
 
+# mu_Tildes_MediansNI %>% filter(Year >= 2006) %>% round(3)
+
+
 
 s_Tildes_MeansNI <- apply(s_Tildes_eq[1:25,], 2, mean)
 s_Tildes_MeansNI <- s_Tildes_MeansNI %>% as.data.frame()
@@ -389,7 +402,7 @@ s_Tildes_MediansNI <- s_Tildes_MediansNI %>% mutate(Year = quantities_prices_cap
 
 s_Tildes_MMNI <- merge(s_Tildes_MeansNI, s_Tildes_MediansNI)
 
-
+# s_Tildes_MediansNI %>% filter(Year >=2006) %>% round(3)
 
 
 mu_Tildes_Means_itr <- apply(mu_Tildes_itr[1:25,], 2, mean)
