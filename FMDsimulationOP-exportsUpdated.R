@@ -193,7 +193,7 @@ beefINV_FORECAST_PostFMD_90_I <- beefINV_FORECAST_PostFMD
 # 4. In year 3 exports ban is lifted and everything is back to normal
 #### All under equillibrium simulation continues
 
-### 20% depopulation (I do this simulation for 7 years)
+### 20% depopulation
 proj_Q_P_PostFMD_20_II <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_20_II <- beefINV_FORECAST_PostFMD
 
@@ -228,14 +228,108 @@ beefINV_FORECAST_PostFMD_90_III <- beefINV_FORECAST_PostFMD
 
 
 
+###################### Here I merge the optimistic case prices under all depopulation levels
+
+proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD_20_II
+proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD_20_OP %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
+                                                                                        Ps20 = Ps,
+                                                                                        Pc20 = Pc)
+proj_Q_P_PostFMD_50_OP <- proj_Q_P_PostFMD_50_II
+proj_Q_P_PostFMD_50_OP <- proj_Q_P_PostFMD_50_OP %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
+                                                                                        Ps50 = Ps,
+                                                                                        Pc50 = Pc)
+
+proj_Q_P_PostFMD_90_OP <- proj_Q_P_PostFMD_90_II
+proj_Q_P_PostFMD_90_OP <- proj_Q_P_PostFMD_90_OP %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
+                                                                                        Ps90 = Ps,
+                                                                                        Pc90 = Pc)
+
+optPriceList <- list(proj_Q_P_PostFMD_20_OP, proj_Q_P_PostFMD_50_OP, proj_Q_P_PostFMD_90_OP)
+optPricePostFMD <- Reduce(function(...) merge(...), optPriceList)
+
+
+beefINV_FORECAST_PostFMD_20_OP <- beefINV_FORECAST_PostFMD_20_II
+beefINV_FORECAST_PostFMD_20_OP <- beefINV_FORECAST_PostFMD_20_OP %>% select(Year, K) %>% transmute(Year = Year,
+                                                                                        K20 = K)
+beefINV_FORECAST_PostFMD_50_OP <- beefINV_FORECAST_PostFMD_50_II
+beefINV_FORECAST_PostFMD_50_OP <- beefINV_FORECAST_PostFMD_50_OP %>% select(Year, K) %>% transmute(Year = Year,
+                                                                                                   K50 = K)
+
+beefINV_FORECAST_PostFMD_90_OP <- beefINV_FORECAST_PostFMD_90_II
+beefINV_FORECAST_PostFMD_90_OP <- beefINV_FORECAST_PostFMD_90_OP %>% select(Year, K) %>% transmute(Year = Year,
+                                                                                                   K90 = K)
+
+optStockList <- list(beefINV_FORECAST_PostFMD_20_OP, beefINV_FORECAST_PostFMD_50_OP, beefINV_FORECAST_PostFMD_90_OP)
+optStockPostFMD <- Reduce(function(...) merge(...), optStockList)
 
 
 
+###################### Here I merge the pessimistic case prices under all depopulation levels
+
+proj_Q_P_PostFMD_20_PE <- proj_Q_P_PostFMD_20_III
+proj_Q_P_PostFMD_20_PE <- proj_Q_P_PostFMD_20_PE %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
+                                                                                        Ps20 = Ps,
+                                                                                        Pc20 = Pc)
+proj_Q_P_PostFMD_50_PE <- proj_Q_P_PostFMD_50_III
+proj_Q_P_PostFMD_50_PE <- proj_Q_P_PostFMD_50_PE %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
+                                                                                        Ps50 = Ps,
+                                                                                        Pc50 = Pc)
+
+proj_Q_P_PostFMD_90_PE <- proj_Q_P_PostFMD_90_III
+proj_Q_P_PostFMD_90_PE <- proj_Q_P_PostFMD_90_PE %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
+                                                                                        Ps90 = Ps,
+                                                                                        Pc90 = Pc)
+
+pePriceList <- list(proj_Q_P_PostFMD_20_PE, proj_Q_P_PostFMD_50_PE, proj_Q_P_PostFMD_90_PE)
+pePricePostFMD <- Reduce(function(...) merge(...), pePriceList)
+
+
+beefINV_FORECAST_PostFMD_20_PE <- beefINV_FORECAST_PostFMD_20_III
+beefINV_FORECAST_PostFMD_20_PE <- beefINV_FORECAST_PostFMD_20_PE %>% select(Year, K) %>% transmute(Year = Year,
+                                                                                                   K20 = K)
+beefINV_FORECAST_PostFMD_50_PE <- beefINV_FORECAST_PostFMD_50_III
+beefINV_FORECAST_PostFMD_50_PE <- beefINV_FORECAST_PostFMD_50_PE %>% select(Year, K) %>% transmute(Year = Year,
+                                                                                                   K50 = K)
+
+beefINV_FORECAST_PostFMD_90_PE <- beefINV_FORECAST_PostFMD_90_III
+beefINV_FORECAST_PostFMD_90_PE <- beefINV_FORECAST_PostFMD_90_PE %>% select(Year, K) %>% transmute(Year = Year,
+                                                                                                   K90 = K)
+
+peStockList <- list(beefINV_FORECAST_PostFMD_20_PE, beefINV_FORECAST_PostFMD_50_PE, beefINV_FORECAST_PostFMD_90_PE)
+peStockPostFMD <- Reduce(function(...) merge(...), peStockList)
 
 
 
+############################ Plotting ############
+
+obsPrices <- pc_ps %>% filter(Year > (optPricePostFMD$Year[1] - 3))
+
+### Optimistic scenario prices
+optPrices <- left_join(obsPrices, optPricePostFMD) %>% filter(Year <= optPricePostFMD$Year[nrow(optPricePostFMD)])
 
 
+optPricesPlot <- optPrices %>% ggplot(aes(x=Year)) + geom_line(aes(y=ps, color="PS OBS"))+ 
+  geom_point(aes(y=ps, color = "PS OBS")) + geom_line(aes(y=Ps20, color="PS DEPOP 20"))+ 
+  geom_point(aes(y=Ps20, color="PS DEPOP 20")) + geom_line(aes(y=Ps50, color="PS DEPOP 50"))+ 
+  geom_point(aes(y=Ps50, color="PS DEPOP 50")) + geom_line(aes(y=Ps90, color="PS DEPOP 90"))+ 
+  geom_point(aes(y=Ps90, color="PS DEPOP 90")) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(optPrices$Year[1],
+                                  optPrices$Year[nrow(optPrices)]))) 
+
+
+### Pessimistic scenario prices
+pePrices <- left_join(obsPrices, pePricePostFMD) %>% filter(Year <= pePricePostFMD$Year[nrow(pePricePostFMD)])
+
+
+pePricesPlot <- pePrices %>% ggplot(aes(x=Year)) + geom_line(aes(y=ps, color="PS OBS"))+ 
+  geom_point(aes(y=ps, color = "PS OBS")) + geom_line(aes(y=Ps20, color="PS DEPOP 20"))+ 
+  geom_point(aes(y=Ps20, color="PS DEPOP 20")) + geom_line(aes(y=Ps50, color="PS DEPOP 50"))+ 
+  geom_point(aes(y=Ps50, color="PS DEPOP 50")) + geom_line(aes(y=Ps90, color="PS DEPOP 90"))+ 
+  geom_point(aes(y=Ps90, color="PS DEPOP 90")) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(pePrices$Year[1],
+                                  pePrices$Year[nrow(pePrices)]))) 
 
 
 

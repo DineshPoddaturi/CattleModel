@@ -257,8 +257,8 @@ dePop <- function(stock, dePopRate){
 }
 
 
-##### 20% depopulation
-dePopR <- 20
+##### depopulation
+dePopR <- 90
 Stock2009_20 <- dePop(stock = Stock_2009, dePopRate = dePopR)
 Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
 
@@ -315,6 +315,15 @@ k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(n
 k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,], 
                                beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
                                calfCrop = calf_crop_PostFMD)
+
+
+##### Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US
+##### December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S.
+#
+####### South Korea resumed U.S. beef imports in July 2008 
+
+### China lifted it's ban in 2016
+
 
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
@@ -393,24 +402,20 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   # slNew <- slNew + slExports
   
   if(i < 4){
-    
     #### Exports are banned that means the production stays in the country. So I assign equal weights to 
     #### both high quality and low quality meat. This might change but for now this is what I do. 
     slExports <- slNew * (exports_percent/100)
     clExports <- clNew * (exports_percent/100)
-    
     ### Here we are changing the total demand for meat. Domestic decline for meat is incorporated
-    
     ANew1 <- ( 1 - (5/100) ) * ANew + slExports + clExports
-    
-  } else if( i >= 4 && i <= 5){
-    ### Here I am assuming after two years the domestic demand for meat climbs back up
+  } else if( i >= 4 && i <= 5 ){ 
+    # i >= 4 && i <= 5 
+    ### Here the domestic demand for meat climbs back up
     slExports <- slNew * (exports_percent/100)
     clExports <- clNew * (exports_percent/100)
-    
     ANew1 <- ANew + slExports + clExports
   } else{
-    ### After three years everything is back to normal
+    ### Everything is back to normal
     ANew1 <-  ANew
   }
   
@@ -475,6 +480,12 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           hcM_pre <- Ps[3]
           EpsM_pre <- Ps[4]
           EpcM_pre <- Ps[5]
+          
+          ### Here I make sure the expected price is not going out of bounds
+          if(EpsM_pre < psM_pre){
+            EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+          }
+          
 
           Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
                                   k = k, CapA = capA_pre, gamma_k3 = gamma_k3,
@@ -501,7 +512,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
             clExp1 <- clNew_Eq * (exports_percent/100)
             ANew1 <- (1 - (5/100)) * ANew_Eq + slExp1 + clExp1
 
-          } else if(i >= 4 && i <= 5){
+          } else if( i >= 4 && i <= 5 ){
 
             slExp1 <- slNew_Eq * (exports_percent/100)
             clExp1 <- clNew_Eq * (exports_percent/100)
@@ -572,7 +583,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 
 
 
-
+#################################################################################################################
 
 
 ##### 30% depopulation
