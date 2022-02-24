@@ -45,7 +45,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   k03 <- k0s$k03
   k02 <- k0s$k02
   
-  # k3_est <- estQ$par
+  k3_est_Head_OG <- estQ$par
   
   k3_est <- abs(estQ$par)
   
@@ -80,7 +80,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   # slNew <- ANew * slShare * adjF
   # clNew <- ANew * (1-slShare) * adjF
   
-  return(c(slNew, clNew, ANew, k3_est, k3_est_Head))
+  return(c(slNew, clNew, ANew, k3_est, k3_est_Head, k3_est_Head_OG))
   
 }  
 
@@ -306,7 +306,9 @@ proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeri
                                EPs = numeric(nn), EPc = numeric(nn), Hc = numeric(nn), 
                                Sl = numeric(nn), Cl = numeric(nn), A = numeric(nn),
                                repHeif = numeric(nn), repHeif_Head = numeric(nn),
-                               boundCond = numeric(nn))
+                               boundCond = numeric(nn), repHeif_HeadOG = numeric(nn),
+                               Sl_Head_OG = numeric(nn), Cl_Head_OG = numeric(nn),
+                               Sl_Head_EQ = numeric(nn), Cl_Head_EQ = numeric(nn))
 
 k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
                           k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
@@ -328,6 +330,7 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
+  # i <- 1
   
   if(i>1){
 
@@ -386,6 +389,11 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   
   k_old_Head <- Qs[5]
   
+  k_old_Head_OG <- Qs[6]
+  slNew_Head_OG <- (slNew * 1000000000)/slaughterAvg_pre
+  clNew_Head_OG <- (clNew * 1000000000)/cullAvg_pre
+  
+  
   while(clNew < 1.01){
     clNew <- clNew + 0.01
   }
@@ -401,14 +409,14 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   # slExports <- slNew * 0.1
   # slNew <- slNew + slExports
   
-  if(i < 4){
+  if(i == 1){
     #### Exports are banned that means the production stays in the country. So I assign equal weights to 
     #### both high quality and low quality meat. This might change but for now this is what I do. 
     slExports <- slNew * (exports_percent/100)
     clExports <- clNew * (exports_percent/100)
     ### Here we are changing the total demand for meat. Domestic decline for meat is incorporated
     ANew1 <- ( 1 - (5/100) ) * ANew + slExports + clExports
-  } else if( i >= 4 && i <= 5 ){ 
+  } else if( i == 2 ){ 
     # i >= 4 && i <= 5 
     ### Here the domestic demand for meat climbs back up
     slExports <- slNew * (exports_percent/100)
@@ -480,12 +488,12 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           hcM_pre <- Ps[3]
           EpsM_pre <- Ps[4]
           EpcM_pre <- Ps[5]
-          
+
           ### Here I make sure the expected price is not going out of bounds
           if(EpsM_pre < psM_pre){
             EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
           }
-          
+
 
           Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
                                   k = k, CapA = capA_pre, gamma_k3 = gamma_k3,
@@ -497,6 +505,10 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           k_old_Eq <- Qs[4]
           k_old_Head_Eq <- Qs[5]
 
+          k_old_Head_OG <- Qs[6]
+          slNew_Head_OG <- (slNew_Eq * 1000000000)/slaughterAvg_pre
+          clNew_Head_OG <- (clNew_Eq * 1000000000)/cullAvg_pre
+
           while(clNew_Eq < 1.01){
             clNew_Eq <- clNew_Eq + 0.01
           }
@@ -506,14 +518,14 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 
           ANew_Eq <- (slNew_Eq + clNew_Eq) * (1/adjF_pre)
 
-          if(i < 4){
-
+          if(i == 1){
+            # i < 4
             slExp1 <- slNew_Eq * (exports_percent/100)
             clExp1 <- clNew_Eq * (exports_percent/100)
             ANew1 <- (1 - (5/100)) * ANew_Eq + slExp1 + clExp1
 
-          } else if( i >= 4 && i <= 5 ){
-
+          } else if( i == 2 ){
+            # i >= 4 && i <= 5
             slExp1 <- slNew_Eq * (exports_percent/100)
             clExp1 <- clNew_Eq * (exports_percent/100)
 
@@ -576,6 +588,13 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   proj_Q_P_PostFMD$repHeif_Head[i] <- abs(k_old_Head)
   
   proj_Q_P_PostFMD$boundCond[i] <- k_old_Head <= 0.5 * g * K1
+  
+  proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG
+  proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
+  proj_Q_P_PostFMD$Cl_Head_OG[i] <- clNew_Head_OG
+  
+  proj_Q_P_PostFMD$Sl_Head_EQ[i] <- ( slNew * 1000000000 )/slaughterAvg_pre
+  proj_Q_P_PostFMD$Cl_Head_EQ[i] <- ( clNew * 1000000000 )/cullAvg_pre
   
   proj_Q_P_PostFMD$Year[i] <- beefINV_FORECAST_PostFMD$Year[i]
   

@@ -1,0 +1,63 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US.
+2. December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S.
+3. South Korea resumed U.S. beef imports in July 2008. 
+4. China lifted it's ban in 2016
+
+
+## Optimistic Scenario:\newline
+1. 5% Decline in domestic demand for 1 year\newline
+2. In year 2 domestic demand goes back up\newline
+3. Exports banned for 2 years (I used exports in 2008 as the exports share for the simulation years)\newline
+4. In year 3 exports ban is lifted and everything is back to normal
+
+
+\begin{figure}
+\caption{Fed cattle price changes(dollar/Lb)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/fedCattlePrices-Optimistic.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Cull cow price changes(dollar/Lb)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/cullCowPrices-Optimistic.jpeg}
+\end{figure}
+
+
+\begin{figure}
+\caption{Stock changes (in in 1000 head)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/stockEvolution-Optimistic.jpeg}
+\end{figure}
+
+
+
+\newpage
+
+## Pessimistic Scenario:\newline
+1. 5% Decline in domestic demand for 3 years\newline
+2. In year 4 domestic demand goes back up\newline
+3. Exports banned for 5 years (I used exports in 2008 as the exports share for the simulation years)\newline
+4. In year 6 exports ban is lifted and everything is back to normal
+
+\begin{figure}
+\caption{Fed cattle price changes(dollar/Lb)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/fedCattlePrices-Pessimistic.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Cull cow price changes(dollar/Lb)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/cullCowPrices-Pessimistic.jpeg}
+\end{figure}
+
+
+\begin{figure}
+\caption{Stock changes (in 1000 head)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/stockEvolution-Pessimistic.jpeg}
+\end{figure}
+
+
+

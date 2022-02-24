@@ -270,7 +270,7 @@ Chad told me to read Secure Beef Plan. This is a government plan about their ste
 When I asked him about the model vs disease, Chad and Lee both told me to highlight the disease outbreak. This is about the disease and simulating different scenarios and different scenario work. 
 
 
-02/04/2021:
+02/04/2022:
 
 * Showed him the projections of the model. He said they are looking as they are supposed to look like. 
 * Also asked me to reach out to FAPRI people to get their stochastic outcomes. All of their projections are averages across 500 stochastic outcomes. So if we have those we can see how well our model is projecting. 
@@ -289,6 +289,28 @@ When I asked him about the model vs disease, Chad and Lee both told me to highli
   ** In an optimistic case we assume all the exports bounce back and the domestic demand also bounce back
   ** In a pessimistic case, exports do not bounce back.
   ** Under these scenarios, we simulate the model to see the changes.
+
+
+
+02/24/2022:
+
+Showed him the scenario results I have.
+
+* 90% depop and 20% depop look fine but somehow 50% depop is looking wonky at the tail years. Especially, in the optimistic scenario. This needs to be investigated closely. 
+
+* There's also another problem. When we look at the 20% and 50% depop stocks levels. 20% depop stock level is higher than the 50% depop stock level. So the prices must be in the opposite direction. However, the model is showing the other way around. Need to investigate that closely. 
+
+* One idea I have is to add the excess fed cattle and cull cow animals as imports to the stock. For now the replacement heifers are added to the stock. So I believe I should also add the cull cows that are imported to reach the subsistence level of demand to the stock. But if we are already slaughtering the imported cull cows to reach the subsistence levels there is no need to add them in the stock. Need to think about this more. 
+
+* In the plotting, instead of plotting the observed prices, plot the model estimates of the prices. 
+
+
+
+
+
+
+
+
 
 
 
