@@ -108,13 +108,13 @@ combinedK <- left_join(beefINV_FORECAST, beefInventory_test) %>% mutate(err = K 
 # 8 2025 31893857 22760719 41026996       NA        NA
 
 
+beefINV_FORECAST_1000 <- beefINV_FORECAST
 
+beefINV_FORECAST_1000[,-1] <- beefINV_FORECAST_1000[,-1]/1000
 
+beefINV_FORECAST_1000 <- beefINV_FORECAST_1000 %>% select(Year, lo95, Kcast, hi95) %>% round()
 
-
-
-
-
+beefINV_FORECAST_lo_k_hi <- beefINV_FORECAST %>% select(Year, lo95, Kcast, hi95)
 
 
 
