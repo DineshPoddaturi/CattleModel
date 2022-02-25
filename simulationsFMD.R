@@ -47,7 +47,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   k3_est_Head_OG <- estQ$par
   
-  k3_est <- abs(estQ$par)
+  k3_est <- estQ$par
   
   slNew <- ((g * K1 - k3_est) * slAvg)/1000000000
   
@@ -64,6 +64,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
     (k3_est - eta * ( (gamma^4) * k06 + (gamma^3) * k05 + (gamma^2) * k04 + gamma * k03 + k02)) -
     ((delta^5)/(gamma^2)) * eta * (delta * gamma * k08 + (delta + (1-delta) * gamma) * k07)
   
+  
   clNew <- (clNew * clAvg)/1000000000
   
   k3_est <- (k3_est * slAvg)/1000000000
@@ -72,7 +73,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   # k3_est_Head <- estQ$par
   
-  k3_est_Head <- abs(estQ$par)
+  k3_est_Head <- estQ$par
   
   # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
   # ANew <- (((g * K1 - k3_est) * slAvg)/1000000000) * (1/slShare)
@@ -330,7 +331,7 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 1
+  # i <- 6
   
   if(i>1){
 
@@ -490,9 +491,9 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           EpcM_pre <- Ps[5]
 
           ### Here I make sure the expected price is not going out of bounds
-          if(EpsM_pre < psM_pre){
-            EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
-          }
+          # if(EpsM_pre < psM_pre){
+          #   EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+          # }
 
 
           Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
@@ -553,9 +554,9 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           if(m >= 10){
             if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
               if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
-                # if( (round(slDiffEq[m-2],2) == round(slDiffEq[m-3],2)) && (round(clDiffEq[m-2],2) == round(clDiffEq[m-3],2)) ){
-                break
-                # }
+                if( (round(slDiffEq[m-2],2) == round(slDiffEq[m-3],2)) && (round(clDiffEq[m-2],2) == round(clDiffEq[m-3],2)) ){
+                    break
+                }
               }
             }
           }
@@ -584,10 +585,10 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   proj_Q_P_PostFMD$Sl[i] <- slNew
   proj_Q_P_PostFMD$Cl[i] <- clNew
   proj_Q_P_PostFMD$A[i] <- ANew1
-  proj_Q_P_PostFMD$repHeif[i] <- abs(k_old)
-  proj_Q_P_PostFMD$repHeif_Head[i] <- abs(k_old_Head)
+  proj_Q_P_PostFMD$repHeif[i] <- abs(k_old_Eq)
+  proj_Q_P_PostFMD$repHeif_Head[i] <- abs(k_old_Head_Eq)
   
-  proj_Q_P_PostFMD$boundCond[i] <- k_old_Head <= 0.5 * g * K1
+  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head_Eq) <= 0.5 * g * K1
   
   proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG
   proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
