@@ -107,6 +107,7 @@ combinedK <- left_join(beefINV_FORECAST, beefInventory_test) %>% mutate(err = K 
 # 7 2024 31889141 23410708 40367575       NA        NA
 # 8 2025 31893857 22760719 41026996       NA        NA
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 beefINV_FORECAST_1000 <- beefINV_FORECAST
 

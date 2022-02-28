@@ -203,6 +203,30 @@ estQFunction_test <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_k3,
 
 
 ###### Retreiving the model parameters
+
+proj_adjFac <- adjFactor_New
+
+proj_adjFac <- adjFactor
+
+proj_muTildes <- mu_Tildes_MMN
+proj_sTildes <- s_Tildes_MMN
+proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPSN,EQestPCN,EQestHCN, EQestEPSN, EQestEPCN))
+
+# proj_muTildes1 <- mu_Tildes_MM_itr
+# proj_sTildes1 <- s_Tildes_MM_itr
+# proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC, ITRestEPS, ITRestEPC))
+
+#### We use the following to get the t+1 supply of the fed cattle
+##### See the work in the binder
+proj_K_t <- Stock %>% transmute(Year = Year, K = K)
+proj_A <- A_quant
+proj_Dshocks <- stateVars %>% transmute(Year = Year, dShock = Shock)
+
+proj_AllDF_EQ <- Reduce(function(...) merge(...), 
+                        list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes,proj_sTildes,proj_PricesCosts, 
+                             dressedWeights_sl_cl))
+
+
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
 modelParamsCONV <- tail(proj_AllDF_CONV, n=1)
@@ -569,9 +593,9 @@ PQs_MEDIANS <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% sele
 PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up)
 PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
 
-PQs_MEDIANS_SL <- PQs_MEDIANS %>% select(Year, Sl_lo, Sl, Sl_up)
-PQs_MEDIANS_CL <- PQs_MEDIANS %>% select(Year, Cl_lo, Cl, Cl_up)
-PQs_MEDIANS_A  <- PQs_MEDIANS %>% select(Year, A_lo, A, A_up) 
+PQs_MEDIANS_SL <- PQs_MEDIANS %>% select(Year, Sl_lo, Sl, Sl_up) %>% round(3)
+PQs_MEDIANS_CL <- PQs_MEDIANS %>% select(Year, Cl_lo, Cl, Cl_up) %>% round(3)
+PQs_MEDIANS_A  <- PQs_MEDIANS %>% select(Year, A_lo, A, A_up) %>% round(3)
 
 PQs_MEDIANS_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_LO = Ps_lo * 100, 
                                                                                Ps = Ps * 100, Ps_UP = Ps_up * 100)
@@ -579,10 +603,7 @@ PQs_MEDIANS_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Y
                                                                                Pc = Pc * 100, Pc_UP = Pc_lo * 100)
 
 
-
-
-PQs_MEDIANS_BKP <- PQs_MEDIANS
-
-
+PQs_MEDIANS_TS <- merge(PQs_MEDIANS_SL, PQs_MEDIANS_CL) %>%
+  transmute(Year = Year, TS_lo = Sl_lo + Cl_lo, TS = Sl + Cl, TS_up = Sl_up + Cl_up)
 
 

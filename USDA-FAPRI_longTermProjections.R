@@ -55,16 +55,20 @@ CARD_USDA_FAPRI_PS_Proj_Plot <- CARD_USDA_FAPRI_PS_Proj %>% ggplot(aes(x=Year)) 
 FAPRI_Proj_TS <- FAPRI_Proj %>% select(-FAPRI_Ps) %>% transmute(Year = FAPRI_Years, FAPRI_TS = FAPRI_TS)
 USDA_Proj_TS <- USDA_Proj %>% select(-USDA_Ps) %>% transmute(Year = USDA_Years, USDA_TS = USDA_TS)
 
-CARD_USDA_FAPRI_TS_Proj <- merge(merge(EQestObsA_Medians_proj, FAPRI_Proj_TS, by="Year", all=TRUE), 
+# CARD_USDA_FAPRI_TS_Proj <- merge(merge(EQestObsA_Medians_proj, FAPRI_Proj_TS, by="Year", all=TRUE), 
+#                                  USDA_Proj_TS, by="Year", all=TRUE)
+
+CARD_USDA_FAPRI_TS_Proj <- merge(merge(EQestObsTS_Medians_proj, FAPRI_Proj_TS, by="Year", all=TRUE), 
                                  USDA_Proj_TS, by="Year", all=TRUE)
 
-CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=A, color = "A OBS")) + geom_point(aes(y=A, color = "A OBS")) + 
-  geom_line(aes(y=AMedian, color="A RATIONAL (MEDIAN)")) + geom_point(aes(y = AMedian, color = "A RATIONAL (MEDIAN)")) + 
-  geom_line(aes(y=A_lo, color="A_LO PROJECTION")) + geom_point(aes(y=A_lo, color="A_LO PROJECTION")) + geom_line(aes(y=A_proj, color="A PROJECTION")) + 
-  geom_point(aes(y=A_proj, color="A PROJECTION")) + geom_line(aes(y=FAPRI_TS, color="FAPRI PROJECTION"))  +
-  geom_point(aes(y=FAPRI_TS, color="FAPRI PROJECTION"))  +geom_line(aes(y=USDA_TS, color="USDA PROJECTION"))  +
-  geom_point(aes(y=USDA_TS, color="USDA PROJECTION"))  + geom_line(aes(y=A_up, color="A_UP PROJECTION"))  +
-  geom_point(aes(y=A_up, color="A_UP PROJECTION"))  + 
+CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=tsObs, color = "Observed")) + geom_point(aes(y=tsObs, color = "Observed")) + 
+  geom_line(aes(y=tsMedian, color="Fitted")) + geom_point(aes(y=tsMedian, color="Fitted")) + 
+  geom_line(aes(y=TS_lo, color="Projected Lower Bound")) + geom_point(aes(y=TS_lo, color="Projected Lower Bound")) + 
+  geom_line(aes(y=TS, color="Projected")) + geom_point(aes(y=TS, color="Projected")) + 
+  geom_line(aes(y=FAPRI_TS, color="FAPRI Projection"))  + geom_point(aes(y=FAPRI_TS, color="FAPRI Projection")) +
+  geom_line(aes(y=USDA_TS, color="USDA Projection"))  + geom_point(aes(y=USDA_TS, color="USDA Projection"))  + 
+  geom_line(aes(y=TS_up, color="Projected Upper Bound"))  + geom_point(aes(y=TS_up, color="Projected Upper Bound"))  + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(CARD_USDA_FAPRI_TS_Proj$Year[1],
                                   CARD_USDA_FAPRI_TS_Proj$Year[nrow(CARD_USDA_FAPRI_TS_Proj)])))

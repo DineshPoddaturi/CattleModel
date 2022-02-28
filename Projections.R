@@ -174,9 +174,9 @@ proj_muTildes <- mu_Tildes_MMN
 proj_sTildes <- s_Tildes_MMN
 proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPSN,EQestPCN,EQestHCN, EQestEPSN, EQestEPCN))
 
-proj_muTildes1 <- mu_Tildes_MM_itr
-proj_sTildes1 <- s_Tildes_MM_itr
-proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC, ITRestEPS, ITRestEPC))
+# proj_muTildes1 <- mu_Tildes_MM_itr
+# proj_sTildes1 <- s_Tildes_MM_itr
+# proj_PricesCosts1 <- Reduce(function(...) merge(...), list(ITRestPS,ITRestPC,ITRestHC, ITRestEPS, ITRestEPC))
 
 #### We use the following to get the t+1 supply of the fed cattle
 ##### See the work in the binder
@@ -188,9 +188,9 @@ proj_AllDF_EQ <- Reduce(function(...) merge(...),
                    list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes,proj_sTildes,proj_PricesCosts, 
                         dressedWeights_sl_cl))
 
-proj_AllDF_CONV <- Reduce(function(...) merge(...), 
-                        list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes1,proj_sTildes1,proj_PricesCosts1, 
-                             dressedWeights_sl_cl))
+# proj_AllDF_CONV <- Reduce(function(...) merge(...), 
+#                         list(proj_K_t,proj_A,proj_Dshocks,proj_adjFac,proj_muTildes1,proj_sTildes1,proj_PricesCosts1, 
+#                              dressedWeights_sl_cl))
 
 
 

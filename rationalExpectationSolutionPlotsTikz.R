@@ -6,7 +6,7 @@ require(tikzDevice)
 # 
 # 
 
-EQestObsPSNI_plots <- EQestObsPSNI %>% filter(Year >=2006) %>% select(Year, psMean, psMedian, ps) %>% 
+EQestObsPSNI_plots <- EQestObsPSNI  %>% select(Year, psMean, psMedian, ps) %>% 
   transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100)
 
 tikz(file="rationalExpectationsLatexPlots/FedCattlePricePlot.tex", width=6, height=3)
@@ -18,14 +18,14 @@ slaughter_plot <- EQestObsPSNI_plots%>% ggplot(aes(x=Year))+geom_line(aes(y=psMe
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPSNI_plots$Year[1],EQestObsPSNI_plots$Year[nrow(EQestObsPSNI_plots)]))) +
   scale_y_continuous(name="Fed Cattle Price")+
-  theme(legend.position = c(0.2, 0.7))
+  theme(legend.position = c(0.2, 0.7)) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 print(slaughter_plot)
 
 dev.off()
 
 
-EQestObsPCNI_plots <- EQestObsPCNI %>% filter(Year >=2006) %>% select(Year, pcMean, pcMedian, pc) %>% 
+EQestObsPCNI_plots <- EQestObsPCNI %>% select(Year, pcMean, pcMedian, pc) %>% 
   transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100)
 
 tikz(file="rationalExpectationsLatexPlots/CullCowPricePlot.tex", width=6, height=3)
@@ -37,7 +37,7 @@ cull_plot <- EQestObsPCNI_plots%>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, c
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPCNI_plots$Year[1],EQestObsPCNI_plots$Year[nrow(EQestObsPCNI_plots)]))) +
   scale_y_continuous(name="Cull Cow Price") +
-  theme(legend.position = c(0.2, 0.7))
+  theme(legend.position = c(0.2, 0.7)) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 print(cull_plot)
 

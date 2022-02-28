@@ -11,7 +11,7 @@
 
 require(librarian)
 
-librarian::shelf(tidyverse, reshape2, readxl, data.table, nleqslv, BB, Metrics)
+librarian::shelf(tidyverse, reshape2, readxl, data.table, nleqslv, BB, Metrics, ggthemes)
 
 # Parameters
 beta <- 0.98

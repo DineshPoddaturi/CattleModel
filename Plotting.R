@@ -1,10 +1,11 @@
 
-EQestObsPS_Medians <- EQestObsPS %>% select(Year, psMedian, ps) %>% filter(Year > 2009)
+EQestObsPS_Medians <- EQestObsPSN %>% select(Year, psMedian, ps) %>% filter(Year > 2009)
 
 PQs_MEDIANS_proj <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up)
 
 EQestObsPS_Medians_proj <- merge(EQestObsPS_Medians,PQs_MEDIANS_proj,by="Year",all=TRUE)
 
+EQestObsPS_Medians_proj[,-1] <- EQestObsPS_Medians_proj[,-1] * 100
 
 EQestObsPS_Medians_proj_plot <- EQestObsPS_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=ps, color = "PS OBS")) + 
   geom_point(aes(y=ps, color = "PS OBS")) + geom_line(aes(y=psMedian, color="PS RATIONAL (MEDIAN)")) +
@@ -19,13 +20,15 @@ EQestObsPS_Medians_proj_plot <- EQestObsPS_Medians_proj %>% ggplot(aes(x=Year)) 
                      breaks=c(seq(EQestObsPS_Medians_proj$Year[1],
                                   EQestObsPS_Medians_proj$Year[nrow(EQestObsPS_Medians_proj)])))
 
+EQestObsPS_Medians_proj_plot 
 
-EQestObsPC_Medians <- EQestObsPC %>% select(Year, pcMedian, pc) %>% filter(Year > 2009)
+EQestObsPC_Medians <- EQestObsPCN %>% select(Year, pcMedian, pc) %>% filter(Year > 2009)
 
 PQs_MEDIANS_proj <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
 
 EQestObsPC_Medians_proj <- merge(EQestObsPC_Medians,PQs_MEDIANS_proj,by="Year",all=TRUE)
 
+EQestObsPC_Medians_proj[,-1] <- EQestObsPC_Medians_proj[,-1] * 100
 
 EQestObsPC_Medians_proj_plot <- EQestObsPC_Medians_proj %>% ggplot(aes(x=Year)) + geom_line(aes(y=pc, color = "PC OBS")) + 
   geom_point(aes(y=pc, color = "PC OBS")) + geom_line(aes(y=pcMedian, color="PC RATIONAL (MEDIAN)")) +
@@ -39,6 +42,8 @@ EQestObsPC_Medians_proj_plot <- EQestObsPC_Medians_proj %>% ggplot(aes(x=Year)) 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPC_Medians_proj$Year[1],
                                   EQestObsPC_Medians_proj$Year[nrow(EQestObsPC_Medians_proj)])))
+
+EQestObsPC_Medians_proj_plot
 
 
 EQestObsSL1 <- EQestObsSL %>% select(Year, slMedian)
@@ -118,6 +123,15 @@ EQestObsA_Medians_proj_plot
 EQestObsSL_Medians_proj_plot
 
 EQestObsCL_Medians_proj_plot
+
+
+
+EQestObsTS_Medians_proj <- merge(EQestObsSL_Medians_proj, EQestObsCL_Medians_proj) %>%
+  transmute(Year = Year, tsMedian = slMedian + clMedian, 
+            tsObs = SlObs + ClObs, TS_lo = Sl_lo + Cl_lo, 
+            TS = Sl + Cl, TS_up = Sl_up + Cl_up) %>% round(3)
+
+
 
 
 
