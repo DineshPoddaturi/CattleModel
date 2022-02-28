@@ -4,7 +4,7 @@
 #### I argue that negative sign indicates that the country imports those number of animals 
 #### just to meet the demand.
 #### Now I am making another assumption: If the supply of the fed cattle and cull cow doesn't meet
-#### the subsistence levels the c ountry imports the exact number of animals just to meet the 
+#### the subsistence levels the country imports the exact number of animals just to meet the 
 ##### levels. This can be argued but in this simulation I make this needed assumption.
 
 ###### I do not make any assertion about how many more animals need to be imported to 
@@ -25,12 +25,20 @@ beefINV_FORECAST_PostFMD_20_N <- beefINV_FORECAST_PostFMD
 proj_Q_P_PostFMD_20_NI <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_20_NI  <- beefINV_FORECAST_PostFMD
 
+#02/28
+proj_Q_P_PostFMD_20_Latest <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_Latest  <- beefINV_FORECAST_PostFMD
+
 ### 50% depopulation
 proj_Q_P_PostFMD_50_N <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_50_N <- beefINV_FORECAST_PostFMD
 
 proj_Q_P_PostFMD_50_NI <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_50_NI <- beefINV_FORECAST_PostFMD
+
+#02/28
+proj_Q_P_PostFMD_50_Latest <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_Latest  <- beefINV_FORECAST_PostFMD
 
 #### 90% depopulation
 proj_Q_P_PostFMD_90_N <- proj_Q_P_PostFMD
@@ -39,18 +47,22 @@ beefINV_FORECAST_PostFMD_90_N <- beefINV_FORECAST_PostFMD
 proj_Q_P_PostFMD_90_NI <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_90_NI <- beefINV_FORECAST_PostFMD
 
+#02/28
+proj_Q_P_PostFMD_90_Latest <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_Latest  <- beefINV_FORECAST_PostFMD
+
 ###################### Here I merge the optimistic case prices and stocks under all depopulation levels
 
-proj_Q_P_PostFMD_20_OPN <- proj_Q_P_PostFMD_20_NI
+proj_Q_P_PostFMD_20_OPN <- proj_Q_P_PostFMD_20_Latest
 proj_Q_P_PostFMD_20_OPN <- proj_Q_P_PostFMD_20_OPN %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
                                                                                         Ps20 = Ps,
                                                                                         Pc20 = Pc)
-proj_Q_P_PostFMD_50_OPN <- proj_Q_P_PostFMD_50_NI
+proj_Q_P_PostFMD_50_OPN <- proj_Q_P_PostFMD_50_Latest
 proj_Q_P_PostFMD_50_OPN <- proj_Q_P_PostFMD_50_OPN %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
                                                                                         Ps50 = Ps,
                                                                                         Pc50 = Pc)
 
-proj_Q_P_PostFMD_90_OPN <- proj_Q_P_PostFMD_90_NI
+proj_Q_P_PostFMD_90_OPN <- proj_Q_P_PostFMD_90_Latest
 proj_Q_P_PostFMD_90_OPN <- proj_Q_P_PostFMD_90_OPN %>% select(Year, Ps, Pc) %>% transmute(Year = Year,
                                                                                         Ps90 = Ps,
                                                                                         Pc90 = Pc)
@@ -61,14 +73,14 @@ optPricePostFMDN <- Reduce(function(...) merge(...), optPriceListN)
 optPricePostFMDNI <- Reduce(function(...) merge(...), optPriceListN)
 
 
-beefINV_FORECAST_PostFMD_20_OPN <- beefINV_FORECAST_PostFMD_20_NI
+beefINV_FORECAST_PostFMD_20_OPN <- beefINV_FORECAST_PostFMD_20_Latest
 beefINV_FORECAST_PostFMD_20_OPN <- beefINV_FORECAST_PostFMD_20_OPN %>% select(Year, K) %>% transmute(Year = Year,
                                                                                                    K20 = K)
-beefINV_FORECAST_PostFMD_50_OPN <- beefINV_FORECAST_PostFMD_50_NI
+beefINV_FORECAST_PostFMD_50_OPN <- beefINV_FORECAST_PostFMD_50_Latest
 beefINV_FORECAST_PostFMD_50_OPN <- beefINV_FORECAST_PostFMD_50_OPN %>% select(Year, K) %>% transmute(Year = Year,
                                                                                                    K50 = K)
 
-beefINV_FORECAST_PostFMD_90_OPN <- beefINV_FORECAST_PostFMD_90_NI
+beefINV_FORECAST_PostFMD_90_OPN <- beefINV_FORECAST_PostFMD_90_Latest
 beefINV_FORECAST_PostFMD_90_OPN <- beefINV_FORECAST_PostFMD_90_OPN %>% select(Year, K) %>% transmute(Year = Year,
                                                                                                    K90 = K)
 

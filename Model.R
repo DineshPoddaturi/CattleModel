@@ -1,11 +1,17 @@
-require(tidyverse)
-require(reshape2)
-require(readxl)
-library(data.table)
-require(nleqslv)
-require(BB)
-require(Metrics)
-require(pracma)
+# require(tidyverse)
+# require(reshape2)
+# require(readxl)
+# library(data.table)
+# require(nleqslv)
+# require(BB)
+# require(Metrics)
+# require(pracma)
+
+# install.packages("librarian")
+
+require(librarian)
+
+librarian::shelf(tidyverse, reshape2, readxl, data.table, nleqslv, BB, Metrics)
 
 # Parameters
 beta <- 0.98
