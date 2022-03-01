@@ -85,6 +85,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
 }  
 
+
 estQFunction_test_FMD <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_k3, 
                                   eta_k3 , int_k3, k0s, slAvg, clAvg){
   
@@ -258,13 +259,13 @@ dePop <- function(stock, dePopRate){
 }
 
 
-##### depopulation
-dePopR <- 90
-Stock2009_20 <- dePop(stock = Stock_2009, dePopRate = dePopR)
-Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
+# ##### depopulation
+# dePopR <- 90
+# Stock2009_20 <- dePop(stock = Stock_2009, dePopRate = dePopR)
+# Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
 
 
-simOptimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn){
+simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn, Stock){
   
   ##### Now I have calf-crop until 2009
   calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
@@ -297,6 +298,7 @@ simOptimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expor
   
   capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
   exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
+  
   
   beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
                                           k4 = numeric(nn), k5 = numeric(nn), k6 = numeric(nn), 
@@ -485,8 +487,15 @@ simOptimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expor
       EpcM_pre <- Ps[5]
       
       ### Here I make sure the expected price is not going out of bounds
-      if(EpsM_pre < psM_pre){
-        EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+      if(i>1){
+
+        if(EpsM_pre < psM_pre){
+          EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+        }
+
+        if(EpcM_pre < pcM_pre){
+          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+        }
       }
       
       
@@ -601,13 +610,13 @@ simOptimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expor
 
 
 optimisticPostFMD_20 <- simOptimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 20, modelParamsEQ_PreFMD = proj_AllDF_EQ,
-                                        exports_preFMD = exports_2008, nn = 10)
+                                        exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 optimisticPostFMD_50 <- simOptimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 50, modelParamsEQ_PreFMD = proj_AllDF_EQ,
-                                         exports_preFMD = exports_2008, nn = 10)
+                                         exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 optimisticPostFMD_90 <- simOptimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
-                                         exports_preFMD = exports_2008, nn = 10)
+                                         exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 postFMD_P_Q_20_Opt <- optimisticPostFMD_20[[1]]
 postFMD_K_20_Opt <- optimisticPostFMD_20[[2]]
@@ -619,7 +628,7 @@ postFMD_P_Q_90_Opt <- optimisticPostFMD_90[[1]]
 postFMD_K_90_Opt <- optimisticPostFMD_90[[2]]
 
 
-simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn){
+simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn, Stock){
   
   ##### Now I have calf-crop until 2009
   calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
@@ -840,8 +849,15 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       EpcM_pre <- Ps[5]
       
       ### Here I make sure the expected price is not going out of bounds
-      if(EpsM_pre < psM_pre){
-        EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+      if(i>1){
+        
+        if(EpsM_pre < psM_pre){
+          EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+        }
+        
+        if(EpcM_pre < pcM_pre){
+          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+        }
       }
       
       
@@ -957,13 +973,13 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
 
 
 pessimisticPostFMD_20 <- simPessimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 20, modelParamsEQ_PreFMD = proj_AllDF_EQ,
-                                         exports_preFMD = exports_2008, nn = 10)
+                                         exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 pessimisticPostFMD_50 <- simPessimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 50, modelParamsEQ_PreFMD = proj_AllDF_EQ,
-                                         exports_preFMD = exports_2008, nn = 10)
+                                         exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 pessimisticPostFMD_90 <- simPessimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
-                                         exports_preFMD = exports_2008, nn = 10)
+                                         exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 postFMD_P_Q_20_Pes <- pessimisticPostFMD_20[[1]]
 postFMD_K_20_Pes <- pessimisticPostFMD_20[[2]]
@@ -977,7 +993,11 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 ##### Now I have calf-crop until 2009
+dePopR <- 90
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
 calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
 calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
@@ -1216,9 +1236,17 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           EpcM_pre <- Ps[5]
 
           ### Here I make sure the expected price is not going out of bounds
-          if(EpsM_pre < psM_pre){
-            EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+          if(i>1){
+            
+            if(EpsM_pre < psM_pre){
+              EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+            }
+            
+            if(EpcM_pre < pcM_pre){
+              EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+            }
           }
+          
 
 
           Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
@@ -1327,44 +1355,22 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 }
 
 
+proj_Q_P_PostFMD_20 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20 <- beefINV_FORECAST_PostFMD
 
-#################################################################################################################
+proj_Q_P_PostFMD_50 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50 <- beefINV_FORECAST_PostFMD
 
-
-##### 30% depopulation
-Stock2009_30 <- dePop(stock = Stock2009, dePopRate = 30)
-Stock2009_30 <- rbind(Stock_2008L, Stock2009_30)
-
-##### 40% depopulation
-Stock2009_40 <- dePop(stock = Stock2009, dePopRate = 40)
-Stock2009_40 <- rbind(Stock_2008L, Stock2009_40)
-
-##### 50% depopulation
-Stock2009_50 <- dePop(stock = Stock2009, dePopRate = 50)
-Stock2009_50 <- rbind(Stock_2008L, Stock2009_50)
-
-##### 60% depopulation
-Stock2009_60 <- dePop(stock = Stock2009, dePopRate = 60)
-Stock2009_60 <- rbind(Stock_2008L, Stock2009_60)
-
-##### 70% depopulation
-Stock2009_70 <- dePop(stock = Stock2009, dePopRate = 70)
-Stock2009_70 <- rbind(Stock_2008L, Stock2009_70)
-
-##### 80% depopulation
-Stock2009_80 <- dePop(stock = Stock2009, dePopRate = 80)
-Stock2009_80 <- rbind(Stock_2008L, Stock2009_80)
-
-##### 90% depopulation
-Stock2009_90 <- dePop(stock = Stock2009, dePopRate = 90)
-Stock2009_90 <- rbind(Stock_2008L, Stock2009_90)
-
-#### I have to study the exports and determine the share of production going towards exports
+proj_Q_P_PostFMD_90 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90 <- beefINV_FORECAST_PostFMD
 
 
+proj_Q_P_PostFMD_20 <- proj_Q_P_PostFMD_20 %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc) 
+proj_Q_P_PostFMD_50 <- proj_Q_P_PostFMD_50 %>% transmute(Year = Year, Ps50 = Ps, Pc50 = Pc) 
+proj_Q_P_PostFMD_90 <- proj_Q_P_PostFMD_90 %>% transmute(Year = Year, Ps90 = Ps, Pc90 = Pc) 
 
 
-
+merge(merge(proj_Q_P_PostFMD_20, proj_Q_P_PostFMD_50), proj_Q_P_PostFMD_90)
 
 
 
