@@ -73,7 +73,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   # k3_est_Head <- estQ$par
   
-  k3_est_Head <- estQ$par
+  k3_est_Head <- abs(estQ$par)
   
   # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
   # ANew <- (((g * K1 - k3_est) * slAvg)/1000000000) * (1/slShare)
@@ -239,9 +239,9 @@ getPsPcEpsEpc_FMD <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
 # This would change the age distribution. So if I introduce the disease let's say 2009, then in that year I remove a%
 # of all the animals. 
 
-repHeifersMin <- merge(proj_AllDF_EQ, Stock) %>% 
-  mutate(repHeifersLB = (Slaughter_avg * k3)/1000000000) %>% select(repHeifersLB) %>% 
-  summarise(minim = min(repHeifersLB, na.rm = T)) %>% unlist() %>% unname()
+# repHeifersMin <- merge(proj_AllDF_EQ, Stock) %>% 
+#   mutate(repHeifersLB = (Slaughter_avg * k3)/1000000000) %>% select(repHeifersLB) %>% 
+#   summarise(minim = min(repHeifersLB, na.rm = T)) %>% unlist() %>% unname()
 
 #### For simplicity I take the 2008 exports as the exports in 2009 and so on
 exports_2008 <- cattle_tot %>% select(Year, Exports) %>% filter(Year == 2008) 
@@ -265,14 +265,14 @@ dePop <- function(stock, dePopRate){
 # Stock2009_20 <- rbind(Stock_2008L, Stock2009_20) %>% as.data.frame()
 
 
-simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn, Stock){
+simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_preFMD, nn, Stock){
   
   ##### Now I have calf-crop until 2009
-  calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
-  calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
+  calf_crop_PreFMD <- calf_cropF %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
+  calf_crop_2009 <- calf_cropF %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
   calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
   
-  modelParamsEQ_PreFMD <- proj_AllDF_EQ %>% filter(Year == 2009)
+  modelParamsEQ_PreFMD <- modelParamsEQ_PreFMD %>% filter(Year == 2009)
   
   slaughterAvg_pre <- modelParamsEQ_PreFMD$Slaughter_avg
   cullAvg_pre <-  modelParamsEQ_PreFMD$Cull_avg
@@ -292,13 +292,17 @@ simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
   
   adjF_pre <- modelParamsEQ_PreFMD$AdjFactor
   
+  
   exports_2009 <- exports_preFMD
+  #### here I am getting export percentage by the meat
   exports_2009_meat <- exports_2009 * (slaughterAvg_pre/1000000000)
   exports_percent <- round((exports_2009_meat/capA_pre) * 100,3)
   
+  ##### Here I am getting exports percentage by the stocks
   capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
   exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
   
+  ### After careful consideration I am using exports_percentK as the exports in the simulation
   
   beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
                                           k4 = numeric(nn), k5 = numeric(nn), k6 = numeric(nn), 
@@ -339,7 +343,7 @@ simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       beefINV_FORECAST_PostFMD$k7[i] <- delta * beefINV_FORECAST_PostFMD$k6[i-1]
       beefINV_FORECAST_PostFMD$k8[i] <- delta * beefINV_FORECAST_PostFMD$k7[i-1]
       beefINV_FORECAST_PostFMD$k9[i] <- delta * beefINV_FORECAST_PostFMD$k8[i-1]
-      beefINV_FORECAST_PostFMD$K[i] <- sum(beefINV_FORECAST_PostFMD[i,-1:-2])
+      beefINV_FORECAST_PostFMD$K[i]  <- sum(beefINV_FORECAST_PostFMD[i,-1:-2])
       
       calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i-1],
                                                          k0 = g * beefINV_FORECAST_PostFMD$K[i-1])
@@ -363,7 +367,7 @@ simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
     
     int_k3 <- 0
     
-    ### Here I assume a 5% decrease in domestic demand and the exports are banned (assume a 10%)
+    ### Here I assume a 5% decrease in domestic demand and the exports are banned
     if(i==1){
       capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
       K1 <- capK_pre * (1 - (dePopR/100))
@@ -487,14 +491,14 @@ simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       EpcM_pre <- Ps[5]
       
       ### Here I make sure the expected price is not going out of bounds
-      if(i>1){
+      if(i>2){
 
         if(EpsM_pre < psM_pre){
-          EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+          EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
         }
 
         if(EpcM_pre < pcM_pre){
-          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-2]
         }
       }
       
@@ -523,13 +527,11 @@ simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       ANew_Eq <- (slNew_Eq + clNew_Eq) * (1/adjF_pre)
       
       if(i == 1){
-        # i < 4
         slExp1 <- slNew_Eq  * (exports_percentK/100)
         clExp1 <- clNew_Eq  * (exports_percentK/100)
         ANew1  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
         
       } else if( i == 2 ){
-        # i >= 4 && i <= 5
         slExp1 <- slNew_Eq * (exports_percentK/100)
         clExp1 <- clNew_Eq * (exports_percentK/100)
         
@@ -609,13 +611,13 @@ simOptimisticFMD <- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
 }
 
 
-optimisticPostFMD_20 <- simOptimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 20, modelParamsEQ_PreFMD = proj_AllDF_EQ,
+optimisticPostFMD_20 <- simOptimisticFMD(calf_cropF = calf_crop, dePopR = 20, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                         exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
-optimisticPostFMD_50 <- simOptimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 50, modelParamsEQ_PreFMD = proj_AllDF_EQ,
+optimisticPostFMD_50 <- simOptimisticFMD(calf_cropF = calf_crop, dePopR = 50, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                          exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
-optimisticPostFMD_90 <- simOptimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
+optimisticPostFMD_90 <- simOptimisticFMD(calf_cropF = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                          exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 postFMD_P_Q_20_Opt <- optimisticPostFMD_20[[1]]
@@ -628,14 +630,20 @@ postFMD_P_Q_90_Opt <- optimisticPostFMD_90[[1]]
 postFMD_K_90_Opt <- optimisticPostFMD_90[[2]]
 
 
-simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn, Stock){
+
+
+
+# optBKP <- list(optimisticPostFMD_20, optimisticPostFMD_50, optimisticPostFMD_90)
+
+
+simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_preFMD, nn, Stock){
   
   ##### Now I have calf-crop until 2009
-  calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
-  calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
+  calf_crop_PreFMD <- calf_cropF %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
+  calf_crop_2009 <- calf_cropF %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
   calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
   
-  modelParamsEQ_PreFMD <- proj_AllDF_EQ %>% filter(Year == 2009)
+  modelParamsEQ_PreFMD <- modelParamsEQ_PreFMD %>% filter(Year == 2009)
   
   slaughterAvg_pre <- modelParamsEQ_PreFMD$Slaughter_avg
   cullAvg_pre <-  modelParamsEQ_PreFMD$Cull_avg
@@ -655,12 +663,17 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
   
   adjF_pre <- modelParamsEQ_PreFMD$AdjFactor
   
+  
   exports_2009 <- exports_preFMD
+  #### here I am getting export percentage by the meat
   exports_2009_meat <- exports_2009 * (slaughterAvg_pre/1000000000)
   exports_percent <- round((exports_2009_meat/capA_pre) * 100,3)
   
+  ##### Here I am getting exports percentage by the stocks
   capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
   exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
+  
+  ### After careful consideration I am using exports_percentK as the exports in the simulation
   
   beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
                                           k4 = numeric(nn), k5 = numeric(nn), k6 = numeric(nn), 
@@ -689,8 +702,6 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
   
   for(i in 1:nrow(proj_Q_P_PostFMD)){
     
-    # i <- 1
-    
     if(i>1){
       
       beefINV_FORECAST_PostFMD$Year[i] <- beefINV_FORECAST_PostFMD$Year[i-1] + 1
@@ -701,7 +712,7 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       beefINV_FORECAST_PostFMD$k7[i] <- delta * beefINV_FORECAST_PostFMD$k6[i-1]
       beefINV_FORECAST_PostFMD$k8[i] <- delta * beefINV_FORECAST_PostFMD$k7[i-1]
       beefINV_FORECAST_PostFMD$k9[i] <- delta * beefINV_FORECAST_PostFMD$k8[i-1]
-      beefINV_FORECAST_PostFMD$K[i] <- sum(beefINV_FORECAST_PostFMD[i,-1:-2])
+      beefINV_FORECAST_PostFMD$K[i]  <- sum(beefINV_FORECAST_PostFMD[i,-1:-2])
       
       calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i-1],
                                                          k0 = g * beefINV_FORECAST_PostFMD$K[i-1])
@@ -725,7 +736,7 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
     
     int_k3 <- 0
     
-    ### Here I assume a 5% decrease in domestic demand and the exports are banned (assume a 10%)
+    ### Here I assume a 5% decrease in domestic demand and the exports are banned
     if(i==1){
       capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
       K1 <- capK_pre * (1 - (dePopR/100))
@@ -765,8 +776,6 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
     ##### I am assuming all the export meat is of high quality so the loss of exports means
     ##### there is excess high quality meat in the country i.e., more supply. 
     ##### Economic theory simply says high supply means the price is low. 
-    # slExports <- slNew * 0.1
-    # slNew <- slNew + slExports
     
     if(i < 4){
       #### Exports are banned that means the production stays in the country. So I assign equal weights to 
@@ -849,14 +858,14 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       EpcM_pre <- Ps[5]
       
       ### Here I make sure the expected price is not going out of bounds
-      if(i>1){
+      if(i>2){
         
         if(EpsM_pre < psM_pre){
-          EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+          EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
         }
         
         if(EpcM_pre < pcM_pre){
-          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-2]
         }
       }
       
@@ -885,13 +894,13 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
       ANew_Eq <- (slNew_Eq + clNew_Eq) * (1/adjF_pre)
       
       if(i < 4){
-        # i < 4
+        
         slExp1 <- slNew_Eq  * (exports_percentK/100)
         clExp1 <- clNew_Eq  * (exports_percentK/100)
         ANew1  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
         
       } else if( i >= 4 && i <= 5 ){
-        # i >= 4 && i <= 5
+        
         slExp1 <- slNew_Eq * (exports_percentK/100)
         clExp1 <- clNew_Eq * (exports_percentK/100)
         
@@ -972,13 +981,13 @@ simPessimisticFMD<- function(calf_crop_PreFMD, dePopR,modelParamsEQ_PreFMD, expo
 
 
 
-pessimisticPostFMD_20 <- simPessimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 20, modelParamsEQ_PreFMD = proj_AllDF_EQ,
+pessimisticPostFMD_20 <- simPessimisticFMD(calf_cropF = calf_crop, dePopR = 20, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                          exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
-pessimisticPostFMD_50 <- simPessimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 50, modelParamsEQ_PreFMD = proj_AllDF_EQ,
+pessimisticPostFMD_50 <- simPessimisticFMD(calf_cropF = calf_crop, dePopR = 50, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                          exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
-pessimisticPostFMD_90 <- simPessimisticFMD(calf_crop_PreFMD = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
+pessimisticPostFMD_90 <- simPessimisticFMD(calf_cropF = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                          exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
 postFMD_P_Q_20_Pes <- pessimisticPostFMD_20[[1]]
@@ -992,6 +1001,8 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 
 
+
+# pesBKP <- list(pessimisticPostFMD_20, pessimisticPostFMD_50, pessimisticPostFMD_90)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -1100,6 +1111,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     capA_pre <- proj_Q_P_PostFMD$A[i-1]
 
     capK_pre <- beefINV_FORECAST_PostFMD$K[i-1]
+    
+    
   }
 
   #### k is replacement heifers starting value.We start with zero (almost never true), but we let the program and data to give
@@ -1236,15 +1249,16 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           EpcM_pre <- Ps[5]
 
           ### Here I make sure the expected price is not going out of bounds
-          if(i>1){
-            
+          if(i>3){
+
             if(EpsM_pre < psM_pre){
-              EpsM_pre <- proj_Q_P_PostFMD$EPs[i-1]
+              EpsM_pre <- proj_Q_P_PostFMD$EPs[i-3]
             }
             
             if(EpcM_pre < pcM_pre){
               EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
             }
+            
           }
           
 
@@ -1355,25 +1369,54 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 }
 
 
-proj_Q_P_PostFMD_20 <- proj_Q_P_PostFMD
-beefINV_FORECAST_PostFMD_20 <- beefINV_FORECAST_PostFMD
+proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_OP <- beefINV_FORECAST_PostFMD
 
-proj_Q_P_PostFMD_50 <- proj_Q_P_PostFMD
-beefINV_FORECAST_PostFMD_50 <- beefINV_FORECAST_PostFMD
+proj_Q_P_PostFMD_50_OP <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_OP <- beefINV_FORECAST_PostFMD
 
-proj_Q_P_PostFMD_90 <- proj_Q_P_PostFMD
-beefINV_FORECAST_PostFMD_90 <- beefINV_FORECAST_PostFMD
-
-
-proj_Q_P_PostFMD_20 <- proj_Q_P_PostFMD_20 %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc) 
-proj_Q_P_PostFMD_50 <- proj_Q_P_PostFMD_50 %>% transmute(Year = Year, Ps50 = Ps, Pc50 = Pc) 
-proj_Q_P_PostFMD_90 <- proj_Q_P_PostFMD_90 %>% transmute(Year = Year, Ps90 = Ps, Pc90 = Pc) 
+proj_Q_P_PostFMD_90_OP <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_OP <- beefINV_FORECAST_PostFMD
 
 
-merge(merge(proj_Q_P_PostFMD_20, proj_Q_P_PostFMD_50), proj_Q_P_PostFMD_90)
+proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD_20_OP %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc) 
+proj_Q_P_PostFMD_50_OP <- proj_Q_P_PostFMD_50_OP %>% transmute(Year = Year, Ps50 = Ps, Pc50 = Pc) 
+proj_Q_P_PostFMD_90_OP <- proj_Q_P_PostFMD_90_OP %>% transmute(Year = Year, Ps90 = Ps, Pc90 = Pc) 
+
+
+proj_Q_P_PostFMD_OP <- merge(merge(proj_Q_P_PostFMD_20_OP, proj_Q_P_PostFMD_50_OP), 
+                             proj_Q_P_PostFMD_90_OP)
+
+
+beefINV_FORECAST_20_OP <- beefINV_FORECAST_PostFMD_20_OP %>% transmute(Year = Year, K20 = K) 
+beefINV_FORECAST_50_OP <- beefINV_FORECAST_PostFMD_50_OP %>% transmute(Year = Year, K50 = K) 
+beefINV_FORECAST_90_OP <- beefINV_FORECAST_PostFMD_90_OP %>% transmute(Year = Year, K90 = K) 
+
+
+beefINV_FORECAST_PostFMD_OP <- merge(merge(beefINV_FORECAST_20_OP, beefINV_FORECAST_50_OP), 
+                             beefINV_FORECAST_90_OP)
 
 
 
+
+
+
+proj_Q_P_PostFMD_20_PE <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_PE <- beefINV_FORECAST_PostFMD
+
+proj_Q_P_PostFMD_50_PE <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_PE <- beefINV_FORECAST_PostFMD
+
+proj_Q_P_PostFMD_90_PE <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_PE <- beefINV_FORECAST_PostFMD
+
+
+proj_Q_P_PostFMD_20_PE <- proj_Q_P_PostFMD_20_PE %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc) 
+proj_Q_P_PostFMD_50_PE <- proj_Q_P_PostFMD_50_PE %>% transmute(Year = Year, Ps50 = Ps, Pc50 = Pc) 
+proj_Q_P_PostFMD_90_PE <- proj_Q_P_PostFMD_90_PE %>% transmute(Year = Year, Ps90 = Ps, Pc90 = Pc) 
+
+
+proj_Q_P_PostFMD_PE <- merge(merge(proj_Q_P_PostFMD_20, proj_Q_P_PostFMD_50), proj_Q_P_PostFMD_90)
 
 
 

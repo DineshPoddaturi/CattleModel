@@ -1,3 +1,24 @@
+#####  Baseline fitted prices ##########
+### Here I use the fitted prices until 2017 and then projections until 2019
+pricesBaseFit <- proj_AllDF_EQ %>% select(Year, psMedian, pcMedian) %>% 
+  filter(Year > (optPricePostFMDN$Year[1] - 3)) %>% transmute(Year = Year, psB = psMedian, pcB = pcMedian)
+
+pricesBaseProj <- PQs_MEDIANS %>% select(Year, Ps, Pc) %>% 
+  filter(Year <= optPricePostFMDN$Year[nrow(optPricePostFMDN)]) %>% transmute(Year = Year, psB = Ps, pcB = Pc)
+
+pricesBaseline <- rbind(pricesBaseFit, pricesBaseProj)
+
+## Baseline stocks
+obsKN <- Stock %>% select(Year, K) %>% 
+  filter(Year > (optStockPostFMDN$Year[1]-3) & Year < (optStockPostFMDN$Year[nrow(optStockPostFMDN)]-1))
+
+## Projected stocks
+projKN <- beefINV_FORECAST %>% select(Year, Kcast) %>% filter(Year <= optStockPostFMDN$Year[nrow(optStockPostFMDN)]) %>%
+  transmute(Year = Year, K = Kcast)
+
+### Merged Baseline Stocks
+KBaseline <- rbind(obsKN, projKN)
+
 
 # Optimstic scenario
 
@@ -20,6 +41,8 @@ postFMD_P_Q_90_OP <- postFMD_P_Q_90_OP %>% select(Year, Ps, Pc) %>% transmute(Ye
 optPriceList <- list(postFMD_P_Q_20_OP, postFMD_P_Q_50_OP, postFMD_P_Q_90_OP)
 optPricePostFMD <- Reduce(function(...) merge(...), optPriceList)
 
+
+
 postFMD_K_20_OP <- postFMD_K_20_Opt
 postFMD_K_20_OP <- postFMD_K_20_OP %>% select(Year, K) %>% transmute(Year = Year, K20 = K)
 
@@ -33,17 +56,6 @@ optStockList <- list(postFMD_K_20_OP, postFMD_K_50_OP,
                       postFMD_K_90_OP)
 optStockPostFMD <- Reduce(function(...) merge(...), optStockList)
 
-
-#####  Baseline fitted prices ##########
-### Here I use the fitted prices until 2017 and then projections until 2019
-pricesBaseFit <- proj_AllDF_EQ %>% select(Year, psMedian, pcMedian) %>% 
-  filter(Year > (optPricePostFMDN$Year[1] - 3)) %>% transmute(Year = Year, psB = psMedian, pcB = pcMedian)
-
-pricesBaseProj <- PQs_MEDIANS %>% select(Year, Ps, Pc) %>% 
-  filter(Year <= optPricePostFMDN$Year[nrow(optPricePostFMDN)]) %>% transmute(Year = Year, psB = Ps, pcB = Pc)
-
-pricesBaseline <- rbind(pricesBaseFit, pricesBaseProj)
-
 prices_Opt <- left_join(pricesBaseline, optPricePostFMD) %>% filter(Year <= optPricePostFMD$Year[nrow(optPricePostFMD)])
 
 optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
@@ -53,7 +65,10 @@ optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, co
   geom_point(aes(y=Ps90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Opt$Year[1],
-                                  prices_Opt$Year[nrow(prices_Opt)]))) 
+                                  prices_Opt$Year[nrow(prices_Opt)]))) + theme_classic() + 
+  scale_y_continuous(name="Fed Cattle Price") +
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline")) + 
@@ -63,21 +78,13 @@ optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
   geom_point(aes(y=Pc90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Opt$Year[1],
-                                  prices_Opt$Year[nrow(prices_Opt)]))) 
+                                  prices_Opt$Year[nrow(prices_Opt)])))+ theme_classic() +
+  scale_y_continuous(name="Cull Cow Price") + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
 
 
 ##### 
-## Baseline stocks
-obsKN <- Stock %>% select(Year, K) %>% 
-  filter(Year > (optStockPostFMDN$Year[1]-3) & Year < (optStockPostFMDN$Year[nrow(optStockPostFMDN)]-1))
-
-## Projected stocks
-projKN <- beefINV_FORECAST %>% select(Year, Kcast) %>% filter(Year <= optStockPostFMDN$Year[nrow(optStockPostFMDN)]) %>%
-  transmute(Year = Year, K = Kcast)
-
-### Merged Baseline Stocks
-KBaseline <- rbind(obsKN, projKN)
-
 stocks_Opt <- left_join(KBaseline, optStockPostFMD) %>% filter(Year <= optStockPostFMD$Year[nrow(optStockPostFMD)])
 stocks_Opt[,-1] <- stocks_Opt[,-1]/1000
 
@@ -88,7 +95,10 @@ optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
   geom_point(aes(y=K90, color="90% DEPOP")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_Opt$Year[1],
-                                  stocks_Opt$Year[nrow(stocks_Opt)])))
+                                  stocks_Opt$Year[nrow(stocks_Opt)]))) + theme_classic() +
+  scale_y_continuous(name="Stocks") + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 
@@ -127,16 +137,6 @@ pesStockList <- list(postFMD_K_20_PE, postFMD_K_50_PE,
 pesStockPostFMD <- Reduce(function(...) merge(...), pesStockList)
 
 
-#####  Baseline fitted prices ##########
-### Here I use the fitted prices until 2017 and then projections until 2019
-pricesBaseFit <- proj_AllDF_EQ %>% select(Year, psMedian, pcMedian) %>% 
-  filter(Year > (optPricePostFMDN$Year[1] - 3)) %>% transmute(Year = Year, psB = psMedian, pcB = pcMedian)
-
-pricesBaseProj <- PQs_MEDIANS %>% select(Year, Ps, Pc) %>% 
-  filter(Year <= optPricePostFMDN$Year[nrow(optPricePostFMDN)]) %>% transmute(Year = Year, psB = Ps, pcB = Pc)
-
-pricesBaseline <- rbind(pricesBaseFit, pricesBaseProj)
-
 prices_Pes <- left_join(pricesBaseline, pesPricePostFMD) %>% filter(Year <= pesPricePostFMD$Year[nrow(pesPricePostFMD)])
 
 pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
@@ -146,7 +146,10 @@ pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, co
   geom_point(aes(y=Ps90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Pes$Year[1],
-                                  prices_Pes$Year[nrow(prices_Pes)]))) 
+                                  prices_Pes$Year[nrow(prices_Pes)]))) + theme_classic() + 
+  scale_y_continuous(name="Fed Cattle Price") +
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline")) + 
@@ -156,20 +159,12 @@ pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
   geom_point(aes(y=Pc90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Pes$Year[1],
-                                  prices_Pes$Year[nrow(prices_Pes)]))) 
+                                  prices_Pes$Year[nrow(prices_Pes)]))) + theme_classic() +
+  scale_y_continuous(name="Cull Cow Price") + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
-##### 
-## Baseline stocks
-obsKN <- Stock %>% select(Year, K) %>% 
-  filter(Year > (optStockPostFMDN$Year[1]-3) & Year < (optStockPostFMDN$Year[nrow(optStockPostFMDN)]-1))
-
-## Projected stocks
-projKN <- beefINV_FORECAST %>% select(Year, Kcast) %>% filter(Year <= optStockPostFMDN$Year[nrow(optStockPostFMDN)]) %>%
-  transmute(Year = Year, K = Kcast)
-
-### Merged Baseline Stocks
-KBaseline <- rbind(obsKN, projKN)
 
 stocks_Pes <- left_join(KBaseline, pesStockPostFMD) %>% filter(Year <= pesStockPostFMD$Year[nrow(pesStockPostFMD)])
 stocks_Pes[,-1] <- stocks_Pes[,-1]/1000
@@ -181,7 +176,10 @@ pesStockPlotN <- stocks_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
   geom_point(aes(y=K90, color="90% DEPOP")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_Pes$Year[1],
-                                  stocks_Pes$Year[nrow(stocks_Pes)]))) 
+                                  stocks_Pes$Year[nrow(stocks_Pes)]))) + theme_classic() +
+  scale_y_continuous(name="Stocks") + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 
