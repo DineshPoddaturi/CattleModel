@@ -497,9 +497,10 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
           EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
         }
 
-        if(EpcM_pre < pcM_pre){
-          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-2]
-        }
+        # if(EpcM_pre < pcM_pre){
+        #   EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+        # }
+
       }
       
       
@@ -629,10 +630,6 @@ postFMD_K_50_Opt <- optimisticPostFMD_50[[2]]
 postFMD_P_Q_90_Opt <- optimisticPostFMD_90[[1]]
 postFMD_K_90_Opt <- optimisticPostFMD_90[[2]]
 
-
-
-
-
 # optBKP <- list(optimisticPostFMD_20, optimisticPostFMD_50, optimisticPostFMD_90)
 
 
@@ -665,14 +662,13 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
   
   
   exports_2009 <- exports_preFMD
-  #### here I am getting export percentage by the meat
+  #### here I am getting export percentage by the meat capA_pre
   exports_2009_meat <- exports_2009 * (slaughterAvg_pre/1000000000)
   exports_percent <- round((exports_2009_meat/capA_pre) * 100,3)
   
-  ##### Here I am getting exports percentage by the stocks
+  ##### Here I am getting exports percentage by the stocks capK_pre_meat
   capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
   exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
-  
   ### After careful consideration I am using exports_percentK as the exports in the simulation
   
   beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
@@ -859,15 +855,18 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
       
       ### Here I make sure the expected price is not going out of bounds
       if(i>2){
-        
+
         if(EpsM_pre < psM_pre){
           EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
         }
+
+        # if(EpcM_pre < pcM_pre){
+        #   EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
+        # }
         
-        if(EpcM_pre < pcM_pre){
-          EpcM_pre <- proj_Q_P_PostFMD$EPc[i-2]
-        }
       }
+      
+      
       
       
       Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
@@ -1002,7 +1001,11 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 
 
-# pesBKP <- list(pessimisticPostFMD_20, pessimisticPostFMD_50, pessimisticPostFMD_90)
+
+############################################################################################################################################################################################################################################################
+
+
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

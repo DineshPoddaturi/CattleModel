@@ -11,53 +11,68 @@ output:
 
 
 ## Optimistic Scenario:\newline
-1. 5% Decline in domestic demand for 1 year\newline
-2. In year 2 domestic demand goes back up\newline
-3. Exports banned for 2 years (I used exports in 2008 as the exports share for the simulation years)\newline
-4. In year 3 exports ban is lifted and everything is back to normal
+
+Year1:  5% domestic demand decline and exports are banned \newline
+Year2: Domestic demand is back up and exports are banned \newline
+Year3: Everything goes back to pre FMD \newline
+
+
+<!-- 1. 5% Decline in domestic demand for 1 year\newline -->
+<!-- 2. In year 2 domestic demand goes back up\newline -->
+<!-- 3. Exports banned for 2 years (I used exports in 2008 as the exports share for the simulation years)\newline -->
+<!-- 4. In year 3 exports ban is lifted and everything is back to normal -->
 
 
 \begin{figure}
 \caption{Fed cattle price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/fedCattlePrices-Optimistic.jpeg}
-\end{figure}
-
-\begin{figure}
-\caption{Cull cow price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/cullCowPrices-Optimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/FedCattlePriceOptimistic.jpeg}
 \end{figure}
 
 
 \begin{figure}
 \caption{Stock changes (in in 1000 head)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/stockEvolution-Optimistic.jpeg}
-\end{figure}
-
-
-
-\newpage
-
-## Pessimistic Scenario:\newline
-1. 5% Decline in domestic demand for 3 years\newline
-2. In year 4 domestic demand goes back up\newline
-3. Exports banned for 5 years (I used exports in 2008 as the exports share for the simulation years)\newline
-4. In year 6 exports ban is lifted and everything is back to normal
-
-\begin{figure}
-\caption{Fed cattle price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/fedCattlePrices-Pessimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/StocksOptimistic.jpeg}
 \end{figure}
 
 \begin{figure}
 \caption{Cull cow price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/cullCowPrices-Pessimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/CullCowPriceOptimistic.jpeg}
 \end{figure}
 
+\clearpage
+
+## Pessimistic Scenario:\newline
+
+Year1: 5% domestic demand decline and exports are banned \newline
+Year2: 5% domestic demand decline and exports are banned \newline
+Year3: 5% domestic demand decline and exports are banned \newline
+Year4: Domestic demand goes back up, exports are still banned \newline
+Year5: Exports are still banned \newline
+Year6: Export band is lifted and everything goes back to pre FMD
+
+
+<!-- 1. 5% Decline in domestic demand for 3 years\newline -->
+<!-- 2. In year 4 domestic demand goes back up\newline -->
+<!-- 3. Exports banned for 5 years (I used exports in 2008 as the exports share for the simulation years)\newline -->
+<!-- 4. In year 6 exports ban is lifted and everything is back to normal -->
+
+\begin{figure}
+\caption{Fed cattle price changes(dollar/Lb)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/FedCattlePricePessimistic.jpeg}
+\end{figure}
 
 \begin{figure}
 \caption{Stock changes (in 1000 head)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/stockEvolution-Pessimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/StocksPessimistic.jpeg}
 \end{figure}
+
+\begin{figure}
+\caption{Cull cow price changes(dollar/Lb)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/CullCowPricePessimistic.jpeg}
+\end{figure}
+
+
+
 
 
 
