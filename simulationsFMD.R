@@ -530,26 +530,26 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
       if(i == 1){
         slExp1 <- slNew_Eq  * (exports_percentK/100)
         clExp1 <- clNew_Eq  * (exports_percentK/100)
-        ANew1  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
+        ANew11  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
         
       } else if( i == 2 ){
         slExp1 <- slNew_Eq * (exports_percentK/100)
         clExp1 <- clNew_Eq * (exports_percentK/100)
         
-        ANew1 <- ANew_Eq + slExp1 + clExp1
+        ANew11 <- ANew_Eq + slExp1 + clExp1
         
       } else{
         
-        ANew1 <- ANew_Eq
+        ANew11 <- ANew_Eq
         
       }
       
       
-      D_sl <- ANew1 *
+      D_sl <- ANew11 *
         ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
            (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
       
-      D_cl <- ANew1 * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
+      D_cl <- ANew11 * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
       
       slDiff <- slNew_Eq - D_sl
       clDiff <- clNew_Eq - D_cl
@@ -568,7 +568,7 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
       }
       ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
       if((m %% 2 == 0)){
-        ANew1 <- ANew1
+        ANew1 <- ANew11
       }else{
         slNew <- slNew_Eq
         clNew <- clNew_Eq
@@ -1088,6 +1088,7 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
 # k_old_Head_Eq <- matrix(data=0, nrow=1000, ncol=nrow(proj_Q_P_PostFMD))
 
 
+
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
   # i <- 1
@@ -1220,11 +1221,14 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     clDiffEq <- NULL
 
         while(abs(slDiff)>0.01 || abs(clDiff)>0.01){
-
+          
+          slDiffEq[m] <- slDiff
+          clDiffEq[m] <- clDiff
+          
           if( slDiff < 0){
             psN <- psM_pre + 0.001
           } else if( slDiff > 0){
-            psN <- psM_pre- 0.001
+            psN <- psM_pre - 0.001
           }
 
           if(psN < 0){
@@ -1240,6 +1244,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           if(pcN < 0){
             pcN <- pcM_pre
           }
+          
 
           Ps <- getPsPcEpsEpc_FMD(PsM = psN, PcM = pcN, EPsM = EpsM_pre, EPcM = EpcM_pre,
                                   HcM = hcM_pre, SlNew = slNew, ClNew = clNew, ANew = ANew1,
@@ -1252,22 +1257,16 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           EpcM_pre <- Ps[5]
 
           ### Here I make sure the expected price is not going out of bounds
-          if(i>3){
+          if(i>2){
 
             if(EpsM_pre < psM_pre){
-              EpsM_pre <- proj_Q_P_PostFMD$EPs[i-3]
+              EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
             }
-            
-            if(EpcM_pre < pcM_pre){
-              EpcM_pre <- proj_Q_P_PostFMD$EPc[i-1]
-            }
-            
+
           }
           
-
-
           Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
-                                  k = k, CapA = capA_pre, gamma_k3 = gamma_k3,
+                                  k = k, CapA = ANew1, gamma_k3 = gamma_k3,
                                   eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF_pre, k0s = k0s,
                                   slAvg = slaughterAvg_pre, clAvg = cullAvg_pre)
           slNew_Eq <- Qs[1]
@@ -1275,38 +1274,45 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
           ANew_Eq <- Qs[3]
           k_old_Eq <- Qs[4]
           k_old_Head_Eq <- Qs[5]
-
+          
           k_old_Head_OG <- Qs[6]
           slNew_Head_OG <- (slNew_Eq * 1000000000)/slaughterAvg_pre
           clNew_Head_OG <- (clNew_Eq * 1000000000)/cullAvg_pre
-
+          
           while(clNew_Eq < 1.01){
             clNew_Eq  <- clNew_Eq  + 0.01
           }
           while(slNew_Eq < 19.01){
             slNew_Eq <- slNew_Eq + 0.01
           }
-
+          
           ANew_Eq <- (slNew_Eq + clNew_Eq) * (1/adjF_pre)
-
+          
           if(i == 1){
             # i < 4
             slExp1 <- slNew_Eq  * (exports_percentK/100)
             clExp1 <- clNew_Eq  * (exports_percentK/100)
-            ANew1  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
-
+            ANew11  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
+            
           } else if( i == 2 ){
             # i >= 4 && i <= 5
             slExp1 <- slNew_Eq * (exports_percentK/100)
             clExp1 <- clNew_Eq * (exports_percentK/100)
-
-            ANew1 <- ANew_Eq + slExp1 + clExp1
-
+            
+            ANew11 <- ANew_Eq + slExp1 + clExp1
+            
           } else{
-
-            ANew1 <- ANew_Eq
-
+            
+            ANew11 <- ANew_Eq
+            
           }
+          
+          # if((m %% 4 == 0)){
+          #   slNew <- slNew_Eq
+          #   clNew <- clNew_Eq
+          # }
+          
+          ANew1 <- ANew11
 
 
           D_sl <- ANew1 *
@@ -1315,11 +1321,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 
           D_cl <- ANew1 * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
 
-          slDiff <- slNew_Eq - D_sl
-          clDiff <- clNew_Eq - D_cl
-
-          slDiffEq[m] <- slDiff
-          clDiffEq[m] <- clDiff
+          slDiff <- slNew - D_sl
+          clDiff <- clNew - D_cl
 
           if(m >= 10){
             if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
@@ -1331,43 +1334,41 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
             }
           }
           ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
-          if((m %% 2 == 0)){
-            ANew1 <- ANew1
-          }else{
-            slNew <- slNew_Eq
-            clNew <- clNew_Eq
-          }
-
-          k_old <- k_old_Eq
-          k_old_Head <- k_old_Head_Eq
+          # if((m %% 4 == 0)){
+          #   slNew <- slNew_Eq
+          #   clNew <- clNew_Eq
+          # }
+          
+          # k_old <- k_old_Eq
+          # k_old_Head <- k_old_Head_Eq
 
           m <- m+1
 
         }
   # }
   
-  proj_Q_P_PostFMD$Ps[i] <- psM_pre
-  proj_Q_P_PostFMD$Pc[i] <- pcM_pre
-  proj_Q_P_PostFMD$Hc[i] <- hcM_pre
-  proj_Q_P_PostFMD$EPs[i] <- EpsM_pre
-  proj_Q_P_PostFMD$EPc[i] <- EpcM_pre
-  
-  proj_Q_P_PostFMD$Sl[i] <- slNew_Eq
-  proj_Q_P_PostFMD$Cl[i] <- clNew_Eq
-  proj_Q_P_PostFMD$A[i] <- ANew1
-  proj_Q_P_PostFMD$repHeif[i] <- k_old_Eq
-  proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head_Eq
-  
-  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head_Eq) <= 0.5 * g * K1
-  
-  proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG
-  proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
-  proj_Q_P_PostFMD$Cl_Head_OG[i] <- clNew_Head_OG
-  
-  proj_Q_P_PostFMD$Sl_Head_EQ[i] <- ( slNew_Eq * 1000000000 )/slaughterAvg_pre
-  proj_Q_P_PostFMD$Cl_Head_EQ[i] <- ( clNew_Eq * 1000000000 )/cullAvg_pre
-  
-  proj_Q_P_PostFMD$Year[i] <- beefINV_FORECAST_PostFMD$Year[i]
+    proj_Q_P_PostFMD$Ps[i] <- psM_pre
+    proj_Q_P_PostFMD$Pc[i] <- pcM_pre
+    proj_Q_P_PostFMD$Hc[i] <- hcM_pre
+    proj_Q_P_PostFMD$EPs[i] <- EpsM_pre
+    proj_Q_P_PostFMD$EPc[i] <- EpcM_pre
+    
+    proj_Q_P_PostFMD$Sl[i] <- slNew
+    proj_Q_P_PostFMD$Cl[i] <- clNew
+    proj_Q_P_PostFMD$A[i] <- ANew1
+    proj_Q_P_PostFMD$repHeif[i] <- k_old
+    proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head
+    
+    proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head) <= 0.5 * g * K1
+    
+    proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG
+    proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
+    proj_Q_P_PostFMD$Cl_Head_OG[i] <- slNew_Head_OG
+    
+    proj_Q_P_PostFMD$Sl_Head_EQ[i] <- ( slNew * 1000000000 )/slaughterAvg_pre
+    proj_Q_P_PostFMD$Cl_Head_EQ[i] <- ( clNew * 1000000000 )/cullAvg_pre
+    
+    proj_Q_P_PostFMD$Year[i] <- beefINV_FORECAST_PostFMD$Year[i]
   
 }
 

@@ -38,10 +38,11 @@ postFMD_P_Q_90_OP <- postFMD_P_Q_90_OP %>% select(Year, Ps, Pc) %>% transmute(Ye
                                                                                           Ps90 = Ps,
                                                                                           Pc90 = Pc)
 
+
 optPriceList <- list(postFMD_P_Q_20_OP, postFMD_P_Q_50_OP, postFMD_P_Q_90_OP)
 optPricePostFMD <- Reduce(function(...) merge(...), optPriceList)
 
-
+optPricePostFMD <- proj_Q_P_PostFMD_OP
 
 postFMD_K_20_OP <- postFMD_K_20_Opt
 postFMD_K_20_OP <- postFMD_K_20_OP %>% select(Year, K) %>% transmute(Year = Year, K20 = K)
@@ -52,9 +53,15 @@ postFMD_K_50_OP <- postFMD_K_50_OP %>% select(Year, K) %>% transmute(Year = Year
 postFMD_K_90_OP <- postFMD_K_90_Opt
 postFMD_K_90_OP <- postFMD_K_90_OP %>% select(Year, K) %>% transmute(Year = Year, K90 = K)
 
+
 optStockList <- list(postFMD_K_20_OP, postFMD_K_50_OP, 
                       postFMD_K_90_OP)
 optStockPostFMD <- Reduce(function(...) merge(...), optStockList)
+
+optStockPostFMD <- beefINV_FORECAST_PostFMD_OP
+
+
+
 
 prices_Opt <- left_join(pricesBaseline, optPricePostFMD) %>% filter(Year <= optPricePostFMD$Year[nrow(optPricePostFMD)])
 
