@@ -24,19 +24,18 @@ Year3: Everything goes back to pre FMD \newline
 
 
 \begin{figure}
-\caption{Fed cattle price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/FedCattlePriceOptimistic.jpeg}
-\end{figure}
-
-
-\begin{figure}
-\caption{Stock changes (in in 1000 head)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/StocksOptimistic.jpeg}
+\caption{Fed cattle price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/fedCattlePriceOptimistic.jpeg}
 \end{figure}
 
 \begin{figure}
-\caption{Cull cow price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/CullCowPriceOptimistic.jpeg}
+\caption{Stock changes (in 1000 head)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/stocksOptimistic.jpeg}
+\end{figure}
+
+\begin{figure}
+\caption{Cull cow price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/cullCowPriceOptimistic.jpeg}
 \end{figure}
 
 \clearpage
@@ -57,18 +56,18 @@ Year6: Export band is lifted and everything goes back to pre FMD
 <!-- 4. In year 6 exports ban is lifted and everything is back to normal -->
 
 \begin{figure}
-\caption{Fed cattle price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/FedCattlePricePessimistic.jpeg}
+\caption{Fed cattle price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/fedCattlePricePessimistic.jpeg}
 \end{figure}
 
 \begin{figure}
 \caption{Stock changes (in 1000 head)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/StocksPessimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/stocksPessimistic.jpeg}
 \end{figure}
 
 \begin{figure}
-\caption{Cull cow price changes(dollar/Lb)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-03/NoChangesExpectedPrice/CullCowPricePessimistic.jpeg}
+\caption{Cull cow price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/cullCowPricePessimistic.jpeg}
 \end{figure}
 
 

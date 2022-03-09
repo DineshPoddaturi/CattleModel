@@ -1,10 +1,12 @@
 #####  Baseline fitted prices ##########
 ### Here I use the fitted prices until 2017 and then projections until 2019
 pricesBaseFit <- proj_AllDF_EQ %>% select(Year, psMedian, pcMedian) %>% 
-  filter(Year > (optPricePostFMDN$Year[1] - 3)) %>% transmute(Year = Year, psB = psMedian, pcB = pcMedian)
+  filter(Year > (optPricePostFMDN$Year[1] - 3)) %>% transmute(Year = Year, 
+                                                              psB = psMedian, pcB = pcMedian)
 
 pricesBaseProj <- PQs_MEDIANS %>% select(Year, Ps, Pc) %>% 
-  filter(Year <= optPricePostFMDN$Year[nrow(optPricePostFMDN)]) %>% transmute(Year = Year, psB = Ps, pcB = Pc)
+  filter(Year <= optPricePostFMDN$Year[nrow(optPricePostFMDN)]) %>% transmute(Year = Year, 
+                                                                              psB = Ps, pcB = Pc)
 
 pricesBaseline <- rbind(pricesBaseFit, pricesBaseProj)
 
@@ -60,10 +62,11 @@ optStockPostFMD <- Reduce(function(...) merge(...), optStockList)
 
 # optStockPostFMD <- beefINV_FORECAST_PostFMD_OP
 
-
-
-
 prices_Opt <- left_join(pricesBaseline, optPricePostFMD) %>% filter(Year <= optPricePostFMD$Year[nrow(optPricePostFMD)])
+
+prices_Opt[,-1] <- prices_Opt[,-1] * 100
+
+prices_Opt <- prices_Opt %>% round(3)
 
 optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
   geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
@@ -108,7 +111,6 @@ optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
-
 # Pessimistic scenario
 
 ###################### Here I merge the pessimistic case prices and stocks under all depopulation levels
@@ -130,7 +132,7 @@ postFMD_P_Q_90_PE <- postFMD_P_Q_90_PE %>% select(Year, Ps, Pc) %>% transmute(Ye
 pesPriceList <- list(postFMD_P_Q_20_PE, postFMD_P_Q_50_PE, postFMD_P_Q_90_PE)
 pesPricePostFMD <- Reduce(function(...) merge(...), pesPriceList)
 
-pesPricePostFMD <- proj_Q_P_PostFMD_PE
+# pesPricePostFMD <- proj_Q_P_PostFMD_PE
 
 
 postFMD_K_20_PE <- postFMD_K_20_Pes
@@ -146,10 +148,14 @@ pesStockList <- list(postFMD_K_20_PE, postFMD_K_50_PE,
                      postFMD_K_90_PE)
 pesStockPostFMD <- Reduce(function(...) merge(...), pesStockList)
 
-pesStockPostFMD <- beefINV_FORECAST_PostFMD_PE
+# pesStockPostFMD <- beefINV_FORECAST_PostFMD_PE
 
 
 prices_Pes <- left_join(pricesBaseline, pesPricePostFMD) %>% filter(Year <= pesPricePostFMD$Year[nrow(pesPricePostFMD)])
+
+prices_Pes[,-1] <- prices_Pes[,-1] * 100
+prices_Pes <- prices_Pes %>% round(3)
+
 
 pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
   geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
