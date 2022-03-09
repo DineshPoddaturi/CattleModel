@@ -25,6 +25,14 @@ dev.off()
 
 beefInventory_plots <- beefInventory %>% transmute(Year = Year, K = K/1000000) %>% filter(Year > 1969) %>% arrange(Year)
 
+# require(pracma)
+# ddlBeefINV <- detrend(as.matrix(beefInventory_plots%>%select(-Year)),tt='linear') %>% as.data.frame() %>% mutate(Year = c(seq(1970,2020))) %>% select(Year, everything())
+# 
+# ddl_plotBeefINV <- ddlBeefINV %>% ggplot(aes(x=Year))+geom_line(aes(y=K,color="Stock"))+geom_point(aes(y=K,color="Stock")) + 
+#   labs(x="Year", y="", colour = "") + geom_hline(yintercept=0, linetype="dashed", color = "black") + theme_classic() + 
+#   scale_x_continuous(name="Year", breaks=c(seq(1970,2020, by =2)))  + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
 tikz(file="introPlots/CattleCycle.tex", width = 6.2, height = 3.5)
 
 inventoryBeef_plot <- beefInventory_plots %>% ggplot(aes(x=Year))+
