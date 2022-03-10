@@ -4,13 +4,13 @@ output:
   html_document: default
 ---
 
-1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US.
-2. December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S.
-3. South Korea resumed U.S. beef imports in July 2008. 
-4. China lifted it's ban in 2016
+<!-- 1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US. -->
+<!-- 2. December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S. -->
+<!-- 3. South Korea resumed U.S. beef imports in July 2008.  -->
+<!-- 4. China lifted it's ban in 2016 -->
 
 
-## Optimistic Scenario:\newline
+# Optimistic Scenario:\newline
 
 Year1:  5% domestic demand decline and exports are banned \newline
 Year2: Domestic demand is back up and exports are banned \newline
@@ -24,23 +24,23 @@ Year3: Everything goes back to pre FMD \newline
 
 
 \begin{figure}
-\caption{Fed cattle price changes (dollar/CWT)}
   \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/fedCattlePriceOptimistic.jpeg}
+  \caption{Fed cattle price changes (dollar/CWT)}
 \end{figure}
 
 \begin{figure}
-\caption{Stock changes (in 1000 head)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/stocksOptimistic.jpeg}
-\end{figure}
-
-\begin{figure}
-\caption{Cull cow price changes (dollar/CWT)}
   \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/cullCowPriceOptimistic.jpeg}
+  \caption{Cull cow price changes (dollar/CWT)}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/stocksOptimistic.jpeg}
+  \caption{Stock changes (in 1000 head)}
 \end{figure}
 
 \clearpage
 
-## Pessimistic Scenario:\newline
+# Pessimistic Scenario:\newline
 
 Year1: 5% domestic demand decline and exports are banned \newline
 Year2: 5% domestic demand decline and exports are banned \newline
@@ -56,19 +56,21 @@ Year6: Export band is lifted and everything goes back to pre FMD
 <!-- 4. In year 6 exports ban is lifted and everything is back to normal -->
 
 \begin{figure}
-\caption{Fed cattle price changes (dollar/CWT)}
   \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/fedCattlePricePessimistic.jpeg}
+  \caption{Fed cattle price changes (dollar/CWT)}
 \end{figure}
 
 \begin{figure}
-\caption{Stock changes (in 1000 head)}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/stocksPessimistic.jpeg}
-\end{figure}
-
-\begin{figure}
-\caption{Cull cow price changes (dollar/CWT)}
   \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/cullCowPricePessimistic.jpeg}
+  \caption{Cull cow price changes (dollar/CWT)}
 \end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-09/stocksPessimistic.jpeg}
+  \caption{Stock changes (in 1000 head)}
+\end{figure}
+
+
 
 
 

@@ -560,6 +560,8 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
       slDiff <- slNew - D_sl
       clDiff <- clNew - D_cl
       
+      ## After 10 iterations, if the differences are not reaching zero, I check whether the differences are reaching a steady state.
+      ## I do this by checking the past three iterations differences stored in the differences array.
       if(m >= 10){
         if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
           if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
@@ -918,6 +920,9 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
       slDiff <- slNew - D_sl
       clDiff <- clNew - D_cl
       
+      ## After 15 iterations, if the differences are not reaching zero, I check whether the differences are reaching a steady state.
+      ## I do this by checking the past three iterations differences stored in the differences array.
+      ## Since it is pessimistic scenario I check this after 15 iterations.
       if(m >= 15){
         if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
           if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
@@ -993,7 +998,7 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 90
+dePopR <- 20
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
 calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
 calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
@@ -1150,9 +1155,6 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   }
   
   ANew <- (slNew + clNew) * (1/adjF_pre)
-  
-  
-  
   
   ##### I am assuming all the export meat is of high quality so the loss of exports means
   ##### there is excess high quality meat in the country i.e., more supply. 
@@ -1314,7 +1316,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     slDiff <- slNew - D_sl
     clDiff <- clNew - D_cl
     
-    if(m >= 50){
+    if(m >= 10){
       if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
         if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
           break

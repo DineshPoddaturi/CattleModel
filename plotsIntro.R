@@ -105,5 +105,58 @@ dev.off()
 
 
 
+###### Detrended plots
+
+
+require(pracma)
+
+ddlPrice_plot <- detrend(as.matrix(pc_ps_cwt_plots%>%select(-Year)),tt='linear') %>% as.data.frame() %>% 
+  mutate(Year = c(seq(ddlPriceINV$Year[1],
+                      ddlPriceINV$Year[nrow(ddlPriceINV)]))) %>% select(Year, everything())
+
+tikz(file="introPlots/PricesReceivedDeTrended.tex", width = 6.2, height = 3)
+
+deTrendedPrice_plot <- ddlPrice_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=PS,color="Fed Cattle Price")) +
+  geom_line(aes(y=PC,color="Cull Cattle Price")) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(ddlPrice_plot$Year[1],
+                                  ddlPrice_plot$Year[nrow(ddlPrice_plot)], by = 2))) + 
+  geom_hline(yintercept=0, linetype="dashed", color = "black") + 
+  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+                                             axis.title.y = element_blank())
+
+print(deTrendedPrice_plot)
+
+dev.off()
+
+
+
+ddlInventory_plot <- detrend(as.matrix(beefInventory_plots%>%select(-Year)),tt='linear') %>% as.data.frame() %>% 
+  mutate(Year = c(seq(beefInventory_plots$Year[1],
+                      beefInventory_plots$Year[nrow(beefInventory_plots)]))) %>% select(Year, everything())
+
+tikz(file="introPlots/CattleCycleDeTrended.tex", width = 6.2, height = 3)
+
+deTrendedInv_plot <- ddlInventory_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Beef Cows")) +
+  scale_x_continuous(name="Year",
+                     breaks=c(seq(ddlInventory_plot$Year[1],
+                                  ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 2))) + 
+  geom_hline(yintercept=0, linetype="dashed", color = "black") + 
+  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+                                              axis.title.y = element_blank())
+
+print(deTrendedInv_plot)
+
+dev.off()
+
+
+
+
+
+
 
 
