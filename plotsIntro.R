@@ -88,7 +88,7 @@ dev.off()
 
 beefValueExport_plots <- beefReceipts %>% select(Year, exportValue)
 
-tikz(file="introPlots/exportValue.tex", width = 6.2, height = 3.5)
+tikz(file="introPlots/exportValue.tex", width = 6.2, height = 3)
 
 exportValue_plot <- beefValueExport_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=exportValue, color="Export Value")) +
@@ -102,6 +102,31 @@ exportValue_plot <- beefValueExport_plots %>% ggplot(aes(x=Year))+
 print(exportValue_plot)
 
 dev.off()
+
+
+
+###### Combinded plot
+domesticExportValue_Plots <- merge(beefReceiptsDomestic_plots, beefValueExport_plots)
+
+tikz(file="introPlots/domesticExportValue.tex", width = 6.2, height = 3.5)
+
+domesticExportValue_plot <- domesticExportValue_Plots %>% ggplot(aes(x=Year))+
+  geom_line(aes(y=exportValue, color="Export Value")) +
+  geom_line(aes(y=domesticReceipts, color="Domestic Cash Receipts")) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(domesticExportValue_Plots$Year[1],
+                                  domesticExportValue_Plots$Year[nrow(domesticExportValue_Plots)]))) + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) +
+  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+print(domesticExportValue_plot)
+
+dev.off()
+
+
+
+
 
 
 

@@ -998,7 +998,7 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 20
+dePopR <- 90
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
 calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
 calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
@@ -1029,7 +1029,6 @@ exports_percent <- round((exports_2009_meat/capA_pre) * 100,3)
 
 capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
 exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
-
 
 nn <- 10
 beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
@@ -1081,7 +1080,7 @@ pcM_EqMN <- NULL
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 5
+  # i <- 1
   
   if(i>1){
     
@@ -1146,12 +1145,17 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   slNew_Head_OG <- (slNew * 1000000000)/slaughterAvg_pre
   clNew_Head_OG <- (clNew * 1000000000)/cullAvg_pre
   
+  clCounter <- 0
+  slCounter <- 0
   
   while(clNew < 1.01){
     clNew <- clNew + 0.01
+    clCounter <- 1
   }
+  
   while(slNew < 19.01){
     slNew <- slNew + 0.01
+    slCounter <- 1
   }
   
   ANew <- (slNew + clNew) * (1/adjF_pre)
@@ -1167,16 +1171,18 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     slExports <- slNew * (exports_percentK/100)
     clExports <- clNew * (exports_percentK/100)
     ### Here we are changing the total demand for meat. Domestic decline for meat is incorporated
-    ANew1 <- ( 1 - (5/100) ) * ANew + slExports + clExports
+    ANew1 <- ( 1 - (5/100) ) * ANew - slExports - clExports
   } else if( i == 2  ){ 
     # i >= 4 && i <= 5 
     ### Here the domestic demand for meat climbs back up
     slExports <- slNew * (exports_percentK/100)
     clExports <- clNew * (exports_percentK/100)
-    ANew1 <- ANew + slExports + clExports
+    ANew1 <- ANew - slExports - clExports
   } else{
     ### Everything is back to normal
-    ANew1 <-  ANew
+    slExports <- slNew * (exports_percentK/100)
+    clExports <- clNew * (exports_percentK/100)
+    ANew1 <-  ANew + slExports + clExports
   }
   
   Ps <- getPsPcEpsEpc_FMD(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
@@ -1290,17 +1296,19 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
       # i < 4
       slExp1 <- slNew_Eq  * (exports_percentK/100)
       clExp1 <- clNew_Eq  * (exports_percentK/100)
-      ANew11  <- (1 - (5/100)) * ANew_Eq  + slExp1 + clExp1
+      ANew11  <- (1 - (5/100)) * ANew_Eq  - slExp1 - clExp1
       
     } else if( i == 2 ){
       # i >= 4 && i <= 5
       slExp1 <- slNew_Eq * (exports_percentK/100)
       clExp1 <- clNew_Eq * (exports_percentK/100)
-      ANew11 <- ANew_Eq + slExp1 + clExp1
+      ANew11 <- ANew_Eq - slExp1 - clExp1
       
     } else{
       
-      ANew11 <- ANew_Eq
+      slExp1 <- slNew_Eq * (exports_percentK/100)
+      clExp1 <- clNew_Eq * (exports_percentK/100)
+      ANew11 <- ANew_Eq + slExp1 + clExp1
       
     }
     
@@ -1343,12 +1351,12 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   proj_Q_P_PostFMD$Sl[i] <- slNew
   proj_Q_P_PostFMD$Cl[i] <- clNew
   proj_Q_P_PostFMD$A[i] <- ANew1
-  proj_Q_P_PostFMD$repHeif[i] <- k_old
-  proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head
+  proj_Q_P_PostFMD$repHeif[i] <- k_old_Eq
+  proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head_Eq
   
-  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head) <= 0.5 * g * K1
+  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head_Eq) <= 0.5 * g * K1
   
-  proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG
+  proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG_Eq
   proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
   proj_Q_P_PostFMD$Cl_Head_OG[i] <- slNew_Head_OG
   

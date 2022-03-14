@@ -312,10 +312,11 @@ Showed him the scenario results I have.
 * Showed chad the new simulation results. Hw commented about the stock levels.
 * They never reach the baseline levels after the disease outbreak. They must reach the baseline or at least have a upward trend to reach the baseline.
 
-* The model is saying we will never reach the baseline stocks. Thsi should be corrected. Maybe this is driving the prices wonky.
+* The model is saying we will never reach the baseline stocks. This should be corrected. Maybe this is driving the prices wonky.
 * Remember we use p_{t-1} to get S_t and D_t by importing animals to reach the subsistence levels of demand. Now I need to check if (imports_t - imports_{t-1})>0 then the expected price should go up. This should be making farmers to increase the stock levels. 
 I have to built that in the algorithm.
 * We are also assuming the costs are not increaseing for importing. But we have costs in the model. 
+
 
 
 
