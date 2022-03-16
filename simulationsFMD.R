@@ -1109,55 +1109,45 @@ pcM_EqMed <- NULL
 psM_EqMN <- NULL
 pcM_EqMN <- NULL
 
+K1 <- NULL
+
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 10
+  i <- 4
   
   if(i>1){
-    
-    # beefINV_FORECAST_PostFMD$Year[i] <- beefINV_FORECAST_PostFMD$Year[i-1] + 1
-    # beefINV_FORECAST_PostFMD$k3[i] <-  abs(proj_Q_P_PostFMD$repHeif_Head[i-1])
-    # beefINV_FORECAST_PostFMD$k4[i] <- delta * beefINV_FORECAST_PostFMD$k3[i-1]
-    # beefINV_FORECAST_PostFMD$k5[i] <- delta * beefINV_FORECAST_PostFMD$k4[i-1]
-    # beefINV_FORECAST_PostFMD$k6[i] <- delta * beefINV_FORECAST_PostFMD$k5[i-1]
-    # beefINV_FORECAST_PostFMD$k7[i] <- delta * beefINV_FORECAST_PostFMD$k6[i-1]
-    # beefINV_FORECAST_PostFMD$k8[i] <- delta * beefINV_FORECAST_PostFMD$k7[i-1]
-    # beefINV_FORECAST_PostFMD$k9[i] <- delta * beefINV_FORECAST_PostFMD$k8[i-1]
-    # beefINV_FORECAST_PostFMD$k10[i] <- delta * beefINV_FORECAST_PostFMD$k9[i-1]
-    # beefINV_FORECAST_PostFMD$K[i] <- sum(beefINV_FORECAST_PostFMD[i,-1:-2])
-    # 
-    # if(beefINV_FORECAST_PostFMD$K[i-1] < K1){
-    #   beefINV_FORECAST_PostFMD$K[i-1] <- K1
-    # }
-    # 
-    # calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i-1],
-    #                                                    k0 = g * beefINV_FORECAST_PostFMD$K[i-1])
-    
+    #Populating the younglings
     k0s_PostFMD[i, ] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[i,],
                                            beefINV_FORECAST = beefINV_FORECAST_PostFMD[i,],
                                            calfCrop = calf_crop_PostFMD)
-    
+    #Retrieving the previous years derived demand and total breeding stock
     capA_pre <- proj_Q_P_PostFMD$A[i-1]
-    
     capK_pre <- beefINV_FORECAST_PostFMD$K[i-1]
-    
   }
-  
+
   #### k is replacement heifers starting value.We start with zero (almost never true), but we let the program and data to give
   ### the optimal replacement heifers.
   k <- 0
-  K1 <- capK_pre 
+  K1[i] <- capK_pre
   k0s <- k0s_PostFMD[i,-1]
-  
   int_k3 <- 0
-  
-  ### Here I assume a 5% decrease in domestic demand and the exports are banned (assume a 10%)
+  ### Here I assume a 5% decrease in domestic demand and the exports are banned.
+  # I am also assuming decrease in the stocks by the apecified depop.
   if(i==1){
     capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
-    # K1 <- capK_pre * (1 - (dePopR/100))
+    K1[i] <- capK_pre * (1 - (dePopR/100))
   }
+  
+  ## After two years the calf crop will become mature and added to the mature stock.
+  if(i>2){
     
-  Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
+    cCrop <- calf_crop_PostFMD %>% filter(Year == proj_Q_P_PostFMD$Year[i-2]) %>% select(k0) %>% as.numeric()
+    rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
+    K1[i] <- K1[i] + cCrop - rHeif
+    
+  }
+  
+  Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
                             k = k, CapA = capA_pre, gamma_k3 = gamma_k3, 
                             eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF_pre, k0s = k0s,
                             slAvg = slaughterAvg_pre, clAvg = cullAvg_pre)
@@ -1194,22 +1184,25 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   
   ANew <- (slNew + clNew) * (1/adjF_pre)
   
-  if((slCounter==1) || (clCounter==1)){
-    
-    slNew_Head_EQ <- (slNew * 1000000000)/slaughterAvg_pre
+  if((clCounter==1)){
     clNew_Head_EQ <- (clNew * 1000000000)/cullAvg_pre
-    
-    K1_new <- K1
-    
-    estK <- BBoptim(par = K1_new, fn = estRepHeifersEQ_FMD, slHead = slNew_Head_EQ, clHead = clNew_Head_EQ, 
-                    k = k_old_Head, gamma_k3 = gamma_k3,
-                    eta_k3 = eta_k3 , int_k3 = int_k3, k0s = k0s)
-    K1 <- estK$par
+    clHeadDiff <- clNew_Head_EQ - clNew_Head_OG
+    # K1[i] <- K1[i] + clHeadDiff
   }
   
-  ##### I am assuming all the export meat is of high quality so the loss of exports means
-  ##### there is excess high quality meat in the country i.e., more supply. 
-  ##### Economic theory simply says high supply means the price is low. 
+  if(slCounter==1){
+    slNew_Head_EQ <- (slNew * 1000000000)/slaughterAvg_pre
+    slHeadDiff <- slNew_Head_EQ - slNew_Head_OG
+    K1[i] <- K1[i] + slHeadDiff
+    # clNew_Head_EQ <- (clNew * 1000000000)/cullAvg_pre
+    # 
+    # K1_new <- K1[i]
+    # 
+    # estK <- BBoptim(par = K1_new, fn = estRepHeifersEQ_FMD, slHead = slNew_Head_EQ, clHead = clNew_Head_EQ,
+    #                 k = k_old_Head, gamma_k3 = gamma_k3,
+    #                 eta_k3 = eta_k3 , int_k3 = int_k3, k0s = k0s, lower = K1_new)
+    # K1[i] <- estK$par
+  }
   
   if(i == 1){
     # i < 4
@@ -1239,8 +1232,6 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   if(clCounter==1){
     EpcM_pre <- EpcM_pre + 0.08
   }
-  
-  # hcM_pre <- (((g * (beta^3) * psM_pre) + (beta - 1) * pcM_pre)/(1 + g * beta * (gamma0 + beta * gamma1)))
   
   Ps <- getPsPcEpsEpc_FMD(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
                           HcM = hcM_pre, SlNew = slNew, ClNew = clNew, ANew = ANew1, 
@@ -1299,7 +1290,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
       pcN <- pcM_pre
     }
     
-    # hcM_pre <- (((g * (beta^3) * psN) + (beta - 1) * pcN)/(1 + g * beta * (gamma0 + beta * gamma1)))
+    hcM_pre <- (((g * (beta^3) * psN) + (beta - 1) * pcN)/(1 + g * beta * (gamma0 + beta * gamma1)))
     
     Ps <- getPsPcEpsEpc_FMD(PsM = psN, PcM = pcN, EPsM = EpsM_pre, EPcM = EpcM_pre,
                             HcM = hcM_pre, SlNew = slNew, ClNew = clNew, ANew = ANew1,
@@ -1315,19 +1306,19 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     pcM_Eq[m] <- pcM_pre
     
     ### Here I make sure the expected price is not going out of bounds
-    # if(i>2){
-    #   
-    #   if(EpsM_pre < psM_pre){
-    #     EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
-    #   }
-    #   
-    #   if(EpcM_pre < pcM_pre){
-    #     EpcM_pre <- proj_Q_P_PostFMD$EPc[i-2]
-    #   }
-    #   
-    # }
+    if(i>2){
+
+      if(EpsM_pre < psM_pre){
+        EpsM_pre <- proj_Q_P_PostFMD$EPs[i-2]
+      }
+
+      if(EpcM_pre < pcM_pre){
+        EpcM_pre <- proj_Q_P_PostFMD$EPc[i-2]
+      }
+
+    }
     
-    Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1,
+    Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
                             k = k, CapA = ANew1, gamma_k3 = gamma_k3,
                             eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF_pre, k0s = k0s,
                             slAvg = slaughterAvg_pre, clAvg = cullAvg_pre)
@@ -1356,17 +1347,25 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     
     ANew_Eq <- (slNew_Eq + clNew_Eq) * (1/adjF_pre)
     
-    if((slCounter_Eq==1) || (clCounter_Eq==1)){
-      
-      slNew_Head_EQ1 <- (slNew_Eq * 1000000000)/slaughterAvg_pre
+    clHeadDiff1 <- 0
+    if((clCounter_Eq==1)){
       clNew_Head_EQ1 <- (clNew_Eq * 1000000000)/cullAvg_pre
-      
-      K1_new1 <- K1
-      
-      estK <- BBoptim(par = K1_new1, fn = estRepHeifersEQ_FMD, slHead = slNew_Head_EQ1, clHead = clNew_Head_EQ1, 
-                      k = k_old_Head_Eq, gamma_k3 = gamma_k3,
-                      eta_k3 = eta_k3 , int_k3 = int_k3, k0s = k0s)
-      K1 <- estK$par
+      clHeadDiff1 <- clNew_Head_EQ1 - clNew_Head_OG_Eq
+      # K1[i] <- K1[i] + clHeadDiff1
+    }
+    
+    if((slCounter_Eq==1)){
+      slNew_Head_EQ1 <- (slNew_Eq * 1000000000)/slaughterAvg_pre
+      # clNew_Head_EQ1 <- (clNew_Eq * 1000000000)/cullAvg_pre
+      slHeadDiff1 <- slNew_Head_EQ1 - slNew_Head_OG_Eq
+      K1[i] <- K1[i] + slHeadDiff1
+
+      # K1_new1 <- K1[i]
+      # 
+      # estK <- BBoptim(par = K1_new, fn = estRepHeifersEQ_FMD, slHead = slNew_Head_EQ1, clHead = clNew_Head_EQ1,
+      #                 k = k_old_Head_Eq, gamma_k3 = gamma_k3,
+      #                 eta_k3 = eta_k3 , int_k3 = int_k3, k0s = k0s, lower = K1_new1)
+      # K1[i] <- estK$par
     }
     
     if(i == 1){
@@ -1398,10 +1397,10 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     
     D_cl <- ANew1 * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
     
-    slDiff <- slNew - D_sl
-    clDiff <- clNew - D_cl
+    slDiff <- slNew_Eq - D_sl
+    clDiff <- clNew_Eq - D_cl
     
-    if(m >= 15){
+    if(m >= 10){
       if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
         if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
           break
@@ -1412,6 +1411,13 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     m <- m+1
     
   }
+  
+  beefINV_FORECAST_PostFMD$K[i] <- beefINV_FORECAST_PostFMD$K[i] + clHeadDiff1
+  beefINV_FORECAST_PostFMD$k3[i] <- beefINV_FORECAST_PostFMD$k3[i] + clHeadDiff1
+  # beefINV_FORECAST_PostFMD[i,-1] <- beefINV_FORECAST_PostFMD[i,-1] + clHeadDiff1
+  
+  # multiplierK <- (beefINV_FORECAST_PostFMD$K[i] + clHeadDiff1)/beefINV_FORECAST_PostFMD$K[i] 
+  # beefINV_FORECAST_PostFMD[i,-1] <- beefINV_FORECAST_PostFMD[i,-1] * multiplierK
   
   psM_EqMed[i] <- median(psM_Eq)
   pcM_EqMed[i] <- median(pcM_Eq)
@@ -1431,7 +1437,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   proj_Q_P_PostFMD$repHeif[i] <- k_old_Eq
   proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head_Eq
   
-  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head_Eq) <= 0.5 * g * K1
+  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head_Eq) <= 0.5 * g * K1[i]
   
   proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG_Eq
   proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
@@ -1453,15 +1459,21 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   beefINV_FORECAST_PostFMD$k10[i+1] <- delta * beefINV_FORECAST_PostFMD$k9[i]
   beefINV_FORECAST_PostFMD$K[i+1] <- sum(beefINV_FORECAST_PostFMD[i+1,-1:-2])
   
-  if((slCounter_Eq==1) || (clCounter_Eq==1)){
-    if(beefINV_FORECAST_PostFMD$K[i] < K1){
-      beefINV_FORECAST_PostFMD$K[i] <- K1
-    }
-  }
+  # if(beefINV_FORECAST_PostFMD$K[i+1] < K1[i]){
+  #   beefINV_FORECAST_PostFMD$K[i+1] <- K1[i]
+  # }
+  
+  # if((slCounter_Eq==1) || (clCounter_Eq==1)){
+  #   if(beefINV_FORECAST_PostFMD$K[i] < K1[i]){
+  #     beefINV_FORECAST_PostFMD$K[i] <- K1[i]
+  #   }
+  # }
+  
+  # calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
+  #                                                    k0 = g * beefINV_FORECAST_PostFMD$K[i])
   
   calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
-                                                     k0 = g * beefINV_FORECAST_PostFMD$K[i])
-  
+                                                     k0 = g * K1[i])
   
 }
 
@@ -1469,14 +1481,23 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
 proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_20_OP <- beefINV_FORECAST_PostFMD
 
+proj_Q_P_PostFMD_20_OP_absk3 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_20_OP_absk3 <- beefINV_FORECAST_PostFMD
+
 proj_Q_P_PostFMD_50_OP <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_50_OP <- beefINV_FORECAST_PostFMD
+
+proj_Q_P_PostFMD_50_OP_absk3 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_50_OP_absk3 <- beefINV_FORECAST_PostFMD
 
 proj_Q_P_PostFMD_90_OP <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_90_OP <- beefINV_FORECAST_PostFMD
 
+proj_Q_P_PostFMD_90_OP_absk3 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_OP_absk3 <- beefINV_FORECAST_PostFMD
 
-proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD_20_OP %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc) 
+
+proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD_20_OP %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc)
 proj_Q_P_PostFMD_50_OP <- proj_Q_P_PostFMD_50_OP %>% transmute(Year = Year, Ps50 = Ps, Pc50 = Pc) 
 proj_Q_P_PostFMD_90_OP <- proj_Q_P_PostFMD_90_OP %>% transmute(Year = Year, Ps90 = Ps, Pc90 = Pc) 
 
