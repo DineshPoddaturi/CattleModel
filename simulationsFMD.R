@@ -1024,8 +1024,9 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 90
+dePopR <- 20
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
+calf_crop_PreFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR)    
 calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
 # calf_crop_2010 <- calf_crop %>% filter(Year == 2010) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
 calf_crop_PostFMD <- rbind(calf_crop_PreFMD, calf_crop_2009)
@@ -1082,6 +1083,9 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
                                       calfCrop = calf_crop_PostFMD)
 
+#  I will also hav to depopulate the k0s as well
+# k0s_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), dePopRate = dePopR)
+
 # k0s_PostFMD[2,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[2,],
 #                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[2,], 
 #                                       calfCrop = calf_crop_PostFMD)
@@ -1113,7 +1117,7 @@ K1 <- NULL
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  i <- 4
+  # i <- 3
   
   if(i>1){
     #Populating the younglings
@@ -1134,18 +1138,45 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   ### Here I assume a 5% decrease in domestic demand and the exports are banned.
   # I am also assuming decrease in the stocks by the apecified depop.
   if(i==1){
+    
     capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
     K1[i] <- capK_pre * (1 - (dePopR/100))
+    
+    # Here I check whether we can meet the demand with the stock in the country.
+    # QsTest <- BBoptim(par = k, fn = estQFunction_test_FMD, tilde_MU = MUtilde_pre, 
+    #               tilde_s = Stilde_pre, ps = psM_pre, pc = pcM_pre, K1 = K1[i], A = capA_pre, 
+    #               gamma_k3 = gamma_k3, eta_k3 = eta_k3, int = int_k3, k0s = k0s, 
+    #               slAvg = slaughterAvg_pre, clAvg = cullAvg_pre)
+    # # From the above function I get the number of replacement heifers needed for two years from now, to meet the demand.
+    # repHeifNeeded <- QsTest$par
+    # 
+    # # If the number of heifers needed is negative, we import those number of mature cows this year to meet the demand (maybe)
+    # # Hence we add these numbers to the stock.
+    # if(repHeifNeeded < 0){
+    #   matureCowsNeeded <- (abs(repHeifNeeded)/g)
+    #   K1[i] <- K1[i] + matureCowsNeeded
+    # }
+    
   }
   
-  ## After two years the calf crop will become mature and added to the mature stock.
-  if(i>2){
-    
-    cCrop <- calf_crop_PostFMD %>% filter(Year == proj_Q_P_PostFMD$Year[i-2]) %>% select(k0) %>% as.numeric()
-    rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
-    K1[i] <- K1[i] + cCrop - rHeif
-    
-  }
+  # After two years the calf crop will become mature and added to the mature stock.
+  # if(i>2){
+  #   # Here we will get the calf crop three years ago and replacement heifers this year. If replacement heifers
+  #   # is greater than the calf crop (that means we imported the replacement heifers), we only add the calf-crop
+  #   # to the stock otherwise we add calf-crop minus replacement heifers to the stock.
+  #   cCrop <- calf_crop_PostFMD %>% filter(Year == proj_Q_P_PostFMD$Year[i-2]-1) %>% select(k0) %>% as.numeric()
+  #   rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-1) %>% select(k3) %>% as.numeric()
+  #   # rHeif <- proj_Q_P_PostFMD %>% filter(Year == proj_Q_P_PostFMD$Year[i-2]-1) %>% select(repHeif_Head) %>% as.numeric()
+  #   # if(rHeif > cCrop){
+  #   #   K1[i] <- K1[i] + cCrop
+  #   # } else{
+  #   #   K1[i] <- K1[i] + cCrop - rHeif
+  #   # }
+  #   
+  #   K1[i] <- K1[i] + cCrop - rHeif
+  #   
+  # 
+  # }
   
   Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
                             k = k, CapA = capA_pre, gamma_k3 = gamma_k3, 
@@ -1187,7 +1218,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   if((clCounter==1)){
     clNew_Head_EQ <- (clNew * 1000000000)/cullAvg_pre
     clHeadDiff <- clNew_Head_EQ - clNew_Head_OG
-    # K1[i] <- K1[i] + clHeadDiff
+    K1[i] <- K1[i] + clHeadDiff
   }
   
   if(slCounter==1){
@@ -1351,7 +1382,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     if((clCounter_Eq==1)){
       clNew_Head_EQ1 <- (clNew_Eq * 1000000000)/cullAvg_pre
       clHeadDiff1 <- clNew_Head_EQ1 - clNew_Head_OG_Eq
-      # K1[i] <- K1[i] + clHeadDiff1
+      K1[i] <- K1[i] + clHeadDiff1
     }
     
     if((slCounter_Eq==1)){
@@ -1390,15 +1421,14 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     
     ANew1 <- ANew11
     
-    
     D_sl <- ANew1 *
       ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
          (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
     
     D_cl <- ANew1 * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
     
-    slDiff <- slNew_Eq - D_sl
-    clDiff <- clNew_Eq - D_cl
+    slDiff <- slNew - D_sl
+    clDiff <- clNew - D_cl
     
     if(m >= 10){
       if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
@@ -1412,8 +1442,8 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     
   }
   
-  beefINV_FORECAST_PostFMD$K[i] <- beefINV_FORECAST_PostFMD$K[i] + clHeadDiff1
-  beefINV_FORECAST_PostFMD$k3[i] <- beefINV_FORECAST_PostFMD$k3[i] + clHeadDiff1
+  beefINV_FORECAST_PostFMD$K[i] <- beefINV_FORECAST_PostFMD$K[i] + clHeadDiff
+  beefINV_FORECAST_PostFMD$k3[i] <- beefINV_FORECAST_PostFMD$k3[i] + clHeadDiff
   # beefINV_FORECAST_PostFMD[i,-1] <- beefINV_FORECAST_PostFMD[i,-1] + clHeadDiff1
   
   # multiplierK <- (beefINV_FORECAST_PostFMD$K[i] + clHeadDiff1)/beefINV_FORECAST_PostFMD$K[i] 
@@ -1434,12 +1464,12 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   proj_Q_P_PostFMD$Sl[i] <- slNew
   proj_Q_P_PostFMD$Cl[i] <- clNew
   proj_Q_P_PostFMD$A[i] <- ANew1
-  proj_Q_P_PostFMD$repHeif[i] <- k_old_Eq
-  proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head_Eq
+  proj_Q_P_PostFMD$repHeif[i] <- k_old
+  proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_Head
   
-  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head_Eq) <= 0.5 * g * K1[i]
+  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_Head) <= 0.5 * g * K1[i]
   
-  proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG_Eq
+  proj_Q_P_PostFMD$repHeif_HeadOG[i] <- k_old_Head_OG
   proj_Q_P_PostFMD$Sl_Head_OG[i] <- slNew_Head_OG
   proj_Q_P_PostFMD$Cl_Head_OG[i] <- clNew_Head_OG
   
@@ -1456,7 +1486,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   beefINV_FORECAST_PostFMD$k7[i+1] <- delta * beefINV_FORECAST_PostFMD$k6[i]
   beefINV_FORECAST_PostFMD$k8[i+1] <- delta * beefINV_FORECAST_PostFMD$k7[i]
   beefINV_FORECAST_PostFMD$k9[i+1] <- delta * beefINV_FORECAST_PostFMD$k8[i]
-  beefINV_FORECAST_PostFMD$k10[i+1] <- delta * beefINV_FORECAST_PostFMD$k9[i]
+  # beefINV_FORECAST_PostFMD$k10[i+1] <- delta * beefINV_FORECAST_PostFMD$k9[i]
   beefINV_FORECAST_PostFMD$K[i+1] <- sum(beefINV_FORECAST_PostFMD[i+1,-1:-2])
   
   # if(beefINV_FORECAST_PostFMD$K[i+1] < K1[i]){
@@ -1469,11 +1499,11 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   #   }
   # }
   
-  # calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
-  #                                                    k0 = g * beefINV_FORECAST_PostFMD$K[i])
-  
   calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
-                                                     k0 = g * K1[i])
+                                                     k0 = g * beefINV_FORECAST_PostFMD$K[i])
+  
+  # calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
+  #                                                    k0 = g * K1[i])
   
 }
 
@@ -1495,6 +1525,9 @@ beefINV_FORECAST_PostFMD_90_OP <- beefINV_FORECAST_PostFMD
 
 proj_Q_P_PostFMD_90_OP_absk3 <- proj_Q_P_PostFMD
 beefINV_FORECAST_PostFMD_90_OP_absk3 <- beefINV_FORECAST_PostFMD
+
+proj_Q_P_PostFMD_90_OP_absk3_1 <- proj_Q_P_PostFMD
+beefINV_FORECAST_PostFMD_90_OP_absk3_1 <- beefINV_FORECAST_PostFMD
 
 
 proj_Q_P_PostFMD_20_OP <- proj_Q_P_PostFMD_20_OP %>% transmute(Year = Year, Ps20 = Ps, Pc20 = Pc)
