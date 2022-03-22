@@ -95,7 +95,7 @@ optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
 
 
 ##### 
-stocks_Opt <- left_join(KBaseline, optStockPostFMD) %>% filter(Year <= optStockPostFMD$Year[nrow(optStockPostFMD)])
+stocks_Opt <- left_join(KBaseline, optStockPostFMD) %>% filter(Year < optStockPostFMD$Year[nrow(optStockPostFMD)])
 stocks_Opt[,-1] <- stocks_Opt[,-1]/1000
 
 optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"))+ 
@@ -132,7 +132,7 @@ postFMD_P_Q_90_PE <- postFMD_P_Q_90_PE %>% select(Year, Ps, Pc) %>% transmute(Ye
 pesPriceList <- list(postFMD_P_Q_20_PE, postFMD_P_Q_50_PE, postFMD_P_Q_90_PE)
 pesPricePostFMD <- Reduce(function(...) merge(...), pesPriceList)
 
-# pesPricePostFMD <- proj_Q_P_PostFMD_PE
+pesPricePostFMD <- proj_Q_P_PostFMD_PE_absk3_1
 
 
 postFMD_K_20_PE <- postFMD_K_20_Pes
@@ -148,14 +148,13 @@ pesStockList <- list(postFMD_K_20_PE, postFMD_K_50_PE,
                      postFMD_K_90_PE)
 pesStockPostFMD <- Reduce(function(...) merge(...), pesStockList)
 
-# pesStockPostFMD <- beefINV_FORECAST_PostFMD_PE
+pesStockPostFMD <- beefINV_FORECAST_PostFMD_PE_absk3_1
 
 
 prices_Pes <- left_join(pricesBaseline, pesPricePostFMD) %>% filter(Year <= pesPricePostFMD$Year[nrow(pesPricePostFMD)])
 
 prices_Pes[,-1] <- prices_Pes[,-1] * 100
 prices_Pes <- prices_Pes %>% round(3)
-
 
 pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
   geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
@@ -184,7 +183,7 @@ pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
 
 
 
-stocks_Pes <- left_join(KBaseline, pesStockPostFMD) %>% filter(Year <= pesStockPostFMD$Year[nrow(pesStockPostFMD)])
+stocks_Pes <- left_join(KBaseline, pesStockPostFMD) %>% filter(Year < pesStockPostFMD$Year[nrow(pesStockPostFMD)])
 stocks_Pes[,-1] <- stocks_Pes[,-1]/1000
 
 pesStockPlotN <- stocks_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"))+ 
