@@ -46,18 +46,26 @@ print(cull_plot)
 dev.off()
 
 
-EQestObsSLNI_Plots <- EQestObsSLNI %>% select(Year, slMedian)
-replacementHeifers <- k3
-totalInventory <- Stock %>% select(Year, K)
+
 
 dressedWeights_sl <- dressedWeights_sl_cl %>% select(Year, Slaughter_avg)
+EQestObsSLNI_Plots <- EQestObsSLNI %>% select(Year, slMedian)
+replacementHeifers <- k3
 EQestObsSLNI_Head <- merge(EQestObsSLNI_Plots, dressedWeights_sl) %>% mutate(slMedianHead = slMedian * (1000000000/Slaughter_avg))
-EQestObsSlHead_totalINV <- merge(EQestObsSLNI_Head, totalInventory) %>% select(Year, slMedianHead, K)
-EQestObsSlHead_totalINV_repHeifers <- left_join(replacementHeifers, EQestObsSlHead_totalINV) %>% 
-  transmute(Year = Year, K = K, slHeadEst = slMedianHead, repH = k3)
-
-EQesttotalInventory <- EQestObsSlHead_totalINV_repHeifers %>% select(Year,slHeadEst, repH) %>%
+EQestObsSlHead_repHeifers <- left_join(replacementHeifers, EQestObsSLNI_Head) %>% 
+  transmute(Year = Year, slHeadEst = slMedianHead, repH = k3)
+EQesttotalInventory <- EQestObsSlHead_repHeifers %>% select(Year,slHeadEst, repH) %>%
   transmute(Year = Year-1, fitK = (slHeadEst + lead(repH,1)/g)) %>% na.exclude()
+
+dressedWeights_cl <- dressedWeights_sl_cl %>% select(Year, Cull_avg)
+EQestObsCLNI_Plots <- EQestObsCLNI %>% select(Year, clMedian)
+
+
+
+
+
+
+totalInventory <- Stock %>% select(Year, K)
 
 
 # Try either adding imports on fitK or remove exports from K
