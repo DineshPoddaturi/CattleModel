@@ -636,7 +636,7 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
       # if the differences reach below tolerance levels. But sometimes this is never the case and there will be 
       # some difference above tolerance level (basically saying that there will be closing stocks). So I exit the loop
       # if the difference stays stagnant.
-      if(m >= 15){
+      if(m >= 10){
         if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
           if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
             break
@@ -722,7 +722,7 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
     
     ### The follwowing are the conditions to check whether the stock and replacement heifers are realistic
     k3Counter <- 0
-    if(i>5){
+    if(i>3){
       if(k3Counter<4){
         if(beefINV_FORECAST_PostFMD$K[i+1] < min(Stock$K)){
           cCrop <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
