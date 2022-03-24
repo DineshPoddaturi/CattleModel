@@ -330,10 +330,10 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
   exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
   ### After careful consideration I am using exports_percentK as the exports in the simulation
   
-  beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
-                                          k4 = numeric(nn), k5 = numeric(nn), k6 = numeric(nn), 
-                                          k7 = numeric(nn), k8 = numeric(nn), k9 = numeric(nn),
-                                          k10 = numeric(nn))
+  beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn+1), K = numeric(nn+1), k3 = numeric(nn+1), 
+                                          k4 = numeric(nn+1), k5 = numeric(nn+1), k6 = numeric(nn+1), 
+                                          k7 = numeric(nn+1), k8 = numeric(nn+1), k9 = numeric(nn+1),
+                                          k10 = numeric(nn+1))
   
   beefINV_FORECAST_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), dePopRate = dePopR)
   
@@ -721,13 +721,15 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
     beefINV_FORECAST_PostFMD$K[i+1] <- sum(beefINV_FORECAST_PostFMD[i+1,-1:-2])
     
     ### The follwowing are the conditions to check whether the stock and replacement heifers are realistic
-    
+    k3Counter <- 0
     if(i>5){
-      
-      if(beefINV_FORECAST_PostFMD$K[i+1] < min(Stock$K)){
-        cCrop <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
-        rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
-        beefINV_FORECAST_PostFMD$k3[i+1] <- beefINV_FORECAST_PostFMD$k3[i+1] +  (beefINV_FORECAST_PostFMD$K[i+1] - (delta * cCrop - rHeif/g))
+      if(k3Counter<4){
+        if(beefINV_FORECAST_PostFMD$K[i+1] < min(Stock$K)){
+          cCrop <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
+          rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
+          beefINV_FORECAST_PostFMD$k3[i+1] <- beefINV_FORECAST_PostFMD$k3[i+1] +  (beefINV_FORECAST_PostFMD$K[i+1] - (delta * cCrop - rHeif/g))
+          k3Counter <- k3Counter + 1
+        }
       }
     }
     
@@ -742,7 +744,7 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
     
     # Here once the stock reach the optimal level, the farmers won't keep the 9-year old cows.
     # The following code does that.
-    if( beefINV_FORECAST_PostFMD$K[i+1] >  median(Stock$K)){
+    while( beefINV_FORECAST_PostFMD$K[i+1] >  median(Stock$K)){
       beefINV_FORECAST_PostFMD$K[i+1] <- beefINV_FORECAST_PostFMD$K[i+1] - (beefINV_FORECAST_PostFMD$k9[i]/delta)
       beefINV_FORECAST_PostFMD$k10[i+1] <- 0
     }
@@ -753,7 +755,7 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
     
   }
   
-  return(list(proj_Q_P_PostFMD, beefINV_FORECAST_PostFMD))
+  return(list(proj_Q_P_PostFMD, beefINV_FORECAST_PostFMD, calf_crop_PostFMD))
   
 }
 
@@ -769,12 +771,15 @@ optimisticPostFMD_90 <- simOptimisticFMD(calf_cropF = calf_crop, dePopR = 90, mo
 
 postFMD_P_Q_20_Opt <- optimisticPostFMD_20[[1]]
 postFMD_K_20_Opt <- optimisticPostFMD_20[[2]]
+postFMD_CC_20_Opt <- optimisticPostFMD_20[[3]]
 
 postFMD_P_Q_50_Opt <- optimisticPostFMD_50[[1]]
 postFMD_K_50_Opt <- optimisticPostFMD_50[[2]]
+postFMD_CC_50_Opt <- optimisticPostFMD_50[[3]]
 
 postFMD_P_Q_90_Opt <- optimisticPostFMD_90[[1]]
 postFMD_K_90_Opt <- optimisticPostFMD_90[[2]]
+postFMD_CC_90_Opt <- optimisticPostFMD_90[[3]]
 
 # optBKP <- list(optimisticPostFMD_20, optimisticPostFMD_50, optimisticPostFMD_90)
 
@@ -818,10 +823,10 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
   exports_percentK <- round((exports_2009_meat/capK_pre_meat) * 100,3)
   ### After careful consideration I am using exports_percentK as the exports in the simulation
   
-  beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = numeric(nn), k3 = numeric(nn), 
-                                          k4 = numeric(nn), k5 = numeric(nn), k6 = numeric(nn), 
-                                          k7 = numeric(nn), k8 = numeric(nn), k9 = numeric(nn),
-                                          k10 = numeric(nn))
+  beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn+1), K = numeric(nn+1), k3 = numeric(nn+1), 
+                                          k4 = numeric(nn+1), k5 = numeric(nn+1), k6 = numeric(nn+1), 
+                                          k7 = numeric(nn+1), k8 = numeric(nn+1), k9 = numeric(nn+1),
+                                          k10 = numeric(nn+1))
   
   beefINV_FORECAST_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), dePopRate = dePopR)
   
@@ -1049,7 +1054,7 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
       }
       
       while(EpcM_pre < pcM_pre){
-        EpcM_pre <- EpcM_pre + 0.1
+        EpcM_pre <- EpcM_pre + 0.8
       }
       
       Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
@@ -1124,7 +1129,7 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
       # if the differences reach below tolerance levels. But sometimes this is never the case and there will be 
       # some difference above tolerance level (basically saying that there will be closing stocks). So I exit the loop
       # if the difference stays stagnant.
-      if(m >= 15){
+      if(m >= 10){
         if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
           if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
               break
@@ -1209,12 +1214,24 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
     beefINV_FORECAST_PostFMD$K[i+1] <- sum(beefINV_FORECAST_PostFMD[i+1,-1:-2])
     
     ### The follwowing are the conditions to check whether the stock and replacement heifers are realistic
+    # if(i>3){
+    #   
+    #   if(beefINV_FORECAST_PostFMD$K[i+1] < min(Stock$K)){
+    #     cCrop <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
+    #     rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
+    #     beefINV_FORECAST_PostFMD$k3[i+1] <- beefINV_FORECAST_PostFMD$k3[i+1] +  (beefINV_FORECAST_PostFMD$K[i+1] - (delta * cCrop - rHeif/g))
+    #   }
+    # }
+    
+    k3Counter <- 0
     if(i>3){
-      
-      if(beefINV_FORECAST_PostFMD$K[i+1] < min(Stock$K)){
-        cCrop <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
-        rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
-        beefINV_FORECAST_PostFMD$k3[i+1] <- beefINV_FORECAST_PostFMD$k3[i+1] +  (beefINV_FORECAST_PostFMD$K[i+1] - (delta * cCrop - rHeif/g))
+      if(k3Counter<4){
+        if(beefINV_FORECAST_PostFMD$K[i+1] < min(Stock$K)){
+          cCrop <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
+          rHeif <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
+          beefINV_FORECAST_PostFMD$k3[i+1] <- beefINV_FORECAST_PostFMD$k3[i+1] +  (beefINV_FORECAST_PostFMD$K[i+1] - (delta * cCrop - rHeif/g))
+          k3Counter <- k3Counter + 1
+        }
       }
     }
     
@@ -1229,7 +1246,7 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
     
     # Here once the stock reach the optimal level, the farmers won't keep the 9-year old cows.
     # The following code does that.
-    if( beefINV_FORECAST_PostFMD$K[i+1] >  median(Stock$K)){
+    while( beefINV_FORECAST_PostFMD$K[i+1] >  median(Stock$K)){
       beefINV_FORECAST_PostFMD$K[i+1] <- beefINV_FORECAST_PostFMD$K[i+1] - (beefINV_FORECAST_PostFMD$k9[i]/delta)
       beefINV_FORECAST_PostFMD$k10[i+1] <- 0
     }
@@ -1240,7 +1257,7 @@ simPessimisticFMD<- function(calf_cropF, dePopR,modelParamsEQ_PreFMD, exports_pr
     
   }
   
-  return(list(proj_Q_P_PostFMD, beefINV_FORECAST_PostFMD))
+  return(list(proj_Q_P_PostFMD, beefINV_FORECAST_PostFMD, calf_crop_PostFMD))
   
 }
 
@@ -1255,15 +1272,18 @@ pessimisticPostFMD_50 <- simPessimisticFMD(calf_cropF = calf_crop, dePopR = 50, 
 pessimisticPostFMD_90 <- simPessimisticFMD(calf_cropF = calf_crop, dePopR = 90, modelParamsEQ_PreFMD = proj_AllDF_EQ,
                                          exports_preFMD = exports_2008, nn = 10, Stock = Stock)
 
+
 postFMD_P_Q_20_Pes <- pessimisticPostFMD_20[[1]]
 postFMD_K_20_Pes <- pessimisticPostFMD_20[[2]]
+postFMD_CC_20_Pes <- pessimisticPostFMD_20[[3]]
 
 postFMD_P_Q_50_Pes <- pessimisticPostFMD_50[[1]]
 postFMD_K_50_Pes <- pessimisticPostFMD_50[[2]]
+postFMD_CC_50_Pes <- pessimisticPostFMD_50[[3]]
 
 postFMD_P_Q_90_Pes <- pessimisticPostFMD_90[[1]]
 postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
-
+postFMD_CC_90_Pes <- pessimisticPostFMD_90[[3]]
 
 
 
@@ -1278,7 +1298,7 @@ postFMD_K_90_Pes <- pessimisticPostFMD_90[[2]]
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 20
+dePopR <- 90
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
 calf_crop_PreFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR)    
 calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
@@ -1507,7 +1527,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   #   K1[i] <- K1[i] + clHeadDiff[i]
   # }
   
-  if(i == 1){
+  if(i < 4){
     # i < 4
     # i == 1
     #### Exports are banned that means the production stays in the country.
@@ -1516,7 +1536,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     # clExports <- clNew * (exports_percentK/100)
     # ANew1 <- ANew + slExports +  clExports - (5/100) * ANew
     ANew1 <- ANew - (5/100) * ANew + ANew * (exports_percentK/100)
-  } else if(i == 2){ 
+  } else if(i >= 4 && i <= 5){ 
     # i >= 4 && i <= 5 
     # i == 2 
     ### Here the domestic demand for meat climbs back up
@@ -1628,11 +1648,11 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     ### Here I make sure the expected price is not going out of bounds
     
       while(EpsM_pre < psM_pre){
-        EpsM_pre <- EpsM_pre  + 0.1
+        EpsM_pre <- EpsM_pre  + 0.8
       }
 
       while(EpcM_pre < pcM_pre){
-        EpcM_pre <- EpcM_pre + 0.1
+        EpcM_pre <- EpcM_pre + 0.8
       }
     
     Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
@@ -1697,7 +1717,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     #   K1[i] <- K1[i] + clHeadDiff1[m]
     # }
     
-    if(i == 1){
+    if(i < 4){
       # i < 4
       # i == 1
       # slExp1 <- slNew_Eq  * (exports_percentK/100)
@@ -1706,7 +1726,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
       
       ANew11  <- ANew_Eq - (5/100) * ANew_Eq  + ANew_Eq * (exports_percentK/100)
       
-    } else if( i == 2 ){
+    } else if( i >= 4 && i <= 5 ){
       # i >= 4 && i <= 5
       # i == 2
       # slExp1 <- slNew_Eq * (exports_percentK/100)
