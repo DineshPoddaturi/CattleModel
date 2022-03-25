@@ -134,6 +134,7 @@ steersSlaughtered <- read_excel("Data/New/SteersSlaughtered.xlsx") %>% as.data.f
 
 steersSlaughtered <- steersSlaughtered %>% select(Year, Value) %>% mutate(SteersHead=Value) %>% select(Year, SteersHead) %>% arrange(Year) %>% filter(Year >= 1994)
 
+
 ################ dressed weights 
 dressedWeights <- read_excel("Data/New/DressedWeights.xlsx") %>% as.data.frame()
 dressedWeights <- dressedWeights[-c(1:2),]
@@ -151,6 +152,8 @@ dressedWeights <- dressedWeights %>% filter(Year<2020)
 ############ Here we convert the number of head to pounds in weight from the dressed weights data ###############
 
 cowsSlaughtered <- merge(cowsSlaughtered,dressedWeights)  %>% transmute(Year = Year, Cowshead = CowsHead, cull_meat = CowsHead * Cows_avg )
+
+
 heifersSlaughtered <- merge(heifersSlaughtered,dressedWeights)  %>% transmute(Year = Year, HeifersHead = HeifersHead, heifer_meat = HeifersHead * Heifers_avg)
 steersSlaughtered <- merge(steersSlaughtered,dressedWeights)  %>% transmute(Year = Year, SteersHead = SteersHead, steer_meat = SteersHead * Steers_avg)
 
@@ -298,6 +301,10 @@ names(demand_new) <- c("Year", "Demand")
 merge(totalSupply_adj, demand_new) %>% ggplot(aes(x=Year))+ geom_line(aes(y=Demand,color="Demand Slaughter")) + geom_point(aes(y=Demand,color="Demand Slaughter")) +
   geom_line(aes(y=TotalSupply, color="Supply")) + geom_point(aes(y=TotalSupply, color="Supply")) +
   labs(x="Year", y="Meat (in billion pounds)", colour = "") + theme_classic() + scale_x_continuous(name="Year", breaks=c(seq(1995,2017)))
+
+
+
+
 
 ### Ratio of slaughter supply  to total supply, in the model this is exp()/(1+exp())
 

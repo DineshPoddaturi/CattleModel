@@ -48,6 +48,51 @@ dev.off()
 
 
 
+dressedWeights_cl <- dressedWeights_sl_cl %>% select(Year, Cull_avg)
+EQestObsCLNI_Plots <- EQestObsCLNI %>% select(Year, clMedian)
+EQestObsCLNI_Head <- merge(EQestObsCLNI_Plots, dressedWeights_cl) %>% mutate(clMedianHead = 
+                                                                               clMedian * (1000000000/Cull_avg))
+
+Stock_lessK <- Stock %>% select(-K)
+EQestObsCLNI_Head_Inventory <- left_join(Stock_lessK, EQestObsCLNI_Head) %>% select(-clMedian, 
+                                                                                    -Cull_avg, -k10)
+
+EQestObsCLNI_Head_Inventory1 <- EQestObsCLNI_Head_Inventory %>% mutate(CLk_987 = clMedianHead + lead(k9,1) + lead(k8,1))
+EQestObsCLNI_Head_Inventory1 <- EQestObsCLNI_Head_Inventory1 %>% na.exclude()
+EQestObsCLNI_Head_Inventory11 <- EQestObsCLNI_Head_Inventory1 %>% select(-clMedianHead)
+EQestObsCLNI_Head_Inventory11 <- EQestObsCLNI_Head_Inventory11 %>% 
+  mutate(fitK = k3 + k4 + k5 + k6 + CLk_987) %>% select(Year, fitK)
+totalInventory <- Stock %>% select(Year, K)
+EQestObstotalInventory <- merge(totalInventory, EQestObsCLNI_Head_Inventory11)
+
+ddlObsInventory_plot <- detrend(as.matrix(EQestObstotalInventory%>%select(-Year)),tt='linear') %>% as.data.frame() %>% 
+  mutate(Year = c(seq(EQestObstotalInventory$Year[1],
+                      EQestObstotalInventory$Year[nrow(EQestObstotalInventory)]))) %>% select(Year, everything())
+
+tikz(file="rationalExpectationsLatexPlots/CattleCyclesReplicationPlot.tex", width=6.2, height=3.5)
+
+
+deTrendedInvReplication_plot <- ddlObsInventory_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=K,color="Observed Inventory")) +
+  geom_line(aes(y=fitK,color="Fitted Inventory")) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(ddlInventory_plot$Year[1],
+                                  ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 2))) + 
+  geom_hline(yintercept=0, linetype="dashed", color = "black") + 
+  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+                                             axis.title.y = element_blank())
+
+print(deTrendedInvReplication_plot)
+
+dev.off()
+
+
+
+
+
+
+
 dressedWeights_sl <- dressedWeights_sl_cl %>% select(Year, Slaughter_avg)
 EQestObsSLNI_Plots <- EQestObsSLNI %>% select(Year, slMedian)
 replacementHeifers <- k3
@@ -57,15 +102,22 @@ EQestObsSlHead_repHeifers <- left_join(replacementHeifers, EQestObsSLNI_Head) %>
 EQesttotalInventory <- EQestObsSlHead_repHeifers %>% select(Year,slHeadEst, repH) %>%
   transmute(Year = Year-1, fitK = (slHeadEst + lead(repH,1)/g)) %>% na.exclude()
 
-dressedWeights_cl <- dressedWeights_sl_cl %>% select(Year, Cull_avg)
-EQestObsCLNI_Plots <- EQestObsCLNI %>% select(Year, clMedian)
+
+inventoryPlot <- EQestObstotalInventory %>% ggplot(aes(x=Year)) + geom_line(aes(y=K,color="Observed Inventory")) +
+  geom_line(aes(y=fitK,color="Fitted Inventory")) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObstotalInventory$Year[1],
+                                  EQestObstotalInventory$Year[nrow(EQestObstotalInventory)])))+ 
+  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
+                                             axis.title.y = element_blank())
 
 
 
 
 
 
-totalInventory <- Stock %>% select(Year, K)
 
 
 # Try either adding imports on fitK or remove exports from K

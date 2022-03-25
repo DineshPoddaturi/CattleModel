@@ -555,14 +555,34 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
       pcM_Eq[m] <- pcM_pre
       
       ### Here I make sure the expected price is not going out of bounds
-      
-      while(EpsM_pre < psM_pre){
-        EpsM_pre <- EpsM_pre  + 0.1
+      if(dePopR==20){
+        
+        while(EpsM_pre < psM_pre){
+          EpsM_pre <- EpsM_pre  + 0.1
+        }
+        
+        while(EpcM_pre < pcM_pre){
+          EpcM_pre <- EpcM_pre + 0.8
+        }
+        
+      } else if(dePopR==20) {
+        while(EpsM_pre < psM_pre){
+          EpsM_pre <- EpsM_pre  + 0.1
+        }
+        
+        while(EpcM_pre < pcM_pre){
+          EpcM_pre <- EpcM_pre + 0.3
+        }
+      }else{
+        while(EpsM_pre < psM_pre){
+          EpsM_pre <- EpsM_pre  + 0.1
+        }
+        
+        while(EpcM_pre < pcM_pre){
+          EpcM_pre <- EpcM_pre + 0.1
+        }
       }
-      
-      while(EpcM_pre < pcM_pre){
-        EpcM_pre <- EpcM_pre + 0.1
-      }
+     
       
       Qs <- getSlClA_test_FMD(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
                               k = k, CapA = ANew1, gamma_k3 = gamma_k3,

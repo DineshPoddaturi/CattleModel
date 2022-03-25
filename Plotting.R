@@ -132,11 +132,6 @@ EQestObsTS_Medians_proj <- merge(EQestObsSL_Medians_proj, EQestObsCL_Medians_pro
             TS = Sl + Cl, TS_up = Sl_up + Cl_up) %>% round(3)
 
 
-
-
-
-
-
 projections_BKP <- cbind(EQestObsPS_Medians_proj, EQestObsPC_Medians_proj, EQestObsA_Medians_proj, EQestObsSL_Medians_proj,
                          EQestObsCL_Medians_proj)
 
