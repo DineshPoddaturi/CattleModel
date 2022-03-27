@@ -53,7 +53,7 @@ Box.test(Kfit$residuals, type = "Ljung-Box")
 #   ggplot2::ggtitle("Non-Standardized Residuals")
 
 
-beefINV_FORECAST <- forecast(object = Kfit, h = 12, level = 95) %>% as.data.frame()
+beefINV_FORECAST <- forecast(object = Kfit, h = 11, level = 95) %>% as.data.frame()
 
 beefINV_FORECAST <- beefINV_FORECAST %>% transmute(Year =  as.double(row.names(beefINV_FORECAST)), 
                                                    Kcast = `Point Forecast`, lo95 = `Lo 95`, hi95 = `Hi 95`)
@@ -84,7 +84,7 @@ calf_crop_proj <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrang
 
 replacementInventory_proj <- replacementInventory %>% arrange(Year) 
 
-CC_RH <- merge(calf_crop_proj, replacementInventory_proj, by="Year",all=TRUE)
+CC_RH <- merge(calf_crop_proj, replacementInventory_proj, by="Year",all=TRUE) %>% filter(Year <=2021)
 
 #### Here we run regression without intercept. 
 #### The rational for this is if both of the explanatory variables () are zero 
@@ -103,7 +103,7 @@ int_k3 <- 0
 
 get_k0s <- function(Yr, lag, calfCrop){
   
-  if(nrow(calfCrop %>% filter( Year == getYear - lag  ) %>% select(k0)) == 0){
+  if(nrow(calfCrop %>% filter( Year == Yr - lag  ) %>% select(k0)) == 0){
     k0 <- 0 
   }else{
     k0 <- calfCrop %>% filter( Year == Yr - lag  ) %>% select(k0) %>% unlist()
@@ -251,7 +251,17 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   psNew_expected <- EPsM
   pcNew_expected <- EPcM
   
+  # if(psNew_expected < psNew){
+  #   psNew_expected <- psNew_expected + 0.05
+  # }
+  # 
+  # if(pcNew_expected < pcNew){
+  #   pcNew_expected <- pcNew_expected + 0.05
+  # }
+  
   hc_new <- HcM
+  
+  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
   
   #### Here we make sure that the holding costs are below the cull cow price
   while(hc_new > pcNew){
@@ -282,7 +292,7 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
   up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
   
-  estPNew <- BBoptim(par = p, fn = estPFunction, sl = SlNew, cl = ClNew, A = ANew, 
+  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
                      tilde_MU = params[1], tilde_s = params[2])
   
@@ -295,6 +305,30 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
     (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
   
   return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
+  
+}
+
+estPFunction_Proj <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
+  
+  ps <- p[1]
+  pc <- p[2]
+  
+  Eps3 <- p[3]
+  Epc1 <- p[4]
+  
+  F1 <- sl - A * ((exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s))/(1 + (exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s))))
+  
+  F2 <- cl  - A * (1/(1+ exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s)))
+  
+  F3 <- B - ps + g * (beta^3) * Eps3 - hc_discounted
+  
+  
+  F4 <- pc - beta * Epc1 - g * (beta^3) * Eps3 + (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  
+  F <- F1^2 + F2^2 + F3^2 + F4^2
+  
+  
+  return(F)
   
 }
 
@@ -315,7 +349,7 @@ proj_A <- A_quant
 
 proj_AllDF_EQ <- Reduce(function(...) merge(...), 
                         list(proj_K_t, proj_A, proj_adjFac, proj_muTildes, proj_sTildes, proj_PricesCosts, 
-                             dressedWeights_sl_cl))
+                             dressedWeights_sl_cl)) %>% round(2)
 
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
@@ -355,8 +389,6 @@ proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo =
                           Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj),
                           repHeif_lo = numeric(nProj), repHeif_Head_lo = numeric(nProj))
 
-
-
 ##### Using the projected stock, I am generating the new born in each year. So basically multiply birth rate with the 
 ##### stock.
 
@@ -377,6 +409,7 @@ calf_crop_proj_N_LO <- rbind(calf_crop_proj, calf_crop_proj1_LO)
 calf_crop_proj_N_UP <- rbind(calf_crop_proj, calf_crop_proj1_UP)
 
 k0s_df <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N)
+
 k0s_df_LO <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N_LO)
 k0s_df_UP <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N_UP)
 
@@ -386,7 +419,20 @@ k0s_df_UP <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORE
 ### the optimal replacement heifers. This mostly depends on the demand.
 k_old <- 0
 
+psM <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
+pcM <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
+hcM <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
+
+EpsM <- mean(tail(proj_AllDF_EQ, n=5)$EpsMedian)
+EpcM <- mean(tail(proj_AllDF_EQ, n=5)$EpcMedian)
+
+capA <- mean(tail(proj_AllDF_EQ, n=5)$A)
+capK <- mean(tail(proj_AllDF_EQ, n=5)$K)
+
+
 for(i in 1:nrow(proj_Q_P)){
+  
+  # i <- 1
   
   #### k is replacement heifers starting value.We start with zero (almost never true), but we let the program and data to give
   ### the optimal replacement heifers. 
@@ -413,7 +459,11 @@ for(i in 1:nrow(proj_Q_P)){
   k_old_Head <- Qs[5]
   
   if(EpcM < pcM){
-    EpcM <- EpcM + 0.08
+    EpcM <- EpcM + 0.1
+  }
+  
+  if(EpsM < psM){
+    EpsM <- EpsM + 0.1
   }
   
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
@@ -424,6 +474,18 @@ for(i in 1:nrow(proj_Q_P)){
   hcM <- Ps[3]
   EpsM <- Ps[4]
   EpcM <- Ps[5]
+  
+  # if(EpcM < pcM){
+  #   EpcM <- EpcM + 0.1
+  # }
+  # 
+  # if(EpsM < psM){
+  #   EpsM <- EpsM + 0.1
+  # }
+  
+  # (slNew + clNew) *
+  #   ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/
+  #      (1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
   
   proj_Q_P$Ps[i] <- psM
   proj_Q_P$Pc[i] <- pcM
@@ -451,15 +513,15 @@ for(i in 1:nrow(proj_Q_P)){
 
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
-psM_up <- modelParamsEQ$psMedian
-pcM_up <- modelParamsEQ$pcMedian
-hcM_up <- modelParamsEQ$hcMedian
+psM_up <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
+pcM_up <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
+hcM <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
 
-EpsM_up <- modelParamsEQ$EpsMedian
-EpcM_up <- modelParamsEQ$EpcMedian
+EpsM_up <- mean(tail(proj_AllDF_EQ, n=5)$EpsMedian)
+EpcM_up <- mean(tail(proj_AllDF_EQ, n=5)$EpcMedian)
 
-capA_up <- modelParamsEQ$A
-capK_up <- modelParamsEQ$K
+capA_up <- mean(tail(proj_AllDF_EQ, n=5)$A)
+capK_up <- mean(tail(proj_AllDF_EQ, n=5)$K)
 
 
 for(i in 1:nrow(proj_Q_P_up)){
@@ -474,7 +536,7 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   int_k3 <- 0
   
-  Qs_up <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_up, PcM = pcM_up, K1 = K1_up,
+  Qs_up <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_up, PcM = pcM_up, K1 = K1_up,
                          k = k, CapA = capA_up, gamma_k3 = gamma_k3, eta_k3 = eta_k3 , int_k3 = int_k3, 
                          adjF = adjF, k0s = k0s,slAvg = slaughterAvg, clAvg = cullAvg)
   slNew_up <- Qs_up[1]
@@ -485,7 +547,15 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   k_old_head_up <- Qs_up[5]
   
-  Ps_up <- getPsPcEpsEpc(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
+  if(EpcM_up < pcM_up){
+    EpcM_up <- EpcM_up + 0.1
+  }
+  
+  if(EpsM_up < psM_up){
+    EpsM_up <- EpsM_up + 0.1
+  }
+  
+  Ps_up <- getPsPcEpsEpc_Proj(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
                          HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
                          params = c(MUtilde, Stilde))
   
@@ -494,6 +564,14 @@ for(i in 1:nrow(proj_Q_P_up)){
   hcM_up <- Ps_up[3]
   EpsM_up <- Ps_up[4]
   EpcM_up <- Ps_up[5]
+  
+  # if(EpcM_up < pcM_up){
+  #   EpcM_up <- EpcM_up + 0.1
+  # }
+  # 
+  # if(EpsM_up < psM_up){
+  #   EpsM_up <- EpsM_up + 0.1
+  # }
   
   
   proj_Q_P_up$Ps_up[i] <- psM_up
@@ -520,15 +598,15 @@ for(i in 1:nrow(proj_Q_P_up)){
 }
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock lower 95%
-psM_lo <- modelParamsEQ$psMedian
-pcM_lo <- modelParamsEQ$pcMedian
-hcM_lo <- modelParamsEQ$hcMedian
+psM_lo <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
+pcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
+hcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
 
-EpsM_lo <- modelParamsEQ$EpsMedian
-EpcM_lo <- modelParamsEQ$EpcMedian
+EpsM_lo <- mean(tail(proj_AllDF_EQ, n=5)$EpsMedian)
+EpcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$EpcMedian)
 
-capA_lo <- modelParamsEQ$A
-capK_lo <- modelParamsEQ$K
+capA_lo <- mean(tail(proj_AllDF_EQ, n=5)$A)
+capK_lo <- mean(tail(proj_AllDF_EQ, n=5)$K)
 
 k_old_lo <- 0
 
@@ -544,7 +622,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   int_k3 <- 0
   
-  Qs_lo <- getSlClA_test(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
+  Qs_lo <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
                          k = k,CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
                          int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
   
@@ -569,11 +647,15 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
   
-  if(EpcM < pcM){
-    EpcM <- EpcM + 0.08
+  if(EpcM_lo < pcM_lo){
+    EpcM_lo <- EpcM_lo + 0.1
   }
   
-  Ps_lo <- getPsPcEpsEpc(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+  if(EpsM_lo < psM_lo){
+    EpsM_lo <- EpsM_lo + 0.1
+  }
+  
+  Ps_lo <- getPsPcEpsEpc_Proj(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
                          HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
                          params = c(MUtilde, Stilde))
   
@@ -582,6 +664,14 @@ for(i in 1:nrow(proj_Q_P_lo)){
   hcM_lo <- Ps_lo[3]
   EpsM_lo <- Ps_lo[4]
   EpcM_lo <- Ps_lo[5]
+  
+  # if(EpcM_lo < pcM_lo){
+  #   EpcM_lo <- EpcM_lo + 0.1
+  # }
+  # 
+  # if(EpsM_lo < psM_lo){
+  #   EpsM_lo <- EpsM_lo + 0.1
+  # }
   
   proj_Q_P_lo$Ps_lo[i] <- psM_lo
   proj_Q_P_lo$Pc_lo[i] <- pcM_lo
@@ -612,12 +702,12 @@ PQs_PROJs <- round(merge(merge(proj_Q_P_lo, proj_Q_P),proj_Q_P_up),5) %>% select
   Year, Ps_lo, Ps, Ps_up, Pc_lo, Pc, Pc_up, Sl_lo, Sl, Sl_up, Cl_lo, Cl, Cl_up, 
   A_lo, A, A_up)
 
-PQs_PROJs_PS <- PQs_MEDIANS %>% select(Year, Ps_lo, Ps, Ps_up)
-PQs_PROJs_PC <- PQs_MEDIANS %>% select(Year, Pc_lo, Pc, Pc_up)
+PQs_PROJs_PS <- PQs_PROJs %>% select(Year, Ps_lo, Ps, Ps_up)
+PQs_PROJs_PC <- PQs_PROJs %>% select(Year, Pc_lo, Pc, Pc_up)
 
-PQs_PROJs_SL <- PQs_PROJs %>% select(Year, Sl_lo, Sl, Sl_up) %>% round(3)
-PQs_PROJs_CL <- PQs_PROJs %>% select(Year, Cl_lo, Cl, Cl_up) %>% round(3)
-PQs_PROJs_A  <- PQs_PROJs %>% select(Year, A_lo, A, A_up) %>% round(3)
+PQs_PROJs_SL <- PQs_PROJs %>% select(Year, Sl_lo, Sl, Sl_up) %>% round(2)
+PQs_PROJs_CL <- PQs_PROJs %>% select(Year, Cl_lo, Cl, Cl_up) %>% round(2)
+PQs_PROJs_A  <- PQs_PROJs %>% select(Year, A_lo, A, A_up) %>% round(2)
 
 PQs_PROJs_PS <- PQs_PROJs %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_LO = Ps_lo * 100, 
                                                                                Ps = Ps * 100, Ps_UP = Ps_up * 100)
@@ -637,10 +727,11 @@ PQs_MEDIANS_projs <- PQs_PROJs %>% select(Year, Ps_lo, Ps, Ps_up)
 EQestObsPS_Medians_projs <- merge(EQestObsPS_Medians,PQs_MEDIANS_projs,by="Year",all=TRUE)
 
 EQestObsPS_Medians_projs[,-1] <- EQestObsPS_Medians_projs[,-1] * 100
+EQestObsPS_Medians_projs <- EQestObsPS_Medians_projs %>% round(2)
 
-EQestObsPS_Medians_proj_plots <- EQestObsPS_Medians_projs %>% ggplot(aes(x=Year)) + geom_line(aes(y=ps, color = "PS OBS")) + 
-  geom_point(aes(y=ps, color = "PS OBS")) + geom_line(aes(y=psMedian, color="PS RATIONAL (MEDIAN)")) +
-  geom_point(aes(y = psMedian, color = "PS RATIONAL (MEDIAN)")) + 
+EQestObsPS_Medians_proj_plots <- EQestObsPS_Medians_projs %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=psMedian, color="PS Fitted")) +
+  geom_point(aes(y = psMedian, color = "PS Fitted")) + 
   geom_line(aes(y=Ps_lo, color="PS_LO PROJECTION")) +
   geom_point(aes(y=Ps_lo, color="PS_LO PROJECTION")) + 
   geom_line(aes(y=Ps, color="PS PROJECTION")) +
@@ -663,9 +754,11 @@ EQestObsPC_Medians_projs <- merge(EQestObsPC_Medians,PQs_MEDIANS_projs,by="Year"
 
 EQestObsPC_Medians_projs[,-1] <- EQestObsPC_Medians_projs[,-1] * 100
 
-EQestObsPC_Medians_proj_plots <- EQestObsPC_Medians_projs %>% ggplot(aes(x=Year)) + geom_line(aes(y=pc, color = "PC OBS")) + 
-  geom_point(aes(y=pc, color = "PC OBS")) + geom_line(aes(y=pcMedian, color="PC RATIONAL (MEDIAN)")) +
-  geom_point(aes(y = pcMedian, color = "PC RATIONAL (MEDIAN)")) +
+EQestObsPC_Medians_projs <- EQestObsPC_Medians_projs %>% round(2)
+
+EQestObsPC_Medians_proj_plots <- EQestObsPC_Medians_projs %>% ggplot(aes(x=Year))  + 
+  geom_line(aes(y=pcMedian, color="PC Fitted")) +
+  geom_point(aes(y = pcMedian, color = "PC Fitted")) +
   geom_line(aes(y=Pc_up, color="PC_LO PROJECTION"))  +
   geom_point(aes(y=Pc_up, color="PC_LO PROJECTION")) +
   geom_line(aes(y=Pc_lo, color="PC_UP PROJECTION")) +
@@ -680,6 +773,167 @@ EQestObsPC_Medians_proj_plots <- EQestObsPC_Medians_projs %>% ggplot(aes(x=Year)
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 EQestObsPC_Medians_proj_plots
+
+
+
+EQestSl_Medians <- EQestObsSLNII %>% filter(Year > 2015)
+# supp_sl_OBS <- supp_sl_adj %>% select(Year, SlObs = Bill_meatLb_sl)
+# EQestObsSL_Medians <- merge(EQestSl_Medians, supp_sl_OBS) %>% filter(Year > 2015)
+
+PQs_MEDIANS_SL_projs <- PQs_PROJs %>% transmute(Year = Year, Sl_lo, Sl, Sl_up)
+
+EQestObsSL_Medians_projs <- merge(EQestSl_Medians,PQs_MEDIANS_SL_projs,by="Year",all=TRUE)
+
+EQestObsSL_Medians_projs <- EQestObsSL_Medians_projs %>% round(2)
+
+
+EQestObsSL_Medians_proj_plots <- EQestObsSL_Medians_projs %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=slMedian, color="SL Fitted")) +
+  geom_point(aes(y = slMedian, color = "SL Fitted")) + 
+  geom_line(aes(y=Sl_lo, color="SL_LO PROJECTION")) +
+  geom_point(aes(y=Sl_lo, color="SL_LO PROJECTION")) + 
+  geom_line(aes(y=Sl, color="SL PROJECTION")) +
+  geom_point(aes(y=Sl, color="SL PROJECTION")) + 
+  geom_line(aes(y=Sl_up, color="SL_UP PROJECTION"))  +
+  geom_point(aes(y=Sl_up, color="SL_UP PROJECTION")) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsSL_Medians_projs$Year[1],
+                                  EQestObsSL_Medians_projs$Year[nrow(EQestObsSL_Medians_projs)])))+ 
+  scale_y_continuous(name="Fed Cattle Production ") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+
+EQestCl_Medians <- EQestObsCLNII %>% filter(Year > 2015)
+# supp_cl_OBS <- supp_cl_adj %>% select(Year, ClObs = Bill_meatLb_cl)
+# EQestObsCL_Medians <- merge(EQestCl_Medians, supp_cl_OBS) %>% filter(Year > 2009)
+
+PQs_MEDIANS_CL_projs <- PQs_PROJs %>% transmute(Year = Year, Cl_lo, Cl, Cl_up)
+
+EQestObsCL_Medians_projs <- merge(EQestCl_Medians, PQs_MEDIANS_CL_projs, by="Year", all=TRUE)
+
+EQestObsCL_Medians_projs <- EQestObsCL_Medians_projs %>% round(2)
+
+EQestObsCL_Medians_proj_plots <- EQestObsCL_Medians_projs %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=clMedian, color="CL Fitted")) +
+  geom_point(aes(y = clMedian, color = "CL Fitted")) + 
+  geom_line(aes(y=Cl_lo, color="CL_LO PROJECTION")) +
+  geom_point(aes(y=Cl_lo, color="CL_LO PROJECTION")) + 
+  geom_line(aes(y=Cl, color="CL PROJECTION")) +
+  geom_point(aes(y=Cl, color="CL PROJECTION")) + 
+  geom_line(aes(y=Cl_up, color="CL_UP PROJECTION"))  +
+  geom_point(aes(y=Cl_up, color="CL_UP PROJECTION"))  + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsCL_Medians_projs$Year[1],
+                                  EQestObsCL_Medians_projs$Year[nrow(EQestObsCL_Medians_projs)])))+ 
+  scale_y_continuous(name="Cull Cow Production ") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+EQestObsTS_Medians_projs <- merge(EQestObsSL_Medians_projs %>% select(-errMean, -errmedian), 
+                                  EQestObsCL_Medians_projs %>% select(-errMean, -errmedian)) %>%
+  transmute(Year = Year-1, tsMedian = slMedian + clMedian, 
+            TS_lo = Sl_lo + Cl_lo, 
+            TS = Sl + Cl, TS_up = Sl_up + Cl_up) %>% round(3)
+
+
+
+
+
+# Here I am plotting the projections with USDA long term and FAPRI lon g term projections
+
+
+#### USDA long term projections
+USDA_Years <- c(seq(from = 2020, to = 2031, by = 1))
+
+## I am taking Steers, 5-area projections from the document page 47. These are in $/CWT
+USDA_Ps <- c(108.51, 121.06, 128.75, 134.94, 135.48, 137.24, 137.73, 138.08, 138.66, 139.63, 140.86, 142.55)
+
+#### I am taking the total production from USDA for our total supply numbers. This is in million pounds. 
+#### I will convert them into billion pounds 
+USDA_TS <- c(27224, 27902, 27065, 26742, 26847, 27034, 27263, 27480, 27715, 27944, 28167, 28384)
+
+USDA_TS <- USDA_TS/1000
+
+USDA_Proj <- cbind(USDA_Years, USDA_Ps, USDA_TS) %>% as.data.frame()
+
+
+#### FAPRI long term projections
+FAPRI_Years <- c(seq(from = 2021, to = 2031, by = 1))
+
+## I am taking Steers, 5-area projections from the document page 61. These are in $/CWT
+FAPRI_Ps <- c(122.40, 135.54, 141.05, 142.90, 144.81, 147.40, 148.39, 146.19, 143.46, 140.71, 138.39)
+
+#### I am taking the total production from USDA for our total supply numbers. This is in million pounds. 
+#### I will convert them into billion pounds 
+FAPRI_TS <- c(28008, 27320, 26855, 26715, 26720, 26703, 26825, 27130, 27513, 27892, 28250)
+
+FAPRI_TS <- FAPRI_TS/1000
+
+FAPRI_Proj <- cbind(FAPRI_Years, FAPRI_Ps, FAPRI_TS) %>% as.data.frame()
+
+
+FAPRI_Proj_Ps <- FAPRI_Proj %>% select(-FAPRI_TS) %>% transmute(Year = FAPRI_Years, FAPRI_Ps = FAPRI_Ps)
+USDA_Proj_Ps <- USDA_Proj %>% select(-USDA_TS) %>% transmute(Year = USDA_Years, USDA_Ps = USDA_Ps)
+
+CARD_USDA_FAPRI_PS_Proj <- left_join(left_join(EQestObsPS_Medians_projs, FAPRI_Proj_Ps, by="Year"), 
+                                 USDA_Proj_Ps, by="Year") 
+
+CARD_USDA_FAPRI_PS_Proj_Plot <- CARD_USDA_FAPRI_PS_Proj %>% ggplot(aes(x=Year)) +  
+  geom_line(aes(y=psMedian, color="Baseline PS")) + 
+  geom_point(aes(y = psMedian, color = "Baseline PS")) + 
+  geom_line(aes(y=Ps_lo, color="PS_LO PROJECTION")) + 
+  geom_point(aes(y=Ps_lo, color="PS_LO PROJECTION")) + 
+  geom_line(aes(y=Ps, color="PS PROJECTION")) +
+  geom_point(aes(y=Ps, color="PS PROJECTION")) + 
+  geom_line(aes(y=FAPRI_Ps, color="FAPRI PROJECTION"))  +
+  geom_point(aes(y=FAPRI_Ps, color="FAPRI PROJECTION"))  + 
+  geom_line(aes(y=USDA_Ps, color="USDA PROJECTION"))  +
+  geom_point(aes(y=USDA_Ps, color="USDA PROJECTION"))  + 
+  geom_line(aes(y=Ps_up, color="PS_UP PROJECTION"))  +
+  geom_point(aes(y=Ps_up, color="PS_UP PROJECTION"))  + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(CARD_USDA_FAPRI_PS_Proj$Year[1],
+                                  CARD_USDA_FAPRI_PS_Proj$Year[nrow(CARD_USDA_FAPRI_PS_Proj)])))+ 
+  scale_y_continuous(name="Fed Cattle Price Projections ") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+
+FAPRI_Proj_TS <- FAPRI_Proj %>% select(-FAPRI_Ps) %>% transmute(Year = FAPRI_Years, FAPRI_TS = FAPRI_TS)
+USDA_Proj_TS <- USDA_Proj %>% select(-USDA_Ps) %>% transmute(Year = USDA_Years, USDA_TS = USDA_TS)
+
+# CARD_USDA_FAPRI_TS_Proj <- merge(merge(EQestObsA_Medians_proj, FAPRI_Proj_TS, by="Year", all=TRUE), 
+#                                  USDA_Proj_TS, by="Year", all=TRUE)
+
+CARD_USDA_FAPRI_TS_Proj <- left_join(left_join(EQestObsTS_Medians_projs, FAPRI_Proj_TS, by="Year"), 
+                                 USDA_Proj_TS, by="Year")
+
+CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year))  + 
+  geom_line(aes(y=tsMedian, color="Baseline")) + 
+  geom_point(aes(y=tsMedian, color="Baseline")) + 
+  geom_line(aes(y=TS_lo, color="Projected Lower Bound")) + 
+  geom_point(aes(y=TS_lo, color="Projected Lower Bound")) + 
+  geom_line(aes(y=TS, color="Projected")) + 
+  geom_point(aes(y=TS, color="Projected")) + 
+  geom_line(aes(y=FAPRI_TS, color="FAPRI Projection"))  + 
+  geom_point(aes(y=FAPRI_TS, color="FAPRI Projection")) +
+  geom_line(aes(y=USDA_TS, color="USDA Projection"))  + 
+  geom_point(aes(y=USDA_TS, color="USDA Projection"))  + 
+  geom_line(aes(y=TS_up, color="Projected Upper Bound"))  + 
+  geom_point(aes(y=TS_up, color="Projected Upper Bound"))  + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(CARD_USDA_FAPRI_TS_Proj$Year[1],
+                                  CARD_USDA_FAPRI_TS_Proj$Year[nrow(CARD_USDA_FAPRI_TS_Proj)])))+ 
+  scale_y_continuous(name="Total Production Projections ") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+
 
 
 
