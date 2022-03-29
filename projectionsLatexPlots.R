@@ -6,9 +6,9 @@ require(tikzDevice)
 # 
 # 
 
-projPS_plots <- EQestObsPS_Medians_proj %>% filter(Year > 2013)
+projPS_plots <- EQestObsPS_Medians_projs
 
-tikz(file="projectionsLatexPlots/ProjectedFedCattlePricePlot.tex", width=6.2, height=3.5)
+tikz(file="projectionsLatexPlots/Updated/ProjectedFedCattlePricePlot.tex", width=6.2, height=3.5)
 
 projectedFedPrice_plot <- projPS_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=psMedian, color="Fitted")) + geom_point(aes(y = psMedian, color = "Fitted")) +
@@ -28,9 +28,9 @@ dev.off()
 
 
 
-projPC_plots <- EQestObsPC_Medians_proj %>% filter(Year > 2013)
+projPC_plots <- EQestObsPC_Medians_projs
 
-tikz(file="projectionsLatexPlots/ProjectedCullCowPricePlot.tex",  width=6.2, height=3.5)
+tikz(file="projectionsLatexPlots/Updated/ProjectedCullCowPricePlot.tex",  width=6.2, height=3.5)
 
 projectedCullPrice_plot <- projPC_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=pcMedian, color="Fitted")) + geom_point(aes(y = pcMedian, color = "Fitted")) +  
@@ -50,9 +50,9 @@ dev.off()
 
 # +theme(legend.position = c(0.1, 0.75))
 
-projSL_plots <- EQestObsSL_Medians_proj %>% filter(Year > 2013)
+projSL_plots <- EQestObsSL_Medians_projs
 
-tikz(file="projectionsLatexPlots/ProjectedFedCattleProduction.tex",  width=6.2, height=3.5)
+tikz(file="projectionsLatexPlots/Updated/ProjectedFedCattleProduction.tex",  width=6.2, height=3.5)
 
 projectedFedProduction_plot <- projSL_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=slMedian, color="Fitted")) + geom_point(aes(y = slMedian, color = "Fitted")) +  
@@ -72,9 +72,9 @@ dev.off()
 
 
 
-projCL_plots <- EQestObsCL_Medians_proj %>% filter(Year > 2013)
+projCL_plots <- EQestObsCL_Medians_projs
 
-tikz(file="projectionsLatexPlots/ProjectedCullCowProduction.tex",  width=6.2, height=3.5)
+tikz(file="projectionsLatexPlots/Updated/ProjectedCullCowProduction.tex",  width=6.2, height=3.5)
 
 projectedCowsProduction_plot <- projCL_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=clMedian, color="Fitted")) + geom_point(aes(y = clMedian, color = "Fitted")) + 
@@ -96,9 +96,9 @@ dev.off()
 
 
 
-CARD_USDA_FAPRI_PS_plots <- CARD_USDA_FAPRI_PS_Proj %>% filter(Year > 2013)
+CARD_USDA_FAPRI_PS_plots <- CARD_USDA_FAPRI_PS_Proj
 
-tikz(file="projectionsLatexPlots/CARD_USDA_FAPRI_PS.tex",  width=6.2, height=4)
+tikz(file="projectionsLatexPlots/Updated/CARD_USDA_FAPRI_PS.tex",  width=6.2, height=4)
 
 CARD_USDA_FAPRI_PS_plot <- CARD_USDA_FAPRI_PS_plots %>% ggplot(aes(x=Year)) + 
   geom_line(aes(y=psMedian, color="Fitted")) + geom_point(aes(y = psMedian, color = "Fitted")) + 
@@ -119,9 +119,9 @@ print(CARD_USDA_FAPRI_PS_plot)
 dev.off()
 
 
-CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_Proj %>% filter(Year > 2013)
+CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_Proj
 
-tikz(file="projectionsLatexPlots/CARD_USDA_FAPRI_TS.tex",  width=6.2, height=4)
+tikz(file="projectionsLatexPlots/Updated/CARD_USDA_FAPRI_TS.tex",  width=6.2, height=4)
 
 CARD_USDA_FAPRI_TS_plot <- CARD_USDA_FAPRI_TS_plots %>% ggplot(aes(x=Year)) + 
   geom_line(aes(y=tsMedian, color="Fitted")) + geom_point(aes(y=tsMedian, color="Fitted")) + 

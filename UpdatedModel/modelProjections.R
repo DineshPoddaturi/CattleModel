@@ -143,7 +143,7 @@ get_k0s_Global <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
 }
 
 getSlClA_Proj <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, 
-                          eta_k3 , int_k3, adjF, Dshock, k0s, slAvg, clAvg){
+                          eta_k3 , int_k3, adjF, Dshock, k0s, slAvg, clAvg,dShock){
   
   estQ <- BBoptim(par = k, fn = estQFunction_Proj, tilde_MU = params[1], 
                   tilde_s = params[2], ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3, 
@@ -158,6 +158,10 @@ getSlClA_Proj <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   k02 <- k0s$k02
   
   k3_est <- estQ$par
+  
+  # if(k3_est < 0){
+  #   k3_est <- 0.5 * g * K1
+  # }
   
   slNew <- ((g * K1 - k3_est) * slAvg)/1000000000
   
@@ -174,9 +178,12 @@ getSlClA_Proj <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   k3_est <- (k3_est * slAvg)/1000000000
   
-  ANew <- (slNew + clNew) * (1/adjF)
+  ANew <- (slNew + clNew)
   
-  k3_est_Head <- estQ$par
+  slNew <- slNew * adjF
+  clNew <- clNew * adjF
+  
+  k3_est_Head <- k3_est
   
   return(c(slNew, clNew, ANew, k3_est, k3_est_Head))
   
@@ -339,6 +346,7 @@ proj_adjFac <- adjFactor
 
 proj_muTildes <- mu_Tildes_MMNII
 proj_sTildes <- s_Tildes_MMNII
+proj_demandShocks <- demandShockGaussian1 %>% transmute(Year = Year, dShock = Shock)
 
 proj_PricesCosts <- Reduce(function(...) merge(...), 
                            list(EQestPSNII,EQestPCNII,EQestHCNII, EQestEPSNII, EQestEPCNII))
@@ -349,7 +357,7 @@ proj_A <- A_quant
 
 proj_AllDF_EQ <- Reduce(function(...) merge(...), 
                         list(proj_K_t, proj_A, proj_adjFac, proj_muTildes, proj_sTildes, proj_PricesCosts, 
-                             dressedWeights_sl_cl)) %>% round(2)
+                             dressedWeights_sl_cl, proj_demandShocks)) %>% round(2)
 
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
@@ -426,8 +434,11 @@ hcM <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
 EpsM <- mean(tail(proj_AllDF_EQ, n=5)$EpsMedian)
 EpcM <- mean(tail(proj_AllDF_EQ, n=5)$EpcMedian)
 
-capA <- mean(tail(proj_AllDF_EQ, n=5)$A)
-capK <- mean(tail(proj_AllDF_EQ, n=5)$K)
+capA <- mean(tail(proj_AllDF_EQ, n=1)$A)
+capK <- mean(tail(proj_AllDF_EQ, n=1)$K)
+
+shockD <- mean(tail(proj_AllDF_EQ, n=5)$dShock)
+adjF <- mean(tail(proj_AllDF_EQ, n=5)$AdjFactor)
 
 
 for(i in 1:nrow(proj_Q_P)){
@@ -448,7 +459,7 @@ for(i in 1:nrow(proj_Q_P)){
   Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
                       k = k, CapA = capA, gamma_k3 = gamma_k3, 
                       eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF, k0s = k0s,
-                      slAvg = slaughterAvg, clAvg = cullAvg)
+                      slAvg = slaughterAvg, clAvg = cullAvg, dShock = shockD)
   
   slNew <- Qs[1]
   clNew <- Qs[2]
@@ -459,16 +470,16 @@ for(i in 1:nrow(proj_Q_P)){
   k_old_Head <- Qs[5]
   
   if(EpcM < pcM){
-    EpcM <- EpcM + 0.1
+    EpcM <- pcM
   }
-  
+
   if(EpsM < psM){
-    EpsM <- EpsM + 0.1
+    EpsM <- psM
   }
-  
+    
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
-                      HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
-                      params = c(MUtilde, Stilde))
+                           HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
+                           params = c(MUtilde, Stilde))
   psM <- Ps[1]
   pcM <- Ps[2]
   hcM <- Ps[3]
@@ -509,20 +520,25 @@ for(i in 1:nrow(proj_Q_P)){
   
   capK <- beefINV_FORECAST$Kcast[i]
   
+  # EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
+  # EpsM <- sum(as.numeric(psM) * fedMeshCheb)
+  
 }
 
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
 psM_up <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
 pcM_up <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
-hcM <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
+hcM_up <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
 
 EpsM_up <- mean(tail(proj_AllDF_EQ, n=5)$EpsMedian)
 EpcM_up <- mean(tail(proj_AllDF_EQ, n=5)$EpcMedian)
 
-capA_up <- mean(tail(proj_AllDF_EQ, n=5)$A)
-capK_up <- mean(tail(proj_AllDF_EQ, n=5)$K)
+capA_up <- mean(tail(proj_AllDF_EQ, n=1)$A)
+capK_up <- mean(tail(proj_AllDF_EQ, n=1)$K)
 
+shockD <- mean(tail(proj_AllDF_EQ, n=5)$dShock)
+adjF <- mean(tail(proj_AllDF_EQ, n=5)$AdjFactor)
 
 for(i in 1:nrow(proj_Q_P_up)){
   
@@ -538,7 +554,7 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   Qs_up <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_up, PcM = pcM_up, K1 = K1_up,
                          k = k, CapA = capA_up, gamma_k3 = gamma_k3, eta_k3 = eta_k3 , int_k3 = int_k3, 
-                         adjF = adjF, k0s = k0s,slAvg = slaughterAvg, clAvg = cullAvg)
+                         adjF = adjF, k0s = k0s,slAvg = slaughterAvg, clAvg = cullAvg, dShock = shockD)
   slNew_up <- Qs_up[1]
   clNew_up <- Qs_up[2]
   ANew_up <- Qs_up[3]
@@ -547,17 +563,19 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   k_old_head_up <- Qs_up[5]
   
-  if(EpcM_up < pcM_up){
-    EpcM_up <- EpcM_up + 0.1
-  }
+  # if(EpcM_up < pcM_up){
+  #   EpcM_up <- pcM_up + 0.1
+  # }
+  # 
+  # if(EpsM_up < psM_up){
+  #   EpsM_up <- psM_up + 0.1
+  # }
   
-  if(EpsM_up < psM_up){
-    EpsM_up <- EpsM_up + 0.1
-  }
+  # ANew_up <- ANew_up * shockD
   
   Ps_up <- getPsPcEpsEpc_Proj(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
-                         HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
-                         params = c(MUtilde, Stilde))
+                              HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
+                              params = c(MUtilde, Stilde))
   
   psM_up <- Ps_up[1]
   pcM_up <- Ps_up[2]
@@ -595,6 +613,9 @@ for(i in 1:nrow(proj_Q_P_up)){
   capA_up <- ANew_up
   capK_up <- beefINV_FORECAST$hi95[i]
   
+  EpcM_up <- sum(as.numeric(pcM_up) * cullMeshCheb)
+  EpsM_up <- sum(as.numeric(psM_up) * fedMeshCheb)
+  
 }
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock lower 95%
@@ -605,8 +626,11 @@ hcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
 EpsM_lo <- mean(tail(proj_AllDF_EQ, n=5)$EpsMedian)
 EpcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$EpcMedian)
 
-capA_lo <- mean(tail(proj_AllDF_EQ, n=5)$A)
-capK_lo <- mean(tail(proj_AllDF_EQ, n=5)$K)
+capA_lo <- mean(tail(proj_AllDF_EQ, n=1)$A)
+capK_lo <- mean(tail(proj_AllDF_EQ, n=1)$K)
+
+shockD <- mean(tail(proj_AllDF_EQ, n=5)$dShock)
+adjF <- mean(tail(proj_AllDF_EQ, n=5)$AdjFactor)
 
 k_old_lo <- 0
 
@@ -624,7 +648,7 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   Qs_lo <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
                          k = k,CapA = capA_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-                         int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg)
+                         int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg,dShock = shockD)
   
   slNew_lo <- Qs_lo[1]
   clNew_lo <- Qs_lo[2]
@@ -637,27 +661,38 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   ###### changing the quantities such that they match the historical quantities. Don't know if this is required.
   ###### If I change this the prices are projected properly i.e., fed cattle price is always greater than cull cow price
+  clCounter <- 0
+  slCounter <- 0
   
   while(clNew_lo < 1.01){
     clNew_lo <- clNew_lo + 0.01
+    clCounter <- 1
   }
+  
   while(slNew_lo < 19.01){
     slNew_lo <- slNew_lo + 0.01
+    slCounter <- 1
   }
   
-  ANew_lo <- (slNew_lo + clNew_lo) * (1/adjF)
+  ANew_lo <- (slNew_lo + clNew_lo)
   
-  if(EpcM_lo < pcM_lo){
-    EpcM_lo <- EpcM_lo + 0.1
+  if(clCounter >0){
+    clNew_lo <- clNew_lo * adjF
   }
-  
-  if(EpsM_lo < psM_lo){
-    EpsM_lo <- EpsM_lo + 0.1
+  if(slCounter >0){
+    slNew_lo <- slNew_lo * adjF
   }
+  # if(EpcM_lo < pcM_lo){
+  #   EpcM_lo <- pcM_lo - 0.1
+  # }
+  # 
+  # if(EpsM_lo < psM_lo){
+  #   EpsM_lo <- psM_lo - 0.1
+  # }
   
   Ps_lo <- getPsPcEpsEpc_Proj(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
-                         HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
-                         params = c(MUtilde, Stilde))
+                              HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                              params = c(MUtilde, Stilde))
   
   psM_lo <- Ps_lo[1]
   pcM_lo <- Ps_lo[2]
@@ -710,9 +745,9 @@ PQs_PROJs_CL <- PQs_PROJs %>% select(Year, Cl_lo, Cl, Cl_up) %>% round(2)
 PQs_PROJs_A  <- PQs_PROJs %>% select(Year, A_lo, A, A_up) %>% round(2)
 
 PQs_PROJs_PS <- PQs_PROJs %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_LO = Ps_lo * 100, 
-                                                                               Ps = Ps * 100, Ps_UP = Ps_up * 100)
-PQs_PROJs_PC <- PQs_PROJs %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_LO = Pc_up * 100, 
-                                                                               Pc = Pc * 100, Pc_UP = Pc_lo * 100)
+                                                                           Ps = Ps * 100, Ps_UP = Ps_up * 100)
+PQs_PROJs_PC <- PQs_PROJs %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_LO = Pc_lo * 100, 
+                                                                           Pc = Pc * 100, Pc_UP = Pc_up * 100)
 
 
 PQs_PROJs_TS <- merge(PQs_PROJs_SL, PQs_PROJs_CL) %>%
@@ -834,7 +869,7 @@ EQestObsCL_Medians_proj_plots <- EQestObsCL_Medians_projs %>% ggplot(aes(x=Year)
 
 EQestObsTS_Medians_projs <- merge(EQestObsSL_Medians_projs %>% select(-errMean, -errmedian), 
                                   EQestObsCL_Medians_projs %>% select(-errMean, -errmedian)) %>%
-  transmute(Year = Year-1, tsMedian = slMedian + clMedian, 
+  transmute(Year = Year, tsMedian = slMedian + clMedian, 
             TS_lo = Sl_lo + Cl_lo, 
             TS = Sl + Cl, TS_up = Sl_up + Cl_up) %>% round(3)
 
@@ -879,7 +914,7 @@ FAPRI_Proj_Ps <- FAPRI_Proj %>% select(-FAPRI_TS) %>% transmute(Year = FAPRI_Yea
 USDA_Proj_Ps <- USDA_Proj %>% select(-USDA_TS) %>% transmute(Year = USDA_Years, USDA_Ps = USDA_Ps)
 
 CARD_USDA_FAPRI_PS_Proj <- left_join(left_join(EQestObsPS_Medians_projs, FAPRI_Proj_Ps, by="Year"), 
-                                 USDA_Proj_Ps, by="Year") 
+                                     USDA_Proj_Ps, by="Year") 
 
 CARD_USDA_FAPRI_PS_Proj_Plot <- CARD_USDA_FAPRI_PS_Proj %>% ggplot(aes(x=Year)) +  
   geom_line(aes(y=psMedian, color="Baseline PS")) + 
@@ -910,7 +945,9 @@ USDA_Proj_TS <- USDA_Proj %>% select(-USDA_Ps) %>% transmute(Year = USDA_Years, 
 #                                  USDA_Proj_TS, by="Year", all=TRUE)
 
 CARD_USDA_FAPRI_TS_Proj <- left_join(left_join(EQestObsTS_Medians_projs, FAPRI_Proj_TS, by="Year"), 
-                                 USDA_Proj_TS, by="Year")
+                                     USDA_Proj_TS, by="Year")
+CARD_USDA_FAPRI_TS_Proj
+
 
 CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year))  + 
   geom_line(aes(y=tsMedian, color="Baseline")) + 
@@ -931,16 +968,6 @@ CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year)) 
   scale_y_continuous(name="Total Production Projections ") +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-
-
-
-
-
-
-
-
 
 
 

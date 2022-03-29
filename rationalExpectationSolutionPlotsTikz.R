@@ -1,17 +1,14 @@
 require(tikzDevice)
 # 
 # # http://iltabiai.github.io/tips/latex/2015/09/15/latex-tikzdevice-r.html
-# 
-# 
-# 
-# 
 
-EQestObsPSNI_plots <- EQestObsPSNI  %>% select(Year, psMean, psMedian, ps) %>% 
-  transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100)
 
-tikz(file="rationalExpectationsLatexPlots/FedCattlePricePlot.tex", width=6.2, height=3.5)
+EQestObsPSNI_plots <- EQestObsPSNII  %>% select(Year, psMean, psMedian, ps) %>% 
+  transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100) %>% filter(Year>=1998)
 
-slaughter_plot <- EQestObsPSNI_plots%>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="Mean fitted price")) +
+tikz(file="rationalExpectationsLatexPlots/Updated/FedCattlePricePlot.tex", width=6.2, height=3.5)
+
+slaughter_plot <- EQestObsPSNI_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="Mean fitted price")) +
   geom_point(aes(y = psMean, color = "Mean fitted price")) + geom_line(aes(y=ps, color = "Observed price")) + 
   geom_point(aes(y=ps, color = "Observed price")) + geom_line(aes(y=psMedian, color="Median fitted price")) +
   geom_point(aes(y = psMedian, color = "Median fitted price")) + theme_classic() + 
@@ -26,10 +23,10 @@ print(slaughter_plot)
 dev.off()
 
 
-EQestObsPCNI_plots <- EQestObsPCNI %>% select(Year, pcMean, pcMedian, pc) %>% 
-  transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100)
+EQestObsPCNI_plots <- EQestObsPCNII %>% select(Year, pcMean, pcMedian, pc) %>% 
+  transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100) %>% filter(Year >= 1998)
 
-tikz(file="rationalExpectationsLatexPlots/CullCowPricePlot.tex", width=6.2, height=3.5)
+tikz(file="rationalExpectationsLatexPlots/Updated/CullCowPricePlot.tex", width=6.2, height=3.5)
 
 cull_plot <- EQestObsPCNI_plots%>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, color="Mean fitted price")) +
   geom_point(aes(y = pcMean, color = "Mean fitted price")) + geom_line(aes(y=pc, color = "Observed price")) + 
@@ -49,7 +46,7 @@ dev.off()
 
 
 dressedWeights_cl <- dressedWeights_sl_cl %>% select(Year, Cull_avg)
-EQestObsCLNI_Plots <- EQestObsCLNI %>% select(Year, clMedian)
+EQestObsCLNI_Plots <- EQestObsCLNII %>% select(Year, clMedian)
 EQestObsCLNI_Head <- merge(EQestObsCLNI_Plots, dressedWeights_cl) %>% mutate(clMedianHead = 
                                                                                clMedian * (1000000000/Cull_avg))
 
@@ -63,14 +60,13 @@ EQestObsCLNI_Head_Inventory11 <- EQestObsCLNI_Head_Inventory1 %>% select(-clMedi
 EQestObsCLNI_Head_Inventory11 <- EQestObsCLNI_Head_Inventory11 %>% 
   mutate(fitK = k3 + k4 + k5 + k6 + CLk_987) %>% select(Year, fitK)
 totalInventory <- Stock %>% select(Year, K)
-EQestObstotalInventory <- merge(totalInventory, EQestObsCLNI_Head_Inventory11)
+EQestObstotalInventory <- merge(totalInventory, EQestObsCLNI_Head_Inventory11) %>% filter(Year >= 1998)
 
 ddlObsInventory_plot <- detrend(as.matrix(EQestObstotalInventory%>%select(-Year)),tt='linear') %>% as.data.frame() %>% 
   mutate(Year = c(seq(EQestObstotalInventory$Year[1],
                       EQestObstotalInventory$Year[nrow(EQestObstotalInventory)]))) %>% select(Year, everything())
 
-tikz(file="rationalExpectationsLatexPlots/CattleCyclesReplicationPlot.tex", width=6.2, height=3.5)
-
+tikz(file="rationalExpectationsLatexPlots/Updated/CattleCyclesReplicationPlot.tex", width=6.2, height=3.5)
 
 deTrendedInvReplication_plot <- ddlObsInventory_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=K,color="Observed Inventory")) +
   geom_line(aes(y=fitK,color="Fitted Inventory")) +
@@ -94,16 +90,18 @@ dev.off()
 
 
 dressedWeights_sl <- dressedWeights_sl_cl %>% select(Year, Slaughter_avg)
-EQestObsSLNI_Plots <- EQestObsSLNI %>% select(Year, slMedian)
+EQestObsSLNI_Plots <- EQestObsSLNII %>% select(Year, slMedian)
 replacementHeifers <- k3
 EQestObsSLNI_Head <- merge(EQestObsSLNI_Plots, dressedWeights_sl) %>% mutate(slMedianHead = slMedian * (1000000000/Slaughter_avg))
-EQestObsSlHead_repHeifers <- left_join(replacementHeifers, EQestObsSLNI_Head) %>% 
-  transmute(Year = Year, slHeadEst = slMedianHead, repH = k3)
-EQesttotalInventory <- EQestObsSlHead_repHeifers %>% select(Year,slHeadEst, repH) %>%
-  transmute(Year = Year-1, fitK = (slHeadEst + lead(repH,1)/g)) %>% na.exclude()
+EQestObsSlHead_repHeifers <- left_join(EQestObsSLNI_Head,stocksImportsExports) %>% 
+  transmute(Year = Year, slHeadEst = slMedianHead, repH = k3, Imports = Imports, Exports = Exports)
+EQesttotalInventory <- EQestObsSlHead_repHeifers %>% select(Year,slHeadEst, repH, Imports, Exports) %>%
+  transmute(Year = Year-1, fitK = ((slHeadEst + lead(repH,1))/g)+Exports) %>% na.exclude()
 
+totalInventory <- Stock %>% select(Year, K)
+EQestObstotalInventorySL <- merge(totalInventory, EQesttotalInventory) %>% filter(Year >= 1998)
 
-inventoryPlot <- EQestObstotalInventory %>% ggplot(aes(x=Year)) + geom_line(aes(y=K,color="Observed Inventory")) +
+inventoryPlot <- EQestObstotalInventorySL %>% ggplot(aes(x=Year)) + geom_line(aes(y=K,color="Observed Inventory")) +
   geom_line(aes(y=fitK,color="Fitted Inventory")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObstotalInventory$Year[1],
