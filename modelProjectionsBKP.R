@@ -3,7 +3,7 @@
 #### First we fit a linear model with the total inventory in the United States
 librarian::shelf(tseries, arfima, forecast, lmtest)
 
-stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2022)
+stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2020)
 stock_K_ts <- ts(stock_K$K, start = stock_K$Year[1], 
                  end = stock_K$Year[nrow(stock_K)], frequency = 1)
 
@@ -14,8 +14,8 @@ adf.test(stock_K_ts)
 # Augmented Dickey-Fuller Test
 # 
 # data:  stock_K_ts
-# Dickey-Fuller = -0.48126, Lag order = 4,
-# p-value = 0.9811
+# Dickey-Fuller = -0.50599, Lag order = 4, p-value
+# = 0.9799
 # alternative hypothesis: stationary
 
 ##### I fit a linear model here. Note that I am using very extensive data from 1924 to 2020.
@@ -34,8 +34,7 @@ Box.test(Kfit$residuals, type = "Ljung-Box")
 # H0:  The residuals are random.
 # Ha:  The residuals are not random.
 # data:  Kfit$residuals
-# X-squared = 0.0017834, df = 1, p-value =
-#   0.9663
+# X-squared = 0.00026887, df = 1, p-value = 0.9869
 
 # The follwing commented code is to check the diagnostics and make sure the linear model is fitted properly
 # qqnorm(Kfit_Residuals)
@@ -54,17 +53,29 @@ Box.test(Kfit$residuals, type = "Ljung-Box")
 #   ggplot2::ggtitle("Non-Standardized Residuals")
 
 
-beefINV_FORECAST <- forecast(object = Kfit, h = 10, level = 95) %>% as.data.frame()
+beefINV_FORECAST <- forecast(object = Kfit, h = 11, level = 95) %>% as.data.frame()
 
 beefINV_FORECAST <- beefINV_FORECAST %>% transmute(Year =  as.double(row.names(beefINV_FORECAST)), 
-                                                   K = `Point Forecast`, lo95 = `Lo 95`, hi95 = `Hi 95`)
+                                                   Kcast = `Point Forecast`, lo95 = `Lo 95`, hi95 = `Hi 95`)
 
 row.names(beefINV_FORECAST) <- NULL
 
-beefInventoryData <- beefInventory %>% arrange(Year) %>% filter(Year >= 2021) %>% mutate(Year = Year, lo95 = K,
-                                                                                         hi95 = K)
+beefInventory_test <- beefInventory %>% arrange(Year)
 
-beefINV_FORECAST <- rbind(beefInventoryData, beefINV_FORECAST)
+combinedK <- left_join(beefINV_FORECAST, beefInventory_test) %>% mutate(err = K - Kcast)
+#   Year    Kcast     lo95     hi95        K       err
+# 1  2021 31051044 29609589 32492498 30843600 -207443.7
+# 2  2022 31063066 28157618 33968514 30125100 -937966.2
+# 3  2023 31157824 26693220 35622427       NA        NA
+# 4  2024 31209654 25298713 37120596       NA        NA
+# 5  2025 31194386 24199626 38189146       NA        NA
+# 6  2026 31159438 23373813 38945062       NA        NA
+# 7  2027 31145681 22693681 39597680       NA        NA
+# 8  2028 31154580 22055784 40253376       NA        NA
+# 9  2029 31166811 21424517 40909104       NA        NA
+# 10 2030 31169867 20814139 41525595       NA        NA
+# 11 2031 31165680 20242995 42088365       NA        NA
+# 12 2032 31161615 19711322 42611909       NA        NA
 
 #### Here we fit a linear model between the calf crop and the replacement heifers to get the relationship
 #### The relationship is shown in the model framework in dissertation document
@@ -389,7 +400,7 @@ proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo =
 ##### Using the projected stock, I am generating the new born in each year. So basically multiply birth rate with the 
 ##### stock.
 
-calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * K) %>% 
+calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * Kcast) %>% 
   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
 calf_crop_proj1_LO <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * lo95) %>% 
@@ -432,7 +443,7 @@ adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
 
 for(i in 1:nrow(proj_Q_P)){
   
-  i <- 1
+  # i <- 1
   
   #### k is replacement heifers starting value.We start with zero (almost never true), but we let the program and data to give
   ### the optimal replacement heifers. 
@@ -458,6 +469,14 @@ for(i in 1:nrow(proj_Q_P)){
   
   k_old_Head <- Qs[5]
   
+  # if(EpcM < pcM){
+  #   EpcM <- EpcM + 0.1
+  # }
+  # 
+  # if(EpsM < psM){
+  #   EpsM <- EpsM + 0.1
+  # }
+  
   ###### changing the quantities such that they match the historical quantities.
   ###### If I change this the prices are projected properly i.e., fed cattle price is always greater than cull cow price
   # clCounter <- 0
@@ -477,17 +496,6 @@ for(i in 1:nrow(proj_Q_P)){
   clNew <- clNew * adjF
   slNew <- slNew * adjF
   
-  # if(EpcM < pcM){
-  #   EpcM <- pcM
-  # }
-  # 
-  # if(EpsM < psM){
-  #   EpsM <- EpsM + 0.1
-  # }
-  
-  EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
-  EpsM <- sum(as.numeric(psM) * fedMeshCheb)
-    
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
                            HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
                            params = c(MUtilde, Stilde))
@@ -496,12 +504,6 @@ for(i in 1:nrow(proj_Q_P)){
   hcM <- Ps[3]
   EpsM <- Ps[4]
   EpcM <- Ps[5]
-  
-  proj_Q_P$Ps[i] <- psM
-  proj_Q_P$Pc[i] <- pcM
-  proj_Q_P$Hc[i] <- hcM
-  proj_Q_P$EPs[i] <- EpsM
-  proj_Q_P$EPc[i] <- EpcM
   
   D_sl <- ANew *
     ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/
@@ -611,11 +613,11 @@ for(i in 1:nrow(proj_Q_P)){
     
   }
   
-  
-  
-  
-  
-  
+  proj_Q_P$Ps[i] <- psM
+  proj_Q_P$Pc[i] <- pcM
+  proj_Q_P$Hc[i] <- hcM
+  proj_Q_P$EPs[i] <- EpsM
+  proj_Q_P$EPc[i] <- EpcM
   
   proj_Q_P$Sl[i] <- slNew
   proj_Q_P$Cl[i] <- clNew
@@ -631,15 +633,18 @@ for(i in 1:nrow(proj_Q_P)){
   
   capA <- ANew
   
-  capK <- beefINV_FORECAST$K[i]
+  capK <- beefINV_FORECAST$Kcast[i]
+  
+  # EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
+  # EpsM <- sum(as.numeric(psM) * fedMeshCheb)
   
 }
 
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
-psM_up <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
-pcM_up <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
-hcM_up <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
+psM_up <- mean(tail(proj_AllDF_EQ, n=1)$psMedian)
+pcM_up <- mean(tail(proj_AllDF_EQ, n=1)$pcMedian)
+hcM_up <- mean(tail(proj_AllDF_EQ, n=1)$hcMedian)
 
 EpsM_up <- mean(tail(proj_AllDF_EQ, n=1)$EpsMedian)
 EpcM_up <- mean(tail(proj_AllDF_EQ, n=1)$EpcMedian)
@@ -673,14 +678,9 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   k_old_head_up <- Qs_up[5]
   
-  ANew_up <- (slNew_up + clNew_up) * shockD
-  clNew_up <- clNew_up 
-  slNew_up <- slNew_up 
-  
-  # if(EpcM_up < pcM_up){
-  #   EpcM_up <- pcM_up + 0.1
-  # }
-  
+  ANew_up <- (slNew_up + clNew_up) * shockD 
+  clNew_up <- clNew_up * adjF
+  slNew_up <- slNew_up * adjF
   
   Ps_up <- getPsPcEpsEpc_Proj(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
                               HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
@@ -691,6 +691,115 @@ for(i in 1:nrow(proj_Q_P_up)){
   hcM_up <- Ps_up[3]
   EpsM_up <- Ps_up[4]
   EpcM_up <- Ps_up[5]
+  
+  D_sl_up <- ANew_up *
+    ((exp((MUtilde - ((psM_up/phi) - (pcM_up/phi)))/Stilde))/
+       (1 + (exp((MUtilde - ((psM_up/phi) - (pcM_up/phi)))/Stilde))))
+  
+  D_cl_up <- ANew_up * (1/(1 + (exp((MUtilde - ((psM_up/phi) - (pcM_up/phi)))/Stilde))))
+  
+  slDiff_up <- slNew_up - D_sl_up
+  clDiff_up <- clNew_up - D_cl_up
+  
+  m <- 1
+  
+  slDiffEq_up <- NULL
+  clDiffEq_up <- NULL
+  psM_Eq_up <- NULL
+  pcM_Eq_up <- NULL
+  
+  while(abs(slDiff_up)>0.01 || abs(clDiff_up)>0.01){
+    
+    slDiffEq_up[m] <- slDiff_up
+    clDiffEq_up[m] <- clDiff_up
+    
+    if( slDiff_up < 0){
+      psN_up <- psM_up + 0.001
+    } else if( slDiff_up > 0){
+      psN_up <- psM_up - 0.001
+    }
+    
+    if(psN_up < 0){
+      psN_up <- psM_up
+    }
+    
+    if( clDiff_up < 0){
+      pcN_up <- pcM_up + 0.001
+    } else if( clDiff_up > 0){
+      pcN_up <- pcM_up - 0.001
+    }
+    
+    if(pcN_up < 0){
+      pcN_up <- pcM_up
+    }
+    
+    hcM_up <- (((g * (beta^3) * psN_up) + (beta - 1) * pcN_up)/(1 + g * beta * (gamma0 + beta * gamma1)))
+    
+    Ps_up <- getPsPcEpsEpc_Proj(PsM = psN_up, PcM = pcN_up, EPsM = EpsM_up, EPcM = EpcM_up,
+                                HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
+                                params = c(MUtilde, Stilde))
+    
+    psM_up <- Ps_up[1]
+    pcM_up <- Ps_up[2]
+    hcM_up <- Ps_up[3]
+    EpsM_up <- Ps_up[4]
+    EpcM_up <- Ps_up[5]
+    
+    psM_Eq_up[m] <- psM_up
+    pcM_Eq_up[m] <- pcM_up
+    
+    Qs_up <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_up, PcM = pcM_up, K1 = K1_up,
+                           k = k,CapA = ANew_up, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+                           int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg,dShock = shockD)
+    slNew_Eq_up <- Qs_up[1]
+    clNew_Eq_up <- Qs_up[2]
+    ANew_Eq_up <- Qs_up[3]
+    
+    k_old_Eq_up <-  Qs_up[4]
+    
+    k_old_head_Eq_up <-  Qs_up[5]
+    
+    slCounter_Eq_up <- 0
+    clCounter_Eq_up <- 0
+    
+    while(clNew_Eq_up < 1.01){
+      clNew_Eq_up  <- clNew_Eq_up  + 0.01
+      clCounter_Eq_up <- 1
+    }
+    
+    while(slNew_Eq_up < 19.01){
+      slNew_Eq_up <- slNew_Eq_up + 0.01
+      slCounter_Eq_up <- 1
+    }
+    
+    ANew_Eq_up[m] <- (slNew_Eq_up + clNew_Eq_up) * shockD
+    
+    
+    D_sl_up <- ANew_Eq_up[m] *
+      ((exp((MUtilde - ((psM_up/phi) - (pcM_up/phi)))/Stilde))/
+         (1 + (exp((MUtilde - ((psM_up/phi) - (pcM_up/phi)))/Stilde))))
+    
+    D_cl_up <- ANew_Eq_up[m] * (1/(1 + (exp((MUtilde - ((psM_up/phi) - (pcM_up/phi)))/Stilde))))
+    
+    slDiff_up <- slNew_Eq_up - D_sl_up
+    clDiff_up <- clNew_Eq_up - D_cl_up
+    
+    # The reason for this condition is to avoid infinite while loop. Note that the while loop stops
+    # if the differences reach below tolerance levels. But sometimes this is never the case and there will be 
+    # some difference above tolerance level (basically saying that there will be closing stocks). So I exit the loop
+    # if the difference stays stagnant.
+    if(m >= 10){
+      if( (round(slDiffEq_up[m],2) == round(slDiffEq_up[m-1],2)) && (round(clDiffEq_up[m],2) == round(clDiffEq_up[m-1],2)) ){
+        if( (round(slDiffEq_up[m-1],2) == round(slDiffEq_up[m-2],2)) && (round(clDiffEq_up[m-1],2) == round(clDiffEq_up[m-2],2)) ){
+          break
+        }
+      }
+    }
+    
+    m <- m+1
+    
+  }
+  
   
   proj_Q_P_up$Ps_up[i] <- psM_up
   proj_Q_P_up$Pc_up[i] <- pcM_up
@@ -713,12 +822,15 @@ for(i in 1:nrow(proj_Q_P_up)){
   capA_up <- ANew_up
   capK_up <- beefINV_FORECAST$hi95[i]
   
+  # EpcM_up <- sum(as.numeric(pcM_up) * cullMeshCheb)
+  # EpsM_up <- sum(as.numeric(psM_up) * fedMeshCheb)
+  
 }
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock lower 95%
-psM_lo <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
-pcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
-hcM_lo <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
+psM_lo <- mean(tail(proj_AllDF_EQ, n=1)$psMedian)
+pcM_lo <- mean(tail(proj_AllDF_EQ, n=1)$pcMedian)
+hcM_lo <- mean(tail(proj_AllDF_EQ, n=1)$hcMedian)
 
 EpsM_lo <- mean(tail(proj_AllDF_EQ, n=1)$EpsMedian)
 EpcM_lo <- mean(tail(proj_AllDF_EQ, n=1)$EpcMedian)
@@ -760,25 +872,25 @@ for(i in 1:nrow(proj_Q_P_lo)){
   ###### If I change this the prices are projected properly i.e., fed cattle price is always greater than cull cow price
   clCounter_lo <- 0
   slCounter_lo <- 0
-
+  
   while(clNew_lo < 1.01){
     clNew_lo <- clNew_lo + 0.01
     clCounter_lo <- 1
   }
-
+  
   while(slNew_lo < 19.01){
     slNew_lo <- slNew_lo + 0.01
     slCounter_lo <- 1
   }
   
-  ANew_lo <- (slNew_lo + clNew_lo) * shockD
-  clNew_lo <- clNew_lo  
-  slNew_lo <- slNew_lo 
+  ANew_lo <- (slNew_lo + clNew_lo) * shockD 
+  clNew_lo <- clNew_lo * adjF
+  slNew_lo <- slNew_lo * adjF
   
-  if(EpcM_lo < pcM_lo){
-    EpcM_lo <- pcM_lo - 0.1
-  }
-
+  # if(EpcM_lo < pcM_lo){
+  #   EpcM_lo <- pcM_lo - 0.1
+  # }
+  # 
   # if(EpsM_lo < psM_lo){
   #   EpsM_lo <- psM_lo - 0.1
   # }
@@ -792,6 +904,114 @@ for(i in 1:nrow(proj_Q_P_lo)){
   hcM_lo <- Ps_lo[3]
   EpsM_lo <- Ps_lo[4]
   EpcM_lo <- Ps_lo[5]
+  
+  D_sl_lo <- ANew_lo *
+    ((exp((MUtilde - ((psM_lo/phi) - (pcM_lo/phi)))/Stilde))/
+       (1 + (exp((MUtilde - ((psM_lo/phi) - (pcM_lo/phi)))/Stilde))))
+  
+  D_cl_lo <- ANew_lo * (1/(1 + (exp((MUtilde - ((psM_lo/phi) - (pcM_lo/phi)))/Stilde))))
+  
+  slDiff_lo <- slNew_lo - D_sl_lo
+  clDiff_lo <- clNew_lo - D_cl_lo
+  
+  m <- 1
+  
+  slDiffEq_lo <- NULL
+  clDiffEq_lo <- NULL
+  psM_Eq_lo <- NULL
+  pcM_Eq_lo <- NULL
+  
+  while(abs(slDiff_lo)>0.01 || abs(clDiff_lo)>0.01){
+    
+    slDiffEq_lo[m] <- slDiff_lo
+    clDiffEq_lo[m] <- clDiff_lo
+    
+    if( slDiff_lo < 0){
+      psN_lo <- psM_lo + 0.001
+    } else if( slDiff_lo > 0){
+      psN_lo <- psM_lo - 0.001
+    }
+    
+    if(psN_lo < 0){
+      psN_lo <- psM_lo
+    }
+    
+    if( clDiff_lo < 0){
+      pcN_lo <- pcM_lo + 0.001
+    } else if( clDiff_lo > 0){
+      pcN_lo <- pcM_lo - 0.001
+    }
+    
+    if(pcN_lo < 0){
+      pcN_lo <- pcM_lo
+    }
+    
+    hcM_lo <- (((g * (beta^3) * psN_lo) + (beta - 1) * pcN_lo)/(1 + g * beta * (gamma0 + beta * gamma1)))
+    
+    Ps_lo <- getPsPcEpsEpc_Proj(PsM = psN_lo, PcM = pcN_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+                                HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                                params = c(MUtilde, Stilde))
+    
+    psM_lo <- Ps_lo[1]
+    pcM_lo <- Ps_lo[2]
+    hcM_lo <- Ps_lo[3]
+    EpsM_lo <- Ps_lo[4]
+    EpcM_lo <- Ps_lo[5]
+    
+    psM_Eq_lo[m] <- psM_lo
+    pcM_Eq_lo[m] <- pcM_lo
+    
+    Qs_lo <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_lo, PcM = pcM_lo, K1 = K1_lo,
+                           k = k,CapA = ANew_lo, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+                           int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg,dShock = shockD)
+    slNew_Eq_lo <- Qs_lo[1]
+    clNew_Eq_lo <- Qs_lo[2]
+    ANew_Eq_lo <- Qs_lo[3]
+    
+    k_old_Eq_lo <-  Qs_lo[4]
+    
+    k_old_head_Eq_lo <-  Qs_lo[5]
+    
+    slCounter_Eq_lo <- 0
+    clCounter_Eq_lo <- 0
+    
+    while(clNew_Eq_lo < 1.01){
+      clNew_Eq_lo  <- clNew_Eq_lo  + 0.01
+      clCounter_Eq_lo <- 1
+    }
+    
+    while(slNew_Eq_lo < 19.01){
+      slNew_Eq_lo <- slNew_Eq_lo + 0.01
+      slCounter_Eq_lo <- 1
+    }
+    
+    ANew_Eq_lo[m] <- (slNew_Eq_lo + clNew_Eq_lo) * shockD
+    
+    
+    D_sl_lo <- ANew_Eq_lo[m] *
+      ((exp((MUtilde - ((psM_lo/phi) - (pcM_lo/phi)))/Stilde))/
+         (1 + (exp((MUtilde - ((psM_lo/phi) - (pcM_lo/phi)))/Stilde))))
+    
+    D_cl_lo <- ANew_Eq_lo[m] * (1/(1 + (exp((MUtilde - ((psM_lo/phi) - (pcM_lo/phi)))/Stilde))))
+    
+    slDiff_lo <- slNew_Eq_lo - D_sl_lo
+    clDiff_lo <- clNew_Eq_lo - D_cl_lo
+    
+    # The reason for this condition is to avoid infinite while loop. Note that the while loop stops
+    # if the differences reach below tolerance levels. But sometimes this is never the case and there will be 
+    # some difference above tolerance level (basically saying that there will be closing stocks). So I exit the loop
+    # if the difference stays stagnant.
+    if(m >= 10){
+      if( (round(slDiffEq_lo[m],2) == round(slDiffEq_lo[m-1],2)) && (round(clDiffEq_lo[m],2) == round(clDiffEq_lo[m-1],2)) ){
+        if( (round(slDiffEq_lo[m-1],2) == round(slDiffEq_lo[m-2],2)) && (round(clDiffEq_lo[m-1],2) == round(clDiffEq_lo[m-2],2)) ){
+          break
+        }
+      }
+    }
+    
+    m <- m+1
+    
+  }
   
   proj_Q_P_lo$Ps_lo[i] <- psM_lo
   proj_Q_P_lo$Pc_lo[i] <- pcM_lo

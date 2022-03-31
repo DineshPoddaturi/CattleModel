@@ -318,7 +318,15 @@ I have to built that in the algorithm.
 * We are also assuming the costs are not increaseing for importing. But we have costs in the model. 
 
 
+03/24/2022:
 
+* Showed Chad the new results and how the stocks are adding up. 
+* The fed cattle prices and cull cow prices are not going crazy so that's good. However, the prices are way too low. And they are not reaching the baseline even in the long-run. 
+* This is due to the fact that I am putting demand constant and changing the supply of the meat. I must change the demand as well.
+* Use the prices to get the demand. Specifically, $D_{fed} = A_{t-1}exp(.)/1+exp(.)$ and $D_{cull} = A_{t-1} 1/1+exp(.)$.
+* Use $D_{fed} + D_{cull}$ as the total derived demand ion the model. The shocks must include demand. They are demand driven. 
+
+* Also try putting some weights for prices. Use historical prices to determine the weights. If you put weights to the prices, state it as as assumption.
 
 
 

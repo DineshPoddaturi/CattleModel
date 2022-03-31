@@ -148,7 +148,7 @@ k8 <- k8 %>% mutate(Year = k7$Year+1) %>% select(Year,k8) %>% arrange(Year)
 stockList <- list(K, k3, k4, k5, k6, k7, k8)
 Stock <- Reduce(function(...) merge(...), stockList)
 
-Stock <- Stock %>% mutate(k9 = abs(K - (k3+k4+k5+k6+k7+k8))) %>% mutate(k9 = if_else(k9 < 0, 0, k9), k10 = 0)
+Stock <- Stock %>% mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9), k10 = 0)
 
 exports <- cattle_tot %>% select(Year, Exports)
 imports <- cattle_tot %>% select(Year, Imports)
@@ -652,6 +652,8 @@ quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% dr
 ####### So the prices we use are from 1982 to 2020 ############################
 ################################################################################
 
+quantities_prices_capK <- quantities_prices_capK %>% filter(Year >= 1990)
+
 prices_ps <- matrix(data = 0,nrow=nrow(fedCattleInterpolationMatrix),ncol = nrow(quantities_prices_capK))
 prices_pc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
 prices_hc <- matrix(data = 0,nrow=nrow(cullInterpolationMatrix),ncol = nrow(quantities_prices_capK))
@@ -742,7 +744,7 @@ checkTol <- matrix(data = 0, nrow = maxIter, ncol = 4)
 
 for(i in 1:nrow(quantities_prices_capK)){
   
-  # i <- 38
+  # i <- 31
   ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
   A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 
@@ -839,7 +841,7 @@ for(i in 1:nrow(quantities_prices_capK)){
     
     if( k > 1 ){
       if( round(checkTol[k-1,1],3) < 0.01 && round(checkTol[k-1,2],3) < 0.01){
-        if( round(checkTol[k-1,3],3) < 0.001 && round(checkTol[k-1,4],3) < 0.001){
+        if( round(checkTol[k-1,3],3) < 0.01 && round(checkTol[k-1,4],3) < 0.01){
           break
         }
       }
@@ -868,18 +870,20 @@ for(i in 1:nrow(quantities_prices_capK)){
         dShockNode <- cull_cartesian$dShockNodes[j]
         fedCattleNode <- fed_cartesian$fedNodes[j]
         cornNode <- fed_cartesian$cornNodes[j]
+        # aNode <- fed_cartesian$demandNodes[j]
         
         # slShare_t <- (exp((mu_Tilde - ((ps_old - pc_old))/phi)/s_Tilde))
         
         # sl_node <- (fedCattleNode) * adjFac
         # cl_node <- (cullCowNode) * adjFac
         
-        A_node <- (sl_node + cl_node) * (dShockNode)
+        # A_node <- (fedCattleNode + cullCowNode) * (dShockNode)
+        adjFac <- A/(fedCattleNode+ cullCowNode)
         
         sl_node <- (fedCattleNode) * adjFac
         cl_node <- (cullCowNode) * adjFac
         
-        # A_node <- (fedCattleNode + cullCowNode) * (dShockNode)
+        A_node <- A  * dShockNode
         
         # A_node <- (fedCattleNode + cullCowNode) * (dShockNode)
         # sl_node <- (A_node * ((slShare_t)/(1 + slShare_t))) * adjFac
@@ -914,11 +918,15 @@ for(i in 1:nrow(quantities_prices_capK)){
           pc_o <- pc_old
         }
         
-        ps_lo <- ps_o  - 0.35
-        pc_lo <- pc_o - 0.4
+        # I am giving upper and lower bounds by looking at the historical prices. Specifically for the lower bounds.
+        # This is what my focus for setting the bounds for the prices. I don't want the program to choose some 
+        # random arbitary number which satisfies the system of equations. Note we can always find a number that
+        # satisfies the system of equations. Our goal is to find the realistic solution and as realistic as possible.
+        ps_lo <- ps_o  - 0.276
+        pc_lo <- pc_o - 0.292
         
-        ps_up <- ps_o + 0.10929
-        pc_up <- pc_o + 0.080153
+        ps_up <- ps_o + 0.1
+        pc_up <- pc_o + 0.1
         
         #### Here we are making sure the lower bound for the prices isn't negative
         if(ps_lo < 0){
@@ -996,13 +1004,15 @@ for(i in 1:nrow(quantities_prices_capK)){
         dShockNode <- cull_cartesian$dShockNodes[j]
         fedCattleNode <- fed_cartesian$fedNodes[j]
         cornNode <- fed_cartesian$cornNodes[j]
+        aNode <- fed_cartesian$demandNodes[j]
         
         sl_node <- slNodes[j,i]
         cl_node <- clNodes[j,i]
-        A_node <- (sl_node + cl_node) * dShockNode
         # A_node <- A_nodes[j,i]
+        # A_node <- (sl_node + cl_node) * dShockNode
+        A_node <- A_nodes[j,i]
         
-        A_nodes[j,i] <- A_node
+        # A_nodes[j,i] <- A_node
         
         while(abs(fedDiff[j,i])>0.001 || abs(cullDiff[j,i])>0.001){
           
@@ -1026,11 +1036,11 @@ for(i in 1:nrow(quantities_prices_capK)){
             pc_n <- prices_pc[j,i]
           }
           
-          ps_lo <- ps_n  - 0.35
-          pc_lo <- pc_n - 0.4
+          ps_lo <- ps_n  - 0.276
+          pc_lo <- pc_n - 0.292
           
-          ps_up <- ps_n + 0.10929
-          pc_up <- pc_n + 0.080153
+          ps_up <- ps_n + 0.1
+          pc_up <- pc_n + 0.1
           
           if(ps_lo < 0){
             ps_lo <- ps_n
@@ -1194,11 +1204,11 @@ for(i in 1:nrow(quantities_prices_capK)){
         ps_n <- prices_ps[j,i]
         pc_n <- prices_pc[j,i]
         
-        ps_lo <- ps_n  - 0.35
-        pc_lo <- pc_n - 0.4
+        ps_lo <- ps_n  - 0.276
+        pc_lo <- pc_n - 0.292
         
-        ps_up <- ps_n + 0.10929
-        pc_up <- pc_n + 0.080153
+        ps_up <- ps_n + 0.1
+        pc_up <- pc_n + 0.1
         
         if(ps_lo < 0){
           ps_lo <- ps_n
@@ -1257,7 +1267,7 @@ for(i in 1:nrow(quantities_prices_capK)){
         
         sl_node <- slNodes[j,i]
         cl_node <- clNodes[j,i]
-        A_node <- A_nodes[j,i] * dShockNode
+        A_node <- A_nodes[j,i]  * dShockNode
         
         params_mu_s <- optParamFunction(sl = sl_node, cl = cl_node, 
                                         ps = ps_n, pc = pc_n, thetas = c(1,1))
@@ -1327,8 +1337,8 @@ for(i in 1:nrow(quantities_prices_capK)){
       fedDiff[,i] <- slNodes[,i] - D_slPsPc[,i]
       cullDiff[,i] <- clNodes[,i] - D_clPsPc[,i]
       
-      slNodes[,i] <- D_slPsPc[,i]
-      clNodes[,i] <- D_clPsPc[,i]
+      # slNodes[,i] <- D_slPsPc[,i]
+      # clNodes[,i] <- D_clPsPc[,i]
       
       sdiff <- fedDiff[,i]
       cdiff <- cullDiff[,i]
@@ -1364,9 +1374,9 @@ for(i in 1:nrow(quantities_prices_capK)){
     checkTol[k,4] <- (pc_m - pc_old)^2
     
     if( k > 3 ){
-      if( all(round(checkTol[k-1,],2) == round(checkTol[k,],2)) ){
-        if( all(round(checkTol[k-2,],2) == round(checkTol[k-1,],2)) ){
-          if( all(round(checkTol[k-3,],2) == round(checkTol[k-2,],2)) ){
+      if( all(round(checkTol[k-1,],1) == round(checkTol[k,],1)) ){
+        if( all(round(checkTol[k-2,],1) == round(checkTol[k-1,],1)) ){
+          if( all(round(checkTol[k-3,],1) == round(checkTol[k-2,],1)) ){
             break
           }
         }
@@ -1385,13 +1395,13 @@ for(i in 1:nrow(quantities_prices_capK)){
 # Estimated Equilibrium Parameters
 
 # mu tildes
-mu_Tildes_MeansNII <- apply(mu_Tildes_eq[1:25,], 2, mean)
+mu_Tildes_MeansNII <- apply(unique(mu_Tildes_eq[1:25,]), 2, mean)
 mu_Tildes_MeansNII <- mu_Tildes_MeansNII %>% as.data.frame()
 names(mu_Tildes_MeansNII) <- "muMean"
 mu_Tildes_MeansNII <- mu_Tildes_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-mu_Tildes_MediansNII <- apply(mu_Tildes_eq[1:25,], 2, median)
+mu_Tildes_MediansNII <- apply(unique(mu_Tildes_eq[1:25,]), 2, median)
 mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% as.data.frame()
 names(mu_Tildes_MediansNII) <- "muMedian"
 mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
@@ -1400,13 +1410,13 @@ mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% mutate(Year = quantities_prices
 mu_Tildes_MMNII <- merge(mu_Tildes_MeansNII, mu_Tildes_MediansNII)
 
 # s tildes
-s_Tildes_MeansNII <- apply(s_Tildes_eq[1:25,], 2, mean)
+s_Tildes_MeansNII <- apply(unique(s_Tildes_eq[1:25,]), 2, mean)
 s_Tildes_MeansNII <- s_Tildes_MeansNII %>% as.data.frame()
 names(s_Tildes_MeansNII) <- "sMean"
 s_Tildes_MeansNII <- s_Tildes_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-s_Tildes_MediansNII <- apply(s_Tildes_eq[1:25,], 2, median)
+s_Tildes_MediansNII <- apply(unique(s_Tildes_eq[1:25,]), 2, median)
 s_Tildes_MediansNII <- s_Tildes_MediansNII %>% as.data.frame()
 names(s_Tildes_MediansNII) <- "sMedian"
 s_Tildes_MediansNII <- s_Tildes_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
@@ -1420,13 +1430,13 @@ merge(mu_Tildes_MMNII,s_Tildes_MMNII) %>% select(Year, muMedian, sMedian) %>% fi
 
 ###### Fitted Fed Cattle Equilibrium prices
 
-EQprices_ps_MeansNII <- apply(prices_ps_eq[1:25,], 2, mean)
+EQprices_ps_MeansNII <- apply(unique(prices_ps_eq[1:25,]), 2, mean)
 EQprices_ps_MeansNII <- EQprices_ps_MeansNII %>% as.data.frame()
 names(EQprices_ps_MeansNII) <- "psMean"
 EQprices_ps_MeansNII <- EQprices_ps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-EQprices_ps_MediansNII <- apply(prices_ps_eq[1:25,], 2, median)
+EQprices_ps_MediansNII <- apply(unique(prices_ps_eq[1:25,]), 2, median)
 EQprices_ps_MediansNII <- EQprices_ps_MediansNII %>% as.data.frame()
 names(EQprices_ps_MediansNII) <- "psMedian"
 EQprices_ps_MediansNII <- EQprices_ps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
@@ -1440,13 +1450,13 @@ EQestObsPSNII <- left_join(EQestPSNII,quantities_prices_capK) %>% select(Year,ps
 EQestObsPSNII
 
 ###### Fitted Cull Cow Equilibrium prices
-EQprices_pc_MeansNII <- apply(prices_pc_eq[1:25,], 2, mean)
+EQprices_pc_MeansNII <- apply(unique(prices_pc_eq[1:25,]), 2, mean)
 EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% as.data.frame()
 names(EQprices_pc_MeansNII) <- "pcMean"
 EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-EQprices_pc_MediansNII <- apply(prices_pc_eq[1:25,], 2, median)
+EQprices_pc_MediansNII <- apply(unique(prices_pc_eq[1:25,]), 2, median)
 EQprices_pc_MediansNII <- EQprices_pc_MediansNII %>% as.data.frame()
 names(EQprices_pc_MediansNII) <- "pcMedian"
 EQprices_pc_MediansNII <- EQprices_pc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
@@ -1469,13 +1479,13 @@ mergedPrices[,-1] <- mergedPrices[,-1] * 100
 
 
 ###### Fitted Holding costs
-EQcosts_hc_MeansNII <- apply(prices_hc_eq[1:25,], 2, mean)
+EQcosts_hc_MeansNII <- apply(unique(prices_hc_eq[1:25,]), 2, mean)
 EQcosts_hc_MeansNII <- EQcosts_hc_MeansNII %>% as.data.frame()
 names(EQcosts_hc_MeansNII) <- "hcMean"
 EQcosts_hc_MeansNII <- EQcosts_hc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-EQcosts_hc_MediansNII <- apply(prices_hc_eq[1:25,], 2, median)
+EQcosts_hc_MediansNII <- apply(unique(prices_hc_eq[1:25,]), 2, median)
 EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% as.data.frame()
 names(EQcosts_hc_MediansNII) <- "hcMedian"
 EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
@@ -1484,13 +1494,13 @@ EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% mutate(Year = quantities_pric
 EQestHCNII <- merge(EQcosts_hc_MeansNII, EQcosts_hc_MediansNII)
 
 ###### Fitted Expected Prices
-EQprices_Eps_MeansNII <- apply(expected_PS_eq[1:25,], 2, mean)
+EQprices_Eps_MeansNII <- apply(unique(expected_PS_eq[1:25,]), 2, mean)
 EQprices_Eps_MeansNII <- EQprices_Eps_MeansNII %>% as.data.frame()
 names(EQprices_Eps_MeansNII) <- "EpsMean"
 EQprices_Eps_MeansNII <- EQprices_Eps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-EQprices_Eps_MediansNII <- apply(expected_PS_eq[1:25,], 2, median)
+EQprices_Eps_MediansNII <- apply(unique(expected_PS_eq[1:25,]), 2, median)
 EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% as.data.frame()
 names(EQprices_Eps_MediansNII) <- "EpsMedian"
 EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
@@ -1498,12 +1508,12 @@ EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% mutate(Year = quantities_
 EQestEPSNII <- merge(EQprices_Eps_MeansNII, EQprices_Eps_MediansNII)
 
 
-EQprices_Epc_MeansNII <- apply(expected_PC_eq[1:25,], 2, mean)
+EQprices_Epc_MeansNII <- apply(unique(expected_PC_eq[1:25,]), 2, mean)
 EQprices_Epc_MeansNII <- EQprices_Epc_MeansNII %>% as.data.frame()
 names(EQprices_Epc_MeansNII) <- "EpcMean"
 EQprices_Epc_MeansNII <- EQprices_Epc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
 
-EQprices_Epc_MediansNII <- apply(expected_PC_eq[1:25,], 2, median)
+EQprices_Epc_MediansNII <- apply(unique(expected_PC_eq[1:25,]), 2, median)
 EQprices_Epc_MediansNII <- EQprices_Epc_MediansNII %>% as.data.frame()
 names(EQprices_Epc_MediansNII) <- "EpcMedian"
 EQprices_Epc_MediansNII <- EQprices_Epc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
@@ -1512,13 +1522,13 @@ EQestEPCNII <- merge(EQprices_Epc_MeansNII, EQprices_Epc_MediansNII)
 
 
 # Fitted Fed Cattle Equilibrium Supply
-EQquantities_sl_MeansNII <- apply(slNodes_eq[1:25,], 2, mean)
+EQquantities_sl_MeansNII <- apply(unique(slNodes_eq[1:25,]), 2, mean)
 EQquantities_sl_MeansNII <- EQquantities_sl_MeansNII %>% as.data.frame()
 names(EQquantities_sl_MeansNII) <- "slMean"
 EQquantities_sl_MeansNII <- EQquantities_sl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-EQquantities_sl_MediansNII <- apply(slNodes_eq[1:25,], 2, median)
+EQquantities_sl_MediansNII <- apply(unique(slNodes_eq[1:25,]), 2, median)
 EQquantities_sl_MediansNII <- EQquantities_sl_MediansNII %>% as.data.frame()
 names(EQquantities_sl_MediansNII) <- "slMedian"
 EQquantities_sl_MediansNII <- EQquantities_sl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
@@ -1538,13 +1548,13 @@ EQestObsSLNII
 
 
 # Fitted Cull Cow Equilibrium Supply 
-EQquantities_cl_MeansNII <- apply(clNodes_eq[1:25,], 2, mean)
+EQquantities_cl_MeansNII <- apply(unique(clNodes_eq[1:25,]), 2, mean)
 EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% as.data.frame()
 names(EQquantities_cl_MeansNII) <- "clMean"
 EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
   select(Year, everything())
 
-EQquantities_cl_MediansNII <- apply(clNodes_eq[1:25,], 2, median)
+EQquantities_cl_MediansNII <- apply(unique(clNodes_eq[1:25,]), 2, median)
 EQquantities_cl_MediansNII <- EQquantities_cl_MediansNII %>% as.data.frame()
 names(EQquantities_cl_MediansNII) <- "clMedian"
 EQquantities_cl_MediansNII <- EQquantities_cl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
