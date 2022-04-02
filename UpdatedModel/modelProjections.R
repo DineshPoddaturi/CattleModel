@@ -3,7 +3,7 @@
 #### First we fit a linear model with the total inventory in the United States
 librarian::shelf(tseries, arfima, forecast, lmtest)
 
-stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2022)
+stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2020)
 stock_K_ts <- ts(stock_K$K, start = stock_K$Year[1], 
                  end = stock_K$Year[nrow(stock_K)], frequency = 1)
 
@@ -14,8 +14,8 @@ adf.test(stock_K_ts)
 # Augmented Dickey-Fuller Test
 # 
 # data:  stock_K_ts
-# Dickey-Fuller = -0.48126, Lag order = 4,
-# p-value = 0.9811
+# Dickey-Fuller = -0.50599, Lag order = 4, p-value
+# = 0.9799
 # alternative hypothesis: stationary
 
 ##### I fit a linear model here. Note that I am using very extensive data from 1924 to 2020.
@@ -31,11 +31,10 @@ Kfit_Residuals <- ts(Kfit$res,
 Box.test(Kfit$residuals, type = "Ljung-Box")
 
 # Box-Ljung test
-# H0:  The residuals are random.
-# Ha:  The residuals are not random.
+# 
 # data:  Kfit$residuals
-# X-squared = 0.0017834, df = 1, p-value =
-#   0.9663
+# X-squared = 0.00026887, df = 1, p-value =
+#   0.9869
 
 # The follwing commented code is to check the diagnostics and make sure the linear model is fitted properly
 # qqnorm(Kfit_Residuals)
@@ -61,19 +60,21 @@ beefINV_FORECAST <- beefINV_FORECAST %>% transmute(Year =  as.double(row.names(b
 
 row.names(beefINV_FORECAST) <- NULL
 
-beefInventoryData <- beefInventory %>% arrange(Year) %>% filter(Year >= 2021) %>% mutate(Year = Year, lo95 = K,
-                                                                                         hi95 = K)
+beefINV_FORECAST <- beefINV_FORECAST %>% select(Year, lo95, K, hi95)
 
-beefINV_FORECAST <- rbind(beefInventoryData, beefINV_FORECAST)
+# beefInventoryData <- beefInventory %>% arrange(Year) %>% filter(Year >= 2021) %>% mutate(Year = Year, lo95 = K,
+#                                                                                          hi95 = K)
+# 
+# beefINV_FORECAST <- rbind(beefInventoryData, beefINV_FORECAST)
 
 #### Here we fit a linear model between the calf crop and the replacement heifers to get the relationship
 #### The relationship is shown in the model framework in dissertation document
 
 calf_crop_proj <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year)
 
-replacementInventory_proj <- replacementInventory %>% arrange(Year) 
+replacementInventory_proj <- replacementInventory %>% arrange(Year) %>% mutate(Year = Year + 1)
 
-CC_RH <- merge(calf_crop_proj, replacementInventory_proj, by="Year",all=TRUE) %>% filter(Year <=2021)
+CC_RH <- merge(calf_crop_proj, replacementInventory_proj, by="Year",all=TRUE) 
 
 #### Here we run regression without intercept. 
 #### The rational for this is if both of the explanatory variables () are zero 
@@ -105,9 +106,9 @@ get_k0s <- function(Yr, lag, calfCrop){
 
 get_k0s_Global <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
   
-  k0s_df <- data.frame(Year = numeric(nProj), k02 = numeric(nProj) , k03 = numeric(nProj), 
-                       k04 = numeric(nProj), k05 = numeric(nProj), k06 = numeric(nProj), 
-                       k07 = numeric(nProj), k08 = numeric(nProj))
+  k0s_df <- data.frame(Year = numeric(nrow(proj_Q_P)), k02 = numeric(nrow(proj_Q_P)) , k03 = numeric(nrow(proj_Q_P)), 
+                       k04 = numeric(nrow(proj_Q_P)), k05 = numeric(nrow(proj_Q_P)), k06 = numeric(nrow(proj_Q_P)), 
+                       k07 = numeric(nrow(proj_Q_P)), k08 = numeric(nrow(proj_Q_P)))
   for (i in 1:nrow(proj_Q_P)){
     
     getYear <- beefINV_FORECAST$Year[i]
@@ -134,7 +135,8 @@ get_k0s_Global <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
 getSlClA_Proj <- function(params, PsM, PcM, K1, k, CapA, gamma_k3, 
                           eta_k3 , int_k3, adjF, Dshock, k0s, slAvg, clAvg,dShock){
   
-  estQ <- BBoptim(par = k, fn = estQFunction_Proj, tilde_MU = params[1], 
+  estQ <- BBoptim(par = k,
+                  fn = estQFunction_Proj, tilde_MU = params[1], 
                   tilde_s = params[2], ps = PsM, pc = PcM, K1 = K1, A = CapA, gamma_k3 = gamma_k3, 
                   eta_k3 = eta_k3, int = int_k3, k0s = k0s, slAvg = slAvg, clAvg = clAvg)
   
@@ -216,91 +218,6 @@ shareMetric <- function(paramMu, paramS, ps, pc){
   
   share <- ((exp((paramMu - ((ps/phi) - (pc/phi)))/paramS))/(1 + (exp((paramMu - ((ps/phi) - (pc/phi)))/paramS))))
   return(share)
-  
-}
-
-getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
-  
-  psNew <- PsM
-  pcNew <- PcM
-  
-  psNew_lo <- psNew  - 0.27667
-  pcNew_lo <- pcNew - 0.29217
-  
-  psNew_up <- psNew + 0.10929
-  pcNew_up <- pcNew + 0.080153
-  
-  #### Here we are making sure the lower bound for the prices isn't negative
-  if(psNew_lo < 0){
-    psNew_lo <- psNew
-  }
-  
-  if(pcNew_lo < 0){
-    pcNew_lo <- pcNew
-  }
-  
-  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
-  while( pcNew_lo > psNew_lo ){
-    pcNew_lo <- pcNew_lo - 0.01
-  }
-  
-  psNew_expected <- EPsM
-  pcNew_expected <- EPcM
-  
-  # if(psNew_expected < psNew){
-  #   psNew_expected <- psNew_expected + 0.05
-  # }
-  # 
-  # if(pcNew_expected < pcNew){
-  #   pcNew_expected <- pcNew_expected + 0.05
-  # }
-  
-  hc_new <- HcM
-  
-  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
-  
-  #### Here we make sure that the holding costs are below the cull cow price
-  while(hc_new > pcNew){
-    hc_new <- hc_new - 0.01
-  }
-  
-  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
-  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
-  
-  psNew_expected_lo <- psNew_expected - 0.1
-  
-  psNew_expected_up <- psNew_expected + 0.1
-  
-  pcNew_expected_lo <- pcNew_expected - 0.1
-  
-  pcNew_expected_up <- pcNew_expected + 0.1
-  
-  if(pcNew_expected_lo < 0){
-    pcNew_expected_lo <- pcNew_expected
-  }
-  
-  if(ps_expected_lo < 0){
-    psNew_expected_lo <- psNew_expected
-  }
-  
-  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
-  
-  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
-  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
-  
-  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
-                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
-                     tilde_MU = params[1], tilde_s = params[2])
-  
-  ps1N <- estPNew$par[1]
-  pc1N <- estPNew$par[2]
-  ps_expected1N <- estPNew$par[3]
-  pc_expected1N <- estPNew$par[4]
-  
-  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
-    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
-  
-  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
   
 }
 
@@ -389,13 +306,13 @@ proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo =
 ##### Using the projected stock, I am generating the new born in each year. So basically multiply birth rate with the 
 ##### stock.
 
-calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * K) %>% 
+calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 =  K) %>% 
   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
-calf_crop_proj1_LO <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * lo95) %>% 
+calf_crop_proj1_LO <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = lo95) %>% 
   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
-calf_crop_proj1_UP <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = g * hi95) %>% 
+calf_crop_proj1_UP <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = hi95) %>% 
   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
 ##### Here I join the data and the projected 
@@ -414,11 +331,10 @@ k0s_df_UP <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORE
 
 ### k_old is the replacement heifers. We start with zero (almost never true), but we let the program and data to give
 ### the optimal replacement heifers. This mostly depends on the demand.
-k_old <- 0
-
-psM <- mean(tail(proj_AllDF_EQ, n=1)$psMedian)
-pcM <- mean(tail(proj_AllDF_EQ, n=1)$pcMedian)
-hcM <- mean(tail(proj_AllDF_EQ, n=1)$hcMedian)
+####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
+psM <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
+pcM <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
+hcM <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
 
 EpsM <- mean(tail(proj_AllDF_EQ, n=1)$EpsMedian)
 EpcM <- mean(tail(proj_AllDF_EQ, n=1)$EpcMedian)
@@ -426,16 +342,104 @@ EpcM <- mean(tail(proj_AllDF_EQ, n=1)$EpcMedian)
 capA <- mean(tail(proj_AllDF_EQ, n=1)$A)
 capK <- mean(tail(proj_AllDF_EQ, n=1)$K)
 
+k3OLD <- replacementInventory_proj %>% filter(Year == tail(proj_AllDF_EQ, n=1)$Year) %>% 
+  select(k3) %>% as.numeric()
+
 shockD <- mean(tail(proj_AllDF_EQ, n=1)$dShock)
 adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
+
+k_old <- 0
+
+getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
+  
+  psNew <- PsM
+  pcNew <- PcM
+  
+  psNew_lo <- psNew  - 0.2
+  pcNew_lo <- pcNew - 0.2
+  
+  psNew_up <- psNew + 0.1
+  pcNew_up <- pcNew + 0.1
+  
+  #### Here we are making sure the lower bound for the prices isn't negative
+  if(psNew_lo < 0){
+    psNew_lo <- psNew
+  }
+  
+  if(pcNew_lo < 0){
+    pcNew_lo <- pcNew
+  }
+  
+  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+  while( pcNew_lo > psNew_lo ){
+    pcNew_lo <- pcNew_lo - 0.01
+  }
+  
+  psNew_expected <- EPsM
+  pcNew_expected <- EPcM
+  
+  # if(psNew_expected < psNew){
+  #   psNew_expected <- psNew_expected + 0.05
+  # }
+  # 
+  # if(pcNew_expected < pcNew){
+  #   pcNew_expected <- pcNew_expected + 0.05
+  # }
+  
+  hc_new <- HcM
+  
+  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
+  
+  #### Here we make sure that the holding costs are below the cull cow price
+  while(hc_new > pcNew){
+    hc_new <- hc_new - 0.01
+  }
+  
+  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+  
+  psNew_expected_lo <- psNew_expected - 0.2
+  
+  psNew_expected_up <- psNew_expected + 0.1
+  
+  pcNew_expected_lo <- pcNew_expected - 0.2
+  
+  pcNew_expected_up <- pcNew_expected + 0.1
+  
+  if(pcNew_expected_lo < 0){
+    pcNew_expected_lo <- pcNew_expected
+  }
+  
+  if(ps_expected_lo < 0){
+    psNew_expected_lo <- psNew_expected
+  }
+  
+  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+  
+  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+  
+  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
+                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+                     tilde_MU = params[1], tilde_s = params[2])
+  
+  ps1N <- estPNew$par[1]
+  pc1N <- estPNew$par[2]
+  ps_expected1N <- estPNew$par[3]
+  pc_expected1N <- estPNew$par[4]
+  
+  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
+  
+  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
+  
+}
 
 
 for(i in 1:nrow(proj_Q_P)){
   
-  i <- 1
+  # i <- 1
   
-  #### k is replacement heifers starting value.We start with zero (almost never true), but we let the program and data to give
-  ### the optimal replacement heifers. 
   k <- 0
   
   K1 <- capK
@@ -444,53 +448,25 @@ for(i in 1:nrow(proj_Q_P)){
   
   int_k3 <- 0
   
-  
   Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
-                      k = k, CapA = capA, gamma_k3 = gamma_k3, 
-                      eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF, k0s = k0s,
-                      slAvg = slaughterAvg, clAvg = cullAvg, dShock = shockD)
+                         k = k,CapA = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+                         int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, 
+                      clAvg = cullAvg,dShock = shockD)
   
   slNew <- Qs[1]
   clNew <- Qs[2]
   ANew <- Qs[3]
   
-  k_old <- Qs[4]
+  k_old <-  Qs[4]
   
-  k_old_Head <- Qs[5]
-  
-  ###### changing the quantities such that they match the historical quantities.
-  ###### If I change this the prices are projected properly i.e., fed cattle price is always greater than cull cow price
-  # clCounter <- 0
-  # slCounter <- 0
-  # 
-  # while(clNew < 1.01){
-  #   clNew <- clNew + 0.01
-  #   clCounter <- 1
-  # }
-  # 
-  # while(slNew < 19.01){
-  #   slNew <- slNew + 0.01
-  #   slCounter <- 1
-  # }
+  k_old_head <-  Qs[5]
   
   ANew <- (slNew + clNew) * shockD
-  clNew <- clNew * adjF
-  slNew <- slNew * adjF
   
-  # if(EpcM < pcM){
-  #   EpcM <- pcM
-  # }
-  # 
-  # if(EpsM < psM){
-  #   EpsM <- EpsM + 0.1
-  # }
-  
-  EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
-  EpsM <- sum(as.numeric(psM) * fedMeshCheb)
-    
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
-                           HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
-                           params = c(MUtilde, Stilde))
+                              HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew,
+                              params = c(MUtilde, Stilde))
+  
   psM <- Ps[1]
   pcM <- Ps[2]
   hcM <- Ps[3]
@@ -503,125 +479,11 @@ for(i in 1:nrow(proj_Q_P)){
   proj_Q_P$EPs[i] <- EpsM
   proj_Q_P$EPc[i] <- EpcM
   
-  D_sl <- ANew *
-    ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/
-       (1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
-  
-  D_cl <- ANew * (1/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
-  
-  slDiff <- slNew - D_sl
-  clDiff <- clNew - D_cl
-  
-  m <- 1
-  
-  slDiffEq <- NULL
-  clDiffEq <- NULL
-  psM_Eq <- NULL
-  pcM_Eq <- NULL
-  
-  while(abs(slDiff)>0.01 || abs(clDiff)>0.01){
-    
-    slDiffEq[m] <- slDiff
-    clDiffEq[m] <- clDiff
-    
-    if( slDiff < 0){
-      psN <- psM + 0.001
-    } else if( slDiff > 0){
-      psN <- psM - 0.001
-    }
-    
-    if(psN < 0){
-      psN <- psM
-    }
-    
-    if( clDiff < 0){
-      pcN <- pcM + 0.001
-    } else if( clDiff > 0){
-      pcN <- pcM - 0.001
-    }
-    
-    if(pcN < 0){
-      pcN <- pcM
-    }
-    
-    hcM <- (((g * (beta^3) * psN) + (beta - 1) * pcN)/(1 + g * beta * (gamma0 + beta * gamma1)))
-    
-    Ps <- getPsPcEpsEpc_Proj(PsM = psN, PcM = pcN, EPsM = EpsM, EPcM = EpcM,
-                             HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew,
-                             params = c(MUtilde, Stilde))
-    
-    psM <- Ps[1]
-    pcM <- Ps[2]
-    hcM <- Ps[3]
-    EpsM <- Ps[4]
-    EpcM <- Ps[5]
-    
-    psM_Eq[m] <- psM
-    pcM_Eq[m] <- pcM
-    
-    Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
-                        k = k,CapA = ANew, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-                        int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg,dShock = shockD)
-    slNew_Eq <- Qs[1]
-    clNew_Eq <- Qs[2]
-    ANew_Eq <- Qs[3]
-    
-    k_old_Eq <-  Qs[4]
-    
-    k_old_head_Eq <-  Qs[5]
-    
-    slCounter_Eq <- 0
-    clCounter_Eq <- 0
-    
-    while(clNew_Eq < 1.01){
-      clNew_Eq  <- clNew_Eq  + 0.01
-      clCounter_Eq <- 1
-    }
-    
-    while(slNew_Eq < 19.01){
-      slNew_Eq <- slNew_Eq + 0.01
-      slCounter_Eq <- 1
-    }
-    
-    ANew_Eq[m] <- (slNew_Eq + clNew_Eq) * shockD
-    
-    
-    D_sl <- ANew_Eq[m] *
-      ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/
-         (1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
-    
-    D_cl <- ANew_Eq[m] * (1/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
-    
-    slDiff <- slNew_Eq - D_sl
-    clDiff <- clNew_Eq - D_cl
-    
-    # The reason for this condition is to avoid infinite while loop. Note that the while loop stops
-    # if the differences reach below tolerance levels. But sometimes this is never the case and there will be 
-    # some difference above tolerance level (basically saying that there will be closing stocks). So I exit the loop
-    # if the difference stays stagnant.
-    if(m >= 10){
-      if( (round(slDiffEq[m],2) == round(slDiffEq[m-1],2)) && (round(clDiffEq[m],2) == round(clDiffEq[m-1],2)) ){
-        if( (round(slDiffEq[m-1],2) == round(slDiffEq[m-2],2)) && (round(clDiffEq[m-1],2) == round(clDiffEq[m-2],2)) ){
-          break
-        }
-      }
-    }
-    
-    m <- m+1
-    
-  }
-  
-  
-  
-  
-  
-  
-  
   proj_Q_P$Sl[i] <- slNew
   proj_Q_P$Cl[i] <- clNew
   proj_Q_P$A[i] <- ANew
   proj_Q_P$repHeif[i] <- k_old
-  proj_Q_P$repHeif_Head[i] <- k_old_Head
+  proj_Q_P$repHeif_Head[i] <- k_old_head
   
   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
   
@@ -630,8 +492,8 @@ for(i in 1:nrow(proj_Q_P)){
   }
   
   capA <- ANew
-  
   capK <- beefINV_FORECAST$K[i]
+  # k3OLD <- k_old_head
   
 }
 
@@ -650,41 +512,141 @@ capK_up <- mean(tail(proj_AllDF_EQ, n=1)$K)
 shockD <- mean(tail(proj_AllDF_EQ, n=1)$dShock)
 adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
 
+k3OLD <- replacementInventory_proj %>% filter(Year == tail(proj_AllDF_EQ, n=1)$Year) %>% 
+  select(k3) %>% as.numeric()
+
+k_old_up <- 0
+
+getPsPcEpsEpc_Proj_UP <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
+  
+  psNew <- PsM
+  pcNew <- PcM
+  
+  psNew_lo <- psNew  - 0.05
+  pcNew_lo <- pcNew - 0.05
+  
+  psNew_up <- psNew + 0.2
+  pcNew_up <- pcNew + 0.2
+  
+  #### Here we are making sure the lower bound for the prices isn't negative
+  if(psNew_lo < 0){
+    psNew_lo <- psNew
+  }
+  
+  if(pcNew_lo < 0){
+    pcNew_lo <- pcNew
+  }
+  
+  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+  while( pcNew_lo > psNew_lo ){
+    pcNew_lo <- pcNew_lo - 0.01
+  }
+  
+  psNew_expected <- EPsM
+  pcNew_expected <- EPcM
+  
+  # if(psNew_expected < psNew){
+  #   psNew_expected <- psNew_expected + 0.05
+  # }
+  # 
+  # if(pcNew_expected < pcNew){
+  #   pcNew_expected <- pcNew_expected + 0.05
+  # }
+  
+  hc_new <- HcM
+  
+  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
+  
+  #### Here we make sure that the holding costs are below the cull cow price
+  while(hc_new > pcNew){
+    hc_new <- hc_new - 0.01
+  }
+  
+  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+  
+  psNew_expected_lo <- psNew_expected - 0.2
+  
+  psNew_expected_up <- psNew_expected + 0.1
+  
+  pcNew_expected_lo <- pcNew_expected - 0.2
+  
+  pcNew_expected_up <- pcNew_expected + 0.1
+  
+  if(pcNew_expected_lo < 0){
+    pcNew_expected_lo <- pcNew_expected
+  }
+  
+  if(ps_expected_lo < 0){
+    psNew_expected_lo <- psNew_expected
+  }
+  
+  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+  
+  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+  
+  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
+                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+                     tilde_MU = params[1], tilde_s = params[2])
+  
+  ps1N <- estPNew$par[1]
+  pc1N <- estPNew$par[2]
+  ps_expected1N <- estPNew$par[3]
+  pc_expected1N <- estPNew$par[4]
+  
+  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
+  
+  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
+  
+}
+
 for(i in 1:nrow(proj_Q_P_up)){
   
   # i <- 1
   
   k <- 0
   
-  K1_up <- capK_up 
+  K1_up <- capK_up
   
   k0s <- k0s_df_UP[i,-1]
   
   int_k3 <- 0
   
   Qs_up <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM_up, PcM = pcM_up, K1 = K1_up,
-                         k = k, CapA = capA_up, gamma_k3 = gamma_k3, eta_k3 = eta_k3 , int_k3 = int_k3, 
-                         adjF = adjF, k0s = k0s,slAvg = slaughterAvg, clAvg = cullAvg, dShock = shockD)
+                         k = k,CapA = capA_up, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+                         int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, clAvg = cullAvg,dShock = shockD)
+  
   slNew_up <- Qs_up[1]
   clNew_up <- Qs_up[2]
   ANew_up <- Qs_up[3]
   
   k_old_up <-  Qs_up[4]
   
-  k_old_head_up <- Qs_up[5]
+  k_old_head_up <-  Qs_up[5]
   
   ANew_up <- (slNew_up + clNew_up) * shockD
-  clNew_up <- clNew_up 
-  slNew_up <- slNew_up 
   
-  # if(EpcM_up < pcM_up){
-  #   EpcM_up <- pcM_up + 0.1
+  # if(i==1){
+  #   if(EpsM_up < psM_up){
+  #     EpsM_up <- sum(as.numeric(psM_up) * fedMeshCheb)
+  #   }
+  #   
+  #   if(EpcM_up < pcM_up){
+  #     EpcM_up <- sum(as.numeric(pcM_up) * cullMeshCheb)
+  #   }
   # }
   
-  
-  Ps_up <- getPsPcEpsEpc_Proj(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
-                              HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
-                              params = c(MUtilde, Stilde))
+  if(i<=1){
+    Ps_up <- getPsPcEpsEpc_Proj(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
+                                   HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
+                                   params = c(MUtilde, Stilde))
+  }else{
+    Ps_up <- getPsPcEpsEpc_Proj_UP(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
+                                   HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
+                                   params = c(MUtilde, Stilde))
+  }
   
   psM_up <- Ps_up[1]
   pcM_up <- Ps_up[2]
@@ -712,6 +674,7 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   capA_up <- ANew_up
   capK_up <- beefINV_FORECAST$hi95[i]
+  # k3OLD <- k_old_head_up
   
 }
 
@@ -730,6 +693,91 @@ shockD <- mean(tail(proj_AllDF_EQ, n=1)$dShock)
 adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
 
 k_old_lo <- 0
+
+getPsPcEpsEpc_Proj_LO <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
+  
+  psNew <- PsM
+  pcNew <- PcM
+  
+  psNew_lo <- psNew  - 0.3
+  pcNew_lo <- pcNew - 0.3
+  
+  psNew_up <- psNew + 0.1
+  pcNew_up <- pcNew + 0.1
+  
+  #### Here we are making sure the lower bound for the prices isn't negative
+  if(psNew_lo < 0){
+    psNew_lo <- psNew
+  }
+  
+  if(pcNew_lo < 0){
+    pcNew_lo <- pcNew
+  }
+  
+  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+  while( pcNew_lo > psNew_lo ){
+    pcNew_lo <- pcNew_lo - 0.01
+  }
+  
+  psNew_expected <- EPsM
+  pcNew_expected <- EPcM
+  
+  # if(psNew_expected < psNew){
+  #   psNew_expected <- psNew_expected + 0.05
+  # }
+  # 
+  # if(pcNew_expected < pcNew){
+  #   pcNew_expected <- pcNew_expected + 0.05
+  # }
+  
+  hc_new <- HcM
+  
+  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
+  
+  #### Here we make sure that the holding costs are below the cull cow price
+  while(hc_new > pcNew){
+    hc_new <- hc_new - 0.01
+  }
+  
+  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+  
+  psNew_expected_lo <- psNew_expected - 0.2
+  
+  psNew_expected_up <- psNew_expected + 0.1
+  
+  pcNew_expected_lo <- pcNew_expected - 0.2
+  
+  pcNew_expected_up <- pcNew_expected + 0.1
+  
+  if(pcNew_expected_lo < 0){
+    pcNew_expected_lo <- pcNew_expected
+  }
+  
+  if(ps_expected_lo < 0){
+    psNew_expected_lo <- psNew_expected
+  }
+  
+  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+  
+  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+  
+  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
+                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+                     tilde_MU = params[1], tilde_s = params[2])
+  
+  ps1N <- estPNew$par[1]
+  pc1N <- estPNew$par[2]
+  ps_expected1N <- estPNew$par[3]
+  pc_expected1N <- estPNew$par[4]
+  
+  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
+  
+  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
+  
+}
 
 for(i in 1:nrow(proj_Q_P_lo)){
   
@@ -772,20 +820,22 @@ for(i in 1:nrow(proj_Q_P_lo)){
   }
   
   ANew_lo <- (slNew_lo + clNew_lo) * shockD
-  clNew_lo <- clNew_lo  
-  slNew_lo <- slNew_lo 
   
-  if(EpcM_lo < pcM_lo){
-    EpcM_lo <- pcM_lo - 0.1
-  }
-
-  # if(EpsM_lo < psM_lo){
-  #   EpsM_lo <- psM_lo - 0.1
+  # if(i==1){
+  #   EpsM_lo <- sum(as.numeric(psM_lo) * fedMeshCheb)
+  #   EpcM_lo <- sum(as.numeric(pcM_lo) * cullMeshCheb)
   # }
+  # 
   
-  Ps_lo <- getPsPcEpsEpc_Proj(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
-                              HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
-                              params = c(MUtilde, Stilde))
+  if(i<=1){
+    Ps_lo <- getPsPcEpsEpc_Proj(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+                                   HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                                   params = c(MUtilde, Stilde))
+  }else{
+    Ps_lo <- getPsPcEpsEpc_Proj_LO(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
+                                   HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                                   params = c(MUtilde, Stilde))
+  }
   
   psM_lo <- Ps_lo[1]
   pcM_lo <- Ps_lo[2]
@@ -831,8 +881,12 @@ PQs_PROJs_A  <- PQs_PROJs %>% select(Year, A_lo, A, A_up) %>% round(2)
 
 PQs_PROJs_PS <- PQs_PROJs %>% select(Year, Ps_lo, Ps, Ps_up) %>% transmute(Year = Year, Ps_LO = Ps_lo * 100, 
                                                                            Ps = Ps * 100, Ps_UP = Ps_up * 100)
+
+PQs_PROJs_PS <- PQs_PROJs_PS %>% round(2)
+
 PQs_PROJs_PC <- PQs_PROJs %>% select(Year, Pc_lo, Pc, Pc_up) %>% transmute(Year = Year, Pc_LO = Pc_up * 100, 
                                                                            Pc = Pc * 100, Pc_UP = Pc_lo * 100)
+PQs_PROJs_PC <- PQs_PROJs_PC %>% round(2)
 
 
 PQs_PROJs_TS <- merge(PQs_PROJs_SL, PQs_PROJs_CL) %>%

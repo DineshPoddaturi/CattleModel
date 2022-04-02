@@ -50,7 +50,13 @@ dev.off()
 
 # +theme(legend.position = c(0.1, 0.75))
 
-projSL_plots <- EQestObsSL_Medians_projs
+adjFactorProj <- adjFactor %>% filter(Year==2020)
+
+projSL_plots <- EQestObsSL_Medians_projs %>% select(Year, slMedian, Sl_lo, Sl, Sl_up)
+
+projSL_plots[,-1:-2] <- projSL_plots[,-1:-2] * adjFactorProj$AdjFactor
+
+projSL_plots <- projSL_plots %>% round(2)
 
 tikz(file="projectionsLatexPlots/Updated/ProjectedFedCattleProduction.tex",  width=6.2, height=3.5)
 
@@ -72,7 +78,8 @@ dev.off()
 
 
 
-projCL_plots <- EQestObsCL_Medians_projs
+projCL_plots <- EQestObsCL_Medians_projs %>% select(Year, clMedian, Cl_lo, Cl, Cl_up)
+projCL_plots <- projCL_plots %>% round(2)
 
 tikz(file="projectionsLatexPlots/Updated/ProjectedCullCowProduction.tex",  width=6.2, height=3.5)
 
@@ -120,6 +127,9 @@ dev.off()
 
 
 CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_Proj
+
+CARD_USDA_FAPRI_TS_plots[,2:4] <- CARD_USDA_FAPRI_TS_plots[,2:4] * adjFactorProj$AdjFactor
+CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_plots %>% round(2)
 
 tikz(file="projectionsLatexPlots/Updated/CARD_USDA_FAPRI_TS.tex",  width=6.2, height=4)
 

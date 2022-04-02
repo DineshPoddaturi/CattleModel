@@ -230,90 +230,7 @@ shareMetric <- function(paramMu, paramS, ps, pc){
   
 }
 
-getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
-  
-  psNew <- PsM
-  pcNew <- PcM
-  
-  psNew_lo <- psNew  - 0.27667
-  pcNew_lo <- pcNew - 0.29217
-  
-  psNew_up <- psNew + 0.10929
-  pcNew_up <- pcNew + 0.080153
-  
-  #### Here we are making sure the lower bound for the prices isn't negative
-  if(psNew_lo < 0){
-    psNew_lo <- psNew
-  }
-  
-  if(pcNew_lo < 0){
-    pcNew_lo <- pcNew
-  }
-  
-  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
-  while( pcNew_lo > psNew_lo ){
-    pcNew_lo <- pcNew_lo - 0.01
-  }
-  
-  psNew_expected <- EPsM
-  pcNew_expected <- EPcM
-  
-  # if(psNew_expected < psNew){
-  #   psNew_expected <- psNew_expected + 0.05
-  # }
-  # 
-  # if(pcNew_expected < pcNew){
-  #   pcNew_expected <- pcNew_expected + 0.05
-  # }
-  
-  hc_new <- HcM
-  
-  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
-  
-  #### Here we make sure that the holding costs are below the cull cow price
-  while(hc_new > pcNew){
-    hc_new <- hc_new - 0.01
-  }
-  
-  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
-  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
-  
-  psNew_expected_lo <- psNew_expected - 0.1
-  
-  psNew_expected_up <- psNew_expected + 0.1
-  
-  pcNew_expected_lo <- pcNew_expected - 0.1
-  
-  pcNew_expected_up <- pcNew_expected + 0.1
-  
-  if(pcNew_expected_lo < 0){
-    pcNew_expected_lo <- pcNew_expected
-  }
-  
-  if(ps_expected_lo < 0){
-    psNew_expected_lo <- psNew_expected
-  }
-  
-  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
-  
-  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
-  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
-  
-  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
-                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
-                     tilde_MU = params[1], tilde_s = params[2])
-  
-  ps1N <- estPNew$par[1]
-  pc1N <- estPNew$par[2]
-  ps_expected1N <- estPNew$par[3]
-  pc_expected1N <- estPNew$par[4]
-  
-  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
-    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
-  
-  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
-  
-}
+
 
 estPFunction_Proj <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
   
@@ -440,6 +357,91 @@ capK <- mean(tail(proj_AllDF_EQ, n=1)$K)
 shockD <- mean(tail(proj_AllDF_EQ, n=1)$dShock)
 adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
 
+
+getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, params){
+  
+  psNew <- PsM
+  pcNew <- PcM
+  
+  psNew_lo <- psNew  - 0.27667
+  pcNew_lo <- pcNew - 0.29217
+  
+  psNew_up <- psNew + 0.10929
+  pcNew_up <- pcNew + 0.080153
+  
+  #### Here we are making sure the lower bound for the prices isn't negative
+  if(psNew_lo < 0){
+    psNew_lo <- psNew
+  }
+  
+  if(pcNew_lo < 0){
+    pcNew_lo <- pcNew
+  }
+  
+  #### Note: The price of the fed cattle is always higher than the cull cows. So we are making sure it holds.
+  while( pcNew_lo > psNew_lo ){
+    pcNew_lo <- pcNew_lo - 0.01
+  }
+  
+  psNew_expected <- EPsM
+  pcNew_expected <- EPcM
+  
+  # if(psNew_expected < psNew){
+  #   psNew_expected <- psNew_expected + 0.05
+  # }
+  # 
+  # if(pcNew_expected < pcNew){
+  #   pcNew_expected <- pcNew_expected + 0.05
+  # }
+  
+  hc_new <- HcM
+  
+  # hc_new <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * pcNew_expected + g * (beta^3) * psNew_expected - pcNew)
+  
+  #### Here we make sure that the holding costs are below the cull cow price
+  while(hc_new > pcNew){
+    hc_new <- hc_new - 0.01
+  }
+  
+  hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
+  
+  psNew_expected_lo <- psNew_expected - 0.1
+  
+  psNew_expected_up <- psNew_expected + 0.1
+  
+  pcNew_expected_lo <- pcNew_expected - 0.1
+  
+  pcNew_expected_up <- pcNew_expected + 0.1
+  
+  if(pcNew_expected_lo < 0){
+    pcNew_expected_lo <- pcNew_expected
+  }
+  
+  if(ps_expected_lo < 0){
+    psNew_expected_lo <- psNew_expected
+  }
+  
+  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+  
+  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
+  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
+  
+  estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
+                     B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
+                     tilde_MU = params[1], tilde_s = params[2])
+  
+  ps1N <- estPNew$par[1]
+  pc1N <- estPNew$par[2]
+  ps_expected1N <- estPNew$par[3]
+  pc_expected1N <- estPNew$par[4]
+  
+  hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * 
+    (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
+  
+  return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
+  
+}
 
 for(i in 1:nrow(proj_Q_P)){
   
@@ -1278,4 +1280,149 @@ CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year)) 
 
 
 
-
+# k_old <- 0
+# 
+# ##### Now I have calf-crop until 2020
+# calf_crop_post2020 <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year <= 2020)
+# 
+# psM <- mean(tail(proj_AllDF_EQ, n=5)$psMedian)
+# pcM <- mean(tail(proj_AllDF_EQ, n=5)$pcMedian)
+# hcM <- mean(tail(proj_AllDF_EQ, n=5)$hcMedian)
+# 
+# EpsM <- mean(tail(proj_AllDF_EQ, n=1)$EpsMedian)
+# EpcM <- mean(tail(proj_AllDF_EQ, n=1)$EpcMedian)
+# 
+# capA <- mean(tail(proj_AllDF_EQ, n=1)$A)
+# capK <- mean(tail(proj_AllDF_EQ, n=1)$K)
+# 
+# 
+# shockD <- mean(tail(proj_AllDF_EQ, n=1)$dShock)
+# adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
+# 
+# k3OLD <- replacementInventory_proj %>% filter(Year == tail(proj_AllDF_EQ, n=1)$Year) %>% select(k3) %>% as.numeric()
+# k3OLD <- replacementInventory_proj %>% filter(Year == tail(proj_AllDF_EQ, n=1)$Year) %>% select(k3) %>% as.numeric()
+# 
+# nProj <- 10
+# 
+# beefINV_FORECAST_post2020 <-  data.frame(Year = numeric(nProj+1), K = numeric(nProj+1), k3 = numeric(nProj+1), 
+#                                          k4 = numeric(nProj+1), k5 = numeric(nProj+1), k6 = numeric(nProj+1), 
+#                                          k7 = numeric(nProj+1), k8 = numeric(nProj+1), k9 = numeric(nProj+1),
+#                                          k10 = numeric(nProj+1))
+# 
+# beefINV_FORECAST_post2020[1,1:2] <- beefINV_FORECAST %>% select(Year, K)
+# beefINV_FORECAST_post2020[1,3:10] <- Stock %>% filter(Year == 2021) %>% select(-Year, -K) 
+# 
+# proj_Q_PPost2020 <- data.frame(Year = numeric(nProj ), Ps = numeric(nProj), Pc = numeric(nProj), 
+#                                EPs = numeric(nProj), EPc = numeric(nProj), Hc = numeric(nProj), 
+#                                Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj),
+#                                repHeif = numeric(nProj), repHeif_Head = numeric(nProj))
+# 
+# k0s_Post2020 <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
+#                            k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
+#                            k07 = numeric(nn), k08 = numeric(nn))
+# 
+# k0s_Post2020[1,] <- get_k0s_Global(proj_Q_P = proj_Q_PPost2020[1,], 
+#                                    beefINV_FORECAST = beefINV_FORECAST_post2020[1,], 
+#                                    calfCrop = calf_crop_post2020)
+# 
+# 
+# 
+# for(i in 1:nrow(proj_Q_PPost2020)){
+#   
+#   # i <- 1
+#   
+#   if(i>1){
+#     #Populating the younglings
+#     k0s_Post2020[i, ] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_PPost2020[i,],
+#                                             beefINV_FORECAST = beefINV_FORECAST_post2020[i,],
+#                                             calfCrop = calf_crop_post2020)
+#     #Retrieving the previous years derived demand and total breeding stock
+#     capA <- proj_Q_PPost2020$A[i-1]
+#     capK <- beefINV_FORECAST_post2020$K[i-1]
+#   }
+#   
+#   
+#   k <- 0
+#   K1 <- capK
+#   k0s <- k0s_Post2020[i,-1]
+#   int_k3 <- 0
+#   
+#   
+#   Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
+#                       k = k, CapA = capA, gamma_k3 = gamma_k3, 
+#                       eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF, k0s = k0s,
+#                       slAvg = slaughterAvg, clAvg = cullAvg, dShock = shockD)
+#   
+#   slNew <- Qs[1]
+#   clNew <- Qs[2]
+#   ANew <- Qs[3]
+#   
+#   k_old <- Qs[4]
+#   
+#   k_old_Head <- Qs[5]
+#   
+#   ANew <- (slNew + clNew) * shockD
+#   
+#   
+#   clNew <- clNew  
+#   slNew <- slNew  
+#   
+#   # if(i == 1){
+#   #   EpsM <- sum(as.numeric(psM) * fedMeshCheb)
+#   #   EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
+#   # }
+#   
+#   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
+#                            HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew, 
+#                            params = c(MUtilde, Stilde))
+#   psM <- Ps[1]
+#   pcM <- Ps[2]
+#   hcM <- Ps[3]
+#   EpsM <- Ps[4]
+#   EpcM <- Ps[5]
+#   
+#   proj_Q_PPost2020$Ps[i] <- psM
+#   proj_Q_PPost2020$Pc[i] <- pcM
+#   proj_Q_PPost2020$Hc[i] <- hcM
+#   proj_Q_PPost2020$EPs[i] <- EpsM
+#   proj_Q_PPost2020$EPc[i] <- EpcM
+#   
+#   proj_Q_PPost2020$Sl[i] <- slNew
+#   proj_Q_PPost2020$Cl[i] <- clNew
+#   proj_Q_PPost2020$A[i] <- ANew
+#   proj_Q_PPost2020$repHeif[i] <- k_old
+#   proj_Q_PPost2020$repHeif_Head[i] <- k_old_Head
+#   
+#   proj_Q_PPost2020$Year[i] <- beefINV_FORECAST_post2020$Year[i]
+#   
+#   beefINV_FORECAST_post2020$Year[i+1] <- beefINV_FORECAST_post2020$Year[i] + 1
+#   beefINV_FORECAST_post2020$k3[i+1] <-  abs(proj_Q_PPost2020$repHeif_Head[i])
+#   beefINV_FORECAST_post2020$k4[i+1] <- delta * beefINV_FORECAST_post2020$k3[i]
+#   beefINV_FORECAST_post2020$k5[i+1] <- delta * beefINV_FORECAST_post2020$k4[i]
+#   beefINV_FORECAST_post2020$k6[i+1] <- delta * beefINV_FORECAST_post2020$k5[i]
+#   beefINV_FORECAST_post2020$k7[i+1] <- delta * beefINV_FORECAST_post2020$k6[i]
+#   beefINV_FORECAST_post2020$k8[i+1] <- delta * beefINV_FORECAST_post2020$k7[i]
+#   # beefINV_FORECAST_post2020$k9[i+1] <- delta * beefINV_FORECAST_post2020$k8[i]
+#   beefINV_FORECAST_post2020$K[i+1] <- sum(beefINV_FORECAST_post2020[i+1,-1:-2])
+#   
+#   # if((beefINV_FORECAST_post2020$K[i+1] - sum(beefINV_FORECAST_post2020[i,-1:-2])) > 0){
+#   #   beefINV_FORECAST_post2020$k9[i+1] <- delta * beefINV_FORECAST_post2020$k8[i]
+#   #   beefINV_FORECAST_post2020$K[i+1] <- sum(beefINV_FORECAST_post2020[i+1,-1:-2])
+#   # }else{
+#   #   beefINV_FORECAST_post2020$k9[i+1] <- 0
+#   # }
+#   
+#   if(i>1){
+#     proj_Q_PPost2020$Year[i] <- beefINV_FORECAST_post2020$Year[i-1] + 1
+#   }
+#   
+#   capA <- ANew
+#   
+#   capK <- beefINV_FORECAST_post2020$K[i]
+#   
+#   # k3OLD <- beefINV_FORECAST_post2020$k3[i]
+#   
+#   calf_crop_post2020 <- calf_crop_post2020 %>% add_row(Year = beefINV_FORECAST_post2020$Year[i],
+#                                                        k0 = g * beefINV_FORECAST_post2020$K[i])
+#   
+# }
