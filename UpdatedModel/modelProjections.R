@@ -1086,6 +1086,7 @@ USDA_Proj_TS <- USDA_Proj %>% select(-USDA_Ps) %>% transmute(Year = USDA_Years, 
 CARD_USDA_FAPRI_TS_Proj <- left_join(left_join(EQestObsTS_Medians_projs, FAPRI_Proj_TS, by="Year"), 
                                      USDA_Proj_TS, by="Year")
 CARD_USDA_FAPRI_TS_Proj
+# CARD_USDA_FAPRI_TS_Proj[,3:5] <- CARD_USDA_FAPRI_TS_Proj[,3:5] * adjFactorProj$AdjFactor
 
 
 CARD_USDA_FAPRI_TS_Proj_plot <- CARD_USDA_FAPRI_TS_Proj %>% ggplot(aes(x=Year))  + 

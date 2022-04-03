@@ -128,7 +128,7 @@ dev.off()
 
 CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_Proj
 
-CARD_USDA_FAPRI_TS_plots[,2:4] <- CARD_USDA_FAPRI_TS_plots[,2:4] * adjFactorProj$AdjFactor
+CARD_USDA_FAPRI_TS_plots[,3:5] <- CARD_USDA_FAPRI_TS_plots[,3:5] * adjFactorProj$AdjFactor
 CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_plots %>% round(2)
 
 tikz(file="projectionsLatexPlots/Updated/CARD_USDA_FAPRI_TS.tex",  width=6.2, height=4)

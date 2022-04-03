@@ -47,7 +47,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   k3_est_Head_OG <- estQ$par
   
-  k3_est <- abs(estQ$par)
+  k3_est <- estQ$par
 
   slNew <- ((g * K1 - k3_est) * slAvg)/1000000000
   
@@ -69,7 +69,7 @@ getSlClA_test_FMD <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   k3_est <- (k3_est * slAvg)/1000000000
   
-  ANew <- (slNew + clNew) * (1/adjF)
+  ANew <- (slNew + clNew)
   
   # k3_est_Head <- estQ$par
   
@@ -1318,7 +1318,7 @@ postFMD_CC_90_Pes <- pessimisticPostFMD_90[[3]]
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 90
+dePopR <- 20
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year < 2009)
 calf_crop_PreFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR)    
 calf_crop_2009 <- calf_crop %>% filter(Year == 2009) %>% transmute(Year = Year, k0 = (1-dePopR/100) * calfCrop)
@@ -1404,7 +1404,7 @@ headRatio <- NULL
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
   
-  # i <- 4
+  i <- 1
   
   if(i>1){
     #Populating the younglings
@@ -1427,7 +1427,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   # I am also assuming decrease in the stocks by the specified depop.
   if(i==1){
     
-    capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
+    capA_pre <- capA_pre - capA_pre * (5/100) - capA_pre * (exports_percentK/100)
     
     
     K1[i] <- capK_pre * (1 - (dePopR/100))
@@ -1471,7 +1471,7 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
   # ccTwo <- calf_crop_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(k0) %>% as.numeric()
   # repHeifNow <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]) %>% select(k3) %>% as.numeric()
   # matureStockTBA <- delta * ccTwo - repHeifNow
-  
+  # 
   # K1[i] <- K1[i] + matureStockTBA
   
   # Here I get the supply by passing the stocks and derived demand. This function will give us
@@ -1511,7 +1511,10 @@ for(i in 1:nrow(proj_Q_P_PostFMD)){
     slCounter <- 1
   }
   
-  ANew <- (slNew + clNew) * (1/adjF_pre)
+  ANew <- (slNew + clNew)
+  
+  slNew <- slNew * adjF_pre
+  clNew <- clNew * adjF_pre
   
   # if((slCounter==1) || (clCounter==1)){
 
