@@ -2036,9 +2036,14 @@ de90I <- de90I %>% transmute(Year = Year, K90 = K)
 
 PPrices <- merge(de20P,merge(de50P, de90P)) %>% select(Year, ps20, ps50, ps90, pc20, pc50, pc90)
 PStocks <- merge(de20I, merge(de50I, de90I))
+PStocks[,-1] <- PStocks[,-1]/1000000
 
 OPrices <- merge(de20P,merge(de50P, de90P)) %>% select(Year, ps20, ps50, ps90, pc20, pc50, pc90)
 OStocks <- merge(de20I, merge(de50I, de90I))
+OStocks[,-1] <- OStocks[,-1]/1000000
+
+
+
 
 
 for(i in 1:nrow(proj_Q_P_PostFMD)){
