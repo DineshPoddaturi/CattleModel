@@ -1449,6 +1449,12 @@ EQestObsPSNII <- left_join(EQestPSNII,quantities_prices_capK) %>% select(Year,ps
 
 EQestObsPSNII
 
+EQestObsPSNII_Err <- EQestObsPSNII %>% select(Year, psMedian, ps) %>% 
+  mutate(eHat = (ps-psMedian)/ps) %>% round(2)
+
+EQestObsPSNII_Err_Median <- median(EQestObsPSNII_Err$eHat)
+EQestObsPSNII_Err_Max <- max(EQestObsPSNII_Err$eHat)
+
 ###### Fitted Cull Cow Equilibrium prices
 EQprices_pc_MeansNII <- apply(unique(prices_pc_eq[1:25,]), 2, mean)
 EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% as.data.frame()
@@ -1469,12 +1475,29 @@ EQestObsPCNII <- left_join(EQestPCNII,quantities_prices_capK) %>% select(Year,pc
 
 EQestObsPCNII
 
+EQestObsPCNII_Err <- EQestObsPCNII %>% select(Year, pcMedian, pc) %>% 
+  mutate(eHat = (pc-pcMedian)/pc) %>% round(2)
+
+EQestObsPCNII_Err_Median <- median(EQestObsPCNII_Err$eHat)
+EQestObsPCNII_Err_Max <- max(EQestObsPCNII_Err$eHat)
+
+
+EQestObsPCNII_R2 <- EQestObsPCNII_Err %>% select(Year, pcMedian, pc) %>% 
+  mutate(resSquared = (pcMedian-pc)^2, totSquared = (pc - mean(pc))^2)
+
+EQestObsPCNII_sumSquaredRes <- sum(EQestObsPCNII_R2$resSquared)
+EQestObsPCNII_sumSquaredTotal <- sum(EQestObsPCNII_R2$totSquared)
+
+EQestObsPCNII_RSquared <- 1 -  (EQestObsPCNII_sumSquaredRes/EQestObsPCNII_sumSquaredTotal)
+
+
 
 mergedPrices <- merge(EQestObsPSNII %>% select(-errMean, -errmedian), 
       EQestObsPCNII %>% select(-errMean, -errmedian)) %>% select(Year, ps, psMedian, 
                                                                  pc, pcMedian) %>%
   filter(Year >= 2010)
 mergedPrices[,-1] <- mergedPrices[,-1] * 100
+
 
 
 
@@ -1547,6 +1570,24 @@ EQestObsSLNII <- left_join(EQestSLNII, supp_sl_MODEL) %>% select(Year, slMean, s
 EQestObsSLNII 
 
 
+EQestObsSLNII_Err <- EQestObsSLNII %>% select(Year, slMedian, slSM) %>% 
+  mutate(eHat = (slSM-slMedian)/slSM) %>% round(2)
+
+EQestObsSLNII_Err_Median <- median(EQestObsSLNII_Err$eHat)
+EQestObsSLNII_Err_Max <- max(EQestObsSLNII_Err$eHat)
+
+
+EQestObsSLNII_R2 <- EQestObsSLNII_Err %>% select(Year, slMedian, slSM) %>% 
+  mutate(resSquared = (slMedian-slSM)^2, totSquared = (slSM - mean(slSM))^2)
+
+EQestObsSLNII_sumSquaredRes <- sum(EQestObsSLNII_R2$resSquared)
+EQestObsSLNII_sumSquaredTotal <- sum(EQestObsSLNII_R2$totSquared)
+
+EQestObsSLNII_RSquared <- 1 -  (EQestObsSLNII_sumSquaredRes/EQestObsSLNII_sumSquaredTotal)
+
+EQestObsSLNII_DiagResPlot <- plot(EQestObsSLNII$slMedian, EQestObsSLNII$errmedian)
+
+
 # Fitted Cull Cow Equilibrium Supply 
 EQquantities_cl_MeansNII <- apply(unique(clNodes_eq[1:25,]), 2, mean)
 EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% as.data.frame()
@@ -1570,6 +1611,23 @@ supp_cl_MODEL <- supp_diss_adj %>% select(Year, clSM = cowsCulled_BillLb)
 EQestObsCLNII <- left_join(EQestCLNII, supp_cl_MODEL) %>% select(Year, clMean, clMedian, clSM) %>% 
   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
 EQestObsCLNII
+
+EQestObsCLNII_Err <- EQestObsCLNII %>% select(Year, clMedian, clSM) %>% 
+  mutate(eHat = (clSM-clMedian)/clSM) %>% round(2) 
+
+EQestObsCLNII_Err_Median <- median(EQestObsCLNII_Err$eHat)
+EQestObsCLNII_Err_Max <- max(EQestObsCLNII_Err$eHat)
+
+
+EQestObsCLNII_R2 <- EQestObsCLNII_Err %>% select(Year, clMedian, clSM) %>% filter(Year >= 1990) %>%
+  mutate(resSquared = (clMedian-clSM)^2, totSquared = (clSM - mean(clSM))^2)
+
+EQestObsCLNII_sumSquaredRes <- sum(EQestObsCLNII_R2$resSquared)
+EQestObsCLNII_sumSquaredTotal <- sum(EQestObsCLNII_R2$totSquared)
+
+EQestObsCLNII_RSquared <- 1 -  (EQestObsCLNII_sumSquaredRes/EQestObsCLNII_sumSquaredTotal)
+
+EQestObsCLNII_DiagResPlot <- plot(EQestObsCLNII$clMedian, EQestObsCLNII$errmedian)
 
 
 merge(EQestObsSLNII %>% select(-errMean, -errmedian), 

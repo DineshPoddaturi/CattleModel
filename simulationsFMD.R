@@ -1375,6 +1375,10 @@ getSlClA_test_FMD_EQ <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   k3_est <- estQ$par
   
+  if(k3_est<0){
+    k3_est <- 0.5 * g * K1
+  }
+  
   slNew <- ((g * K1 - k3_est) * slAvg)/1000000000
   
   gamma <- gamma_k3
@@ -1393,13 +1397,15 @@ getSlClA_test_FMD_EQ <- function(params, PsM, PcM, K1, k, CapA, gamma_k3,
   
   clNew <- (clNew * clAvg)/1000000000
   
+  k3_est_Head <- k3_est
+  
   k3_est <- (k3_est * slAvg)/1000000000
   
   ANew <- (slNew + clNew)
   
   # k3_est_Head <- estQ$par
   
-  k3_est_Head <- estQ$par
+  
   
   # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
   # ANew <- (((g * K1 - k3_est) * slAvg)/1000000000) * (1/slShare)
@@ -1682,7 +1688,7 @@ headRatio <- NULL
 
 for(i in 1: nrow(proj_Q_P_PostFMD)){
   
-  # i <- 2
+  # i <- 1
   
   capA_pre <- modelParamsEQ_PreFMD$A
   
@@ -1693,11 +1699,11 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   }
   
   #### Changes in the demand for beef
-  if(i == 1){
+  if(i < 4){
     # i < 4
     # i == 1
     capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
-  }else if(i == 2){
+  }else if(i >= 4 && i <= 5 ){
     # i >= 4 && i <= 5 
     # i == 2
     capA_pre <- capA_pre + capA_pre * (exports_percentK/100)
@@ -1740,15 +1746,15 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   
   slCounterL <- 0
   clCounterL <- 0
-  
+
   slCounterH <- 0
   clCounterH <- 0
-  
+
   while(clNew < clHistMin){
     clNew <- clNew + 0.1
     clCounterL <- 1
   }
-  
+
   while(slNew < slHistMin){
     slNew <- slNew + 0.1
     slCounterL <- 1
@@ -1773,7 +1779,7 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     slNew_Head_New <- (slNew * 1000000000)/slaughterAvg_pre
     slHeadDiff <- abs(abs(slNew_Head_New) - abs(slNew_Head_OG))
     if(k_old_Head_OG<=0){
-      k_old_Head <- slHeadDiff 
+      k_old_Head <- slHeadDiff
     }else{
       k_old_Head <- k_old_Head + slHeadDiff
     }
@@ -1845,105 +1851,6 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   slHeadDiff1 <- NULL
   k_old_Head_EqRatio <- NULL
   K1Ratio <- NULL
-  
-  # while(abs(slDiff)>0.1 || abs(clDiff)>0.1){
-  # 
-  #   slDiffEq[m] <- slDiff
-  #   clDiffEq[m] <- clDiff
-  # 
-  #   if( slDiff < 0){
-  #     psN <- psM_pre + 0.001
-  #   } else if( slDiff > 0){
-  #     psN <- psM_pre - 0.001
-  #   }
-  # 
-  #   if(psN < 0){
-  #     psN <- psM_pre
-  #   }
-  # 
-  #   if( clDiff < 0){
-  #     pcN <- pcM_pre + 0.001
-  #   } else if( clDiff > 0){
-  #     pcN <- pcM_pre - 0.001
-  #   }
-  # 
-  #   if(pcN < 0){
-  #     pcN <- pcM_pre
-  #   }
-  # 
-  #   hcM_pre <- (((g * (beta^3) * psN) + (beta - 1) * pcN)/(1 + g * beta * (gamma0 + beta * gamma1)))
-  # 
-  #   while(hcM_pre>pcN){
-  #     hcM_pre <- pcN - 0.01
-  #   }
-  # 
-  #   Ps_eq <- getPsPcEpsEpc_FMD_EQ(PsM = psN, PcM = pcN, EPsM = EpsM_pre, EPcM = EpcM_pre,
-  #                           HcM = hcM_pre, SlNew = slNew, ClNew = clNew, ANew = ANew1,
-  #                           params = c(MUtilde_pre, Stilde_pre),depops = dePopR)
-  # 
-  #   psM_pre <- Ps_eq[1]
-  #   pcM_pre <- Ps_eq[2]
-  #   hcM_pre <- Ps_eq[3]
-  #   EpsM_pre <- Ps_eq[4]
-  #   EpcM_pre <- Ps_eq[5]
-  # 
-  #   psM_Eq[m] <- psM_pre
-  #   pcM_Eq[m] <- pcM_pre
-  # 
-  #   D_sl <- ANew1 *
-  #     ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
-  #        (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
-  # 
-  #   D_cl <- ANew1 * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
-  # 
-  #   # Qs_Eq <- getSlClA_test_FMD_EQ(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
-  #   #                            k = k, CapA = ANew1, gamma_k3 = gamma_k3,
-  #   #                            eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF_pre, k0s = k0s,
-  #   #                            slAvg = slaughterAvg_pre, clAvg = cullAvg_pre, slDem = D_sl,
-  #   #                            clDem = D_cl)
-  #   # slNew_Eq <- Qs_Eq[1]
-  #   # clNew_Eq <- Qs_Eq[2]
-  #   # ANew_Eq <- Qs_Eq[3]
-  #   # k_old_Eq <- Qs_Eq[4]
-  #   # k_old_Head_Eq <- Qs_Eq[5]
-  #   #
-  #   # k_old_Head_OG_Eq <- Qs_Eq[6]
-  #   # slNew_Head_OG_Eq <- (slNew_Eq * 1000000000)/slaughterAvg_pre
-  #   # clNew_Head_OG_Eq <- (clNew_Eq * 1000000000)/cullAvg_pre
-  #   #
-  #   # slCounter_Eq <- 0
-  #   # clCounter_Eq <- 0
-  #   #
-  #   # slNew <- slNew_Eq * adjF_pre
-  #   # clNew <- clNew_Eq * adjF_pre
-  # 
-  #   slDiff <- slNew - D_sl
-  #   clDiff <- clNew - D_cl
-  # 
-  #   # The reason for this condition is to avoid infinite while loop. Note that the while loop stops
-  #   # if the differences reach below tolerance levels. But sometimes this is never the case and there will be
-  #   # some difference above tolerance level (basically saying that there will be closing stocks). So I exit the loop
-  #   # if the difference stays stagnant.
-  #   if(m >= 15){
-  #     if( (round(slDiffEq[m],1) == round(slDiffEq[m-1],1)) && (round(clDiffEq[m],1) == round(clDiffEq[m-1],1)) ){
-  #       # if( (round(slDiffEq[m-1],1) == round(slDiffEq[m-2],1)) && (round(clDiffEq[m-1],1) == round(clDiffEq[m-2],1)) ){
-  #         # if( (round(slDiffEq[m-2],2) == round(slDiffEq[m-3],2)) && (round(clDiffEq[m-2],2) == round(clDiffEq[m-3],2)) ){
-  #         break
-  #         # }
-  #       # }
-  #     }
-  #   }
-  # 
-  #   # if((m %% 2 == 0)){
-  #   #   slNew <- D_sl
-  #   #   clNew <- D_cl
-  #   # }else{
-  #   #   ANew1 <- (D_sl + D_cl)
-  #   # }
-  # 
-  #   m <- m+1
-  # 
-  # }
   
   if(k_old_Head_OG<=0){
     fedTBA <- k_old_Head
@@ -2041,6 +1948,11 @@ PStocks[,-1] <- PStocks[,-1]/1000000
 OPrices <- merge(de20P,merge(de50P, de90P)) %>% select(Year, ps20, ps50, ps90, pc20, pc50, pc90)
 OStocks <- merge(de20I, merge(de50I, de90I))
 OStocks[,-1] <- OStocks[,-1]/1000000
+
+
+
+
+
 
 
 
