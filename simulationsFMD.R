@@ -1479,51 +1479,61 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
   
   if(depops == 20){
     
-    psNew_lo <- psNew  - 0.25
+    # psNew <- psNew + 0.02
+    
+    psNew_lo <- psNew  - 0.1
     pcNew_lo <- pcNew - 0.25
     
-    psNew_up <- psNew + 0.2
-    pcNew_up <- pcNew + 0.2
+    psNew_up <- psNew + 0.5
+    pcNew_up <- pcNew + 0.08
     
-    psNew_expected_lo <- psNew_expected - 0.1
+    # psNew_expected <- psNew_expected + 0.025
     
-    psNew_expected_up <- psNew_expected + 0.3
+    psNew_expected_lo <- psNew_expected - 0.05
+    
+    psNew_expected_up <- psNew_expected + 0.5
     
     pcNew_expected_lo <- pcNew_expected 
     
-    pcNew_expected_up <- pcNew_expected + 0.3
+    pcNew_expected_up <- pcNew_expected + 0.1
     
     
   }else if(depops == 50){
+    
+    
     psNew_lo <- psNew  - 0.2
-    pcNew_lo <- pcNew - 0.2
+    pcNew_lo <- pcNew - 0.4
     
     psNew_up <- psNew + 0.1
-    pcNew_up <- pcNew + 0.1
+    pcNew_up <- pcNew + 0.08
     
-    psNew_expected_lo <- psNew_expected - 0.2
+    # psNew_expected <- psNew_expected + 0.0125
     
-    psNew_expected_up <- psNew_expected + 0.2
+    psNew_expected_lo <- psNew_expected - 0.1
+    
+    psNew_expected_up <- psNew_expected + 0.25
     
     pcNew_expected_lo <- pcNew_expected 
     
-    pcNew_expected_up <- pcNew_expected + 0.2
+    pcNew_expected_up <- pcNew_expected + 0.15
     
   }else if (depops == 90){
     
     psNew_lo <- psNew  - 0.2
-    pcNew_lo <- pcNew - 0.2
+    pcNew_lo <- pcNew - 0.4
     
     psNew_up <- psNew + 0.1
-    pcNew_up <- pcNew + 0.1
+    pcNew_up <- pcNew + 0.08
     
-    psNew_expected_lo <- psNew_expected - 0.2
+    # psNew_expected <- psNew_expected + 0.001
     
-    psNew_expected_up <- psNew_expected + 0.3
+    psNew_expected_lo <- psNew_expected - 0.1
     
-    pcNew_expected_lo <- pcNew_expected - 0.2
+    psNew_expected_up <- psNew_expected + 0.25
     
-    pcNew_expected_up <- pcNew_expected + 0.3
+    pcNew_expected_lo <- pcNew_expected - 0.1
+    
+    pcNew_expected_up <- pcNew_expected + 0.15
   }
  
   
@@ -1590,7 +1600,7 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 90
+dePopR <- 20
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year <= 2009)
 calf_crop_PostFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR) %>% as.data.frame()
 
@@ -1686,6 +1696,7 @@ clHeadDiff <- NULL
 slHeadDiff <- NULL
 headRatio <- NULL
 
+
 for(i in 1: nrow(proj_Q_P_PostFMD)){
   
   # i <- 1
@@ -1711,7 +1722,15 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     capA_pre <- capA_pre
   }
   
-  capK_pre <- capK_pre * (1 + 0.5 * g)
+  if(i <= 3){
+    matureYoungs <- capK_k3_depopFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(K) %>% as.numeric()
+  } else{
+    matureYoungs <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(K) %>% as.numeric()
+  }
+  
+  # capK_pre <- capK_pre + 0.5 * delta * calfCrop
+  capK_pre <- capK_pre + 0.5 * g * matureYoungs
+  # capK_pre <- capK_pre * (1+ 0.5 * g)
   
   K1[i] <- capK_pre
   
@@ -1741,8 +1760,8 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   clNew_Head_OG <- (clNew * 1000000000)/cullAvg_pre
   
   ANew1 <- capA_pre
-  slNew <- slNew * adjF_pre
-  clNew <- clNew * adjF_pre
+  # slNew <- slNew * adjF_pre
+  # clNew <- clNew * adjF_pre
   
   slCounterL <- 0
   clCounterL <- 0
@@ -1751,22 +1770,26 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   clCounterH <- 0
 
   while(clNew < clHistMin){
-    clNew <- clNew + 0.1
+    clNew <- ((clNew * 1000000000)/cullAvg_pre + 10000) * (cullAvg_pre/1000000000)
+    # clNew <- clNew + 0.1
     clCounterL <- 1
   }
 
   while(slNew < slHistMin){
-    slNew <- slNew + 0.1
+    slNew <- ((slNew * 1000000000)/slaughterAvg_pre + 10000) * (slaughterAvg_pre/1000000000)
+    # slNew <- slNew + 0.1
     slCounterL <- 1
   }
   
   while(clNew > clHistMax){
-    clNew <- clNew - 0.1
+    clNew <- ((clNew * 1000000000)/cullAvg_pre - 10000) * (cullAvg_pre/1000000000)
+    # clNew <- clNew - 0.1
     clCounterH <- 1
   }
   
   while(slNew > slHistMax){
-    slNew <- slNew - 0.1
+    slNew <- ((slNew * 1000000000)/slaughterAvg_pre - 10000) * (slaughterAvg_pre/1000000000)
+    # slNew <- slNew - 0.1
     slCounterH <- 1
   }
   
@@ -1783,6 +1806,7 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     }else{
       k_old_Head <- k_old_Head + slHeadDiff
     }
+    EpsM_pre <- EpsM_pre + 0.01
   }
   
   
@@ -1794,6 +1818,7 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     # }else{
       K1[i] <- K1[i] + clHeadDiff
     # }
+    EpcM_pre <- EpcM_pre + 0.01
   }
   
   
@@ -1803,9 +1828,12 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     if(k_old_Head_OG<=0){
       k_old_Head <- slHeadDiff
     }else{
-      k_old_Head <- k_old_Head - slHeadDiff
+      if((k_old_Head - slHeadDiff)>0){
+        k_old_Head <- k_old_Head - slHeadDiff
+      }
+      
     }
-    EpsM_pre <- EpsM_pre + 0.05
+    EpsM_pre <- EpsM_pre - 0.01
   }
   
   if(clCounterH == 1){
@@ -1816,8 +1844,20 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     # }else{
       # k_old_Head <- k_old_Head - clHeadDiff
     # }
-    K1[i] <- K1[i] - clHeadDiff
-    # EpcM_pre <- EpcM_pre + 0.1
+    if((K1[i] - clHeadDiff)>0){
+      K1[i] <- K1[i] - clHeadDiff
+    }
+    # if((slCounterH == 1) && (k_old_Head - clHeadDiff)>0){
+    #   k_old_Head <- k_old_Head - clHeadDiff
+    # }
+    EpcM_pre <- EpcM_pre - 0.01
+  }
+
+  
+  if(i>5){
+    psM_pre <- psM_pre + 0.025
+    pcM_pre <- pcM_pre - 0.01
+    # EpsM_pre <- EpsM_pre + 0.02
   }
   
   Ps <- getPsPcEpsEpc_FMD_EQ(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
@@ -1852,25 +1892,28 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   k_old_Head_EqRatio <- NULL
   K1Ratio <- NULL
   
+  
   if(k_old_Head_OG<=0){
     fedTBA <- k_old_Head
   }else{
     fedTBA <- k_old_Head
-    K1[i] <- K1[i] - fedTBA
+    if((K1[i] - fedTBA)>0){
+      K1[i] <- K1[i] - fedTBA
+    }
   }
   
-  k3Median <- Stock %>% filter(Year <= beefINV_FORECAST_PostFMD$Year[i]-1) %>% tail(15)
-  k3Median <- median(k3Median$k3)
+  k3Median <- Stock %>% filter(Year <= beefINV_FORECAST_PostFMD$Year[i]) %>% tail(15)
+  k3Median <- mean(k3Median$k3)
   
   while(fedTBA > k3Median){
-    fedTBA <- fedTBA - 10000
+    fedTBA <- fedTBA - 1000
   }
   
-  Kmedian <- Stock %>% filter(Year <= beefINV_FORECAST_PostFMD$Year[i]-1) %>% tail(15)
-  Kmedian <- median(Kmedian$K)
+  Kmedian <- Stock %>% filter(Year <= beefINV_FORECAST_PostFMD$Year[i]) %>% tail(15)
+  Kmedian <- mean(Kmedian$K)
   
   while(K1[i] > Kmedian){
-    K1[i] <- K1[i] - 10000
+    K1[i] <- K1[i] - 1000
   }
   
   repNewLbs <- fedTBA * (slaughterAvg_pre/1000000000)
@@ -1948,7 +1991,6 @@ PStocks[,-1] <- PStocks[,-1]/1000000
 OPrices <- merge(de20P,merge(de50P, de90P)) %>% select(Year, ps20, ps50, ps90, pc20, pc50, pc90)
 OStocks <- merge(de20I, merge(de50I, de90I))
 OStocks[,-1] <- OStocks[,-1]/1000000
-
 
 
 

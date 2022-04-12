@@ -24,18 +24,18 @@ Year3: Everything goes back to pre FMD \newline
 
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-24/fedCattlePriceOptimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/fedCattlePriceOptimistic.jpeg}
   \caption{Fed cattle price changes (dollar/CWT)}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-24/cullCowPriceOptimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/cullCowPriceOptimistic.jpeg}
   \caption{Cull cow price changes (dollar/CWT)}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-24/stocksOptimistic.jpeg}
-  \caption{Stock changes (in 1000 head)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/stocksOptimistic.jpeg}
+  \caption{Stock changes (in Million head)}
 \end{figure}
 
 \clearpage
@@ -56,18 +56,18 @@ Year6: Export band is lifted and everything goes back to pre FMD
 <!-- 4. In year 6 exports ban is lifted and everything is back to normal -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-24/fedCattlePricePessimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/fedCattlePricePessimistic.jpeg}
   \caption{Fed cattle price changes (dollar/CWT)}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-24/cullCowPricePessimistic.jpeg}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/cullCowPricePessimistic.jpeg}
   \caption{Cull cow price changes (dollar/CWT)}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/03-24/stocksPessimistic.jpeg}
-  \caption{Stock changes (in 1000 head)}
+  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/stocksPessimistic.jpeg}
+  \caption{Stock changes (in Million head)}
 \end{figure}
 
 
