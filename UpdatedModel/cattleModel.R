@@ -1450,10 +1450,10 @@ EQestObsPSNII <- left_join(EQestPSNII,quantities_prices_capK) %>% select(Year,ps
 EQestObsPSNII
 
 EQestObsPSNII_Err <- EQestObsPSNII %>% select(Year, psMedian, ps) %>% 
-  mutate(eHat = (ps-psMedian)/ps) %>% round(2)
+  mutate(eHat = ((ps-psMedian)/ps)* 100)
 
-EQestObsPSNII_Err_Median <- median(EQestObsPSNII_Err$eHat)
-EQestObsPSNII_Err_Max <- max(EQestObsPSNII_Err$eHat)
+EQestObsPSNII_Err_Median <- median(EQestObsPSNII_Err$eHat) %>% round(2)
+EQestObsPSNII_Err_Max <- max(EQestObsPSNII_Err$eHat) %>% round(2)
 
 ###### Fitted Cull Cow Equilibrium prices
 EQprices_pc_MeansNII <- apply(unique(prices_pc_eq[1:25,]), 2, mean)
@@ -1476,10 +1476,10 @@ EQestObsPCNII <- left_join(EQestPCNII,quantities_prices_capK) %>% select(Year,pc
 EQestObsPCNII
 
 EQestObsPCNII_Err <- EQestObsPCNII %>% select(Year, pcMedian, pc) %>% 
-  mutate(eHat = (pc-pcMedian)/pc) %>% round(2)
+  mutate(eHat = ((pc-pcMedian)/pc)*100)
 
-EQestObsPCNII_Err_Median <- median(EQestObsPCNII_Err$eHat)
-EQestObsPCNII_Err_Max <- max(EQestObsPCNII_Err$eHat)
+EQestObsPCNII_Err_Median <- median(EQestObsPCNII_Err$eHat) %>% round(2)
+EQestObsPCNII_Err_Max <- max(EQestObsPCNII_Err$eHat) %>% round(2)
 
 
 EQestObsPCNII_R2 <- EQestObsPCNII_Err %>% select(Year, pcMedian, pc) %>% 
@@ -1571,10 +1571,10 @@ EQestObsSLNII
 
 
 EQestObsSLNII_Err <- EQestObsSLNII %>% select(Year, slMedian, slSM) %>% 
-  mutate(eHat = (slSM-slMedian)/slSM) %>% round(2)
+  mutate(eHat = ((slSM-slMedian)/slSM)*100)
 
-EQestObsSLNII_Err_Median <- median(EQestObsSLNII_Err$eHat)
-EQestObsSLNII_Err_Max <- max(EQestObsSLNII_Err$eHat)
+EQestObsSLNII_Err_Median <- median(EQestObsSLNII_Err$eHat) %>% round(2)
+EQestObsSLNII_Err_Max <- max(EQestObsSLNII_Err$eHat) %>% round(2)
 
 
 EQestObsSLNII_R2 <- EQestObsSLNII_Err %>% select(Year, slMedian, slSM) %>% 
@@ -1613,10 +1613,10 @@ EQestObsCLNII <- left_join(EQestCLNII, supp_cl_MODEL) %>% select(Year, clMean, c
 EQestObsCLNII
 
 EQestObsCLNII_Err <- EQestObsCLNII %>% select(Year, clMedian, clSM) %>% 
-  mutate(eHat = (clSM-clMedian)/clSM) %>% round(2) 
+  mutate(eHat = ((clSM-clMedian)/clSM)*100)
 
-EQestObsCLNII_Err_Median <- median(EQestObsCLNII_Err$eHat)
-EQestObsCLNII_Err_Max <- max(EQestObsCLNII_Err$eHat)
+EQestObsCLNII_Err_Median <- median(EQestObsCLNII_Err$eHat) %>% round(2)
+EQestObsCLNII_Err_Max <- max(EQestObsCLNII_Err$eHat) %>% round(2)
 
 
 EQestObsCLNII_R2 <- EQestObsCLNII_Err %>% select(Year, clMedian, clSM) %>% filter(Year >= 1990) %>%
