@@ -44,7 +44,9 @@ postFMD_P_Q_90_OP <- postFMD_P_Q_90_OP %>% select(Year, Ps, Pc) %>% transmute(Ye
 optPriceList <- list(postFMD_P_Q_20_OP, postFMD_P_Q_50_OP, postFMD_P_Q_90_OP)
 optPricePostFMD <- Reduce(function(...) merge(...), optPriceList)
 
-optPricePostFMD <- OPrices
+optPricePostFMD <- optPricePostFMD %>% select(Year, Ps20, Ps50, Ps90, Pc20, Pc50, Pc90)
+
+# optPricePostFMD <- OPrices
 
 # optPricePostFMD <- proj_Q_P_PostFMD_OP_absk3_11
 
@@ -62,7 +64,7 @@ optStockList <- list(postFMD_K_20_OP, postFMD_K_50_OP,
                       postFMD_K_90_OP)
 optStockPostFMD <- Reduce(function(...) merge(...), optStockList)
 
-optStockPostFMD <- OStocks
+# optStockPostFMD <- OStocks
 
 
 # optStockPostFMD <- beefINV_FORECAST_PostFMD_OP_absk3_11
@@ -74,10 +76,10 @@ prices_Opt[,-1] <- prices_Opt[,-1] * 100
 prices_Opt <- prices_Opt %>% round(3)
 
 optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
-  geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=ps20, color="20% depop")) + 
-  geom_point(aes(y=ps20, color="20% depop")) + geom_line(aes(y=ps50, color="50% depop")) + 
-  geom_point(aes(y=ps50, color="50% depop")) + geom_line(aes(y=ps90, color="90% depop")) + 
-  geom_point(aes(y=ps90, color="90% depop")) + 
+  geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
+  geom_point(aes(y=Ps20, color="20% depop")) + geom_line(aes(y=Ps50, color="50% depop")) + 
+  geom_point(aes(y=Ps50, color="50% depop")) + geom_line(aes(y=Ps90, color="90% depop")) + 
+  geom_point(aes(y=Ps90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Opt$Year[1],
                                   prices_Opt$Year[nrow(prices_Opt)]))) + theme_classic() + 
@@ -87,10 +89,10 @@ optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, co
 
 
 optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline")) + 
-  geom_point(aes(y=pcB, color="Baseline")) + geom_line(aes(y=pc20, color="20% depop")) + 
-  geom_point(aes(y=pc20, color="20% depop")) + geom_line(aes(y=pc50, color="50% depop")) + 
-  geom_point(aes(y=pc50, color="50% depop")) + geom_line(aes(y=pc90, color="90% depop")) + 
-  geom_point(aes(y=pc90, color="90% depop")) + 
+  geom_point(aes(y=pcB, color="Baseline")) + geom_line(aes(y=Pc20, color="20% depop")) + 
+  geom_point(aes(y=Pc20, color="20% depop")) + geom_line(aes(y=Pc50, color="50% depop")) + 
+  geom_point(aes(y=Pc50, color="50% depop")) + geom_line(aes(y=Pc90, color="90% depop")) + 
+  geom_point(aes(y=Pc90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Opt$Year[1],
                                   prices_Opt$Year[nrow(prices_Opt)])))+ theme_classic() +
@@ -101,7 +103,7 @@ optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
 
 ##### 
 stocks_Opt <- left_join(KBaseline, optStockPostFMD) %>% filter(Year < optStockPostFMD$Year[nrow(optStockPostFMD)])
-stocks_Opt[,2] <- stocks_Opt[,2]/1000000
+stocks_Opt[,-1] <- stocks_Opt[,-1]/1000000
 
 optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"))+ 
   geom_point(aes(y=K, color="Baseline")) + geom_line(aes(y=K20, color="20% DEPOP"))+ 
@@ -137,7 +139,9 @@ postFMD_P_Q_90_PE <- postFMD_P_Q_90_PE %>% select(Year, Ps, Pc) %>% transmute(Ye
 pesPriceList <- list(postFMD_P_Q_20_PE, postFMD_P_Q_50_PE, postFMD_P_Q_90_PE)
 pesPricePostFMD <- Reduce(function(...) merge(...), pesPriceList)
 
-pesPricePostFMD <- PPrices
+pesPricePostFMD <- pesPricePostFMD %>% select(Year, Ps20, Ps50, Ps90, Pc20, Pc50, Pc90)
+
+# pesPricePostFMD <- PPrices
 
 # pesPricePostFMD <- proj_Q_P_PostFMD_PE_absk3_11
 
@@ -156,7 +160,7 @@ pesStockList <- list(postFMD_K_20_PE, postFMD_K_50_PE,
 pesStockPostFMD <- Reduce(function(...) merge(...), pesStockList)
 
 
-pesStockPostFMD <- PStocks
+# pesStockPostFMD <- PStocks
 # pesStockPostFMD <- beefINV_FORECAST_PostFMD_PE_absk3_11
 
 
@@ -166,10 +170,10 @@ prices_Pes[,-1] <- prices_Pes[,-1] * 100
 prices_Pes <- prices_Pes %>% round(3)
 
 pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
-  geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=ps20, color="20% depop")) + 
-  geom_point(aes(y=ps20, color="20% depop")) + geom_line(aes(y=ps50, color="50% depop")) + 
-  geom_point(aes(y=ps50, color="50% depop")) + geom_line(aes(y=ps90, color="90% depop")) + 
-  geom_point(aes(y=ps90, color="90% depop")) + 
+  geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
+  geom_point(aes(y=Ps20, color="20% depop")) + geom_line(aes(y=Ps50, color="50% depop")) + 
+  geom_point(aes(y=Ps50, color="50% depop")) + geom_line(aes(y=Ps90, color="90% depop")) + 
+  geom_point(aes(y=Ps90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Pes$Year[1],
                                   prices_Pes$Year[nrow(prices_Pes)]))) + theme_classic() + 
@@ -179,10 +183,10 @@ pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, co
 
 
 pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline")) + 
-  geom_point(aes(y=pcB, color="Baseline")) + geom_line(aes(y=pc20, color="20% depop")) + 
-  geom_point(aes(y=pc20, color="20% depop")) + geom_line(aes(y=pc50, color="50% depop")) + 
-  geom_point(aes(y=pc50, color="50% depop")) + geom_line(aes(y=pc90, color="90% depop")) + 
-  geom_point(aes(y=pc90, color="90% depop")) + 
+  geom_point(aes(y=pcB, color="Baseline")) + geom_line(aes(y=Pc20, color="20% depop")) + 
+  geom_point(aes(y=Pc20, color="20% depop")) + geom_line(aes(y=Pc50, color="50% depop")) + 
+  geom_point(aes(y=Pc50, color="50% depop")) + geom_line(aes(y=Pc90, color="90% depop")) + 
+  geom_point(aes(y=Pc90, color="90% depop")) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Pes$Year[1],
                                   prices_Pes$Year[nrow(prices_Pes)]))) + theme_classic() +
@@ -193,7 +197,7 @@ pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
 
 
 stocks_Pes <- left_join(KBaseline, pesStockPostFMD) %>% filter(Year < pesStockPostFMD$Year[nrow(pesStockPostFMD)])
-stocks_Pes[,2] <- stocks_Pes[,2]/1000000
+stocks_Pes[,-1] <- stocks_Pes[,-1]/1000000
 
 # stocks_Pes[,-1] <- stocks_Pes[,-1]/1000
 
