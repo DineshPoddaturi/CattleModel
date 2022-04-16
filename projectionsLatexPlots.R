@@ -20,7 +20,8 @@ projectedFedPrice_plot <- projPS_plots %>% ggplot(aes(x=Year))+
                                   projPS_plots$Year[nrow(projPS_plots)]))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Fed Cattle Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_y_continuous(name="Fed Cattle Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(projectedFedPrice_plot)
 
@@ -42,7 +43,8 @@ projectedCullPrice_plot <- projPC_plots %>% ggplot(aes(x=Year))+
                                   projPC_plots$Year[nrow(projPC_plots)])))  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Cull Cow Price")  + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+  scale_y_continuous(name="Cull Cow Price")  + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(projectedCullPrice_plot)
 
@@ -70,7 +72,8 @@ projectedFedProduction_plot <- projSL_plots %>% ggplot(aes(x=Year))+
                                   projSL_plots$Year[nrow(projSL_plots)]))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + 
-  scale_y_continuous(name="Fed Cattle Production") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+  scale_y_continuous(name="Fed Cattle Production") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(projectedFedProduction_plot)
 
@@ -93,7 +96,8 @@ projectedCowsProduction_plot <- projCL_plots %>% ggplot(aes(x=Year))+
                                   projCL_plots$Year[nrow(projCL_plots)]))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + 
-  scale_y_continuous(name="Cull Cow Production") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+  scale_y_continuous(name="Cull Cow Production") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) 
 
 print(projectedCowsProduction_plot)
 
@@ -119,7 +123,8 @@ CARD_USDA_FAPRI_PS_plot <- CARD_USDA_FAPRI_PS_plots %>% ggplot(aes(x=Year)) +
   theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + 
-  scale_y_continuous(name="Fed Cattle Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+  scale_y_continuous(name="Fed Cattle Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(CARD_USDA_FAPRI_PS_plot)
 
@@ -146,7 +151,8 @@ CARD_USDA_FAPRI_TS_plot <- CARD_USDA_FAPRI_TS_plots %>% ggplot(aes(x=Year)) +
   theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + 
-  scale_y_continuous(name="Total Supply") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+  scale_y_continuous(name="Total Supply") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(CARD_USDA_FAPRI_TS_plot)
 

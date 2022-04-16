@@ -5,17 +5,18 @@ require(tikzDevice)
 pc_ps_cwt_plots <- merge(pcs_cwt, pss_cwt) %>% select(Year,pss_cwt, pcs_cwt) %>% 
   transmute(Year = Year, PS = pss_cwt, PC = pcs_cwt) %>% round(2) %>% filter(Year > 1969)
 
-tikz(file="introPlots/PricesReceived.tex", width = 6.2, height = 3)
+tikz(file="introPlots/PricesReceived.tex", width = 6.2, height = 3.5)
 
 price_plot <- pc_ps_cwt_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=PS, color="Fed Cattle")) +
   geom_line(aes(y=PC, color="Cull Cow")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(pc_ps_cwt_plots$Year[1],
-                                  pc_ps_cwt_plots$Year[nrow(pc_ps_cwt_plots)], by = 2))) + theme_classic() + 
+                                  pc_ps_cwt_plots$Year[nrow(pc_ps_cwt_plots)], by = 3))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_y_continuous(name="Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(price_plot)
 
@@ -39,10 +40,11 @@ inventoryBeef_plot <- beefInventory_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=K, color="Beef Cows")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(beefInventory_plots$Year[1],
-                                  beefInventory_plots$Year[nrow(beefInventory_plots)],by=2))) + theme_classic() + 
+                                  beefInventory_plots$Year[nrow(beefInventory_plots)], by=3))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Million head") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_y_continuous(name="Million head") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(inventoryBeef_plot)
 
@@ -77,7 +79,8 @@ domesticReceipts_plot <- beefReceiptsDomestic_plots %>% ggplot(aes(x=Year))+
                                   beefReceiptsDomestic_plots$Year[nrow(beefReceiptsDomestic_plots)]))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(domesticReceipts_plot)
 
@@ -88,7 +91,7 @@ dev.off()
 
 beefValueExport_plots <- beefReceipts %>% select(Year, exportValue)
 
-tikz(file="introPlots/exportValue.tex", width = 6.2, height = 3)
+tikz(file="introPlots/exportValue.tex", width = 6.2, height = 3.5)
 
 exportValue_plot <- beefValueExport_plots %>% ggplot(aes(x=Year))+
   geom_line(aes(y=exportValue, color="Export Value")) +
@@ -97,7 +100,8 @@ exportValue_plot <- beefValueExport_plots %>% ggplot(aes(x=Year))+
                                   beefValueExport_plots$Year[nrow(beefValueExport_plots)]))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(exportValue_plot)
 
@@ -118,7 +122,8 @@ domesticExportValue_plot <- domesticExportValue_Plots %>% ggplot(aes(x=Year))+
                                   domesticExportValue_Plots$Year[nrow(domesticExportValue_Plots)]))) + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_y_continuous(name="Billion dollars") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(domesticExportValue_plot)
 
@@ -145,12 +150,13 @@ deTrendedPrice_plot <- ddlPrice_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=P
   geom_line(aes(y=PC,color="Cull Cattle Price")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(ddlPrice_plot$Year[1],
-                                  ddlPrice_plot$Year[nrow(ddlPrice_plot)], by = 2))) + 
+                                  ddlPrice_plot$Year[nrow(ddlPrice_plot)], by = 3))) + 
   geom_hline(yintercept=0, linetype="dashed", color = "black") + 
   theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
-                                             axis.title.y = element_blank())
+                                             axis.title.y = element_blank())+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(deTrendedPrice_plot)
 
@@ -162,17 +168,18 @@ ddlInventory_plot <- detrend(as.matrix(beefInventory_plots%>%select(-Year)),tt='
   mutate(Year = c(seq(beefInventory_plots$Year[1],
                       beefInventory_plots$Year[nrow(beefInventory_plots)]))) %>% select(Year, everything())
 
-tikz(file="introPlots/CattleCycleDeTrended.tex", width = 6.2, height = 3)
+tikz(file="introPlots/CattleCycleDeTrended.tex", width = 6.2, height = 3.5)
 
 deTrendedInv_plot <- ddlInventory_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Beef Cows")) +
   scale_x_continuous(name="Year",
                      breaks=c(seq(ddlInventory_plot$Year[1],
-                                  ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 2))) + 
+                                  ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 3))) + 
   geom_hline(yintercept=0, linetype="dashed", color = "black") + 
   theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
-                                              axis.title.y = element_blank())
+                                              axis.title.y = element_blank())+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(deTrendedInv_plot)
 

@@ -16,7 +16,8 @@ slaughter_plot <- EQestObsPSNI_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=psM
                      breaks=c(seq(EQestObsPSNI_plots$Year[1],EQestObsPSNI_plots$Year[nrow(EQestObsPSNI_plots)]))) +
   scale_y_continuous(name="Fed Cattle Price")+ theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(slaughter_plot)
 
@@ -36,7 +37,8 @@ cull_plot <- EQestObsPCNI_plots%>% ggplot(aes(x=Year))+geom_line(aes(y=pcMean, c
                      breaks=c(seq(EQestObsPCNI_plots$Year[1],EQestObsPCNI_plots$Year[nrow(EQestObsPCNI_plots)]))) +
   scale_y_continuous(name="Cull Cow Price") +theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(cull_plot)
 
@@ -78,7 +80,8 @@ invReplication_plot <- EQestObstotalInventory %>% ggplot(aes(x=Year)) +
   theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
-                                             axis.title.y = element_blank())
+                                             axis.title.y = element_blank()) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(invReplication_plot)
 
@@ -101,9 +104,10 @@ deTrendedInvReplication_plot <- ddlObsInventory_plot %>% ggplot(aes(x=Year)) +
                                   ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 2))) + 
   geom_hline(yintercept=0, linetype="dashed", color = "black") +
   theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.position="bottom", legend.box = "horizontal") + 
   theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
-                                             axis.title.y = element_blank())
+                                             axis.title.y = element_blank()) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(deTrendedInvReplication_plot)
 

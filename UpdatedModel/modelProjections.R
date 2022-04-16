@@ -359,7 +359,7 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   pcNew_lo <- pcNew - 0.2
   
   psNew_up <- psNew + 0.1
-  pcNew_up <- pcNew + 0.1
+  pcNew_up <- pcNew + 0.18
   
   #### Here we are making sure the lower bound for the prices isn't negative
   if(psNew_lo < 0){
@@ -523,10 +523,10 @@ getPsPcEpsEpc_Proj_UP <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew,
   pcNew <- PcM
   
   psNew_lo <- psNew  - 0.05
-  pcNew_lo <- pcNew - 0.05
+  pcNew_lo <- pcNew - 0.1
   
-  psNew_up <- psNew + 0.2
-  pcNew_up <- pcNew + 0.2
+  psNew_up <- psNew + 0.25
+  pcNew_up <- pcNew + 0.18
   
   #### Here we are making sure the lower bound for the prices isn't negative
   if(psNew_lo < 0){
