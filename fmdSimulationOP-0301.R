@@ -101,6 +101,41 @@ optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
 
 
+##### Percentage changes in the prices from the basleine
+prices_OptPer <- left_join(pricesBaseline, optPricePostFMD) %>% filter(Year <= optPricePostFMD$Year[nrow(optPricePostFMD)])
+prices_OptPer <- prices_OptPer %>% na.omit()
+
+## Fed Cattle
+prices_Opt_FedCattle <- prices_OptPer %>% select(Year, psB, Ps20, Ps50, Ps90)
+prices_Opt_FedCattle_20 <- prices_Opt_FedCattle %>% select(Year, psB, Ps20) %>% 
+  mutate(perentChangePS20 = (Ps20-psB)/psB) %>% round(3)
+prices_Opt_FedCattle_20[,-1] <- prices_Opt_FedCattle_20[,-1] * 100
+
+prices_Opt_FedCattle_50 <- prices_Opt_FedCattle %>% select(Year, psB, Ps50) %>% 
+  mutate(perentChangePS50 = (Ps50-psB)/psB) %>% round(3)
+prices_Opt_FedCattle_50[,-1] <- prices_Opt_FedCattle_50[,-1] * 100
+
+prices_Opt_FedCattle_90 <- prices_Opt_FedCattle %>% select(Year, psB, Ps90) %>% 
+  mutate(perentChangePS90 = (Ps90-psB)/psB) %>% round(3)
+prices_Opt_FedCattle_90[,-1] <- prices_Opt_FedCattle_90[,-1] * 100
+
+
+## Cull Cows
+prices_Opt_CullCows <- prices_OptPer %>% select(Year, pcB, Pc20, Pc50, Pc90)
+prices_Opt_CullCows_20 <- prices_Opt_CullCows %>% select(Year, pcB, Pc20) %>% 
+  mutate(perentChangePC20 = (Pc20-pcB)/pcB) %>% round(3)
+prices_Opt_CullCows_20[,-1] <- prices_Opt_CullCows_20[,-1] * 100
+
+prices_Opt_CullCows_50 <- prices_Opt_CullCows %>% select(Year, pcB, Pc50) %>% 
+  mutate(perentChangePC50 = (Pc50-pcB)/pcB) %>% round(3)
+prices_Opt_CullCows_50[,-1] <- prices_Opt_CullCows_50[,-1] * 100
+
+prices_Opt_CullCows_90 <- prices_Opt_CullCows %>% select(Year, pcB, Pc90) %>% 
+  mutate(perentChangePC90 = (Pc90-pcB)/pcB) %>% round(3)
+prices_Opt_CullCows_90[,-1] <- prices_Opt_CullCows_90[,-1] * 100
+
+
+
 ##### 
 stocks_Opt <- left_join(KBaseline, optStockPostFMD) %>% filter(Year < optStockPostFMD$Year[nrow(optStockPostFMD)])
 stocks_Opt[,-1] <- stocks_Opt[,-1]/1000000
@@ -116,6 +151,20 @@ optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
   scale_y_continuous(name="Stocks (Million Head)") + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+######## Percentage change in stocks 
+stocks_Opt_Percent <- stocks_Opt %>% na.omit()
+
+stocks_Opt_Percent_20 <- stocks_Opt_Percent %>% select(Year, K, K20) %>% 
+  mutate(perentChangeK20 = ((K20-K)/K)*100) %>% round(3)
+
+stocks_Opt_Percent_50 <- stocks_Opt_Percent %>% select(Year, K, K50) %>% 
+  mutate(perentChangeK50 = ((K50-K)/K)*100) %>% round(3)
+
+stocks_Opt_Percent_90 <- stocks_Opt_Percent %>% select(Year, K, K90) %>% 
+  mutate(perentChangeK50 = ((K90-K)/K)*100) %>% round(3)
+
 
 
 # Pessimistic scenario
@@ -194,6 +243,38 @@ pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, co
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
+##### Percentage changes in the prices from the basleine
+prices_PesPer <- left_join(pricesBaseline, pesPricePostFMD) %>% filter(Year <= pesPricePostFMD$Year[nrow(pesPricePostFMD)])
+prices_PesPer <- prices_PesPer %>% na.omit()
+
+## Fed Cattle
+prices_Pes_FedCattle <- prices_PesPer %>% select(Year, psB, Ps20, Ps50, Ps90)
+prices_Pes_FedCattle_20 <- prices_Pes_FedCattle %>% select(Year, psB, Ps20) %>% 
+  mutate(perentChangePS20 = (Ps20-psB)/psB) %>% round(3)
+prices_Pes_FedCattle_20[,-1] <- prices_Pes_FedCattle_20[,-1] * 100
+
+prices_Pes_FedCattle_50 <- prices_Pes_FedCattle %>% select(Year, psB, Ps50) %>% 
+  mutate(perentChangePS50 = (Ps50-psB)/psB) %>% round(3)
+prices_Pes_FedCattle_50[,-1] <- prices_Pes_FedCattle_50[,-1] * 100
+
+prices_Pes_FedCattle_90 <- prices_Pes_FedCattle %>% select(Year, psB, Ps90) %>% 
+  mutate(perentChangePS90 = (Ps90-psB)/psB) %>% round(3)
+prices_Pes_FedCattle_90[,-1] <- prices_Pes_FedCattle_90[,-1] * 100
+
+
+## Cull Cows
+prices_Pes_CullCows <- prices_PesPer %>% select(Year, pcB, Pc20, Pc50, Pc90)
+prices_Pes_CullCows_20 <- prices_Pes_CullCows %>% select(Year, pcB, Pc20) %>% 
+  mutate(perentChangePC20 = (Pc20-pcB)/pcB) %>% round(3)
+prices_Pes_CullCows_20[,-1] <- prices_Pes_CullCows_20[,-1] * 100
+
+prices_Pes_CullCows_50 <- prices_Pes_CullCows %>% select(Year, pcB, Pc50) %>% 
+  mutate(perentChangePC50 = (Pc50-pcB)/pcB) %>% round(3)
+prices_Pes_CullCows_50[,-1] <- prices_Pes_CullCows_50[,-1] * 100
+
+prices_Pes_CullCows_90 <- prices_Pes_CullCows %>% select(Year, pcB, Pc90) %>% 
+  mutate(perentChangePC90 = (Pc90-pcB)/pcB) %>% round(3)
+prices_Pes_CullCows_90[,-1] <- prices_Pes_CullCows_90[,-1] * 100
 
 
 stocks_Pes <- left_join(KBaseline, pesStockPostFMD) %>% filter(Year < pesStockPostFMD$Year[nrow(pesStockPostFMD)])
@@ -214,6 +295,17 @@ pesStockPlotN <- stocks_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
+######## Percentage change in stocks 
+stocks_Pes_Percent <- stocks_Pes %>% na.omit()
+
+stocks_Pes_Percent_20 <- stocks_Pes_Percent %>% select(Year, K, K20) %>% 
+  mutate(perentChangeK20 = ((K20-K)/K)*100) %>% round(3)
+
+stocks_Pes_Percent_50 <- stocks_Pes_Percent %>% select(Year, K, K50) %>% 
+  mutate(perentChangeK50 = ((K50-K)/K)*100) %>% round(3)
+
+stocks_Pes_Percent_90 <- stocks_Pes_Percent %>% select(Year, K, K90) %>% 
+  mutate(perentChangeK50 = ((K90-K)/K)*100) %>% round(3)
 
 
 

@@ -328,6 +328,17 @@ I have to built that in the algorithm.
 
 * Also try putting some weights for prices. Use historical prices to determine the weights. If you put weights to the prices, state it as as assumption.
 
+04/12/2022:
+
+* Showed Chad the new updated results. Chad is satisfied with it. The stocks look like they are approaching equilibrium in the long-run.
+
+* The Fed cattle prices look like they are approaching the pre disease levels. The cull cow prices are higher than the basleine. However, the average cull cow price (long-run average) is falling within the historical bounds. This is okay.
+
+* Now we need to determine how much change we see in the optimistic and pessimistic scenarios to the baseline. Need percentage changes for it.
+
+* Since we have the counterfactuals, it's a simple back of the envelope method to get the producer surplus losses.
+
+* Chad also told me to think about other applications of the model. This disease impacts is a big shock to the system. We shocked it with domestic meat decline, loss of exports, and changes in the stocks in two different scenarios. But think about simple cases like increase in demand, or decrease in demand as such.
 
 
 

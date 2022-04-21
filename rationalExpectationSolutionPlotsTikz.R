@@ -77,10 +77,9 @@ invReplication_plot <- EQestObstotalInventory %>% ggplot(aes(x=Year)) +
                      breaks=c(seq(EQestObstotalInventory$Year[1],
                                   EQestObstotalInventory$Year[nrow(EQestObstotalInventory)], by = 2))) + 
   # geom_hline(yintercept=0, linetype="dashed", color = "black") +
-  theme_classic() + 
+  scale_y_continuous(name="Million Head") + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
-                                             axis.title.y = element_blank()) + 
+  theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(invReplication_plot)
@@ -103,7 +102,7 @@ deTrendedInvReplication_plot <- ddlObsInventory_plot %>% ggplot(aes(x=Year)) +
                      breaks=c(seq(ddlInventory_plot$Year[1],
                                   ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 2))) + 
   geom_hline(yintercept=0, linetype="dashed", color = "black") +
-  theme_classic() + 
+   theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") + 
   theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1),
                                              axis.title.y = element_blank()) + 
