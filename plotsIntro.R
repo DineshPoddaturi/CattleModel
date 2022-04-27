@@ -7,16 +7,15 @@ pc_ps_cwt_plots <- merge(pcs_cwt, pss_cwt) %>% select(Year,pss_cwt, pcs_cwt) %>%
 
 tikz(file="introPlots/PricesReceived.tex", width = 6.2, height = 3.5)
 
-price_plot <- pc_ps_cwt_plots %>% ggplot(aes(x=Year))+
-  geom_line(aes(y=PS, color="Fed Cattle")) +
-  geom_line(aes(y=PC, color="Cull Cow")) +
-  scale_x_continuous(name="Year", 
-                     breaks=c(seq(pc_ps_cwt_plots$Year[1],
-                                  pc_ps_cwt_plots$Year[nrow(pc_ps_cwt_plots)], by = 3))) + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) +
-  scale_y_continuous(name="Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+price_plot <- pc_ps_cwt_plots %>% ggplot(aes(x=Year)) + geom_line(aes(y=PS, color = "Steers and Heifers")) + 
+  geom_line(aes(y=PC, color="Cows")) + 
+  scale_x_continuous(name = "Year", 
+                     breaks = c(seq(pc_ps_cwt_plots$Year[1],pc_ps_cwt_plots$Year[nrow(pc_ps_cwt_plots)], 
+                                    by = 3))) + theme_classic() + 
+  theme(legend.position = "bottom", legend.box = "horizontal", legend.title = element_blank()) +
+  scale_y_continuous(name="Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  
 
 print(price_plot)
 
@@ -37,7 +36,7 @@ beefInventory_plots <- beefInventory %>% transmute(Year = Year, K = K/1000000) %
 tikz(file="introPlots/CattleCycle.tex", width = 6.2, height = 3.5)
 
 inventoryBeef_plot <- beefInventory_plots %>% ggplot(aes(x=Year))+
-  geom_line(aes(y=K, color="Beef Cows")) +
+  geom_line(aes(y=K, color="Beef cows")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(beefInventory_plots$Year[1],
                                   beefInventory_plots$Year[nrow(beefInventory_plots)], by=3))) + theme_classic() + 
@@ -73,7 +72,7 @@ beefReceiptsDomestic_plots <- beefReceipts %>% select(Year,
 tikz(file="introPlots/domesticReceipts.tex", width = 6.2, height = 3.5)
 
 domesticReceipts_plot <- beefReceiptsDomestic_plots %>% ggplot(aes(x=Year))+
-  geom_line(aes(y=domesticReceipts, color="Cash Receipts")) +
+  geom_line(aes(y=domesticReceipts, color="Cash receipts")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(beefReceiptsDomestic_plots$Year[1],
                                   beefReceiptsDomestic_plots$Year[nrow(beefReceiptsDomestic_plots)]))) + theme_classic() + 
@@ -94,7 +93,7 @@ beefValueExport_plots <- beefReceipts %>% select(Year, exportValue)
 tikz(file="introPlots/exportValue.tex", width = 6.2, height = 3.5)
 
 exportValue_plot <- beefValueExport_plots %>% ggplot(aes(x=Year))+
-  geom_line(aes(y=exportValue, color="Export Value")) +
+  geom_line(aes(y=exportValue, color="Export value")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(beefValueExport_plots$Year[1],
                                   beefValueExport_plots$Year[nrow(beefValueExport_plots)]))) + theme_classic() + 
@@ -146,8 +145,8 @@ ddlPrice_plot <- detrend(as.matrix(pc_ps_cwt_plots%>%select(-Year)),tt='linear')
 
 tikz(file="introPlots/PricesReceivedDeTrended.tex", width = 6.2, height = 3)
 
-deTrendedPrice_plot <- ddlPrice_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=PS,color="Fed Cattle Price")) +
-  geom_line(aes(y=PC,color="Cull Cattle Price")) +
+deTrendedPrice_plot <- ddlPrice_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=PS,color="Steers and Heifers")) +
+  geom_line(aes(y=PC,color="Cows")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(ddlPrice_plot$Year[1],
                                   ddlPrice_plot$Year[nrow(ddlPrice_plot)], by = 3))) + 
@@ -170,7 +169,7 @@ ddlInventory_plot <- detrend(as.matrix(beefInventory_plots%>%select(-Year)),tt='
 
 tikz(file="introPlots/CattleCycleDeTrended.tex", width = 6.2, height = 3.5)
 
-deTrendedInv_plot <- ddlInventory_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Beef Cows")) +
+deTrendedInv_plot <- ddlInventory_plot %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Beef cows")) +
   scale_x_continuous(name="Year",
                      breaks=c(seq(ddlInventory_plot$Year[1],
                                   ddlInventory_plot$Year[nrow(ddlInventory_plot)], by = 3))) + 
