@@ -165,8 +165,6 @@ stocks_Opt_Percent_50 <- stocks_Opt_Percent %>% select(Year, K, K50) %>%
 stocks_Opt_Percent_90 <- stocks_Opt_Percent %>% select(Year, K, K90) %>% 
   mutate(perentChangeK50 = ((K90-K)/K)*100) %>% round(3)
 
-
-
 # Pessimistic scenario
 
 ###################### Here I merge the pessimistic case prices and stocks under all depopulation levels
