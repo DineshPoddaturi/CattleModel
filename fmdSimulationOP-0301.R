@@ -107,33 +107,52 @@ prices_OptPer <- prices_OptPer %>% na.omit()
 
 ## Fed Cattle
 prices_Opt_FedCattle <- prices_OptPer %>% select(Year, psB, Ps20, Ps50, Ps90)
+
 prices_Opt_FedCattle_20 <- prices_Opt_FedCattle %>% select(Year, psB, Ps20) %>% 
-  mutate(perentChangePS20 = (Ps20-psB)/psB) %>% round(3)
+  mutate(percentChangePS20 = (Ps20-psB)/psB) %>% round(3)
 prices_Opt_FedCattle_20[,-1] <- prices_Opt_FedCattle_20[,-1] * 100
 
 prices_Opt_FedCattle_50 <- prices_Opt_FedCattle %>% select(Year, psB, Ps50) %>% 
-  mutate(perentChangePS50 = (Ps50-psB)/psB) %>% round(3)
+  mutate(percentChangePS50 = (Ps50-psB)/psB) %>% round(3)
 prices_Opt_FedCattle_50[,-1] <- prices_Opt_FedCattle_50[,-1] * 100
 
 prices_Opt_FedCattle_90 <- prices_Opt_FedCattle %>% select(Year, psB, Ps90) %>% 
-  mutate(perentChangePS90 = (Ps90-psB)/psB) %>% round(3)
+  mutate(percentChangePS90 = (Ps90-psB)/psB) %>% round(3)
 prices_Opt_FedCattle_90[,-1] <- prices_Opt_FedCattle_90[,-1] * 100
+
+prices_Opt_FedCattle_20_agg <- prices_Opt_FedCattle_20 %>% select(Year, percentChangePS20)
+
+prices_Opt_FedCattle_50_agg <- prices_Opt_FedCattle_50 %>% select(Year, percentChangePS50)
+
+prices_Opt_FedCattle_90_agg <- prices_Opt_FedCattle_90 %>% select(Year, percentChangePS90)
+
+prices_Opt_FedCattle_agg <- merge(prices_Opt_FedCattle_20_agg, 
+                                  merge(prices_Opt_FedCattle_50_agg, prices_Opt_FedCattle_90_agg))
 
 
 ## Cull Cows
 prices_Opt_CullCows <- prices_OptPer %>% select(Year, pcB, Pc20, Pc50, Pc90)
+
 prices_Opt_CullCows_20 <- prices_Opt_CullCows %>% select(Year, pcB, Pc20) %>% 
-  mutate(perentChangePC20 = (Pc20-pcB)/pcB) %>% round(3)
+  mutate(percentChangePC20 = (Pc20-pcB)/pcB) %>% round(3)
 prices_Opt_CullCows_20[,-1] <- prices_Opt_CullCows_20[,-1] * 100
 
 prices_Opt_CullCows_50 <- prices_Opt_CullCows %>% select(Year, pcB, Pc50) %>% 
-  mutate(perentChangePC50 = (Pc50-pcB)/pcB) %>% round(3)
+  mutate(percentChangePC50 = (Pc50-pcB)/pcB) %>% round(3)
 prices_Opt_CullCows_50[,-1] <- prices_Opt_CullCows_50[,-1] * 100
 
 prices_Opt_CullCows_90 <- prices_Opt_CullCows %>% select(Year, pcB, Pc90) %>% 
-  mutate(perentChangePC90 = (Pc90-pcB)/pcB) %>% round(3)
+  mutate(percentChangePC90 = (Pc90-pcB)/pcB) %>% round(3)
 prices_Opt_CullCows_90[,-1] <- prices_Opt_CullCows_90[,-1] * 100
 
+prices_Opt_CullCows_20_agg <- prices_Opt_CullCows_20 %>% select(Year, percentChangePC20)
+
+prices_Opt_CullCows_50_agg <- prices_Opt_CullCows_50 %>% select(Year, percentChangePC50)
+
+prices_Opt_CullCows_90_agg <- prices_Opt_CullCows_90 %>% select(Year, percentChangePC90)
+
+prices_Opt_CullCows_agg <- merge(prices_Opt_CullCows_20_agg,
+                                 merge(prices_Opt_CullCows_50_agg, prices_Opt_CullCows_90_agg))
 
 
 ##### 
@@ -157,13 +176,22 @@ optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
 stocks_Opt_Percent <- stocks_Opt %>% na.omit()
 
 stocks_Opt_Percent_20 <- stocks_Opt_Percent %>% select(Year, K, K20) %>% 
-  mutate(perentChangeK20 = ((K20-K)/K)*100) %>% round(3)
+  mutate(percentChangeK20 = ((K20-K)/K)*100) %>% round(3)
 
 stocks_Opt_Percent_50 <- stocks_Opt_Percent %>% select(Year, K, K50) %>% 
-  mutate(perentChangeK50 = ((K50-K)/K)*100) %>% round(3)
+  mutate(percentChangeK50 = ((K50-K)/K)*100) %>% round(3)
 
 stocks_Opt_Percent_90 <- stocks_Opt_Percent %>% select(Year, K, K90) %>% 
-  mutate(perentChangeK50 = ((K90-K)/K)*100) %>% round(3)
+  mutate(percentChangeK90 = ((K90-K)/K)*100) %>% round(3)
+
+stocks_Opt_Percent_20_agg <- stocks_Opt_Percent_20 %>% select(Year, percentChangeK20)
+
+stocks_Opt_Percent_50_agg <- stocks_Opt_Percent_50 %>% select(Year, percentChangeK50)
+
+stocks_Opt_Percent_90_agg <- stocks_Opt_Percent_90 %>% select(Year, percentChangeK90)
+
+stocks_Opt_Percent_agg <- merge(stocks_Opt_Percent_20_agg, 
+                                merge(stocks_Opt_Percent_50_agg, stocks_Opt_Percent_90_agg))
 
 # Pessimistic scenario
 
@@ -247,32 +275,54 @@ prices_PesPer <- prices_PesPer %>% na.omit()
 
 ## Fed Cattle
 prices_Pes_FedCattle <- prices_PesPer %>% select(Year, psB, Ps20, Ps50, Ps90)
+
 prices_Pes_FedCattle_20 <- prices_Pes_FedCattle %>% select(Year, psB, Ps20) %>% 
-  mutate(perentChangePS20 = (Ps20-psB)/psB) %>% round(3)
+  mutate(percentChangePS20 = (Ps20-psB)/psB) %>% round(3)
 prices_Pes_FedCattle_20[,-1] <- prices_Pes_FedCattle_20[,-1] * 100
 
 prices_Pes_FedCattle_50 <- prices_Pes_FedCattle %>% select(Year, psB, Ps50) %>% 
-  mutate(perentChangePS50 = (Ps50-psB)/psB) %>% round(3)
+  mutate(percentChangePS50 = (Ps50-psB)/psB) %>% round(3)
 prices_Pes_FedCattle_50[,-1] <- prices_Pes_FedCattle_50[,-1] * 100
 
 prices_Pes_FedCattle_90 <- prices_Pes_FedCattle %>% select(Year, psB, Ps90) %>% 
-  mutate(perentChangePS90 = (Ps90-psB)/psB) %>% round(3)
+  mutate(percentChangePS90 = (Ps90-psB)/psB) %>% round(3)
 prices_Pes_FedCattle_90[,-1] <- prices_Pes_FedCattle_90[,-1] * 100
+
+prices_Pes_FedCattle_20_agg <- prices_Pes_FedCattle_20 %>% select(Year, percentChangePS20)
+
+prices_Pes_FedCattle_50_agg <- prices_Pes_FedCattle_50 %>% select(Year, percentChangePS50)
+
+prices_Pes_FedCattle_90_agg <- prices_Pes_FedCattle_90 %>% select(Year, percentChangePS90)
+
+prices_Pes_FedCattle_agg <- merge(prices_Pes_FedCattle_20_agg,
+                                  merge(prices_Pes_FedCattle_50_agg, prices_Pes_FedCattle_90_agg))
+
 
 
 ## Cull Cows
 prices_Pes_CullCows <- prices_PesPer %>% select(Year, pcB, Pc20, Pc50, Pc90)
+
 prices_Pes_CullCows_20 <- prices_Pes_CullCows %>% select(Year, pcB, Pc20) %>% 
-  mutate(perentChangePC20 = (Pc20-pcB)/pcB) %>% round(3)
+  mutate(percentChangePC20 = (Pc20-pcB)/pcB) %>% round(3)
 prices_Pes_CullCows_20[,-1] <- prices_Pes_CullCows_20[,-1] * 100
 
 prices_Pes_CullCows_50 <- prices_Pes_CullCows %>% select(Year, pcB, Pc50) %>% 
-  mutate(perentChangePC50 = (Pc50-pcB)/pcB) %>% round(3)
+  mutate(percentChangePC50 = (Pc50-pcB)/pcB) %>% round(3)
 prices_Pes_CullCows_50[,-1] <- prices_Pes_CullCows_50[,-1] * 100
 
 prices_Pes_CullCows_90 <- prices_Pes_CullCows %>% select(Year, pcB, Pc90) %>% 
-  mutate(perentChangePC90 = (Pc90-pcB)/pcB) %>% round(3)
+  mutate(percentChangePC90 = (Pc90-pcB)/pcB) %>% round(3)
 prices_Pes_CullCows_90[,-1] <- prices_Pes_CullCows_90[,-1] * 100
+
+
+prices_Pes_CullCows_20_agg <- prices_Pes_CullCows_20 %>% select(Year, percentChangePC20)
+
+prices_Pes_CullCows_50_agg <- prices_Pes_CullCows_50 %>% select(Year, percentChangePC50)
+
+prices_Pes_CullCows_90_agg <- prices_Pes_CullCows_90 %>% select(Year, percentChangePC90)
+
+prices_Pes_CullCows_agg <- merge(prices_Pes_CullCows_20_agg,
+                                 merge(prices_Pes_CullCows_50_agg, prices_Pes_CullCows_90_agg))
 
 
 stocks_Pes <- left_join(KBaseline, pesStockPostFMD) %>% filter(Year < pesStockPostFMD$Year[nrow(pesStockPostFMD)])
@@ -297,13 +347,134 @@ pesStockPlotN <- stocks_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="
 stocks_Pes_Percent <- stocks_Pes %>% na.omit()
 
 stocks_Pes_Percent_20 <- stocks_Pes_Percent %>% select(Year, K, K20) %>% 
-  mutate(perentChangeK20 = ((K20-K)/K)*100) %>% round(3)
+  mutate(percentChangeK20 = ((K20-K)/K)*100) %>% round(3)
 
 stocks_Pes_Percent_50 <- stocks_Pes_Percent %>% select(Year, K, K50) %>% 
-  mutate(perentChangeK50 = ((K50-K)/K)*100) %>% round(3)
+  mutate(percentChangeK50 = ((K50-K)/K)*100) %>% round(3)
 
 stocks_Pes_Percent_90 <- stocks_Pes_Percent %>% select(Year, K, K90) %>% 
-  mutate(perentChangeK50 = ((K90-K)/K)*100) %>% round(3)
+  mutate(percentChangeK90 = ((K90-K)/K)*100) %>% round(3)
+
+stocks_Pes_Percent_20_agg <- stocks_Pes_Percent_20 %>% select(Year, percentChangeK20)
+
+stocks_Pes_Percent_50_agg <- stocks_Pes_Percent_50 %>% select(Year, percentChangeK50)
+
+stocks_Pes_Percent_90_agg <- stocks_Pes_Percent_90 %>% select(Year, percentChangeK90)
+
+stocks_Pes_Percent_agg <- merge(stocks_Pes_Percent_20_agg, 
+                                merge(stocks_Pes_Percent_50_agg,stocks_Pes_Percent_90_agg))
+
+
+  
+  
+  
+  
+########## ALL aggregated percentage changes data frames
+
+prices_Opt_FedCattle_aggW <- prices_Opt_FedCattle_agg %>% 
+  transmute(Year = Year, `20` = percentChangePS20, 
+            `50` = percentChangePS50, `90` = percentChangePS90) %>% as.data.frame()
+
+prices_Opt_FedCattle_aggW <- 
+  gather(prices_Opt_FedCattle_aggW, depop, value, `20`:`90`, factor_key=TRUE)
+
+prices_Opt_FedCattle_aggW %>% ggplot(aes(fill=depop, y=value, x=Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(prices_Opt_FedCattle_aggW$Year[1],
+                                                 prices_Opt_FedCattle_aggW$Year[nrow(prices_Opt_FedCattle_aggW)]))) + 
+  scale_y_continuous(name="Percent Change") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal") 
+
+# +
+#   scale_fill_manual(values = c("Blue", "Red", "Green"))
+
+
+prices_Opt_CullCows_aggW <- prices_Opt_CullCows_agg %>%
+  transmute(Year = Year, `20` = percentChangePC20, 
+            `50` = percentChangePC50, `90` = percentChangePC90) %>% as.data.frame()
+
+prices_Opt_CullCows_aggW <- 
+  gather(prices_Opt_CullCows_aggW, depop, value, `20`:`90`, factor_key=TRUE)
+
+prices_Opt_CullCows_aggW %>% ggplot(aes(fill=depop, y=value, x = Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(prices_Opt_CullCows_aggW$Year[1],
+                                                 prices_Opt_CullCows_aggW$Year[nrow(prices_Opt_CullCows_aggW)]))) + 
+  scale_y_continuous(name="Percent Change ") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal")
+
+
+
+stocks_Opt_Percent_aggW <- stocks_Opt_Percent_agg %>%
+  transmute(Year = Year, `20` = percentChangeK20, 
+            `50` = percentChangeK50, `90` = percentChangeK90) %>% as.data.frame()
+
+stocks_Opt_Percent_aggW <- 
+  gather(stocks_Opt_Percent_aggW, depop, value, `20`:`90`, factor_key=TRUE)
+
+stocks_Opt_Percent_aggW %>% ggplot(aes(fill=depop, y=value, x = Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(stocks_Opt_Percent_aggW$Year[1],
+                                                 stocks_Opt_Percent_aggW$Year[nrow(stocks_Opt_Percent_aggW)]))) + 
+  scale_y_continuous(name="Percent Change") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal")
+
+
+
+prices_Pes_FedCattle_aggW <- prices_Pes_FedCattle_agg %>%
+  transmute(Year = Year, `20` = percentChangePS20, 
+            `50` = percentChangePS50, `90` = percentChangePS90) %>% as.data.frame()
+
+prices_Pes_FedCattle_aggW <- 
+  gather(prices_Pes_FedCattle_aggW, depop, value, `20`:`90`, factor_key=TRUE)
+
+prices_Pes_FedCattle_aggW %>% ggplot(aes(fill=depop, y=value, x=Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(prices_Pes_FedCattle_aggW$Year[1],
+                                                 prices_Pes_FedCattle_aggW$Year[nrow(prices_Pes_FedCattle_aggW)]))) + 
+  scale_y_continuous(name="Percent Change") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal") 
+
+
+
+prices_Pes_CullCows_aggW <- prices_Pes_CullCows_agg %>%
+  transmute(Year = Year, `20` = percentChangePC20, 
+            `50` = percentChangePC50, `90` = percentChangePC90) %>% as.data.frame()
+
+prices_Pes_CullCows_aggW <- 
+  gather(prices_Pes_CullCows_aggW, depop, value, `20`:`90`, factor_key=TRUE)
+
+prices_Pes_CullCows_aggW %>% ggplot(aes(fill=depop, y=value, x=Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(prices_Pes_CullCows_aggW$Year[1],
+                                                 prices_Pes_CullCows_aggW$Year[nrow(prices_Pes_CullCows_aggW)]))) + 
+  scale_y_continuous(name="Percent Change") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal") 
+
+
+stocks_Pes_Percent_aggW <- stocks_Pes_Percent_agg %>%
+  transmute(Year = Year, `20` = percentChangeK20, 
+            `50` = percentChangeK50, `90` = percentChangeK90) %>% as.data.frame()
+  
+stocks_Pes_Percent_aggW <- 
+  gather(stocks_Pes_Percent_aggW, depop, value, `20`:`90`, factor_key=TRUE)
+
+stocks_Pes_Percent_aggW %>% ggplot(aes(fill=depop, y=value, x=Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(stocks_Pes_Percent_aggW$Year[1],
+                                                 stocks_Pes_Percent_aggW$Year[nrow(stocks_Pes_Percent_aggW)]))) + 
+  scale_y_continuous(name="Percent Change") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal")
+  
+  
+  
+
 
 
 
