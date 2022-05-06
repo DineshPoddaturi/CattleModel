@@ -366,7 +366,7 @@ stocks_Pes_Percent_agg <- merge(stocks_Pes_Percent_20_agg,
 
 
   
-  
+
   
   
 ########## ALL aggregated percentage changes data frames
@@ -472,7 +472,9 @@ stocks_Pes_Percent_aggW %>% ggplot(aes(fill=depop, y=value, x=Year)) +
   theme_test() + 
   theme(legend.position="bottom", legend.box = "horizontal")
   
-  
+
+
+
   
 
 
