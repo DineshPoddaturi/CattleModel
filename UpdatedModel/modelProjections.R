@@ -449,8 +449,8 @@ for(i in 1:nrow(proj_Q_P)){
   int_k3 <- 0
   
   Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
-                         k = k,CapA = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-                         int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, 
+                      k = k,CapA = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+                      int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, 
                       clAvg = cullAvg,dShock = shockD)
   
   slNew <- Qs[1]
@@ -464,8 +464,8 @@ for(i in 1:nrow(proj_Q_P)){
   ANew <- (slNew + clNew) * shockD
   
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
-                              HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew,
-                              params = c(MUtilde, Stilde))
+                           HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew,
+                           params = c(MUtilde, Stilde))
   
   psM <- Ps[1]
   pcM <- Ps[2]
@@ -640,8 +640,8 @@ for(i in 1:nrow(proj_Q_P_up)){
   
   if(i<=1){
     Ps_up <- getPsPcEpsEpc_Proj(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
-                                   HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
-                                   params = c(MUtilde, Stilde))
+                                HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
+                                params = c(MUtilde, Stilde))
   }else{
     Ps_up <- getPsPcEpsEpc_Proj_UP(PsM = psM_up, PcM = pcM_up, EPsM = EpsM_up, EPcM = EpcM_up,
                                    HcM = hcM_up, SlNew = slNew_up, ClNew = clNew_up, ANew = ANew_up,
@@ -808,12 +808,12 @@ for(i in 1:nrow(proj_Q_P_lo)){
   ###### If I change this the prices are projected properly i.e., fed cattle price is always greater than cull cow price
   clCounter_lo <- 0
   slCounter_lo <- 0
-
+  
   while(clNew_lo < 1.01){
     clNew_lo <- clNew_lo + 0.01
     clCounter_lo <- 1
   }
-
+  
   while(slNew_lo < 19.01){
     slNew_lo <- slNew_lo + 0.01
     slCounter_lo <- 1
@@ -829,8 +829,8 @@ for(i in 1:nrow(proj_Q_P_lo)){
   
   if(i<=1){
     Ps_lo <- getPsPcEpsEpc_Proj(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
-                                   HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
-                                   params = c(MUtilde, Stilde))
+                                HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,
+                                params = c(MUtilde, Stilde))
   }else{
     Ps_lo <- getPsPcEpsEpc_Proj_LO(PsM = psM_lo, PcM = pcM_lo, EPsM = EpsM_lo, EPcM = EpcM_lo,
                                    HcM = hcM_lo, SlNew = slNew_lo, ClNew = clNew_lo, ANew = ANew_lo,

@@ -75,30 +75,32 @@ prices_Opt[,-1] <- prices_Opt[,-1] * 100
 
 prices_Opt <- prices_Opt %>% round(3)
 
-optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
-  geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
-  geom_point(aes(y=Ps20, color="20% depop")) + geom_line(aes(y=Ps50, color="50% depop")) + 
-  geom_point(aes(y=Ps50, color="50% depop")) + geom_line(aes(y=Ps90, color="90% depop")) + 
-  geom_point(aes(y=Ps90, color="90% depop")) + 
+optPricesPlot_PS <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline"),size=1.1) + 
+  geom_point(aes(y=psB, color="Baseline"),size=2) + geom_line(aes(y=Ps20, color="20% depop"),size=1.1) + 
+  geom_point(aes(y=Ps20, color="20% depop"),size=2) + geom_line(aes(y=Ps50, color="50% depop"),size=1.1) + 
+  geom_point(aes(y=Ps50, color="50% depop"),size=2) + geom_line(aes(y=Ps90, color="90% depop"),size=1.1) + 
+  geom_point(aes(y=Ps90, color="90% depop"),size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Opt$Year[1],
                                   prices_Opt$Year[nrow(prices_Opt)]))) + theme_classic() + 
   scale_y_continuous(name="Fed Cattle Price") +
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                              axis.text.y = element_text(size = 12))
 
 
-optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline")) + 
-  geom_point(aes(y=pcB, color="Baseline")) + geom_line(aes(y=Pc20, color="20% depop")) + 
-  geom_point(aes(y=Pc20, color="20% depop")) + geom_line(aes(y=Pc50, color="50% depop")) + 
-  geom_point(aes(y=Pc50, color="50% depop")) + geom_line(aes(y=Pc90, color="90% depop")) + 
-  geom_point(aes(y=Pc90, color="90% depop")) + 
+optPricesPlot_PC <- prices_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline"),size=1.1) + 
+  geom_point(aes(y=pcB, color="Baseline"),size=2) + geom_line(aes(y=Pc20, color="20% depop"),size=1.1) + 
+  geom_point(aes(y=Pc20, color="20% depop"),size=2) + geom_line(aes(y=Pc50, color="50% depop"),size=1.1) + 
+  geom_point(aes(y=Pc50, color="50% depop"),size=2) + geom_line(aes(y=Pc90, color="90% depop"),size=1.1) + 
+  geom_point(aes(y=Pc90, color="90% depop"),size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Opt$Year[1],
                                   prices_Opt$Year[nrow(prices_Opt)])))+ theme_classic() +
   scale_y_continuous(name="Cull Cow Price") + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                              axis.text.y = element_text(size = 12)) 
 
 
 ##### Percentage changes in the prices from the basleine
@@ -159,17 +161,18 @@ prices_Opt_CullCows_agg <- merge(prices_Opt_CullCows_20_agg,
 stocks_Opt <- left_join(KBaseline, optStockPostFMD) %>% filter(Year < optStockPostFMD$Year[nrow(optStockPostFMD)])
 stocks_Opt[,-1] <- stocks_Opt[,-1]/1000000
 
-optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"))+ 
-  geom_point(aes(y=K, color="Baseline")) + geom_line(aes(y=K20, color="20% DEPOP"))+ 
-  geom_point(aes(y=K20, color="20% DEPOP")) + geom_line(aes(y=K50, color="50% DEPOP"))+ 
-  geom_point(aes(y=K50, color="50% DEPOP")) + geom_line(aes(y=K90, color="90% DEPOP"))+ 
-  geom_point(aes(y=K90, color="90% DEPOP")) + 
+optStockPlotN <- stocks_Opt %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"),size=1.1)+ 
+  geom_point(aes(y=K, color="Baseline"),size=2) + geom_line(aes(y=K20, color="20% DEPOP"),size=1.1)+ 
+  geom_point(aes(y=K20, color="20% DEPOP"),size=2) + geom_line(aes(y=K50, color="50% DEPOP"),size=1.1)+ 
+  geom_point(aes(y=K50, color="50% DEPOP"),size=2) + geom_line(aes(y=K90, color="90% DEPOP"),size=1.1)+ 
+  geom_point(aes(y=K90, color="90% DEPOP"),size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_Opt$Year[1],
                                   stocks_Opt$Year[nrow(stocks_Opt)]))) + theme_classic() +
   scale_y_continuous(name="Stocks (Million Head)") + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                              axis.text.y = element_text(size = 12))
 
 
 ######## Percentage change in stocks 
@@ -244,30 +247,32 @@ prices_Pes <- left_join(pricesBaseline, pesPricePostFMD) %>% filter(Year <= pesP
 prices_Pes[,-1] <- prices_Pes[,-1] * 100
 prices_Pes <- prices_Pes %>% round(3)
 
-pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline")) + 
-  geom_point(aes(y=psB, color="Baseline")) + geom_line(aes(y=Ps20, color="20% depop")) + 
-  geom_point(aes(y=Ps20, color="20% depop")) + geom_line(aes(y=Ps50, color="50% depop")) + 
-  geom_point(aes(y=Ps50, color="50% depop")) + geom_line(aes(y=Ps90, color="90% depop")) + 
-  geom_point(aes(y=Ps90, color="90% depop")) + 
+pesPricesPlot_PS <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=psB, color="Baseline"),size=1.1) + 
+  geom_point(aes(y=psB, color="Baseline"),size=2) + geom_line(aes(y=Ps20, color="20% depop"),size=1.1) + 
+  geom_point(aes(y=Ps20, color="20% depop"),size=2) + geom_line(aes(y=Ps50, color="50% depop"),size=1.1) + 
+  geom_point(aes(y=Ps50, color="50% depop"),size=2) + geom_line(aes(y=Ps90, color="90% depop"),size=1.1) + 
+  geom_point(aes(y=Ps90, color="90% depop"),size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Pes$Year[1],
                                   prices_Pes$Year[nrow(prices_Pes)]))) + theme_classic() + 
   scale_y_continuous(name="Fed Cattle Price") +
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                              axis.text.y = element_text(size = 12))
 
 
-pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline")) + 
-  geom_point(aes(y=pcB, color="Baseline")) + geom_line(aes(y=Pc20, color="20% depop")) + 
-  geom_point(aes(y=Pc20, color="20% depop")) + geom_line(aes(y=Pc50, color="50% depop")) + 
-  geom_point(aes(y=Pc50, color="50% depop")) + geom_line(aes(y=Pc90, color="90% depop")) + 
-  geom_point(aes(y=Pc90, color="90% depop")) + 
+pesPricesPlot_PC <- prices_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=pcB, color="Baseline"),size=1.1) + 
+  geom_point(aes(y=pcB, color="Baseline"),size=2) + geom_line(aes(y=Pc20, color="20% depop"),size=1.1) + 
+  geom_point(aes(y=Pc20, color="20% depop"),size=2) + geom_line(aes(y=Pc50, color="50% depop"),size=1.1) + 
+  geom_point(aes(y=Pc50, color="50% depop"),size=2) + geom_line(aes(y=Pc90, color="90% depop"),size=1.1) + 
+  geom_point(aes(y=Pc90, color="90% depop"),size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(prices_Pes$Year[1],
                                   prices_Pes$Year[nrow(prices_Pes)]))) + theme_classic() +
   scale_y_continuous(name="Cull Cow Price") + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                              axis.text.y = element_text(size = 12))
 
 ##### Percentage changes in the prices from the basleine
 prices_PesPer <- left_join(pricesBaseline, pesPricePostFMD) %>% filter(Year <= pesPricePostFMD$Year[nrow(pesPricePostFMD)])
@@ -330,17 +335,18 @@ stocks_Pes[,-1] <- stocks_Pes[,-1]/1000000
 
 # stocks_Pes[,-1] <- stocks_Pes[,-1]/1000
 
-pesStockPlotN <- stocks_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"))+ 
-  geom_point(aes(y=K, color="Baseline")) + geom_line(aes(y=K20, color="20% DEPOP"))+ 
-  geom_point(aes(y=K20, color="20% DEPOP")) + geom_line(aes(y=K50, color="50% DEPOP"))+ 
-  geom_point(aes(y=K50, color="50% DEPOP")) + geom_line(aes(y=K90, color="90% DEPOP"))+ 
-  geom_point(aes(y=K90, color="90% DEPOP")) + 
+pesStockPlotN <- stocks_Pes %>% ggplot(aes(x=Year)) + geom_line(aes(y=K, color="Baseline"),size=1.1)+ 
+  geom_point(aes(y=K, color="Baseline"),size=2) + geom_line(aes(y=K20, color="20% DEPOP"),size=1.1)+ 
+  geom_point(aes(y=K20, color="20% DEPOP"),size=2) + geom_line(aes(y=K50, color="50% DEPOP"),size=1.1)+ 
+  geom_point(aes(y=K50, color="50% DEPOP"),size=2) + geom_line(aes(y=K90, color="90% DEPOP"),size=1.1)+ 
+  geom_point(aes(y=K90, color="90% DEPOP"),size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_Pes$Year[1],
                                   stocks_Pes$Year[nrow(stocks_Pes)]))) + theme_classic() +
   scale_y_continuous(name="Stocks (Million Head)") + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                              axis.text.y = element_text(size = 12))
 
 
 ######## Percentage change in stocks 

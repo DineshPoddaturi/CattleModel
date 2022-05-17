@@ -112,18 +112,19 @@ CARD_USDA_FAPRI_PS_plots <- CARD_USDA_FAPRI_PS_Proj
 tikz(file="projectionsLatexPlots/Updated/CARD_USDA_FAPRI_PS.tex",  width=6.2, height=4)
 
 CARD_USDA_FAPRI_PS_plot <- CARD_USDA_FAPRI_PS_plots %>% ggplot(aes(x=Year)) + 
-  geom_line(aes(y=psMedian, color="Fitted")) + geom_point(aes(y = psMedian, color = "Fitted")) + 
-  geom_line(aes(y=Ps_lo, color="Lower bound")) + geom_point(aes(y=Ps_lo, color="Lower bound")) + 
-  geom_line(aes(y=Ps, color="Projected")) + geom_point(aes(y=Ps, color="Projected")) + 
-  geom_line(aes(y=FAPRI_Ps, color="FAPRI"))  + geom_point(aes(y=FAPRI_Ps, color="FAPRI")) + 
-  geom_line(aes(y=USDA_Ps, color="USDA"))  + geom_point(aes(y=USDA_Ps, color="USDA"))  + 
-  geom_line(aes(y=Ps_up, color="Upper bound"))  + geom_point(aes(y=Ps_up, color="Upper bound"))  + 
+  geom_line(aes(y=psMedian, color="Fitted"),size=1.1) + geom_point(aes(y = psMedian, color = "Fitted"),size=2) + 
+  geom_line(aes(y=Ps_lo, color="Lower bound"),size=1.1) + geom_point(aes(y=Ps_lo, color="Lower bound"),size=2) + 
+  geom_line(aes(y=Ps, color="Projected"),size=1.1) + geom_point(aes(y=Ps, color="Projected"),size=2) + 
+  geom_line(aes(y=FAPRI_Ps, color="FAPRI"),size=1.1)  + geom_point(aes(y=FAPRI_Ps, color="FAPRI"),size=2) + 
+  geom_line(aes(y=USDA_Ps, color="USDA"),size=1.1)  + geom_point(aes(y=USDA_Ps, color="USDA"),size=2)  + 
+  geom_line(aes(y=Ps_up, color="Upper bound"),size=1.1)  + geom_point(aes(y=Ps_up, color="Upper bound"),size=2)  + 
   scale_x_continuous(name="Year", breaks=c(seq(CARD_USDA_FAPRI_PS_plots$Year[1],
                                                CARD_USDA_FAPRI_PS_plots$Year[nrow(CARD_USDA_FAPRI_PS_plots)])))  +
   theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
   theme(legend.title=element_blank()) + 
-  scale_y_continuous(name="Fed Cattle Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  scale_y_continuous(name="Fed Cattle Price") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                                      axis.text.y = element_text(size = 12)) + 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(CARD_USDA_FAPRI_PS_plot)
@@ -139,19 +140,20 @@ CARD_USDA_FAPRI_TS_plots <- CARD_USDA_FAPRI_TS_plots %>% round(2)
 tikz(file="projectionsLatexPlots/Updated/CARD_USDA_FAPRI_TS.tex",  width=6.2, height=4)
 
 CARD_USDA_FAPRI_TS_plot <- CARD_USDA_FAPRI_TS_plots %>% ggplot(aes(x=Year)) + 
-  geom_line(aes(y=tsMedian, color="Fitted")) + geom_point(aes(y=tsMedian, color="Fitted")) + 
-  geom_line(aes(y=TS_lo, color="Lower Bound")) + geom_point(aes(y=TS_lo, color="Lower Bound")) + 
-  geom_line(aes(y=TS, color="Projected")) + geom_point(aes(y=TS, color="Projected")) + 
-  geom_line(aes(y=FAPRI_TS, color="FAPRI"))  + geom_point(aes(y=FAPRI_TS, color="FAPRI")) +
-  geom_line(aes(y=USDA_TS, color="USDA"))  + geom_point(aes(y=USDA_TS, color="USDA"))  + 
-  geom_line(aes(y=TS_up, color="Upper Bound"))  + geom_point(aes(y=TS_up, color="Upper Bound"))  + 
+  geom_line(aes(y=tsMedian, color="Fitted"),size=1.1) + geom_point(aes(y=tsMedian, color="Fitted"),size=2) + 
+  geom_line(aes(y=TS_lo, color="Lower Bound"),size=1.1) + geom_point(aes(y=TS_lo, color="Lower Bound"),size=2) + 
+  geom_line(aes(y=TS, color="Projected"),size=1.1) + geom_point(aes(y=TS, color="Projected"),size=2) + 
+  geom_line(aes(y=FAPRI_TS, color="FAPRI"),size=1.1)  + geom_point(aes(y=FAPRI_TS, color="FAPRI"),size=2) +
+  geom_line(aes(y=USDA_TS, color="USDA"),size=1.1)  + geom_point(aes(y=USDA_TS, color="USDA"),size=2)  + 
+  geom_line(aes(y=TS_up, color="Upper Bound"),size=1.1)  + geom_point(aes(y=TS_up, color="Upper Bound"),size=2)  + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(CARD_USDA_FAPRI_TS_plots$Year[1],
                                   CARD_USDA_FAPRI_TS_plots$Year[nrow(CARD_USDA_FAPRI_TS_plots)]))) +
   theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
   theme(legend.title=element_blank()) + 
-  scale_y_continuous(name="Total Supply") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) + 
+  scale_y_continuous(name="Total Supply") + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                                  axis.text.y = element_text(size = 12)) + 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 print(CARD_USDA_FAPRI_TS_plot)
