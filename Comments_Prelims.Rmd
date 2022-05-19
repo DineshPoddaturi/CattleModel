@@ -1,0 +1,91 @@
+---
+title: "Comments from Prelims"
+author: "Poddaturi, Dinesh R"
+date: '2022-05-19'
+output: pdf_document
+---
+
+
+1. John: Asked me at the beginning he was thinking about how the model is applicable for policies. Maybe mention about the policy application at the beginning.
+
+2. Need to be very careful about quantity terminology. 
+
+3. Dermot: How am I including export markets here. And how the trade hit is going to be analyzed in the model. Export markets are different. Their preferences for meat will be different as well. In the model consumer demand is vertically differentiating. I am assuming the retail price of fed cattle meat is always greater than the retail price of cull cow meat. This means the share is always shifting vertically. Should I change this? If I am changing this to what I should change this.
+
+4. Holsteins and non-fed beef/cows are included in the total inventory? Because if I am using cattle inventory that means the data includes Holsteins as well? I am using the culled cows data to get the inverse demand. which means Holsteins are included then. Look into it carefully.
+
+5. Calf-crop data. Mostly this includes the dairy calves data as well. So check that.
+
+6. When showing the fitted prices of fed cattle, the mean and median distribution flipped between 2011-2016. Investigate this and come up with a better answer. 
+
+7. The cattle inventory replication comes with an error. Dan: Maybe dairy cows could be the source of error. Look into this. Perhaps just compare beef cow inventories. 
+
+8. Lee, John, Dermot: In the projections after couple of years the price is falling flat or reverting to mean. USDA prices are reverting to mean immediately. FAPRI takes long to revert back to mean. This is crucial. I need to project the prices must reflect cattle cycle prices.
+
+9. John: Since we fixed the parameters. That could be the case we see this flat projections. (one of the source causing this phenomena)
+
+10. Dermot: Use corn price futures from CME to increase costs or something such that the prices are reflected.
+
+11. In case of decreased price meat consumed would increase. I am fixing the A in the model this could be causing the problem. 
+
+12. Lee: Need to VERY VERY careful when I am saying demand. Demand includes price. Here I am using inverse demand. That means the price is not included. 
+
+13. The committee is okay with Demand being constant. But not the inverse demand. Demand, D = A * p, where A is the inverse demand and p is the price. D can be constant but A and p must be moving. This need to be further investigated and included in the model. 
+
+14. Differentiation between Demand and quantity demanded is critical here. 
+
+
+
+FMD comments
+
+15. Dermot: Feeder cattle imports would be stopped from Canada and Mexico. Imports of boxed beef still flows. 
+
+16. Maybe consider the depop of 5%, 10%, and 20%. The current depop levels are way too high and not realistic at all. 
+
+17. Domestic demand must be added properly. And the prices are acting weird. 
+
+
+18. John: Look at the logistic distribution. If it is not changing then this is the problem. Plot the distribution. If this remains constant then you must figure out how to change this.
+
+19. Dermot: Without depop, change the exports and see how it changes the prices. 
+
+
+Other comments:
+
+20. Dan: Age distribution. I am assuming the younger cows are never culled and assuming for whatever reason they are culled, the parameter delta captures it. But in reality farmers do cull the younger cows. One of the reasons is failure to re breed. Look at the literature about this. Maybe assign different survival probability and make differential for 2 and 3 year old cows, and 4,5,6 older cows. 
+
+21. Birth rate and survival probability. 
+22. Try investigating/incorporating milk price and corn price as well. 
+
+23. Quantity demand must change as the price changes. This needs to be included in the model. Think about how you can include this. 
+
+24. Put something about mu in the appendix. How you are computing this and what data you used to compute this. 
+
+25. Look at mu's and look at what is constant in the model. If everything is constant in the model then something isn't right. At least something should change so that it is reflected in the output. 
+
+26. John: In regards to FMD. The willingness to pay will change. Using the past literature include that in the model. Track where things are moving is crucial. 
+
+
+27. Chad: We need to know for what policies this model doesn't work. 
+
+28. Chad: I am holding the demand A for meat constant. The committee wants the dollars spent constant. Not A (the demand for meat). A20 * p20 = D, A21 * p21 = D. Here these D's can be constant.
+
+29: Graph the shares. Look at the mu's and p's. If I am saying these are same at the equilibrium then that means the logistic is constant.
+
+30. First graph the shares and show them to Chad. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
