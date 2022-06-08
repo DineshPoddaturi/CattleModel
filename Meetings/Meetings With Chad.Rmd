@@ -357,6 +357,18 @@ I have to built that in the algorithm.
 
 06/08/2022:
 
+* The new plots seem good. But need some more information.
+
+* Estimate the production backwards from the current projections estimation method and see how the model estimates the fed cattle and cull cow production.
+
+* Also must come up with market/economics arguments for questions. Specifically the arguments about $\tilde{\mu}$. Historically it's between 2 and 2.5. But in the projections, we see it's jumping up and is going up to 3.00. This means the consumers' willingness to pay for fed cattle meat is around $3. What's the reason?
+We do see a general upward trend in the $\tilde{\mu}$'s so this general upward trend makes sense. 
+However, when we observe the production projections, it is also going up. This is indicating quantity demanded in the future very string. This in-turn loops back to the upward tick in the willingness to pay for high quality meat. 
+
+* In our model A is the Quantity Demanded. Not the demand. Be careful with that. 
+
+* For FMD cap K, use the calf crop from 2008 and the age distribution from that year to get the best estimate for K in 2009, and so on. This way we can get the entire age distribution and corresponding supplies. 
+
 
 
 
