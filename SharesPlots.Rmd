@@ -1,0 +1,147 @@
+---
+title: "Plots of Fitted and Projected"
+output:
+  pdf_document: default
+  word_document: default
+date: "06-08-2022"
+---
+
+<!-- # FITTED -->
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/meanFedShareFitted.png} -->
+<!--   \caption{Mean of Fed Cattle Meat Share - Fitted} -->
+<!-- \end{figure} -->
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/medianFedShareFitted.png} -->
+<!--   \caption{Median of Fed Cattle Meat Share - Fitted} -->
+<!-- \end{figure} -->
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/muMeanFitted.png} -->
+<!--   \caption{Mean of MU - Fitted} -->
+<!-- \end{figure} -->
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/muMedianFitted.png} -->
+<!--   \caption{Median of MU - Fitted} -->
+<!-- \end{figure} -->
+
+<!-- \clearpage -->
+
+# PROJECTED
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/shareFedProjPacket.png}
+  \caption{Fed Cattle Meat Share - Projected - In Prelims}
+\end{figure}
+
+The above is projected with a constant $\tilde{\mu} = 2.11$ and $\tilde{s} = 0.74$
+
+
+## After addition of storage model type estimation for supply and keeping track of age distribution
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/sharePlot.png}
+  \caption{Fed Cattle Meat Share - Projected}
+\end{figure}
+
+The above is projected with a moving $\tilde{\mu}$ and $\tilde{s}$
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/muPlot.png}
+  \caption{MU - Projected}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/psPlot.png}
+  \caption{Fed Cattle Price - Projected with FAPRI USDA Comparisions}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/pcPlot.png}
+  \caption{Cull Cow Price - Projected}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/hcPlot.png}
+  \caption{Holding Costs - Projected}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\caption{Age Distribution}
+\begin{tabular}{llllllllll}
+\hline
+Year &       K &     k3 &     k4 &     k5 &     k6 &     k7 &     k8  &       k9 &k10 \\\hline
+2016 &30163800 &6086400 &5278485 &4899853 &4527454 &4182164 &4211690  &977754.1  & 0\\
+2017 &31170700 &6335200 &5782080 &5014561 &4654860 &4301082 &3973056 &1109861.6  &  0\\
+2018 &31466200 &6363200 &6018440 &5492976 &4763833 &4422117 &4086028  &319606.3  & 0\\
+2019 &31690700 &6108200 &6045040 &5717518 &5218327 &4525641 &4201011  &     0.0   &0\\
+2020 &31338700 &5884900 &5802790 &5742788 &5431642 &4957411 &4299359  &     0.0   &0\\
+2021 &31051044 &5269757 &5590655 &5512650 &5455649 &5160060 &      0  &     0.0   &0\\
+2022 &31063066 &5384695 &5006269 &5311122 &5237018 &5182866 &4902057  &     0.0   &0\\
+2023 &31157824 &5945207 &5115460 &4755956 &5045566 &4975167 &4923723  &     0.0   &0\\
+2024 &31209654 &6178027 &5647946 &4859687 &4518158 &4793288 &4726409  &     0.0   &0\\
+2025 &31194386 &6455054 &5869126 &5365549 &4616703 &4292250 &4553623  &     0.0   &0\\
+2026 &31159438 &5973039 &6132302 &5575669 &5097271 &4385868 &4077637  &     0.0   &0\\
+2027 &31145681 &5661790 &5674387 &5825687 &5296886 &4842408 &4166574  &     0.0   &0\\
+2028 &31154580 &5822151 &5378701 &5390668 &5534402 &5032042 &4600287  &     0.0   &0\\
+2029 &31166811 &5843665 &5531044 &5109766 &5121134 &5257682 &4780440  &     0.0   &0\\
+2030 &31169867 &6254248 &5551482 &5254492 &4854277 &4865077 &4994798  &     0.0   &0\\\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Meat Production}
+\begin{tabular}{lll}
+\hline
+Year &  Fed Cattle Meat & Cull Cow Meat\\\hline
+2016 &21.388 &2.757\\
+2017 &21.544 &3.199\\
+2018 &22.477 &2.905\\
+2019 &22.986 &2.412\\
+2020 &24.174 &2.522\\
+2021 &23.700 &3.310\\
+2022 &24.010 &3.320\\
+2023 &23.540 &3.190\\
+2024 &23.450 &3.070\\
+2025 &23.430 &2.750\\
+2026 &23.530 &2.810\\
+2027 &23.570 &3.100\\
+2028 &23.550 &3.230\\
+2029 &23.530 &3.370\\
+2030 &23.510 &3.120\\\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/slPlot.png}
+  \caption{Fed Cattle Meat Production - Projected}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/clPlot.png}
+  \caption{Cull Cow Meat Production - Projected}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/APlot.png}
+  \caption{Demand for Meat - Projected}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+

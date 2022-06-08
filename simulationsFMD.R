@@ -1,6 +1,37 @@
 
 
 ##### Global functions
+
+lossfn_FMDProj <- function(theta,e,ps,pc){
+  mu <- theta[1]
+  s <- theta[2]
+  
+  v <- sum((e - ((( mu - ((ps-pc)/phi)))/s)))^2
+  
+  return(v)
+}
+
+optParamFunction_FMDProj <- function(sl, cl, ps, pc, thetas, adj){
+  
+  s <- sl
+  c <- cl
+  
+  sl_share <- s/((s+c) * adj)
+  cl_share <- 1-sl_share
+  
+  tilde <- log((1-cl_share)/cl_share)
+  
+  theta0 <- thetas
+  
+  out <- BBoptim(par= theta0, fn = lossfn_FMDProj, e = tilde ,ps=ps, pc=pc)
+  
+  muTilde <- out$par[1]
+  sTilde <- out$par[2]
+  
+  return(c(muTilde,sTilde))
+  
+}
+
 get_k0s_Global_FMD <- function(proj_Q_P, beefINV_FORECAST, calfCrop){
   
   k0s_df <- data.frame(Year = numeric(nrow(proj_Q_P)), k02 = numeric(nrow(proj_Q_P)) , k03 = numeric(nrow(proj_Q_P)), 
@@ -348,15 +379,18 @@ estQFunction_test_FMD_EQ <- function(tilde_MU, tilde_s, ps, pc, K1, k, A, gamma_
   k03 <- k0s$k03
   k02 <- k0s$k02
   
-  # slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
-  # clShare <- (1-slShare)
+  slShare <- shareMetric(paramMu = tilde_MU, paramS = tilde_s, ps = ps, pc = pc)
+  clShare <- (1-slShare)
   
   gamma <- gamma_k3
   eta <- eta_k3
   int <- int_k3
   
-  slHead <- slDem * (1000000000/slAvg)  
-  clHead <- clDem * (1000000000/clAvg)
+  slHead <- (A * slShare) * (1000000000/slAvg)
+  clHead <- (A * clShare) * (1000000000/clAvg)
+  
+  # slHead <- slDem * (1000000000/slAvg)  
+  # clHead <- clDem * (1000000000/clAvg)
   
   F1 <- g * K1 - k3t2 - slHead
   
@@ -393,64 +427,64 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
   }
   
   
-  if(depops == 20){
+  # if(depops == 20){
     
     # psNew <- psNew + 0.02
     
-    psNew_lo <- psNew  - 0.1
-    pcNew_lo <- pcNew - 0.25
-    
-    psNew_up <- psNew + 0.5
-    pcNew_up <- pcNew + 0.08
+    psNew_lo <- psNew  - 0.5
+    pcNew_lo <- pcNew - 0.3
+  
+    psNew_up <- psNew + 0.05
+    pcNew_up <- pcNew + 0.05
     
     # psNew_expected <- psNew_expected + 0.025
     
-    psNew_expected_lo <- psNew_expected - 0.05
+    psNew_expected_lo <- psNew_expected - 0.5
     
-    psNew_expected_up <- psNew_expected + 0.5
+    psNew_expected_up <- psNew_expected + 0.1
     
-    pcNew_expected_lo <- pcNew_expected 
+    pcNew_expected_lo <- pcNew_expected - 0.5
     
     pcNew_expected_up <- pcNew_expected + 0.1
     
     
-  }else if(depops == 50){
-    
-    
-    psNew_lo <- psNew  - 0.2
-    pcNew_lo <- pcNew - 0.4
-    
-    psNew_up <- psNew + 0.1
-    pcNew_up <- pcNew + 0.08
-    
-    # psNew_expected <- psNew_expected + 0.0125
-    
-    psNew_expected_lo <- psNew_expected - 0.1
-    
-    psNew_expected_up <- psNew_expected + 0.25
-    
-    pcNew_expected_lo <- pcNew_expected 
-    
-    pcNew_expected_up <- pcNew_expected + 0.15
-    
-  }else if (depops == 90){
-    
-    psNew_lo <- psNew  - 0.2
-    pcNew_lo <- pcNew - 0.4
-    
-    psNew_up <- psNew + 0.1
-    pcNew_up <- pcNew + 0.08
-    
-    # psNew_expected <- psNew_expected + 0.001
-    
-    psNew_expected_lo <- psNew_expected - 0.1
-    
-    psNew_expected_up <- psNew_expected + 0.25
-    
-    pcNew_expected_lo <- pcNew_expected - 0.1
-    
-    pcNew_expected_up <- pcNew_expected + 0.15
-  }
+  # }else if(depops == 50){
+  #   
+  #   
+  #   psNew_lo <- psNew  - 0.2
+  #   pcNew_lo <- pcNew - 0.4
+  #   
+  #   psNew_up <- psNew + 0.1
+  #   pcNew_up <- pcNew + 0.08
+  #   
+  #   # psNew_expected <- psNew_expected + 0.0125
+  #   
+  #   psNew_expected_lo <- psNew_expected - 0.1
+  #   
+  #   psNew_expected_up <- psNew_expected + 0.25
+  #   
+  #   pcNew_expected_lo <- pcNew_expected 
+  #   
+  #   pcNew_expected_up <- pcNew_expected + 0.15
+  #   
+  # }else if (depops == 90){
+  #   
+  #   psNew_lo <- psNew  - 0.2
+  #   pcNew_lo <- pcNew - 0.4
+  #   
+  #   psNew_up <- psNew + 0.1
+  #   pcNew_up <- pcNew + 0.08
+  #   
+  #   # psNew_expected <- psNew_expected + 0.001
+  #   
+  #   psNew_expected_lo <- psNew_expected - 0.1
+  #   
+  #   psNew_expected_up <- psNew_expected + 0.25
+  #   
+  #   pcNew_expected_lo <- pcNew_expected - 0.1
+  #   
+  #   pcNew_expected_up <- pcNew_expected + 0.15
+  # }
   
   
   #### Here we are making sure the lower bound for the prices isn't negative
@@ -647,6 +681,8 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
   
   capK_k3_depopFMD <- dePop(stock = Stock, dePopRate = dePopR) %>% select(Year, K, k3) %>% filter(Year <= 2010)
   
+  # capK_k_depopFMD <- dePop(stock = Stock, dePopRate = dePopR) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9, k10) %>% filter(Year <= 2010)
+  
   slHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(slSM) %>% max()
   clHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(clSM) %>% max()
   
@@ -711,6 +747,10 @@ simOptimisticFMD <- function(calf_cropF, dePopR, modelParamsEQ_PreFMD, exports_p
          (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
     
     clDemand <- capA_pre * (1/(1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
+    
+    ##### Here I have to use the storage model type specification to get 
+    ##### the approximation of the supplies. 
+    ##### For this I must have the age distribution and also keep track of it. 
     
     Qs <- getSlClA_test_FMD_EQ(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
                                k = k, CapA = capA_pre, gamma_k3 = gamma_k3,
@@ -1304,12 +1344,32 @@ FMD_AllDF_EQ <- Reduce(function(...) merge(...),
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+##### Beef exports data
+beefExports <- read_excel("Data/Meat-BeefVeal-Exports/Meat-BeefVeal-Exports.xlsx") %>% as.data.frame()
+beefExports <- beefExports %>% select(-`Unit Description`, -Commodity, -Country)
+
+exportsBeef <- data.frame(t(beefExports[-1]))
+colnames(exportsBeef) <- beefExports[,1]
+exportsBeef <- exportsBeef %>% mutate(Year = c(rownames(exportsBeef)))
+exportsBeef <- exportsBeef %>% select(Year,everything())
+rownames(exportsBeef) <- seq(1, nrow(exportsBeef))
+########## Changing the units (the original units are in 1000 MT)
+exportsBeef[,-1] <- (exportsBeef[,-1] * 1000 * (2204.68))
+
+########## Now converting meat to billion pounds ############
+exportsBeef[,-1] <- exportsBeef[,-1]/1000000000
+
+
+
+# 5%, 10%, and 20%.
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 20
+dePopR <- 5
 calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year <= 2009)
 calf_crop_PostFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR) %>% as.data.frame()
+
+calf_crop_PostFMD <- calf_crop_PreFMD %>% tail(10)
 
 modelParamsEQ_PreFMD <- FMD_AllDF_EQ %>% filter(Year == 2009)
 
@@ -1318,6 +1378,9 @@ cullAvg_pre <-  modelParamsEQ_PreFMD$Cull_avg
 
 MUtilde_pre <- modelParamsEQ_PreFMD$muMedian
 Stilde_pre <- modelParamsEQ_PreFMD$sMedian
+
+slSM_pre <- modelParamsEQ_PreFMD$slMedian
+clSM_pre <- modelParamsEQ_PreFMD$clMedian
 
 psM_pre <- modelParamsEQ_PreFMD$psMedian
 pcM_pre <- modelParamsEQ_PreFMD$pcMedian
@@ -1331,18 +1394,25 @@ capK_pre <- modelParamsEQ_PreFMD$K
 
 adjF_pre <- modelParamsEQ_PreFMD$AdjFactor
 
-exports_2008 <- exports %>% filter(Year == 2008) %>% select(Exports) %>% as.numeric()
-exports_2008_meat <- exports_2008 * (slaughterAvg_pre/1000000000)
-exports_2008_meat <- round(exports_2008_meat,1)
-exports_percent <- round((exports_2008_meat/capA_pre) * 100,3)
+slShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$slShock)
+clShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$clShock)
 
+#### I convert exported live animals from number of head to pounds in meat
+exports_2009_Live <- exports %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+exports_2009_LiveMeat <- exports_2009_Live * (slaughterAvg_pre/1000000000)
+#### Here I get the exported meat and add this and the above
+exportsBeef_2009 <- exportsBeef %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+totalBeefExportsMeat_2009 <- round(exports_2009_LiveMeat + exportsBeef_2009, 3)
+# beefMeatExports_percent <- round((totalBeefExportsMeat_2009/capA_pre) * 100,3)
 capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
-exports_percentK <- round((exports_2008_meat/capK_pre_meat) * 100,3)
+exports_percentK <- round((totalBeefExportsMeat_2009/capK_pre_meat) * 100,3)
 
 nn <- 10
-beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn+1), K = numeric(nn+1), k3 = numeric(nn+1))
+beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = NA, k3 = NA,
+                                        k4 =  NA, k5 =  NA, k6 =  NA, 
+                                        k7 =  NA, k8 =  NA, k9 =  NA)
 
-beefINV_FORECAST_PostFMD$Year <- seq(from=2010, to=2010+nn)
+beefINV_FORECAST_PostFMD$Year <- seq(from=2010, to=2010+nn-1)
 
 # beefINV_FORECAST_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), dePopRate = dePopR)
 # beefINV_FORECAST_PostFMD[2,] <- dePop(stock = Stock %>% filter(Year == 2011), dePopRate = dePopR)
@@ -1353,7 +1423,8 @@ proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeri
                                repHeif = numeric(nn), repHeif_Head = numeric(nn),
                                boundCond = numeric(nn), repHeif_HeadOG = numeric(nn),
                                Sl_Head_OG = numeric(nn), Cl_Head_OG = numeric(nn),
-                               Sl_Head_EQ = numeric(nn), Cl_Head_EQ = numeric(nn))
+                               Sl_Head_EQ = numeric(nn), Cl_Head_EQ = numeric(nn),
+                               muTilde = numeric(nn), sTilde = numeric(nn), sh = numeric(nn))
 
 k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
                           k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
@@ -1363,7 +1434,45 @@ k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,],
                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
                                       calfCrop = calf_crop_PostFMD)
 
-#  I will also hav to depopulate the k0s as well
+
+stockForecastFMD <- Stock %>% filter(Year < 2010)
+mergedForecastFMD <- merge(stockForecastFMD, beefINV_FORECAST_PostFMD, all=TRUE) %>% filter(Year >= 1995)
+
+# mergedForecastFMD$k3[mergedForecastFMD$Year==2010] <- mergedForecastFMD$k3[mergedForecastFMD$Year==2009]
+
+quantitiesSLCLFMD <- quantities %>% select(Year, sl, cl) %>% filter(Year < 2010 & Year >= 1995)
+wtAVGFMD <- allStockShocks %>% select(Year, Slaughter_avg, Cull_avg) %>% filter(Year < 2010 & Year >= 1995)
+quantsWeightsFMD <- merge(quantitiesSLCLFMD, wtAVGFMD)
+
+impExpFMD <- stocksImportsExports %>% select(Year, Imports, Exports) %>% filter(Year < 2010 & Year >= 1995)
+
+quantsWeightsFMD <- merge(quantsWeightsFMD, impExpFMD, all=TRUE)
+
+mergedForecastFMD <- merge(mergedForecastFMD, quantsWeightsFMD, all=TRUE)
+
+mergedForecastFMD <- fill(mergedForecastFMD, Cull_avg, .direction = 'down')
+mergedForecastFMD <- fill(mergedForecastFMD, Slaughter_avg, .direction = 'down')
+
+mergedForecastFMD$k3[mergedForecastFMD$Year==2010] <- g * mergedForecastFMD$K[mergedForecastFMD$Year==2008] - 
+  (mergedForecastFMD$sl[mergedForecastFMD$Year==2009] * (1000000000/mergedForecastFMD$Slaughter_avg[mergedForecastFMD$Year==2009]) - 
+     mergedForecastFMD$Imports[mergedForecastFMD$Year==2009] + mergedForecastFMD$Exports[mergedForecastFMD$Year==2009])
+
+mergedForecastFMD <- mergedForecastFMD %>% mutate(k4 = delta * lag(k3), k5 = delta * lag(k4), k6 = delta * lag(k5),
+                                                  k7 = delta * lag(k6), k8 = delta * lag(k7), 
+                                                  k9 = if_else((K - (k3+k4+k5+k6+k7+k8)) < 0, 0, (K - (k3+k4+k5+k6+k7+k8))),
+                                                  k10 = 0) %>% filter(Year > 2000)
+
+#### Here I simply replace the NA's of k9 
+require(imputeTS)
+mergedForecastFMD <- mergedForecastFMD %>% mutate(k9 = 
+                                                    na_ma(k9, k = 8, weighting = "exponential", maxgap = Inf))
+
+# coalesce(k9,delta * lag(k8))
+
+
+mergedForecastFMD$K[mergedForecastFMD$Year==2010] <- mergedForecastFMD %>% filter(Year == 2010) %>% mutate(K= k3+k4+k5+k6+k7+k8+k9) %>% select(K) %>% as.numeric()
+
+#  I will also have to depopulate the k0s as well
 # k0s_PostFMD[1,] <- dePop(stock = Stock %>% filter(Year == 2010), dePopRate = dePopR)
 
 # k0s_PostFMD[2,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[2,],
@@ -1403,36 +1512,229 @@ clHeadDiff <- NULL
 slHeadDiff <- NULL
 headRatio <- NULL
 
+proj_Q_P_PostFMD$Year <- seq(beefINV_FORECAST_PostFMD$Year[1], beefINV_FORECAST_PostFMD$Year[nrow(beefINV_FORECAST_PostFMD)], 
+                             by = 1)
+mergedForecastFMD_Proj <- mergedForecastFMD %>% filter(Year >= beefINV_FORECAST_PostFMD$Year[1]-8)
+
+#### Since I know the supply of fed cattle meat and cull cow meat in 2009, by using 2008 K I can get the replacement heifers 
+#### in 2010. Note : This is done because we must know the approximate supply of both types of meat in 2010 to get the prices.
+# mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year==2010] <- 
+#   g * mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year==2008] - 
+#   (mergedForecastFMD_Proj$sl[mergedForecastFMD_Proj$Year==2009] * (1000000000/mergedForecastFMD_Proj$Slaughter_avg[mergedForecastFMD_Proj$Year==2009]) - 
+#      mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year==2009] + mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year==2009])  
+
+# mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year==2010] <- mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year==2009]
+
+slNewPre <- slSM_pre
+clNewPre <- clSM_pre
+
+params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewPre, cl = clNewPre, 
+                                                 ps = psM_pre, pc = pcM_pre, thetas = c(1,1), adj = 1)
+
+MUtilde_pre <- params_mu_s_FMDProj[1]
+Stilde_pre <- params_mu_s_FMDProj[2]
+
+
 
 for(i in 1: nrow(proj_Q_P_PostFMD)){
   
-  # i <- 1
+  i <- 1
   
-  capA_pre <- modelParamsEQ_PreFMD$A
+  yearIFMD <- proj_Q_P_PostFMD$Year[i]
+  
+  # capA_pre <- modelParamsEQ_PreFMD$A
+  
+  ##### Here I construct the supply of cull cow meat
+  k6nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k6)
+  k7nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k7)
+  k8nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k8)
+  k9nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k9)
+  clShnFMD <- clShock2009
+  cAvgFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Cull_avg)
+  clmFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(cl)
+  ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
+  # k9n <- 0
+  clNewFMD <-  ((k9nFMD + (1-delta) * k8nFMD + (1-delta) * k7nFMD) * clShnFMD +
+               (delta * (k8nFMD + k7nFMD + k6nFMD) - (k7nFMD + k8nFMD + k9nFMD)) )* (cAvgFMD/1000000000)
+  clNewFMD <- as.numeric(clNewFMD)
+  
+  ##### Here I construct the supply of fed cattle meat
+  slm1FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(sl)
+  
+  slShmFMD <- slShock2009
+  Km2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(K)
+  Km3FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-4) %>% select(K)
+  k9m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k9)
+  k8m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k8)
+  k7m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k7)
+  fedAvgFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>%select(Slaughter_avg)
+  ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
+  ## This might change if the imports are increased. I do not add imports in the analysis for now.
+  # k9m2FMD <- 0
+  slNewFMD <- ((g - 0.37 * g) * Km2FMD * slShmFMD +
+              ((1 - 0.37 * g) * g * delta * (Km2FMD - (g - 0.37 * g) * Km3FMD -
+                                               (k9m2FMD + (1-delta) * k8m2FMD + (1-delta) * k7m2FMD)))) * (fedAvgFMD/1000000000)
+  slNewFMD <- as.numeric(slNewFMD)
+  
+  
+  ANewFMD <- (slNewFMD + clNewFMD) * adjF_pre
+  capAFMD <- ANewFMD
+  
+  capAFMD <- capA_pre
+  
+  #### Changes in the demand for beef
+  if(i == 1){
+    # i < 4
+    # i == 1
+    capAFMD <- capAFMD - capAFMD * (5/100) + capAFMD * (exports_percentK/100)
+  }else if(i == 2){
+    # i >= 4 && i <= 5 
+    # i == 2
+    capAFMD <- capAFMD + capAFMD * (exports_percentK/100)
+  }else{
+    capAFMD <- capAFMD
+  }
+  
+  K1[i] <- capK_pre
+  
+  k <- 0
+  k0s <- k0s_PostFMD[i,-1]
+  int_k3 <- 0
+  
+  slaughterAvgFMD <- as.numeric(mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Slaughter_avg))
+  cullAvgFMD <- as.numeric(mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Cull_avg))
+  
+  k_old_headFMD <- g * K1[i] - (slNewFMD * (1000000000/slaughterAvgFMD))
+  
+  QsFMD <- getSlClA_test_FMD_EQ(params = c(MUtilde_pre, Stilde_pre), PsM = psM_pre, PcM = pcM_pre, K1 = K1[i],
+                             k = k, CapA = capAFMD, gamma_k3 = gamma_k3,
+                             eta_k3 = eta_k3 , int_k3 = int_k3, adjF = adjF_pre, k0s = k0s,
+                             slAvg = slaughterAvgFMD, clAvg = cullAvgFMD, slDem = slNewFMD, clDem = clNewFMD)
+  
+  ### From the above function, of the returned values I check whether the supplies are greater than the 
+  ### constructed supplies. If yes, then I use them as my supply. I also use the replacement heifers determined
+  ### from the above to append my age distribution.
+  
+  # if(QsFMD[1] > slNewFMD){
+    slNewFMD <- QsFMD[1]
+  # }
+  # if(QsFMD[2]> clNewFMD){
+    clNewFMD <- QsFMD[2]
+  # }
+  
+  k_oldFMD <-  QsFMD[4]
+  k_old_head1FMD <-  QsFMD[5]
+  
+  mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD+1] <- k_old_head1FMD
+  
+  # if(!is.integer(mergedForecastFMD_Proj$k9[mergedForecastFMD_Proj$Year == yearIFMD+1])){
+  #   mergedForecastFMD_Proj$k9[mergedForecastFMD_Proj$Year == yearIFMD+1] <- 
+  #     delta * mergedForecastFMD_Proj$k8[mergedForecastFMD_Proj$Year == yearIFMD]
+  #   mergedForecastFMD_Proj$k10[mergedForecastFMD_Proj$Year == yearIFMD+1] <- 0
+  # }
+  
+  
+  if(!is.integer(mergedForecastFMD_Proj$k4[mergedForecastFMD_Proj$Year == yearIFMD+2])){
+    mergedForecastFMD_Proj$k4[mergedForecastFMD_Proj$Year == yearIFMD+2] <- 
+      delta * mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD+1]
+    mergedForecastFMD_Proj$k5[mergedForecastFMD_Proj$Year == yearIFMD+3] <- 
+      delta * mergedForecastFMD_Proj$k4[mergedForecastFMD_Proj$Year == yearIFMD+2]
+    mergedForecastFMD_Proj$k6[mergedForecastFMD_Proj$Year == yearIFMD+4] <- 
+      delta * mergedForecastFMD_Proj$k5[mergedForecastFMD_Proj$Year == yearIFMD+3]
+    mergedForecastFMD_Proj$k7[mergedForecastFMD_Proj$Year == yearIFMD+5] <- 
+      delta * mergedForecastFMD_Proj$k6[mergedForecastFMD_Proj$Year == yearIFMD+4]
+    mergedForecastFMD_Proj$k8[mergedForecastFMD_Proj$Year == yearIFMD+6] <- 
+      delta * mergedForecastFMD_Proj$k7[mergedForecastFMD_Proj$Year == yearIFMD+5]
+    # mergedForecastFMD_Proj$k9[mergedForecastFMD_Proj$Year == yearIFMD+7] <- 
+    #   delta * mergedForecastFMD_Proj$k8[mergedForecastFMD_Proj$Year == yearIFMD+6]
+  }
+  
+  mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD+1] <- 
+    mergedForecastFMD_Proj %>% filter(Year == yearIFMD+1) %>% mutate(K= k3+k4+k5+k6+k7+k8+k9) %>% select(K) %>% as.numeric()
+  
+  # k9k10 <- mergedForecast_Proj %>% filter(Year == yearI+1) %>%
+  #   mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9), k10 = 0)
+  # mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI+1] <- k9k10$k9
+  # mergedForecast_Proj$k10[mergedForecast_Proj$Year == yearI+1] <- k9k10$k10
+  
+  mergedForecastFMD_Proj$cl[mergedForecastFMD_Proj$Year == yearIFMD] <- clNewFMD
+  mergedForecastFMD_Proj$sl[mergedForecastFMD_Proj$Year == yearIFMD] <- slNewFMD
+  
+  # ANewFMD <- (slNewFMD + clNewFMD) * adjF_pre
+  
+  ANewFMD <- capAFMD
+  
+  shFMD <- ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
+              (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
+  
+  proj_Q_P_PostFMD$muTilde[i] <- MUtilde_pre
+  proj_Q_P_PostFMD$sTilde[i] <- Stilde_pre
+  proj_Q_P_PostFMD$sh[i] <- shFMD
+  
+  PsFMD <- getPsPcEpsEpc_FMD_EQ(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
+                             HcM = hcM_pre, SlNew = slNewFMD, ClNew = clNewFMD, ANew = ANewFMD, 
+                             params = c(MUtilde_pre, Stilde_pre),depops = dePopR)
+  
+  psM_pre <- PsFMD[1]
+  pcM_pre <- PsFMD[2]
+  hcM_pre <- PsFMD[3]
+  EpsM_pre <- PsFMD[4]
+  EpcM_pre <- PsFMD[5]
+  
+  proj_Q_P_PostFMD$Ps[i] <- psM_pre
+  proj_Q_P_PostFMD$Pc[i] <- pcM_pre
+  proj_Q_P_PostFMD$Hc[i] <- hcM_pre
+  proj_Q_P_PostFMD$EPs[i] <- EpsM_pre
+  proj_Q_P_PostFMD$EPc[i] <- EpcM_pre
+  
+  proj_Q_P_PostFMD$muTilde[i] <- MUtilde_pre
+  proj_Q_P_PostFMD$sTilde[i] <- Stilde_pre
+  proj_Q_P_PostFMD$sh[i] <- shFMD
+  
+  proj_Q_P_PostFMD$Sl[i] <- slNewFMD
+  proj_Q_P_PostFMD$Cl[i] <- clNewFMD
+  proj_Q_P_PostFMD$A[i] <- ANewFMD
+  proj_Q_P_PostFMD$repHeif[i] <- k_oldFMD
+  proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_head1FMD
+  
+  proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_head1FMD) <= 0.5 * g * K1[i]
+  
+  beefINV_FORECAST_PostFMD[i,] <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
+  
+  calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
+                                                     k0 = g * beefINV_FORECAST_PostFMD$K[i])
+  
+  
+  k0s_PostFMD[i+1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[i+1,], 
+                                        beefINV_FORECAST = beefINV_FORECAST_PostFMD[i+1,], 
+                                        calfCrop = calf_crop_PostFMD)
+  
+  capK_pre <- beefINV_FORECAST_PostFMD[i,]$K
+  
+  params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewFMD, cl = clNewFMD, 
+                                                  ps = psM_pre, pc = pcM_pre, thetas = c(1,1), adj = 1)
+  MUtilde_pre <- params_mu_s_FMDProj[1]
+  Stilde_pre <- params_mu_s_FMDProj[2]
+  
+  
+  
+  
+  
+  
+  
   
   if(i==1){
-    capK_pre <- capK_k3_depopFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-1) %>% select(K) %>% as.numeric()
+    capK_pre <- mergedForecastFMD %>% filter(Year == yearIFMD-2) %>% select(K) %>% as.numeric()
   }else{
     capK_pre <- beefINV_FORECAST_PostFMD$K[i-1]
   }
   
-  #### Changes in the demand for beef
-  if(i < 4){
-    # i < 4
-    # i == 1
-    capA_pre <- capA_pre - capA_pre * (5/100) + capA_pre * (exports_percentK/100)
-  }else if(i >= 4 && i <= 5 ){
-    # i >= 4 && i <= 5 
-    # i == 2
-    capA_pre <- capA_pre + capA_pre * (exports_percentK/100)
-  }else{
-    capA_pre <- capA_pre
-  }
+  
   
   if(i <= 3){
-    matureYoungs <- capK_k3_depopFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(K) %>% as.numeric()
+    matureYoungs <- mergedForecastFMD %>% filter(Year == yearIFMD-2) %>% select(K) %>% as.numeric()
   } else{
-    matureYoungs <- beefINV_FORECAST_PostFMD %>% filter(Year == beefINV_FORECAST_PostFMD$Year[i]-2) %>% select(K) %>% as.numeric()
+    matureYoungs <- beefINV_FORECAST_PostFMD %>% filter(Year == yearIFMD-2) %>% select(K) %>% as.numeric()
   }
   
   # capK_pre <- capK_pre + 0.5 * delta * calfCrop
@@ -1445,6 +1747,7 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   k0s <- k0s_PostFMD[i,-1]
   int_k3 <- 0
   
+  ##### Here I must construct the supply with the storage model type equation from the age distribution
   slDemand <- capA_pre *
     ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
        (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))

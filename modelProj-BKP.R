@@ -226,7 +226,7 @@ shareMetric <- function(paramMu, paramS, ps, pc){
   
 }
 
-estPFunction_Proj <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s, hc_new){
+estPFunction_Proj <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s){
   
   ps <- p[1]
   pc <- p[2]
@@ -234,7 +234,7 @@ estPFunction_Proj <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s,
   Eps3 <- p[3]
   Epc1 <- p[4]
   
-  # hc_new <- p[5]
+  hc <- p[5]
   
   F1 <- sl - A * ((exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s))/(1 + (exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s))))
   
@@ -242,7 +242,7 @@ estPFunction_Proj <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s,
   
   F3 <- B - ps + g * (beta^3) * Eps3 - hc_discounted
   
-  F4 <- pc - beta * Epc1 - g * (beta^3) * Eps3 + (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  F4 <- pc - beta * Epc1 - g * (beta^3) * Eps3 + (1 + g * beta * (gamma0 + beta * gamma1)) * hc
   
   F <- F1^2 + F2^2 + F3^2 + F4^2
   
@@ -367,8 +367,8 @@ StildeMin <- min(proj_AllDF_EQ$sMedian)
 shockD <- mean(tail(proj_AllDF_EQ, n=1)$dShock)
 adjF <- mean(tail(proj_AllDF_EQ, n=1)$AdjFactor)
 
-slShockHist <- mean(tail(allStockShocks, n=1)$slShock)
-clShockHist <- mean(tail(allStockShocks, n=1)$clShock)
+slShockHist <- mean(tail(allStockShocks,n=1)$slShock)
+clShockHist <- mean(tail(allStockShocks,n=1)$clShock)
 
 k_old <- 0
 
@@ -384,10 +384,10 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   pcNew <- PcM
   
   psNew_lo <- psNew  - 0.05
-  pcNew_lo <- pcNew - 0.08
+  pcNew_lo <- pcNew - 0.05
   
-  psNew_up <- psNew + 0.08
-  pcNew_up <- pcNew + 0.1
+  psNew_up <- psNew + 0.15
+  pcNew_up <- pcNew + 0.15
   
   #### Here we are making sure the lower bound for the prices isn't negative
   if(psNew_lo < 0){
@@ -406,22 +406,22 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   psNew_expected <- EPsM
   pcNew_expected <- EPcM
   
-  # while(psNew_expected < psNew){
+  # if(psNew_expected < psNew){
   #   psNew_expected <- psNew_expected + 0.05
   # }
   # 
-  # while(pcNew_expected < pcNew){
+  # if(pcNew_expected < pcNew){
   #   pcNew_expected <- pcNew_expected + 0.05
   # }
   
   
-  psNew_expected_lo <- psNew_expected - 0.2
+  psNew_expected_lo <- psNew_expected - 0.5
   
-  psNew_expected_up <- psNew_expected + 0.1
+  psNew_expected_up <- psNew_expected + 0.8
   
-  pcNew_expected_lo <- pcNew_expected - 0.2
+  pcNew_expected_lo <- pcNew_expected - 0.5
   
-  pcNew_expected_up <- pcNew_expected + 0.1
+  pcNew_expected_up <- pcNew_expected + 0.8
   
   while(pcNew_expected_lo < pcNew){
     pcNew_expected_lo <- pcNew_expected_lo + 0.1
@@ -432,11 +432,11 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   }
   
   while(psNew_expected_up < psNew){
-    psNew_expected_up <- psNew_expected_up + 0.1
+    psNew_expected_up <- psNew_expected_up + 0.2
   }
   
   while(pcNew_expected_up < pcNew){
-    pcNew_expected_up <- pcNew_expected_up + 0.1
+    pcNew_expected_up <- pcNew_expected_up + 0.2
   }
   
   # hc_new <- HcM
@@ -446,16 +446,16 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   
   #### Here we make sure that the holding costs are below the cull cow price
   while(hc_new > pcNew){
-    hc_new <- hc_new - 0.1
+    hc_new <- hc_new - 0.01
   }
   
   hc_new_lo <- hc_new - 0.1
   hc_new_up <- hc_new + 0.1
-
+  
   while(hc_new_lo<0){
     hc_new_lo <- hc_new_lo + 0.1
   }
-
+  
   while(hc_new_up > pcNew_up){
     hc_new_up <- hc_new_up - 0.1
   }
@@ -463,24 +463,20 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   hc_discounted <- ((1-(beta^7))/(1-beta)) * (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
   B <- psNew - g * (beta^3) * psNew_expected + hc_discounted
   
-  p <- c(psNew, pcNew, psNew_expected, pcNew_expected)
+  p <- c(psNew, pcNew, psNew_expected, pcNew_expected, hc_new)
   
-  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo)
-  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up)
-  
-  # SlNew <- slNew
-  # ClNew <- clNew
-  # params <- c(MUtilde, Stilde)
+  lo <- c(psNew_lo, pcNew_lo, psNew_expected_lo, pcNew_expected_lo, hc_new_lo)
+  up <- c(psNew_up, pcNew_up, psNew_expected_up, pcNew_expected_up, hc_new_up)
   
   estPNew <- BBoptim(par = p, fn = estPFunction_Proj, sl = SlNew, cl = ClNew, A = ANew, 
                      B = B, hc_discounted = hc_discounted, lower = lo, upper = up,
-                     tilde_MU = params[1], tilde_s = params[2], hc_new = hc_new)
+                     tilde_MU = params[1], tilde_s = params[2])
   
   ps1N <- estPNew$par[1]
   pc1N <- estPNew$par[2]
   ps_expected1N <- estPNew$par[3]
   pc_expected1N <- estPNew$par[4]
-  # hc1N <- estPNew$par[5]
+  hc1N <- estPNew$par[5]
   
   hc1N <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) *
     (beta * pc_expected1N + g * (beta^3) * ps_expected1N - pc1N)
@@ -541,10 +537,12 @@ mergedForecast_Proj <- mergedForecast %>% filter(Year >= beefINV_FORECAST$Year[1
 
 proj_Q_P$Year <- seq(beefINV_FORECAST$Year[1], beefINV_FORECAST$Year[nrow(beefINV_FORECAST)]+1, by = 1)
 
+# EpsM <- sum(as.numeric(psM) * fedMeshCheb)
+# EpcM <- sum(as.numeric(pcM) * cullMeshCheb)
 
 for(i in 1:(nrow(proj_Q_P)-1)){
   
-  # i <- 10
+  i <- 1
   
   sh <- ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
   
@@ -556,83 +554,58 @@ for(i in 1:(nrow(proj_Q_P)-1)){
   
   slI <- mergedForecast_Proj %>% filter(Year == yearI) %>% select(sl) %>% as.numeric()
   clI <- mergedForecast_Proj %>% filter(Year == yearI) %>% select(cl) %>% as.numeric()
-
+  
   if((is.na(slI) | is.na(clI))){
-    
-    
-    # expectedValue_k9 <- beta * EpcM + g * (beta^3) * EpsM - (1+g*beta*(gamma0+beta*gamma1)) * hcM
-    # 
-    # expectedValue_k9 <- round(expectedValue_k9,2)
-    # 
-    # #If expectedValue_k9 is > pc then we have 9 year olds in the stock , else we cull all the 9 year olds. 
-    # # This mean no more 10 year olds. See pages 35 and so on in dissertation
-    # if(expectedValue_k9 > pcM){
-    #   # We should have 9-year olds in the stock. All 10-years are culled.
-    #   k9_Old <- 1
-    # }else if(expectedValue_k9 == pcM){
-    #   # We should have 8-year olds in the stock. All 10-years and 9-years are culled 
-    #   k9_Old <- 0
-    # } else if(expectedValue_k9 < pcM){
-    #   # We should have 7-year olds in the stock, All the 10,9,8 year old cows are culled
-    #   k9_Old <- 2
-    # }
-    # 
-    # if(k9_Old == 1){
-    #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI-1) %>%
-    #     mutate(k9 = delta * k8) %>% mutate(k9 = if_else(k9 < 0, 0, k9)) %>% select(k9) %>% as.numeric()
-    # }else if(k9_Old == 0) {
-    #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- 0
-    # } else if(k9_Old == 2){
-    #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- 0
-    #   mergedForecast_Proj$k8[mergedForecast_Proj$Year == yearI] <- 0
-    #   mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI-1) %>%
-    #     mutate(k7 = delta * k6) %>% select(k7) %>% as.numeric()
-    # }
     
     if(is.na(clI)){
       k6n <- mergedForecast_Proj %>% filter(Year == yearI-1) %>% select(k6)
       k7n <- mergedForecast_Proj %>% filter(Year == yearI-1) %>% select(k7)
       k8n <- mergedForecast_Proj %>% filter(Year == yearI-1) %>% select(k8)
       k9n <- mergedForecast_Proj %>% filter(Year == yearI-1) %>% select(k9)
+      # clShn <- mergedForecast_Proj %>% filter(Year == yearI-1) %>% select(clShock)
       clShn <- clShockHist
-      clShn <- 1
-      # clShn <- mergedForecast_Proj %>% filter(Year == yearI) %>% select(clShock)
       cAvg <- mergedForecast_Proj %>% filter(Year == yearI) %>% select(Cull_avg)
+      clm <- mergedForecast_Proj %>% filter(Year == yearI-1) %>% select(cl)
+      ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
+      # k9n <- 0
       clNew <-  ((k9n + (1-delta) * k8n + (1-delta) * k7n) * clShn +
-                    (delta * (k8n + k7n + k6n) - (k7n + k8n + k9n)) )* (cAvg/1000000000)
-      clNew <- round(as.numeric(clNew),2)
+                   (delta * (k8n + k7n + k6n) - (k7n + k8n + k9n)) )* (cAvg/1000000000)
+      clNew <- as.numeric(clNew)
     }else{
-      clNew <- round(as.numeric(clI),2)
+      clNew <- as.numeric(clI)
     }
     
     if(is.na(slI)){
       slm1 <- mergedForecast_Proj %>% filter(Year == yearI-2) %>% select(sl)
+      
+      # slShm1 <- mergedForecast_Proj %>% filter(Year == yearI-2) %>% select(slShock)
       slShm1 <- slShockHist
-      slShm1 <- 1
-      # slShm1 <- mergedForecast_Proj %>% filter(Year == yearI) %>% select(slShock)
       Km2 <- mergedForecast_Proj %>% filter(Year == yearI-3) %>% select(K)
       Km3 <- mergedForecast_Proj %>% filter(Year == yearI-4) %>% select(K)
       k9m2 <- mergedForecast_Proj %>% filter(Year == yearI-3) %>% select(k9)
       k8m2 <- mergedForecast_Proj %>% filter(Year == yearI-3) %>% select(k8)
       k7m2 <- mergedForecast_Proj %>% filter(Year == yearI-3) %>% select(k7)
       fedAvg <- mergedForecast_Proj %>% filter(Year == yearI-1) %>%select(Slaughter_avg)
+      ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
+      ## This might change if the imports are increased. I do not add imports in the analysis for now.
+      # k9m2 <- 0
       slNew <- ((g - 0.37 * g) * Km2 * slShm1 +
-        ((1 - 0.37 * g) * g * delta * (Km2 - (g - 0.37 * g) * Km3 -
-                                         (k9m2 + (1-delta) * k8m2 + (1-delta) * k7m2)))) * (fedAvg/1000000000)
-      slNew <- round(as.numeric(slNew),2)
+                  ((1 - 0.37 * g) * g * delta * (Km2 - (g - 0.37 * g) * Km3 -
+                                                   (k9m2 + (1-delta) * k8m2 + (1-delta) * k7m2)))) * (fedAvg/1000000000)
+      slNew <- as.numeric(slNew)
     }else{
-      slNew <- round(as.numeric(slI),2)
+      slNew <- as.numeric(slI)
     }
     
     ANew <- as.numeric((slNew + clNew))
     
-    # capA <- ANew  * adjF
+    capA <- ANew  * adjF
     
     k <- 0
     
     K1 <- capK
     
-    # k0s <- k0s_df[i,-1]
+    k0s <- k0s_df[i,-1]
     
     int_k3 <- 0
     
@@ -647,54 +620,78 @@ for(i in 1:(nrow(proj_Q_P)-1)){
     
     k_old_head <- g * K1 - slDemHead + imprts - exprts
     
+    # Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
+    #                     k = k, CapA = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
+    #                     int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg,
+    #                     clAvg = cullAvg, dShock = shockD, sl = slNew, cl = clNew)
+    
+    ### From the above function, of the returned values I check whether the supplies are greater than the 
+    ### constructed supplies. If yes, then I use them as my supply. I also use the replacement heifers determined
+    ### from the above to append my age distribution.
+    
+    #   if(Qs[1] > slNew){
+    #     slNew <- Qs[1]
+    #   }
+    #   if(Qs[2]> clNew){
+    #     clNew <- Qs[2]
+    #   }
+    # 
+    # k_old <-  Qs[4]
+    # k_old_head1 <-  Qs[5]
+    
     mergedForecast_Proj$k3[mergedForecast_Proj$Year == yearI] <- k_old_head
     
-    expectedValue_k9 <- beta * EpcM + g * (beta^3) * EpsM - (1+g*beta*(gamma0+beta*gamma1)) * hcM
-
-    # expectedValue_k9 <- round(expectedValue_k9,2)
-
-    #If expectedValue_k9 is > pc then we have 9 year olds in the stock , else we cull all the 9 year olds.
+    expectedValue_k9 <- beta * Epcm + g * (beta^3) * EpsM - (1+g*beta*(gamma0+beta*gamma1)) * hcM
+    
+    #If expectedValue_k9 is > pc then we have 9 year olds in the stock , else we cull all the 9 year olds. 
     # This mean no more 10 year olds. See pages 35 and so on in dissertation
-    if(round(expectedValue_k9,2) > round(pcM,2)){
+    if(expectedValue_k9 > pcM){
       # We should have 9-year olds in the stock. All 10-years are culled.
       k9_Old <- 1
-    }else if(round(expectedValue_k9,2) == round(pcM,2)){
-      # We should have 8-year olds in the stock. All 10-years and 9-years are culled
+    }else if(expectedValue_k9 = pcM){
+      # We should have 8-year olds in the stock. All 10-years and 9-years are culled 
       k9_Old <- 0
-    } else if(round(expectedValue_k9,2) < round(pcM,2)){
+    } else if(expectedValue_k9 < pcM){
       # We should have 7-year olds in the stock, All the 10,9,8 year old cows are culled
       k9_Old <- 2
     }
-
+    
     if(k9_Old == 1){
       mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI) %>%
         mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9)) %>% select(k9) %>% as.numeric()
     }else if(k9_Old == 0) {
       mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- 0
-    } else if(k9_Old == 2){
+    } else if(k9_Old <- 2){
       mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- 0
       mergedForecast_Proj$k8[mergedForecast_Proj$Year == yearI] <- 0
-      mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI-1) %>%
-        mutate(k7 = delta * k6) %>% select(k7) %>% as.numeric()
     }
-
-
+    
+    # if(!is.integer(mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI])){
+    #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI) %>%
+    #     mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9)) %>% select(k9) %>% as.numeric()
+    #   # mergedForecast_Proj$k10[mergedForecast_Proj$Year == yearI+1] <- 0
+    # }
+    
     if(!is.integer(mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1])){
-      mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1] <-
+      mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1] <- 
         delta * mergedForecast_Proj$k3[mergedForecast_Proj$Year == yearI]
-      mergedForecast_Proj$k5[mergedForecast_Proj$Year == yearI+2] <-
+      mergedForecast_Proj$k5[mergedForecast_Proj$Year == yearI+2] <- 
         delta * mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1]
-      mergedForecast_Proj$k6[mergedForecast_Proj$Year == yearI+3] <-
+      mergedForecast_Proj$k6[mergedForecast_Proj$Year == yearI+3] <- 
         delta * mergedForecast_Proj$k5[mergedForecast_Proj$Year == yearI+2]
-      mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI+4] <-
+      mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI+4] <- 
         delta * mergedForecast_Proj$k6[mergedForecast_Proj$Year == yearI+3]
-      mergedForecast_Proj$k8[mergedForecast_Proj$Year == yearI+5] <-
+      mergedForecast_Proj$k8[mergedForecast_Proj$Year == yearI+5] <- 
         delta * mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI+4]
     }
     
+    # k9k10 <- mergedForecast_Proj %>% filter(Year == yearI+1) %>%
+    #   mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9), k10 = 0)
+    # mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI+1] <- k9k10$k9
+    # mergedForecast_Proj$k10[mergedForecast_Proj$Year == yearI+1] <- k9k10$k10
+    
     mergedForecast_Proj$cl[mergedForecast_Proj$Year == yearI] <- clNew
     mergedForecast_Proj$sl[mergedForecast_Proj$Year == yearI] <- slNew
-    
   }else{
     slNew <- as.numeric(slI)
     clNew <- as.numeric(clI)
@@ -702,17 +699,37 @@ for(i in 1:(nrow(proj_Q_P)-1)){
   
   ANew <- (slNew + clNew) * adjF
   
+  # hcM <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * EpcM + g * (beta^3) * EpsM - pcM)
+  
+  # while(EpsM < psM){
+  #   EpsM <- psM
+  # }
+  # 
+  # if(i>2){
+  #   if(EpcM < proj_Q_P$EPc[i-1]){
+  #     EpcM <- proj_Q_P$EPc[i-1]
+  #   }
+  # }
+  
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
                            HcM = hcM, SlNew = as.numeric(slNew), ClNew = as.numeric(clNew), 
                            ANew = as.numeric(ANew),
                            params = c(MUtilde, Stilde))
-  # Ps <- round(Ps,2)
   
   psM <- Ps[1]
   pcM <- Ps[2]
   hcM <- Ps[3]
   EpsM <- Ps[4]
   EpcM <- Ps[5]
+  
+  slDem_Proj  <- ANew *
+    ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
+  
+  clDem_Proj  <- ANew *
+    (1/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
+  
+  slDiff_Proj <- slNew - slDem_Proj
+  clDiff_Proj <- clNew - clDem_Proj
   
   proj_Q_P$Ps[i] <- psM
   proj_Q_P$Pc[i] <- pcM
@@ -736,58 +753,13 @@ for(i in 1:(nrow(proj_Q_P)-1)){
                                             thetas = c(1,1), adj = 1)
   MUtilde <- params_mu_s_Proj[1]
   Stilde <- params_mu_s_Proj[2]
-   
+  
   if(i>1){
     proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
   }
   
   capA <- ANew
   capK <- beefINV_FORECAST$K[i]
-  
-  
-  # expectedValue_k9 <- beta * EpcM + g * (beta^3) * EpsM - (1+g*beta*(gamma0+beta*gamma1)) * hcM
-  # 
-  # expectedValue_k9 <- round(expectedValue_k9,2)
-  # 
-  # #If expectedValue_k9 is > pc then we have 9 year olds in the stock , else we cull all the 9 year olds.
-  # # This mean no more 10 year olds. See pages 35 and so on in dissertation
-  # if(expectedValue_k9 > pcM){
-  #   # We should have 9-year olds in the stock. All 10-years are culled.
-  #   k9_Old <- 1
-  # }else if(expectedValue_k9 == pcM){
-  #   # We should have 8-year olds in the stock. All 10-years and 9-years are culled
-  #   k9_Old <- 0
-  # } else if(expectedValue_k9 < pcM){
-  #   # We should have 7-year olds in the stock, All the 10,9,8 year old cows are culled
-  #   k9_Old <- 2
-  # }
-  # 
-  # if(k9_Old == 1){
-  #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI) %>%
-  #     mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9)) %>% select(k9) %>% as.numeric()
-  # }else if(k9_Old == 0) {
-  #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- 0
-  # } else if(k9_Old == 2){
-  #   mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- 0
-  #   mergedForecast_Proj$k8[mergedForecast_Proj$Year == yearI] <- 0
-  #   mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI-1) %>%
-  #     mutate(k7 = delta * k6) %>% select(k7) %>% as.numeric()
-  # }
-  # 
-  # 
-  # if(!is.integer(mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1])){
-  #   mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1] <-
-  #     delta * mergedForecast_Proj$k3[mergedForecast_Proj$Year == yearI]
-  #   mergedForecast_Proj$k5[mergedForecast_Proj$Year == yearI+2] <-
-  #     delta * mergedForecast_Proj$k4[mergedForecast_Proj$Year == yearI+1]
-  #   mergedForecast_Proj$k6[mergedForecast_Proj$Year == yearI+3] <-
-  #     delta * mergedForecast_Proj$k5[mergedForecast_Proj$Year == yearI+2]
-  #   mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI+4] <-
-  #     delta * mergedForecast_Proj$k6[mergedForecast_Proj$Year == yearI+3]
-  #   mergedForecast_Proj$k8[mergedForecast_Proj$Year == yearI+5] <-
-  #     delta * mergedForecast_Proj$k7[mergedForecast_Proj$Year == yearI+4]
-  # }
-  
   
 }
 
