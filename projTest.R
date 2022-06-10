@@ -72,10 +72,138 @@ clFun <-function(stocksALL){
 
 
 
+### Here I am estimating the production back and check whether my projected projection makes a 
+### connection with the existing data. For this I am using the projected data frame.
+
+#### First I will add some rows above to the data frame
+
+mergedForecast_backCast <- mergedForecast %>% filter(Year < mergedForecast_Proj$Year[1])
+
+mergedForecast_Proj_BackCast <- rbind(mergedForecast_backCast, mergedForecast_Proj)
+
+mergedForecast_Proj_BackCastBKP <- mergedForecast_Proj_BackCast
+
+for (i in 1:nrow(mergedForecast_Proj_BackCast)) {
+  
+  # i <- 6
+  
+  yearBackCast <- mergedForecast_Proj_BackCast$Year[i]
+  
+  if(yearBackCast == 2021){
+    break
+  }else{
+    
+    #### Getting cl Production
+    k6nB <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-1) %>% select(k6) %>% as.numeric()
+    k7nB <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-1) %>% select(k7) %>% as.numeric()
+    k8nB <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-1) %>% select(k8) %>% as.numeric()
+    k9nB <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-1) %>% select(k9) %>% as.numeric()
+    clShnB <- 1
+    cAvgB <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast) %>% select(Cull_avg)
+    clNewB <-  ((k9nB + (1-delta) * k8nB + (1-delta) * k7nB) * clShnB +
+                 (delta * (k8nB + k7nB + k6nB) - (k7nB + k8nB + k9nB)) )* (cAvgB/1000000000)
+    
+    clNewB <- round(as.numeric(clNewB),2)
+    
+    #### Getting sl Production
+    slm1B <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-2) %>% select(sl) %>% as.numeric()
+    slShm1B <- 1
+    Km2B <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-3) %>% select(K) %>% as.numeric()
+    Km3B <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-4) %>% select(K) %>% as.numeric()
+    k9m2B <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-3) %>% select(k9) %>% as.numeric()
+    k8m2B <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-3) %>% select(k8) %>% as.numeric()
+    k7m2B <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-3) %>% select(k7) %>% as.numeric()
+    fedAvgB <- mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast-1) %>%select(Slaughter_avg) %>% as.numeric()
+    
+    fedImprts <- as.numeric(mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast - 2) %>% select(Imports)) %>% as.numeric()
+    fedExprts <- as.numeric(mergedForecast_Proj_BackCast %>% filter(Year == yearBackCast - 2) %>% select(Exports)) %>% as.numeric()
+    
+    fedNetImpExp <- fedImprts - fedExprts
+    
+    slNewB <- ((g - 0.37 * g) * Km2B * slShm1B +
+                ((1 - 0.37 * g) * g * delta * (Km2B - (g - 0.37 * g) * Km3B -
+                                                 (k9m2B + (1-delta) * k8m2B + (1-delta) * k7m2B))) ) * (fedAvgB/1000000000)
+    
+    # slNewB <- ((g - 0.37 * g) * Km2B * slShm1B +
+    #              ((1 - 0.37 * g) * g * delta * (Km2B - (g - 0.37 * g) * Km3B -
+    #                                               (k9m2B + (1-delta) * k8m2B + (1-delta) * k7m2B))) + fedNetImpExp) * (fedAvgB/1000000000)
+    
+    slNewB <- round(as.numeric(slNewB), 2)
+  }
+  
+  mergedForecast_Proj_BackCast$sl[i] <- slNewB
+  mergedForecast_Proj_BackCast$cl[i] <- clNewB
+  
+}
+
+
+mergedForecast_Proj_BC <- mergedForecast_Proj_BackCast %>% filter(!is.na(sl)) %>% 
+  mutate(slBC = sl, clBC = cl) %>% select(Year, slBC, clBC) %>% filter(Year < 2021 & Year >=2018)
+
+mergedForecast_Proj_BC_SL <- merge(estProj_SLV, mergedForecast_Proj_BC, all=TRUE) %>%
+  select(-errMean, -errmedian, -slMean, -clBC)
+
+mergedForecast_Proj_BC_CL <- merge(estProj_CLV, mergedForecast_Proj_BC, all=TRUE) %>%
+  select(-errMean, -errmedian, -clMean, -slBC)
+
+mergedForecast_Proj_BC_SL <- mergedForecast_Proj_BC_SL %>% 
+  mutate(Sl = coalesce(Sl,slBC)) %>% select(Year, slMedian, Sl) %>% filter(Year > 2015)
+
+mergedForecast_Proj_BC_CL <- mergedForecast_Proj_BC_CL %>%
+  mutate(Cl = coalesce(Cl,clBC)) %>% select(Year, clMedian, Cl) %>% filter(Year > 2015)
+
+estProj_SLV_plotsBC <- mergedForecast_Proj_BC_SL %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=slMedian, color="SL Fitted")) +
+  geom_point(aes(y = slMedian, color = "SL Fitted")) +
+  geom_line(aes(y=Sl, color="SL PROJECTION")) +
+  geom_point(aes(y=Sl, color="SL PROJECTION"))+
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(estProj_SLV$Year[1],
+                                  estProj_SLV$Year[nrow(estProj_SLV)])))+ 
+  scale_y_continuous(name="Fed Cattle Production") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+
+estProj_CLV_plotsBC <- mergedForecast_Proj_BC_CL %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=clMedian, color="CL Fitted")) +
+  geom_point(aes(y = clMedian, color = "CL Fitted")) +
+  geom_line(aes(y=Cl, color="CL PROJECTION")) +
+  geom_point(aes(y=Cl, color="CL PROJECTION"))+
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(estProj_CLV$Year[1],
+                                  estProj_CLV$Year[nrow(estProj_CLV)])))+ 
+  scale_y_continuous(name="Cull Cow Production") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+
+
+##### The below plots of fed cattle (Imports and exports are included. Specifically, I used lagged - 2 years imports and exports) 
+##### and cull cow production
+estProj_SLV_plotsBC_IE <- estProj_SLV_plotsBC
+
+estProj_CLV_plotsBC
+
+#### From the above plots it is apparent from back casting of the production, both fed cattle and cull cow 
+#### meat production is over estimated in the year 2020. This back casting is purely related to age distribution.
+#### Note: Since I already have the age distribution determined. I may not have to use the prices in that specific
+#### years to get the production. However, I can and should be able to back cast with prices too. 
+#### In an instance of using the prices to back cast, the age distribution might change. As the data is already observed
+#### I may not have to do that.
+#### When back casting the production, I am assuming the market is functioning properly. But as we know we did had 
+#### a huge exogenous shock in 2019-2020. So this might be the case we see a bug jump in the supply of the meat.
 
 
 
+##### The below plots of fed cattle and cull cow production
+estProj_SLV_plotsBC_NIE <- estProj_SLV_plotsBC
 
+estProj_CLV_plotsBC
+
+## In the case where I do not include the exports and imports, purely from the age distribution, the model underestimated 
+## fed cattle production back casting. When I closely observe the production of fed cattle, the supply is increasing 
+## overtime from 2018 and so on.
 
 
 
