@@ -3,32 +3,32 @@ title: "Plots of Fitted and Projected"
 output:
   pdf_document: default
   word_document: default
-date: "06-08-2022"
+date: "06-13-2022"
 ---
 
-<!-- # FITTED -->
+# FITTED
 
-<!-- \begin{figure} -->
-<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/meanFedShareFitted.png} -->
-<!--   \caption{Mean of Fed Cattle Meat Share - Fitted} -->
-<!-- \end{figure} -->
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/meanFedShareFitted.png}
+  \caption{Mean of Fed Cattle Meat Share - Fitted}
+\end{figure}
 
-<!-- \begin{figure} -->
-<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/medianFedShareFitted.png} -->
-<!--   \caption{Median of Fed Cattle Meat Share - Fitted} -->
-<!-- \end{figure} -->
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/medianFedShareFitted.png}
+  \caption{Median of Fed Cattle Meat Share - Fitted}
+\end{figure}
 
-<!-- \begin{figure} -->
-<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/muMeanFitted.png} -->
-<!--   \caption{Mean of MU - Fitted} -->
-<!-- \end{figure} -->
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/muMeanFitted.png}
+  \caption{Mean of MU - Fitted}
+\end{figure}
 
-<!-- \begin{figure} -->
-<!--   \includegraphics[width=1.1\linewidth]{SharesPlot/muMedianFitted.png} -->
-<!--   \caption{Median of MU - Fitted} -->
-<!-- \end{figure} -->
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/muMedianFitted.png}
+  \caption{Median of MU - Fitted}
+\end{figure}
 
-<!-- \clearpage -->
+\clearpage
 
 # PROJECTED
 
@@ -133,8 +133,26 @@ Year &  Fed Cattle Meat & Cull Cow Meat\\\hline
   \caption{Demand for Meat - Projected}
 \end{figure}
 
+\clearpage
 
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/slBackCast.png}
+  \caption{Fed Cattle Meat Production - Projected and Backcasted}
+\end{figure}
 
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{SharesPlot/06-08/clBackCast.png}
+  \caption{Cull Cow Meat Production - Projected and Backcasted}
+\end{figure}
+
+\begin{flushleft}
+From the above plots it is apparent from back casting of the production, both fed cattle and cull cow 
+meat production is over estimated in the year 2020. This back casting is purely related to age distribution.
+Note: Since I already have the age distribution determined. I may not have to use the prices in that specific
+years to get the production. However, I can and should be able to back cast with prices too. 
+In an instance of using the prices to back cast, the age distribution might change. As the data is already observed
+I may not have to do that. When back casting the production, I am assuming the market is functioning properly. But as we know we did had a huge exogenous shock in 2019-2020. So this might be the case we see a bug jump in the supply of the meat.
+\end{flushleft}
 
 
 

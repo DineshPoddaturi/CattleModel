@@ -434,11 +434,11 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     
     # psNew <- psNew + 0.02
     
-    psNew_lo <- psNew  - 0.3
-    pcNew_lo <- pcNew - 0.3
+    psNew_lo <- psNew  - 0.1
+    pcNew_lo <- pcNew - 0.1
   
-    psNew_up <- psNew + 0.1
-    pcNew_up <- pcNew + 0.1
+    psNew_up <- psNew + 0.25
+    pcNew_up <- pcNew + 0.25
     
     #### Here we are making sure the lower bound for the prices isn't negative
     if(psNew_lo < 0){
@@ -463,11 +463,10 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     pcNew_expected_up <- pcNew_expected + 0.1
     
     # while(pcNew_expected_lo < pcNew){
-    #   pcNew_expected_lo <- pcNew_expected_lo + 0.05
+    #   pcNew_expected_lo <- pcNew
     # }
-    # 
     # while(psNew_expected_lo < psNew){
-    #   psNew_expected_lo <- psNew_expected_lo + 0.05
+    #   psNew_expected_lo <- psNew
     # }
     # 
     # while(psNew_expected_up < psNew){
@@ -1376,16 +1375,14 @@ exportsBeef[,-1] <- exportsBeef[,-1]/1000000000
 
 ##### Now I have calf-crop until 2009
 ##### Now I have calf-crop until 2009
-dePopR <- 5
-calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year <= 2009)
-calf_crop_PostFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR) %>% as.data.frame()
-
-#### Checking the calf crop and K data inconsistencies
-stock_PreFMD <- Stock %>% select(Year, K, k3) %>% filter(Year <= 2009)
-
-stock_CC_PreFMD <- merge(stock_PreFMD, merge(calf_crop_PreFMD,modelParamsEQ_PreFMD))
-
-calf_crop_PostFMD <- calf_crop_PreFMD %>% tail(10)
+# calf_crop_PreFMD <- calf_crop %>% transmute(Year = Year, k0 = calfCrop) %>% arrange(Year) %>% filter(Year <= 2009)
+# # calf_crop_PostFMD <- dePop(stock = calf_crop_PreFMD %>% tail(10), dePopRate = dePopR) %>% as.data.frame()
+# #### Checking the calf crop and K data inconsistencies
+# stock_PreFMD <- Stock %>% select(Year, K, k3) %>% filter(Year <= 2009)
+# 
+# stock_CC_PreFMD <- merge(stock_PreFMD, merge(calf_crop_PreFMD,modelParamsEQ_PreFMD))
+# 
+# calf_crop_PostFMD <- calf_crop_PreFMD %>% tail(10)
 
 #### Here I get all the equilibrium estimates
 
@@ -1424,11 +1421,12 @@ exports_2009_LiveMeat <- exports_2009_Live * (slaughterAvg_pre/1000000000)
 #### Here I get the exported meat and add this and the above
 exportsBeef_2009 <- exportsBeef %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
 totalBeefExportsMeat_2009 <- round(exports_2009_LiveMeat + exportsBeef_2009, 3)
-# beefMeatExports_percent <- round((totalBeefExportsMeat_2009/capA_pre) * 100,3)
-capK_pre_meat <- capK_pre * (cullAvg_pre/1000000000)
-exports_percentK <- round((totalBeefExportsMeat_2009/capK_pre_meat) * 100,3)
+##### I get the production (without imports) and determine the export percentage
+PR_2009 <- exportsBeef %>% filter(Year == 2009) %>% select(Production) %>% as.numeric()
+# capK_pre_meat <- capK_pre * (slaughterAvg_pre/1000000000)
+exports_percentK <- round((totalBeefExportsMeat_2009/PR_2009) * 100,3)
 
-nn <- 10
+nn <- 12
 beefINV_FORECAST_PostFMD <-  data.frame(Year = numeric(nn), K = NA, k3 = NA,
                                         k4 =  NA, k5 =  NA, k6 =  NA, 
                                         k7 =  NA, k8 =  NA, k9 =  NA)
@@ -1497,7 +1495,6 @@ mergedForecastFMD <- mergedForecastFMD %>% mutate(k4 = delta * lag(k3), k5 = del
 #                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[2,], 
 #                                       calfCrop = calf_crop_PostFMD)
 
-
 ##### Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US
 ##### December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S.
 #
@@ -1505,19 +1502,27 @@ mergedForecastFMD <- mergedForecastFMD %>% mutate(k4 = delta * lag(k3), k5 = del
 
 ### China lifted it's ban in 2016
 
-demandFMD <- quantities_prices_capK %>% filter(Year > 2009) %>% select(Year, A)
-demandShocksFMD <- demandShockGaussian1 %>% transmute(Year = Year, dShock = Shock) %>% 
-  filter(Year > 2009)
-
-capK_k3_depopFMD <- dePop(stock = Stock, dePopRate = dePopR) %>% select(Year, K, k3) %>% filter(Year <= 2010)
+# demandFMD <- quantities_prices_capK %>% filter(Year > 2009) %>% select(Year, A)
+# demandShocksFMD <- demandShockGaussian1 %>% transmute(Year = Year, dShock = Shock) %>% 
+#   filter(Year > 2009)
+# capK_k3_depopFMD <- dePop(stock = Stock, dePopRate = dePopR) %>% select(Year, K, k3) %>% filter(Year <= 2010)
 
 # I get historical maximum and minimum supplies
-
 slHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(slSM) %>% max()
 clHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(clSM) %>% max()
 
 slHistMin <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(slSM) %>% min()
 clHistMin <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(clSM) %>% min()
+
+# I get historical maximum, minimum, median of K and k3
+k3HistMax <- Stock %>% filter(Year <= 2009) %>% select(k3) %>% max()
+KHistMax <- Stock %>% filter(Year <= 2009) %>% select(K) %>% max()
+
+k3HistMin <- Stock %>% filter(Year <= 2009) %>% select(k3) %>% min()
+KHistMin <- Stock %>% filter(Year <= 2009) %>% select(K) %>% min()
+
+k3HistMed <- median(Stock$k3[Stock$Year <=2009])
+KHistMed <- median(Stock$K[Stock$Year <=2009])
 
 
 psM_EqMed <- NULL
@@ -1532,7 +1537,12 @@ headRatio <- NULL
 
 proj_Q_P_PostFMD$Year <- seq(beefINV_FORECAST_PostFMD$Year[1], beefINV_FORECAST_PostFMD$Year[nrow(beefINV_FORECAST_PostFMD)], 
                              by = 1)
-mergedForecastFMD_Proj <- mergedForecastFMD %>% filter(Year >= beefINV_FORECAST_PostFMD$Year[1]-8)
+mergedForecastFMD_Proj <- mergedForecastFMD %>% filter(Year >= beefINV_FORECAST_PostFMD$Year[1]-10)
+
+#### Here I depop the stocks (5%, 10%, 20%)
+dePopR <- 5
+mergedForecastFMD_Proj[,1:10] <- 
+  dePop(stock = mergedForecastFMD_Proj[,1:10], dePopRate = dePopR) 
 
 #### Since I know the supply of fed cattle meat and cull cow meat in 2009, by using 2008 K I can get the replacement heifers 
 #### in 2010. Note : This is done because we must know the approximate supply of both types of meat in 2010 to get the prices.
@@ -1554,18 +1564,23 @@ Stilde_pre <- params_mu_s_FMDProj[2]
 
 for(i in 1: nrow(proj_Q_P_PostFMD)){
   
-  i <- 3
+  i <- 12
   
-  capAFMD <- capA_pre
+  yearIFMD <- proj_Q_P_PostFMD$Year[i]
+  
+  # if(i==1){
+  capK_pre <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% 
+      select(K) %>% as.numeric()
+  # }else{
+  #   capK_pre <- beefINV_FORECAST_PostFMD$K[i-1]
+  # }
   
   sh_pre <- ((exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))/
            (1 + (exp((MUtilde_pre - ((psM_pre/phi) - (pcM_pre/phi)))/Stilde_pre))))
   
   proj_Q_P_PostFMD$muTilde[i] <- MUtilde_pre
-  proj_Q_P_PostFMD$sTilde[i] <- MUtilde_pre
+  proj_Q_P_PostFMD$sTilde[i] <- Stilde_pre
   proj_Q_P_PostFMD$sh[i] <- sh_pre
-  
-  yearIFMD <- proj_Q_P_PostFMD$Year[i]
   
   ##### Here I construct the supply of cull cow meat
   k6nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k6)
@@ -1596,7 +1611,79 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
                                                (k9m2FMD + (1-delta) * k8m2FMD + (1-delta) * k7m2FMD)))) * (fedAvgFMD/1000000000)
   slNewFMD <- as.numeric(slNewFMD)
   
-  ANewFMD <- as.numeric((slNewFMD + clNewFMD))
+  # if(i==1){
+  #   capAFMD <- capA_pre
+  # }else{
+  #   capAFMD <- (slNewFMD + clNewFMD)
+  # }
+  
+  #### Export markets
+  #### For the export markets inaccessibility I am adding that meat into the supply 
+  #### This is because there is more meat left in the country, i.e., more supply.
+  if(i == 1){
+    # i < 4
+    # i == 1
+    # capAFMD <- capAFMD - capAFMD * (5/100) + capAFMD * (exports_percentK/100)
+    slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
+    clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
+    capAFMD <- (slNewFMD + clNewFMD) * adjF_pre
+    capAFMD <- capAFMD - capAFMD * (5/100)
+    exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
+    if(is.na(exprtsFMD)){
+      exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
+    }
+    mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+  }else if(i == 2){
+    # i >= 4 && i <= 5
+    # i == 2
+    # capAFMD <- capAFMD + capAFMD * (exports_percentK/100)
+    slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
+    clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
+    capAFMD <- (slNewFMD + clNewFMD) * adjF_pre
+    capAFMD <- capAFMD
+    exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
+    if(is.na(exprtsFMD)){
+      exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
+    }
+    mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+  }else{
+    slNewFMD <- slNewFMD - slNewFMD * (exports_percentK/100)
+    clNewFMD <- clNewFMD - clNewFMD * (exports_percentK/100)
+    capAFMD <- (slNewFMD + clNewFMD) * adjF_pre
+    capAFMD <- capAFMD
+    exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric()
+    if(is.na(exprtsFMD)){
+      exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+    }
+    mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+  }
+  
+  # ANewFMD <- (slNewFMD + clNewFMD)
+  
+  # #### Here in order to determine K for this year I get the calf crop from two years ago.
+  # #### We get that by taking the cull cow supply off of the total inventory K and multiply with g
+  # #### Now only half of those will be heifers. An assumption made in the model. So two years from now
+  # #### half of the new born will be up for the decision.
+  # exprtsTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(Exports) %>% as.numeric()
+  # 
+  # if(is.na(exprtsTwo)){
+  #   exprtsTwo <- 0
+  # }else{
+  #   exprtsTwo <- exprtsTwo
+  # }
+  # 
+  # KTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(K) %>% as.numeric()
+  # clTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% 
+  #   mutate(clH = cl * (1000000000/Cull_avg)) %>% select(clH) %>% as.numeric()
+  # ccY1 <- g * (KTwo - clTwo) - exprtsTwo
+  # 
+  # KOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(K) %>% as.numeric()
+  # clDemHeadFMDOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% 
+  #   mutate(clH = cl * (1000000000/Cull_avg)) %>% select(clH) %>% as.numeric()
+  # 
+  # approxKFMD <- (KOne - clDemHeadFMDOne) + (0.5 * ccY1)
+  # 
+  # capK_pre <- approxKFMD
   
   k <- 0
   
@@ -1609,29 +1696,67 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   # imprtsFMD <- as.numeric(mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Imports))
   # exprtsFMD <- as.numeric(mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Exports))
   
-  slDemFMD <- ANewFMD * sh_pre
+  slDemFMD <- capAFMD * sh_pre
   slDemHeadFMD <- slDemFMD * (1000000000/slaughterAvgFMD)
-  
-  k_old_headFMD <- g * K1[i] - slDemHeadFMD
-  
-  mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD] <- k_old_headFMD
   
   # Chad's suggestion: Use calf crop from 2009 and age distribution from 2009 to get a best estimate of K for 2010
   # So basically use mergedForecastFMD_Proj cap K to get the calf crop and then think creatively to get the K for 2010
   
-  ccY1 <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% 
-    mutate(cc = g * K ) %>% select(cc) %>% as.numeric()
+  k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
   
-  clDemFMD <- ANewFMD * (1-sh_pre)
-  clDemHeadFMD <- clDemFMD * (1000000000/cullAvgFMD)
+  #### Here after the export ban is lifted I check whether the replacement heifers are greater than the historical 
+  #### maximum. If yes, then remove the animals and add them into the exports.
+  expUpdate <- 0
+
+  if(i>=3){
+
+    k_old_headFMD_OG <- k_old_headFMD
+
+    while(k_old_headFMD > k3HistMax){
+      k_old_headFMD <- k_old_headFMD - 1000
+      expUpdate <- 1
+    }
+    exprtsFMD <- exprtsFMD + (k_old_headFMD_OG - k_old_headFMD)
+    mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <-
+      if_else(exprtsFMD>0,exprtsFMD,0)
+  }
   
-  approxKFMD <- k_old_headFMD + ccY1 - clDemHeadFMD
+  mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD] <- k_old_headFMD
   
-  mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD
+  #### Here in order to determine K for this year I get the calf crop from two years ago.
+  #### We get that by taking the cull cow supply off of the total inventory K and multiply with g
+  #### Now only half of those will be heifers. An assumption made in the model. So two years from now
+  #### half of the new born will be up for the decision.
+  exprtsTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(Exports) %>% as.numeric()
+  if(is.na(exprtsTwo)){
+    exprtsTwo <- 0
+  }else{
+    exprtsTwo <- exprtsTwo
+  }
   
-  expectedValue_k9FMD <- beta * EpcM_pre + g * (beta^3) * EpsM_pre - (1+g*beta*(gamma0+beta*gamma1)) * hcM_pre
+  KTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(K) %>% as.numeric()
+  clTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% 
+    mutate(clH = cl * (1000000000/Cull_avg)) %>% select(clH) %>% as.numeric()
+  ccY1 <- g * (KTwo - clTwo) - exprtsTwo
   
-  # expectedValue_k9 <- round(expectedValue_k9,2)
+  KOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(K) %>% as.numeric()
+  clDemHeadFMDOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>%
+    mutate(clH = cl * (1000000000/Cull_avg)) %>% select(clH) %>% as.numeric()
+  
+  approxKFMD <- (KOne - clDemHeadFMDOne) + (0.5 * ccY1) - k_old_headFMD
+  
+  # (KOne - clDemHeadFMDOne) + (0.5 * ccY1) - k_old_headFMD
+ 
+  # if(i>1){
+  #   mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD-1] <- 
+  #     mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD-1] - k_old_headFMD
+  #   mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD
+  # }else{
+    mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD
+  # }
+  
+  expectedValue_k9FMD <- 
+    beta * EpcM_pre + g * (beta^3) * EpsM_pre - (1+g*beta*(gamma0+beta*gamma1)) * hcM_pre
   
   #If expectedValue_k9 is > pc then we have 9 year olds in the stock , else we cull all the 9 year olds.
   # This mean no more 10 year olds. See pages 35 and so on in dissertation
@@ -1655,14 +1780,19 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   }else if(k9_OldFMD == 0) {
     
     mergedForecastFMD_Proj$k9[mergedForecastFMD_Proj$Year == yearIFMD] <- 0
+    # mergedForecastFMD_Proj$k8[mergedForecastFMD_Proj$Year == yearIFMD] <-
+    #   mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>%
+    #   mutate(k8 = K - (k3+k4+k5+k6+k7)) %>% mutate(k8 = if_else(k8 < 0, 0, k8)) %>% select(k8) %>% as.numeric()
     
   } else if(k9_OldFMD == 2){
     
     mergedForecastFMD_Proj$k9[mergedForecastFMD_Proj$Year == yearIFMD] <- 0
     mergedForecastFMD_Proj$k8[mergedForecastFMD_Proj$Year == yearIFMD] <- 0
-    mergedForecastFMD_Proj$k7[mergedForecastFMD_Proj$Year == yearIFMD] <- 
+    mergedForecastFMD_Proj$k7[mergedForecastFMD_Proj$Year == yearIFMD] <-
       mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% mutate(k7 = delta * k6) %>% select(k7) %>% as.numeric()
-    
+    # mergedForecastFMD_Proj$k7[mergedForecastFMD_Proj$Year == yearIFMD] <-
+    #   mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>%
+    #   mutate(k7 = K - (k3+k4+k5+k6)) %>% mutate(k7 = if_else(k7 < 0, 0, k7)) %>% select(k7) %>% as.numeric()
   }
   
   if(!is.integer(mergedForecastFMD_Proj$k4[mergedForecastFMD_Proj$Year == yearIFMD+1])){
@@ -1693,25 +1823,27 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   #### For the export markets inaccessibility I am adding that meat into the supply 
   #### This is because there is more meat left in the country, i.e., more supply.
   
-  if(i == 1){
-    # i < 4
-    # i == 1
-    # capAFMD <- capAFMD - capAFMD * (5/100) + capAFMD * (exports_percentK/100)
-    capAFMD <- capAFMD - capAFMD * (5/100)
-    slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
-    
-  }else if(i == 2){
-    # i >= 4 && i <= 5 
-    # i == 2
-    # capAFMD <- capAFMD + capAFMD * (exports_percentK/100)
-    capAFMD <- capAFMD
-    slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
-    
-  }else{
-    
-    capAFMD <- capAFMD
-    
-  }
+  # if(i == 1){
+  #   # i < 4
+  #   # i == 1
+  #   # capAFMD <- capAFMD - capAFMD * (5/100) + capAFMD * (exports_percentK/100)
+  #   capAFMD <- capAFMD - capAFMD * (5/100)
+  #   slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
+  #   # clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
+  # 
+  # }else if(i == 2){
+  #   # i >= 4 && i <= 5
+  #   # i == 2
+  #   # capAFMD <- capAFMD + capAFMD * (exports_percentK/100)
+  #   capAFMD <- capAFMD
+  #   slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
+  #   # clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
+  # 
+  # }else{
+  # 
+  #   capAFMD <- capAFMD
+  # 
+  # }
   
   # k <- 0
   # k0s <- k0s_PostFMD[i,-1]
@@ -1809,13 +1941,22 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   
   proj_Q_P_PostFMD$Sl[i] <- slNewFMD
   proj_Q_P_PostFMD$Cl[i] <- clNewFMD
-  proj_Q_P_PostFMD$A[i] <- ANewFMD
+  # proj_Q_P_PostFMD$A[i] <- ANewFMD
+  proj_Q_P_PostFMD$A[i] <- capAFMD
   # proj_Q_P_PostFMD$repHeif[i] <- k_oldFMD
   proj_Q_P_PostFMD$repHeif_Head[i] <- k_old_headFMD
   
   proj_Q_P_PostFMD$boundCond[i] <- abs(k_old_headFMD) <= 0.5 * g * K1[i]
   
-  beefINV_FORECAST_PostFMD[i,] <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
+  # if(i>1){
+  #   beefINV_FORECAST_PostFMD[i-1,] <- 
+  #     mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
+  #   beefINV_FORECAST_PostFMD[i,] <- 
+  #     mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
+  # }else{
+    beefINV_FORECAST_PostFMD[i,] <- 
+      mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
+  # }
   
   # calf_crop_PostFMD <- calf_crop_PostFMD %>% add_row(Year = beefINV_FORECAST_PostFMD$Year[i],
   #                                                    k0 = g * beefINV_FORECAST_PostFMD$K[i])
@@ -1832,8 +1973,16 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   MUtilde_pre <- params_mu_s_FMDProj[1]
   Stilde_pre <- params_mu_s_FMDProj[2]
   
+  # capAFMD <- as.numeric((slNewFMD + clNewFMD)) * adjF_pre
+  
+  # capAFMD <- ANewFMD * adjF_pre
+  
+}
   
   
+  
+  
+    
   
     
   if(i==1){

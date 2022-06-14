@@ -120,13 +120,15 @@ for (i in 1:nrow(mergedForecast_Proj_BackCast)) {
     
     fedNetImpExp <- fedImprts - fedExprts
     
-    slNewB <- ((g - 0.37 * g) * Km2B * slShm1B +
-                ((1 - 0.37 * g) * g * delta * (Km2B - (g - 0.37 * g) * Km3B -
-                                                 (k9m2B + (1-delta) * k8m2B + (1-delta) * k7m2B))) ) * (fedAvgB/1000000000)
-    
     # slNewB <- ((g - 0.37 * g) * Km2B * slShm1B +
-    #              ((1 - 0.37 * g) * g * delta * (Km2B - (g - 0.37 * g) * Km3B -
-    #                                               (k9m2B + (1-delta) * k8m2B + (1-delta) * k7m2B))) + fedNetImpExp) * (fedAvgB/1000000000)
+    #             ((1 - 0.37 * g) * g * delta * (Km2B - (g - 0.37 * g) * Km3B -
+    #                                              (k9m2B + (1-delta) * k8m2B + (1-delta) * k7m2B))) ) * (fedAvgB/1000000000)
+    
+    slNewB <- ((g - 0.37 * g) * Km2B * slShm1B +
+                 ((1 - 0.37 * g) * g * delta * (Km2B - (g - 0.37 * g) * Km3B -
+                                                  (k9m2B + (1-delta) * k8m2B + (1-delta) * k7m2B))) + fedNetImpExp) * (fedAvgB/1000000000)
+    
+    
     
     slNewB <- round(as.numeric(slNewB), 2)
   }
