@@ -1,7 +1,9 @@
 ---
+title: "FMD Simulations"
 output:
   pdf_document: default
-  html_document: default
+  word_document: default
+date: "06-17-2022"
 ---
 
 <!-- 1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US. -->
@@ -9,65 +11,184 @@ output:
 <!-- 3. South Korea resumed U.S. beef imports in July 2008.  -->
 <!-- 4. China lifted it's ban in 2016 -->
 
+The following assumptions were made in the scenario work.
+\begin{enumerate}
+\item There are no imports for the entire period of simulation.
+\end{enumerate}
+
 
 # Optimistic Scenario:\newline
 
-Year1:  5% domestic demand decline and exports are banned \newline
-Year2: Domestic demand is back up and exports are banned \newline
-Year3: Everything goes back to pre FMD \newline
-
+\begin{itemize}
+\item Year1: $5\%$ decline in domestic demand and exports are banned
+\item Year2: Domestic demand is back up and exports are banned
+\item Year3: Everything goes back to pre FMD 
+\end{itemize}
 
 <!-- 1. 5% Decline in domestic demand for 1 year\newline -->
 <!-- 2. In year 2 domestic demand goes back up\newline -->
 <!-- 3. Exports banned for 2 years (I used exports in 2008 as the exports share for the simulation years)\newline -->
 <!-- 4. In year 3 exports ban is lifted and everything is back to normal -->
 
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/fedCattlePriceChanges.png} -->
+<!--   \caption{Change in the fed cattle price} -->
+<!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/fedCattlePriceOptimistic.jpeg}
-  \caption{Fed cattle price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/fedCattlePricePercentChanges.png}
+  \caption{Percentage change in the fed cattle price}
+\end{figure}
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/cullCowPriceChanges.png} -->
+<!--   \caption{Change in the cull cow price} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/cullCowPricePercentChanges.png}
+  \caption{Percentage change in the cull cow price}
+\end{figure}
+
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/stockChanges.png} -->
+<!--   \caption{Change in the stocks} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/stockPercentChanges.png}
+  \caption{Percentage change in the stocks}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/fedCattleSupplyChanges.png}
+  \caption{Change in the fed cattle supply}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/cullCowPriceOptimistic.jpeg}
-  \caption{Cull cow price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/fedCattleSupplyPercentChanges.png}
+  \caption{Percentage change in the fed cattle supply}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/stocksOptimistic.jpeg}
-  \caption{Stock changes (in Million head)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/cullCowSupplyChanges.png}
+  \caption{Change in the cull cow supply}
 \end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/cullCowSupplyPercentChanges.png}
+  \caption{Percentage change in the cull cow supply}
+\end{figure}
+
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/muChanges.png} -->
+<!--   \caption{Change in $\mu$} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/muPercentChanges.png}
+  \caption{Percentage change in  $\mu$}
+\end{figure}
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/shareChanges.png} -->
+<!--   \caption{Change in share} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/OPT/sharePercentChanges.png}
+  \caption{Percentage change in share}
+\end{figure}
+
 
 \clearpage
 
 # Pessimistic Scenario:\newline
 
-Year1: 5% domestic demand decline and exports are banned \newline
-Year2: 5% domestic demand decline and exports are banned \newline
-Year3: 5% domestic demand decline and exports are banned \newline
-Year4: Domestic demand goes back up, exports are still banned \newline
-Year5: Exports are still banned \newline
-Year6: Export band is lifted and everything goes back to pre FMD
+\begin{itemize}
+\item Year1: $5\%$ decline in domestic demand and exports are banned
+\item Year2: $5\%$ decline in domestic demand and exports are banned
+\item Year3: $5\%$ decline in domestic demand and exports are banned
+\item Year4: Domestic demand goes back up, exports are still banned
+\item Year5: Exports are still banned
+\item Year6: Export band is lifted and everything goes back to pre FMD
+\end{itemize}
 
-
-<!-- 1. 5% Decline in domestic demand for 3 years\newline -->
-<!-- 2. In year 4 domestic demand goes back up\newline -->
-<!-- 3. Exports banned for 5 years (I used exports in 2008 as the exports share for the simulation years)\newline -->
-<!-- 4. In year 6 exports ban is lifted and everything is back to normal -->
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/fedCattlePriceChanges.png} -->
+<!--   \caption{Change in the fed cattle price} -->
+<!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/fedCattlePricePessimistic.jpeg}
-  \caption{Fed cattle price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/fedCattlePricePercentChanges.png}
+  \caption{Percentage change in the fed cattle price}
+\end{figure}
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/cullCowPriceChanges.png} -->
+<!--   \caption{Change in the cull cow price} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/cullCowPricePercentChanges.png}
+  \caption{Percentage change in the cull cow price}
+\end{figure}
+
+
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/stockChanges.png} -->
+<!--   \caption{Change in the stocks} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/stockPercentChanges.png}
+  \caption{Percentage change in the stocks}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/fedCattleSupplyChanges.png}
+  \caption{Change in the fed cattle supply}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/cullCowPricePessimistic.jpeg}
-  \caption{Cull cow price changes (dollar/CWT)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/fedCattleSupplyPercentChanges.png}
+  \caption{Percentage change in the fed cattle supply}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{fmdSimulationPlots/04-12/stocksPessimistic.jpeg}
-  \caption{Stock changes (in Million head)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/cullCowSupplyChanges.png}
+  \caption{Change in the cull cow supply}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/cullCowSupplyPercentChanges.png}
+  \caption{Percentage change in the cull cow supply}
+\end{figure}
+
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/muChanges.png} -->
+<!--   \caption{Change in $\mu$} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/muPercentChanges.png}
+  \caption{Percentage change in  $\mu$}
+\end{figure}
+
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/shareChanges.png} -->
+<!--   \caption{Change in share} -->
+<!-- \end{figure} -->
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/06-17/PES/sharePercentChanges.png}
+  \caption{Percentage change in share}
 \end{figure}
 
 
