@@ -454,10 +454,10 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     
     # OPT
     # psNew_lo <- psNew  - 0.25
-    # pcNew_lo <- pcNew - 0.25
+    # pcNew_lo <- pcNew - 0.08
     # 
     # psNew_up <- psNew + 0.08
-    # pcNew_up <- pcNew + 0.25
+    # pcNew_up <- pcNew + 0.3
     
     # PES
     psNew_lo <- psNew  - 0.08
@@ -469,28 +469,18 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     
   } else if(depops == 10){
     
-    # psNew_lo <- psNew  - 0.25
-    # pcNew_lo <- pcNew - 0.05
-    # 
-    # psNew_up <- psNew + 0.08
-    # pcNew_up <- pcNew + 0.25
     #OPT
     # psNew_lo <- psNew  - 0.5
     # pcNew_lo <- pcNew - 0.01
     # 
     # psNew_up <- psNew + 0.05
     # pcNew_up <- pcNew + 0.8
-    # psNew_lo <- psNew  - 0.25
-    # pcNew_lo <- pcNew - 0.25
-    # 
-    # psNew_up <- psNew + 0.25
-    # pcNew_up <- pcNew + 0.25
     
     # PES
     psNew_lo <- psNew  - 0.5
     pcNew_lo <- pcNew - 0.001
 
-    psNew_up <- psNew + 0.05
+    psNew_up <- psNew + 0.04
     pcNew_up <- pcNew + 1
     
   } else if(depops == 20){
@@ -499,20 +489,15 @@ getPsPcEpsEpc_FMD_EQ <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # psNew_lo <- psNew  - 0.5
     # pcNew_lo <- pcNew - 0.01
     # 
-    # psNew_up <- psNew + 0.05
+    # psNew_up <- psNew + 0.03
     # pcNew_up <- pcNew + 0.8
-    # psNew_lo <- psNew  - 0.25
-    # pcNew_lo <- pcNew - 0.25
-    # 
-    # psNew_up <- psNew + 0.25
-    # pcNew_up <- pcNew + 0.25
     
     # PES
     psNew_lo <- psNew  - 0.5
     pcNew_lo <- pcNew - 0.001
 
     psNew_up <- psNew + 0.05
-    pcNew_up <- pcNew + 1
+    pcNew_up <- pcNew + 1.5
     
   }
     
@@ -1375,8 +1360,6 @@ FMD_AllDF_EQ <- Reduce(function(...) merge(...),
                         list(EQ_K_t, EQ_A, proj_adjFac, EQ_muTildes, EQ_sTildes, EQ_PricesCosts, 
                              EQ_Supplies,dressedWeights_sl_cl, EQ_demandShocks)) %>% round(2) 
 
-
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 ##### Beef exports data
@@ -1448,7 +1431,7 @@ proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeri
                                Sl = numeric(nn), Cl = numeric(nn), A = numeric(nn),
                                repHeif_Head = numeric(nn),boundCond = numeric(nn), 
                                muTilde = numeric(nn), sTilde = numeric(nn), sh = numeric(nn),
-                               demDollarsAfter = numeric(nn))
+                               demDollarsAfter = numeric(nn), Sl_OG = numeric(nn), Cl_OG = numeric(nn))
 
 k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
                           k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
@@ -1508,7 +1491,7 @@ Stilde_pre <- params_mu_s_FMDProj[2]
 
 for(i in 1: nrow(proj_Q_P_PostFMD)){
   
-  # i <- 1
+  # i <- 6
   
   yearIFMD <- proj_Q_P_PostFMD$Year[i]
   
@@ -1543,6 +1526,8 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   clNewFMD <- as.numeric(clNewFMD)
   
   clNewFMDHead_OG <- as.numeric(clNewFMD * (1000000000/cAvgFMD))
+  clNewFMD_OG <- clNewFMD
+  proj_Q_P_PostFMD$Cl_OG[i] <- clNewFMD_OG
   
   ##### Here I construct the supply of fed cattle meat
   slm1FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(sl)
@@ -1561,6 +1546,8 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   slNewFMD <- as.numeric(slNewFMD)
   
   slNewFMDHead_OG <- as.numeric(slNewFMD * (1000000000/fedAvgFMD))
+  slNewFMD_OG <- slNewFMD
+  proj_Q_P_PostFMD$Sl_OG[i] <- slNewFMD_OG
   
   capAFMD <- capA_pre
   
@@ -1579,10 +1566,10 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     
     capAFMD_Dollars <- capAFMD * sh_pre * psM_pre + capAFMD * (1-sh_pre) * pcM_pre
     
-    exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
-    if(exprtsFMD < 0){
+    # exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
+    # if(exprtsFMD < 0){
       exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
-    }
+    # }
     mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
   }else if(i >= 4 && i <= 5){
     # i >= 4 && i <= 5
@@ -1590,10 +1577,10 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
     # capAFMD <- capAFMD
     slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
     clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
-    exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
-    if(exprtsFMD < 0){
+    # exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
+    # if(exprtsFMD < 0){
       exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
-    }
+    # }
     mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
   }else{
     # capAFMD <- capAFMD
@@ -1604,10 +1591,10 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
       # slNewFMD <- slNewFMD
       # clNewFMD <- clNewFMD
     # }
-    exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric()
-    if(exprtsFMD < 0){
+    # exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric()
+    # if(exprtsFMD < 0){
       exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
-    }
+    # }
     mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
   }
   
@@ -1624,7 +1611,7 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   # Chad's suggestion: Use calf crop from 2009 and age distribution from 2009 to get a best estimate of K for 2010
   # So basically use mergedForecastFMD_Proj cap K to get the calf crop and then think creatively to get the K for 2010
   
-  k_old_headFMD <- g * K1[i] - slDemHeadFMD 
+  k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
   
   mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD] <- k_old_headFMD
   
@@ -1650,8 +1637,9 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
   KOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(K) %>% as.numeric()
   clDemHeadFMDOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>%
     mutate(clH = cl * (1000000000/Cull_avg)) %>% select(clH) %>% as.numeric()
+  exprtsFMDOne <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric()
   
-  approxKFMD <- delta * (KOne - clDemHeadFMDOne) + (delta * 0.5 * (ccY1)) - k_old_headFMD
+  approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) + (delta * 0.5 * (ccY1)) - k_old_headFMD
   
   mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD
   
@@ -1861,6 +1849,11 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
 # proj_Q_P_PostFMD_OPT_5_I <- proj_Q_P_PostFMD
 # beefINV_FORECAST_PostFMD_OPT_5_I <- beefINV_FORECAST_PostFMD
 # mergedForecastFMD_Proj_OPT_5_I <- mergedForecastFMD_Proj
+#
+# proj_Q_P_PostFMD_OPT_5_I_I <- proj_Q_P_PostFMD
+# beefINV_FORECAST_PostFMD_OPT_5_I_I <- beefINV_FORECAST_PostFMD
+# mergedForecastFMD_Proj_OPT_5_I_I <- mergedForecastFMD_Proj
+
 
 # ## 10% depop (slUp + 0.08 lo -0.25, clUp + 0.25 lo -0.05, exp imports No)
 # proj_Q_P_PostFMD_OPT_10 <- proj_Q_P_PostFMD
@@ -1870,6 +1863,11 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
 # proj_Q_P_PostFMD_OPT_10_I <- proj_Q_P_PostFMD
 # beefINV_FORECAST_PostFMD_OPT_10_I <- beefINV_FORECAST_PostFMD
 # mergedForecastFMD_Proj_OPT_10_I <- mergedForecastFMD_Proj
+#
+# proj_Q_P_PostFMD_OPT_10_I_I <- proj_Q_P_PostFMD
+# beefINV_FORECAST_PostFMD_OPT_10_I_I <- beefINV_FORECAST_PostFMD
+# mergedForecastFMD_Proj_OPT_10_I_I <- mergedForecastFMD_Proj
+
 
 # ## 20% depop (slUp + 0.05 lo -0.5, clUp + 0.4 lo -0.01, exp imports No)
 # proj_Q_P_PostFMD_OPT_20 <- proj_Q_P_PostFMD
@@ -1879,6 +1877,12 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
 # proj_Q_P_PostFMD_OPT_20_I <- proj_Q_P_PostFMD
 # beefINV_FORECAST_PostFMD_OPT_20_I <- beefINV_FORECAST_PostFMD
 # mergedForecastFMD_Proj_OPT_20_I <- mergedForecastFMD_Proj
+#
+# proj_Q_P_PostFMD_OPT_20_I_I <- proj_Q_P_PostFMD
+# beefINV_FORECAST_PostFMD_OPT_20_I_I <- beefINV_FORECAST_PostFMD
+# mergedForecastFMD_Proj_OPT_20_I_I <- mergedForecastFMD_Proj
+
+
 
 
 ######## OUTPUTS - PESSIMISTIC ########
@@ -1891,6 +1895,10 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
 # proj_Q_P_PostFMD_PES_5_I <- proj_Q_P_PostFMD
 # beefINV_FORECAST_PostFMD_PES_5_I <- beefINV_FORECAST_PostFMD
 # mergedForecastFMD_Proj_PES_5_I <- mergedForecastFMD_Proj
+#
+# proj_Q_P_PostFMD_PES_5_I_I <- proj_Q_P_PostFMD
+# beefINV_FORECAST_PostFMD_PES_5_I_I <- beefINV_FORECAST_PostFMD
+# mergedForecastFMD_Proj_PES_5_I_I <- mergedForecastFMD_Proj
 
 
 # ## 10% depop (slUp + 0.08 lo -0.25, clUp + 0.25 lo -0.05, exp imports No)
@@ -1901,6 +1909,10 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
 # proj_Q_P_PostFMD_PES_10_I <- proj_Q_P_PostFMD
 # beefINV_FORECAST_PostFMD_PES_10_I <- beefINV_FORECAST_PostFMD
 # mergedForecastFMD_Proj_PES_10_I <- mergedForecastFMD_Proj
+#
+# proj_Q_P_PostFMD_PES_10_I_I <- proj_Q_P_PostFMD
+# beefINV_FORECAST_PostFMD_PES_10_I_I <- beefINV_FORECAST_PostFMD
+# mergedForecastFMD_Proj_PES_10_I_I <- mergedForecastFMD_Proj
 
 # ## 20% depop (slUp + 0.03 lo -0.5, clUp + 0.5 lo -0.01, exp imports No)
 # proj_Q_P_PostFMD_PES_20 <- proj_Q_P_PostFMD
@@ -1910,6 +1922,10 @@ for(i in 1: nrow(proj_Q_P_PostFMD)){
 # proj_Q_P_PostFMD_PES_20_I <- proj_Q_P_PostFMD
 # beefINV_FORECAST_PostFMD_PES_20_I <- beefINV_FORECAST_PostFMD
 # mergedForecastFMD_Proj_PES_20_I <- mergedForecastFMD_Proj
+#
+# proj_Q_P_PostFMD_PES_20_I_I <- proj_Q_P_PostFMD
+# beefINV_FORECAST_PostFMD_PES_20_I_I <- beefINV_FORECAST_PostFMD
+# mergedForecastFMD_Proj_PES_20_I_I <- mergedForecastFMD_Proj
 
 
 ##########
