@@ -104,12 +104,12 @@ PostFMD_OPT_II_I_PS_ChangePlot <- round(proj_Q_P_PostFMD_OPT_II_I_PS_B,3) %>% gg
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_OPT_II_I_PS_PercentChangePlot <- proj_Q_P_PostFMD_OPT_II_I_PS_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Ps5Percent, color="5% Depop")) +
-  geom_point(aes(y = Ps5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Ps10Percent, color="10% Depop")) +
-  geom_point(aes(y = Ps10Percent, color="10% Depop")) +
-  geom_line(aes(y = Ps20Percent, color="20% Depop")) +
-  geom_point(aes(y = Ps20Percent, color="20% Depop")) +
+  geom_line(aes(y = Ps5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Ps5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Ps10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Ps10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Ps20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Ps20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPT_II_I_PS_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_OPT_II_I_PS_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPT_II_I_PS_B_PercentChange)])))+ 
@@ -136,12 +136,12 @@ PostFMD_OPT_II_I_PC_ChangePlot <- round(proj_Q_P_PostFMD_OPT_II_I_PC_B,3) %>% gg
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_OPT_II_I_PC_PercentChangePlot <- proj_Q_P_PostFMD_OPT_II_I_PC_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Pc5Percent, color="5% Depop")) +
-  geom_point(aes(y = Pc5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Pc10Percent, color="10% Depop")) +
-  geom_point(aes(y = Pc10Percent, color="10% Depop")) +
-  geom_line(aes(y = Pc20Percent, color="20% Depop")) +
-  geom_point(aes(y = Pc20Percent, color="20% Depop")) +
+  geom_line(aes(y = Pc5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Pc5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Pc10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Pc10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Pc20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Pc20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPT_II_I_PC_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_OPT_II_I_PC_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPT_II_I_PC_B_PercentChange)])))+ 
@@ -180,12 +180,12 @@ PostFMD_stocks_OPT_ChangePlot <- round(stocks_OPT_Baseline,3) %>% ggplot(aes(x =
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_stocks_OPT_PercentChangePlot <- stocks_OPT_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = K5Percent, color="5% Depop")) +
-  geom_point(aes(y = K5Percent, color = "5% Depop")) +
-  geom_line(aes(y = K10Percent, color="10% Depop")) +
-  geom_point(aes(y = K10Percent, color="10% Depop")) +
-  geom_line(aes(y = K20Percent, color="20% Depop")) +
-  geom_point(aes(y = K20Percent, color="20% Depop")) +
+  geom_line(aes(y = K5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = K5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = K10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = K10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = K20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = K20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_OPT_B_PercentChange$Year[1],
                                   stocks_OPT_B_PercentChange$Year[nrow(stocks_OPT_B_PercentChange)])))+ 
@@ -246,12 +246,12 @@ PostFMD_OPT_II_I_Sl_ChangePlot <- round(proj_Q_P_PostFMD_OPT_II_I_Sl_B,3) %>% gg
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_OPT_II_I_Sl_PercentChangePlot <- proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Sl5Percent, color="5% Depop")) +
-  geom_point(aes(y = Sl5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Sl10Percent, color="10% Depop")) +
-  geom_point(aes(y = Sl10Percent, color="10% Depop")) +
-  geom_line(aes(y = Sl20Percent, color="20% Depop")) +
-  geom_point(aes(y = Sl20Percent, color="20% Depop")) +
+  geom_line(aes(y = Sl5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Sl5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Sl10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Sl10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Sl20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Sl20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange)])))+ 
@@ -311,12 +311,12 @@ PostFMD_OPT_II_I_Sl_OG_ChangePlot <- round(proj_Q_P_PostFMD_OPT_II_I_Sl_B,3) %>%
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_OPT_II_I_Sl_OG_PercentChangePlot <- proj_Q_P_PostFMD_OPT_II_I_Sl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Sl5Percent, color="5% Depop")) +
-  geom_point(aes(y = Sl5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Sl10Percent, color="10% Depop")) +
-  geom_point(aes(y = Sl10Percent, color="10% Depop")) +
-  geom_line(aes(y = Sl20Percent, color="20% Depop")) +
-  geom_point(aes(y = Sl20Percent, color="20% Depop")) +
+  geom_line(aes(y = Sl5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Sl5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Sl10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Sl10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Sl20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Sl20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPT_II_I_Sl_B_PercentChange)])))+ 
@@ -343,12 +343,12 @@ PostFMD_OPT_II_I_Cl_OG_ChangePlot <- round(proj_Q_P_PostFMD_OPT_II_I_Cl_B,3) %>%
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_OPT_II_I_Cl_OG_PercentChangePlot <- proj_Q_P_PostFMD_OPT_II_I_Cl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Cl5Percent, color="5% Depop")) +
-  geom_point(aes(y = Cl5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Cl10Percent, color="10% Depop")) +
-  geom_point(aes(y = Cl10Percent, color="10% Depop")) +
-  geom_line(aes(y = Cl20Percent, color="20% Depop")) +
-  geom_point(aes(y = Cl20Percent, color="20% Depop")) +
+  geom_line(aes(y = Cl5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Cl5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Cl10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Cl10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Cl20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Cl20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPT_II_I_Cl_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_OPT_II_I_Cl_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPT_II_I_Cl_B_PercentChange)])))+ 
@@ -489,12 +489,12 @@ PostFMD_PES_II_I_PS_ChangePlot <- round(proj_Q_P_PostFMD_PES_II_I_PS_B,3) %>% gg
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_PES_II_I_PS_PercentChangePlot <- proj_Q_P_PostFMD_PES_II_I_PS_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Ps5Percent, color="5% Depop")) +
-  geom_point(aes(y = Ps5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Ps10Percent, color="10% Depop")) +
-  geom_point(aes(y = Ps10Percent, color="10% Depop")) +
-  geom_line(aes(y = Ps20Percent, color="20% Depop")) +
-  geom_point(aes(y = Ps20Percent, color="20% Depop")) +
+  geom_line(aes(y = Ps5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Ps5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Ps10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Ps10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Ps20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Ps20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PES_II_I_PS_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_PES_II_I_PS_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_PES_II_I_PS_B_PercentChange)])))+ 
@@ -521,12 +521,12 @@ PostFMD_PES_II_I_PC_ChangePlot <- round(proj_Q_P_PostFMD_PES_II_I_PC_B,3) %>% gg
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_PES_II_I_PC_PercentChangePlot <- proj_Q_P_PostFMD_PES_II_I_PC_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Pc5Percent, color="5% Depop")) +
-  geom_point(aes(y = Pc5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Pc10Percent, color="10% Depop")) +
-  geom_point(aes(y = Pc10Percent, color="10% Depop")) +
-  geom_line(aes(y = Pc20Percent, color="20% Depop")) +
-  geom_point(aes(y = Pc20Percent, color="20% Depop")) +
+  geom_line(aes(y = Pc5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Pc5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Pc10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Pc10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Pc20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Pc20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PES_II_I_PC_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_PES_II_I_PC_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_PES_II_I_PC_B_PercentChange)])))+ 
@@ -564,12 +564,12 @@ PostFMD_stocks_PES_ChangePlot <- round(stocks_PES_Baseline,3) %>% ggplot(aes(x =
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 PostFMD_stocks_PES_PercentChangePlot <- stocks_PES_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = K5Percent, color="5% Depop")) +
-  geom_point(aes(y = K5Percent, color = "5% Depop")) +
-  geom_line(aes(y = K10Percent, color="10% Depop")) +
-  geom_point(aes(y = K10Percent, color="10% Depop")) +
-  geom_line(aes(y = K20Percent, color="20% Depop")) +
-  geom_point(aes(y = K20Percent, color="20% Depop")) +
+  geom_line(aes(y = K5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = K5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = K10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = K10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = K20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = K20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_PES_B_PercentChange$Year[1],
                                   stocks_PES_B_PercentChange$Year[nrow(stocks_PES_B_PercentChange)])))+ 
@@ -700,12 +700,12 @@ PostFMD_PES_II_I_Sl_OG_ChangePlot <- round(proj_Q_P_PostFMD_PES_II_I_Sl_B,3) %>%
 
 
 PostFMD_PES_II_I_Sl_OG_PercentChangePlot <- proj_Q_P_PostFMD_PES_II_I_Sl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Sl5Percent, color="5% Depop")) +
-  geom_point(aes(y = Sl5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Sl10Percent, color="10% Depop")) +
-  geom_point(aes(y = Sl10Percent, color="10% Depop")) +
-  geom_line(aes(y = Sl20Percent, color="20% Depop")) +
-  geom_point(aes(y = Sl20Percent, color="20% Depop")) +
+  geom_line(aes(y = Sl5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Sl5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Sl10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Sl10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Sl20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Sl20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PES_II_I_Sl_OG_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_PES_II_I_Sl_OG_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_PES_II_I_Sl_OG_B_PercentChange)])))+ 
@@ -734,12 +734,12 @@ PostFMD_PES_II_I_Cl_OG_ChangePlot <- round(proj_Q_P_PostFMD_PES_II_I_Cl_B,3) %>%
 
 
 PostFMD_PES_II_I_Cl_OG_PercentChangePlot <- proj_Q_P_PostFMD_PES_II_I_Cl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = Cl5Percent, color="5% Depop")) +
-  geom_point(aes(y = Cl5Percent, color = "5% Depop")) +
-  geom_line(aes(y = Cl10Percent, color="10% Depop")) +
-  geom_point(aes(y = Cl10Percent, color="10% Depop")) +
-  geom_line(aes(y = Cl20Percent, color="20% Depop")) +
-  geom_point(aes(y = Cl20Percent, color="20% Depop")) +
+  geom_line(aes(y = Cl5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Cl5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Cl10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Cl10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Cl20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Cl20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PES_II_I_Cl_OG_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_PES_II_I_Cl_OG_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_PES_II_I_Cl_OG_B_PercentChange)])))+ 
@@ -836,6 +836,59 @@ PostFMD_PES_II_I_SHR_PercentChangePlot <- proj_Q_P_PostFMD_PES_SHR_PercentChange
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+
+
+
+
+################################################################################################################################################################################################################################################################################################################################
+
+mergedForecastFMD_Proj_OPT_5_New <- mergedForecastFMD_Proj_OPT_5_I_I %>% 
+  select(-Slaughter_avg, -Cull_avg, -Imports, -Exports)
+
+mergedForecastFMD_Proj_OPT_10_New <- mergedForecastFMD_Proj_OPT_10_I_I %>% 
+  select(-Slaughter_avg, -Cull_avg, -Imports, -Exports)
+
+mergedForecastFMD_Proj_OPT_20_New <- mergedForecastFMD_Proj_OPT_20_I_I %>% 
+  select(-Slaughter_avg, -Cull_avg, -Imports, -Exports)
+
+mergedForecastFMD_Proj_PES_5_New <- mergedForecastFMD_Proj_PES_5_I_I %>% 
+  select(-Slaughter_avg, -Cull_avg, -Imports, -Exports)
+
+mergedForecastFMD_Proj_PES_10_New <- mergedForecastFMD_Proj_PES_10_I_I %>% 
+  select(-Slaughter_avg, -Cull_avg, -Imports, -Exports)
+
+mergedForecastFMD_Proj_PES_20_New <- mergedForecastFMD_Proj_PES_20_I_I %>% 
+  select(-Slaughter_avg, -Cull_avg, -Imports, -Exports)
+
+
+
+
+##### Here I get the changes in the animal numbers from baseline
+
+Stock_Baseline <- Stock %>% filter(Year > 2009 & Year <= 2020) %>% select(-k10)
+
+OPT_5_Baseline <- Stock_Baseline - beefINV_FORECAST_PostFMD_OPT_5_I_I
+
+OPT_10_Baseline <- Stock_Baseline - beefINV_FORECAST_PostFMD_OPT_10_I_I
+
+OPT_20_Baseline <- Stock_Baseline - beefINV_FORECAST_PostFMD_OPT_20_I_I
+
+PES_5_Baseline <- Stock_Baseline - beefINV_FORECAST_PostFMD_PES_5_I_I
+
+PES_10_Baseline <- Stock_Baseline - beefINV_FORECAST_PostFMD_PES_10_I_I
+
+PES_20_Baseline <- Stock_Baseline - beefINV_FORECAST_PostFMD_PES_20_I_I
+
+library(latexpdf)
+as.pdf(beefINV_FORECAST_PostFMD_OPT_5_I_I)
+as.pdf(beefINV_FORECAST_PostFMD_OPT_10_I_I)
+as.pdf(beefINV_FORECAST_PostFMD_OPT_20_I_I)
+
+as.pdf(beefINV_FORECAST_PostFMD_PES_5_I_I)
+as.pdf(beefINV_FORECAST_PostFMD_PES_10_I_I)
+as.pdf(beefINV_FORECAST_PostFMD_PES_20_I_I)
+
+
 
 
 
