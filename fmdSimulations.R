@@ -6,6 +6,30 @@
 ############################################################################################################################################################################################################################################################
 
 ############################################################################################################################################################################################################################################################
+estPFunction_FMD <- function(p, sl, cl, A, B, hc_discounted, tilde_MU, tilde_s, hc_new){
+  
+  ps <- p[1]
+  pc <- p[2]
+  
+  Eps3 <- p[3]
+  Epc1 <- p[4]
+  
+  F1 <- sl - A * ((exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s))/(1 + (exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s))))
+  
+  F2 <- cl  - A * (1/(1+ exp((tilde_MU - ((ps/phi) - (pc/phi)))/tilde_s)))
+  
+  F3 <- B - ps + g * (beta^3) * Eps3 - hc_discounted
+  
+  F4 <- pc - beta * Epc1 - g * (beta^3) * Eps3 + (1 + g * beta * (gamma0 + beta * gamma1)) * hc_new
+  
+  F <- F1^2 + F2^2 + F3^2 + F4^2
+  
+  
+  return(F)
+  
+}
+
+
 
 getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, 
                                  ANew, params, depops){
@@ -35,11 +59,11 @@ getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # psNew_up <- psNew + 0.07
     # pcNew_up <- pcNew + 0.8
     
-    psNew_lo <- psNew  - 0.01
+    psNew_lo <- psNew  - 0.07
     pcNew_lo <- pcNew - 0.01
     
-    psNew_up <- psNew + 0.16
-    pcNew_up <- pcNew + 0.1
+    psNew_up <- psNew + 0.08
+    pcNew_up <- pcNew + 0.05
     
     # PES
     # psNew_lo <- psNew  - 0.08
@@ -71,11 +95,11 @@ getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # psNew_up <- psNew + 0.07
     # pcNew_up <- pcNew + 0.8
     
-    psNew_lo <- psNew  - 0.02
-    pcNew_lo <- pcNew - 0.01
+    psNew_lo <- psNew  - 0.05
+    pcNew_lo <- pcNew - 0.02
     
-    psNew_up <- psNew + 0.13
-    pcNew_up <- pcNew + 0.1
+    psNew_up <- psNew + 0.1
+    pcNew_up <- pcNew + 0.03
     
     # PES
     # psNew_lo <- psNew  - 0.5
@@ -106,11 +130,11 @@ getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # psNew_up <- psNew + 0.07
     # pcNew_up <- pcNew + 0.8
     
-    psNew_lo <- psNew  - 0.05
-    pcNew_lo <- pcNew - 0.01
+    psNew_lo <- psNew  - 0.03
+    pcNew_lo <- pcNew - 0.02
     
-    psNew_up <- psNew + 0.13
-    pcNew_up <- pcNew + 0.1
+    psNew_up <- psNew + 0.12
+    pcNew_up <- pcNew + 0.02
     
     # PES
     # psNew_lo <- psNew  - 0.5
@@ -127,6 +151,28 @@ getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     
     pcNew_expected_up <- pcNew_expected + 0.5
     
+  }else{
+    
+    psNew_lo <- psNew  - 0.03
+    pcNew_lo <- pcNew - 0.03
+    
+    psNew_up <- psNew + 0.03
+    pcNew_up <- pcNew + 0.03
+    
+    # PES
+    # psNew_lo <- psNew  - 0.08
+    # pcNew_lo <- pcNew - 0.05
+    # 
+    # psNew_up <- psNew + 0.5
+    # pcNew_up <- pcNew + 0.25
+    
+    psNew_expected_lo <- psNew_expected
+    
+    psNew_expected_up <- psNew_expected + 0.5
+    
+    pcNew_expected_lo <- pcNew_expected  
+    
+    pcNew_expected_up <- pcNew_expected + 0.5
   }
   
   #### Here we are making sure the lower bound for the prices isn't negative
@@ -217,11 +263,18 @@ getPsPcEpsEpc_FMD_EQ_PES <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # pcNew_up <- pcNew + 0.3
     
     # PES
-    psNew_lo <- psNew  - 0.01
+    # psNew_lo <- psNew  - 0.01
+    # pcNew_lo <- pcNew - 0.01
+    # 
+    # psNew_up <- psNew + 0.08
+    # pcNew_up <- pcNew + 0.1
+    
+    psNew_lo <- psNew  - 0.07
     pcNew_lo <- pcNew - 0.01
     
     psNew_up <- psNew + 0.08
-    pcNew_up <- pcNew + 0.1
+    pcNew_up <- pcNew + 0.03
+    
     
     psNew_expected_lo <- psNew_expected 
     
@@ -242,11 +295,18 @@ getPsPcEpsEpc_FMD_EQ_PES <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # pcNew_up <- pcNew + 0.8
     
     # PES
-    psNew_lo <- psNew  - 0.02
+    # psNew_lo <- psNew  - 0.02
+    # pcNew_lo <- pcNew - 0.01
+    # 
+    # psNew_up <- psNew + 0.07
+    # pcNew_up <- pcNew + 0.1
+    
+    psNew_lo <- psNew  - 0.05
     pcNew_lo <- pcNew - 0.01
     
-    psNew_up <- psNew + 0.07
-    pcNew_up <- pcNew + 0.1
+    psNew_up <- psNew + 0.1
+    pcNew_up <- pcNew + 0.03
+    
     
     psNew_expected_lo <- psNew_expected 
     
@@ -266,17 +326,46 @@ getPsPcEpsEpc_FMD_EQ_PES <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
     # pcNew_up <- pcNew + 0.8
     
     # PES
-    psNew_lo <- psNew  - 0.05
+    # psNew_lo <- psNew  - 0.05
+    # pcNew_lo <- pcNew - 0.01
+    # 
+    # psNew_up <- psNew + 0.07
+    # pcNew_up <- pcNew + 0.1
+    
+    psNew_lo <- psNew  - 0.04
     pcNew_lo <- pcNew - 0.01
     
-    psNew_up <- psNew + 0.07
-    pcNew_up <- pcNew + 0.1
+    psNew_up <- psNew + 0.11
+    pcNew_up <- pcNew + 0.02
     
     psNew_expected_lo <- psNew_expected 
     
     psNew_expected_up <- psNew_expected + 0.5
     
     pcNew_expected_lo <- pcNew_expected
+    
+    pcNew_expected_up <- pcNew_expected + 0.5
+    
+  }else{
+    
+    psNew_lo <- psNew  - 0.03
+    pcNew_lo <- pcNew - 0.03
+    
+    psNew_up <- psNew + 0.03
+    pcNew_up <- pcNew + 0.03
+    
+    # PES
+    # psNew_lo <- psNew  - 0.08
+    # pcNew_lo <- pcNew - 0.05
+    # 
+    # psNew_up <- psNew + 0.5
+    # pcNew_up <- pcNew + 0.25
+    
+    psNew_expected_lo <- psNew_expected
+    
+    psNew_expected_up <- psNew_expected + 0.5
+    
+    pcNew_expected_lo <- pcNew_expected  
     
     pcNew_expected_up <- pcNew_expected + 0.5
     
@@ -376,7 +465,7 @@ FMD_AllDF_EQ <- Reduce(function(...) merge(...),
                        list(EQ_K_t, EQ_A, proj_adjFac, EQ_muTildes, EQ_sTildes, EQ_PricesCosts, 
                             EQ_Supplies,dressedWeights_sl_cl, EQ_demandShocks)) %>% round(2) 
 
-modelParamsEQ_PreFMD <- FMD_AllDF_EQ %>% filter(Year <= 2009)
+modelParamsEQ_PreFMD <- FMD_AllDF_EQ %>% filter(Year <= 2020)
 
 ##### Beef exports data
 beefExports <- read_excel("Data/Meat-BeefVeal-Exports/Meat-BeefVeal-Exports.xlsx") %>% as.data.frame()
@@ -395,37 +484,38 @@ exportsBeef[,-1] <- exportsBeef[,-1]/1000000000
 
 #### Here I get all the equilibrium estimates
 
-modelParamsEQ_PreFMD <- FMD_AllDF_EQ %>% filter(Year <= 2009)
+modelParamsEQ_PreFMD <- FMD_AllDF_EQ %>% filter(Year <= 2020)
 #### I convert exported live animals from number of head to pounds in meat
-exports_2009_Live <- exports %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+exports_2009_Live <- exports %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric()
 exports_2009_LiveMeat <- exports_2009_Live * (slaughterAvg_pre/1000000000)
 #### Here I get the exported meat and add this and the above
-exportsBeef_2009 <- exportsBeef %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+exportsBeef_2009 <- exportsBeef %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric()
 totalBeefExportsMeat_2009 <- round(exports_2009_LiveMeat + exportsBeef_2009, 3)
 ##### I get the production (without imports) and determine the export percentage
-PR_2009 <- exportsBeef %>% filter(Year == 2009) %>% select(Production) %>% as.numeric()
+PR_2009 <- exportsBeef %>% filter(Year == 2020) %>% select(Production) %>% as.numeric()
 # capK_pre_meat <- capK_pre * (slaughterAvg_pre/1000000000)
 exports_percentK <- round((totalBeefExportsMeat_2009/PR_2009) * 100,3)
 
 # I get historical maximum, minimum, and median supplies
-slHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(slSM) %>% max()
-clHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(clSM) %>% max()
+slHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2020) %>% select(slSM) %>% max()
+clHistMax <- FMD_AllDF_EQ %>% filter(Year <= 2020) %>% select(clSM) %>% max()
 
-slHistMin <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(slSM) %>% min()
-clHistMin <- FMD_AllDF_EQ %>% filter(Year <= 2009) %>% select(clSM) %>% min()
+slHistMin <- FMD_AllDF_EQ %>% filter(Year <= 2020) %>% select(slSM) %>% min()
+clHistMin <- FMD_AllDF_EQ %>% filter(Year <= 2020) %>% select(clSM) %>% min()
 
-slHistMed <- median(FMD_AllDF_EQ$slSM[FMD_AllDF_EQ$Year<=2009]) 
-clHistMed <- median(FMD_AllDF_EQ$clSM[FMD_AllDF_EQ$Year<=2009]) 
+slHistMed <- median(FMD_AllDF_EQ$slSM[FMD_AllDF_EQ$Year<=2020]) 
+clHistMed <- median(FMD_AllDF_EQ$clSM[FMD_AllDF_EQ$Year<=2020]) 
 
 # I get historical maximum, minimum, median of K and k3
-k3HistMax <- Stock %>% filter(Year <= 2009) %>% select(k3) %>% max()
-KHistMax <- Stock %>% filter(Year <= 2009) %>% select(K) %>% max()
+k3HistMax <- Stock %>% filter(Year <= 2020) %>% select(k3) %>% max()
+KHistMax <- Stock %>% filter(Year <= 2020) %>% select(K) %>% max()
 
-k3HistMin <- Stock %>% filter(Year <= 2009) %>% select(k3) %>% min()
-KHistMin <- Stock %>% filter(Year <= 2009) %>% select(K) %>% min()
+k3HistMin <- Stock %>% filter(Year <= 2020) %>% select(k3) %>% min()
+KHistMin <- Stock %>% filter(Year <= 2020) %>% select(K) %>% min()
 
-k3HistMed <- median(Stock$k3[Stock$Year <=2009])
-KHistMed <- median(Stock$K[Stock$Year <=2009])
+k3HistMed <- median(Stock$k3[Stock$Year <=2020])
+k3HistMean <- mean(Stock$k3[Stock$Year <=2020])
+KHistMed <- median(Stock$K[Stock$Year <=2020])
 nn <- 11
 
 simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn, Stock){
@@ -451,8 +541,8 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
         
         adjF_pre <- mean(tail(modelParamsEQ_PreFMD, n=1)$AdjFactor)
         
-        slShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$slShock)
-        clShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$clShock)
+        # slShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$slShock)
+        # clShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$clShock)
         
         slShock2009 <- 1
         clShock2009 <- 1
@@ -461,7 +551,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
                                                 k4 =  NA, k5 =  NA, k6 =  NA, 
                                                 k7 =  NA, k8 =  NA, k9 =  NA)
         
-        beefINV_FORECAST_PostFMD$Year <- seq(from=2010, to=2010+nn-1)
+        beefINV_FORECAST_PostFMD$Year <- seq(from=2021, to=2021+nn-1)
         
         proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeric(nn), 
                                        EPs = numeric(nn), EPc = numeric(nn), Hc = numeric(nn), 
@@ -470,23 +560,25 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
                                        muTilde = numeric(nn), sTilde = numeric(nn), sh = numeric(nn),
                                        demDollarsAfter = numeric(nn), Sl_OG = numeric(nn), Cl_OG = numeric(nn))
         
-        k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
-                                  k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
-                                  k07 = numeric(nn), k08 = numeric(nn))
+        # k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
+        #                           k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
+        #                           k07 = numeric(nn), k08 = numeric(nn))
+        # 
+        # k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,], 
+        #                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
+        #                                       calfCrop = calf_crop_PostFMD)
         
-        k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,], 
-                                              beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
-                                              calfCrop = calf_crop_PostFMD)
         
-        
-        stockForecastFMD <- Stock %>% filter(Year < 2010)
+        stockForecastFMD <- Stock %>% filter(Year < 2021)
         mergedForecastFMD <- merge(stockForecastFMD, beefINV_FORECAST_PostFMD, all=TRUE) %>% filter(Year >= 1995)
         
-        quantitiesSLCLFMD <- quantities %>% select(Year, sl, cl) %>% filter(Year < 2010 & Year >= 1995)
-        wtAVGFMD <- allStockShocks %>% select(Year, Slaughter_avg, Cull_avg) %>% filter(Year < 2010 & Year >= 1995)
+        # quantitiesSLCLFMD <- quantities %>% select(Year, sl, cl) %>% filter(Year < 2021 & Year >= 1995)
+        
+        quantitiesSLCLFMD <- modelParamsEQ_PreFMD %>% select(Year, slMedian, clMedian) %>% filter(Year < 2021 & Year >= 1995)
+        wtAVGFMD <- allStockShocks %>% select(Year, Slaughter_avg, Cull_avg) %>% filter(Year < 2021 & Year >= 1995)
         quantsWeightsFMD <- merge(quantitiesSLCLFMD, wtAVGFMD)
         
-        impExpFMD <- stocksImportsExports %>% select(Year, Imports, Exports) %>% filter(Year < 2010 & Year >= 1995)
+        impExpFMD <- stocksImportsExports %>% select(Year, Imports, Exports) %>% filter(Year < 2021 & Year >= 1995)
         
         quantsWeightsFMD <- merge(quantsWeightsFMD, impExpFMD, all=TRUE)
         
@@ -495,13 +587,12 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
         mergedForecastFMD <- fill(mergedForecastFMD, Cull_avg, .direction = 'down')
         mergedForecastFMD <- fill(mergedForecastFMD, Slaughter_avg, .direction = 'down')
         
-        mergedForecastFMD$k3[mergedForecastFMD$Year==2010] <- mergedForecastFMD$k3[mergedForecastFMD$Year==2009]
+        mergedForecastFMD$k3[mergedForecastFMD$Year==2021] <- mergedForecastFMD$k3[mergedForecastFMD$Year==2020]
         
         mergedForecastFMD <- mergedForecastFMD %>% mutate(k4 = delta * lag(k3), k5 = delta * lag(k4), k6 = delta * lag(k5),
                                                           k7 = delta * lag(k6), k8 = delta * lag(k7), 
                                                           k9 = if_else((K - (k3+k4+k5+k6+k7+k8)) < 0, 0, (K - (k3+k4+k5+k6+k7+k8))),
                                                           k10 = 0) %>% filter(Year > 2000)
-        
         
         ##### Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US
         ##### December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S.
@@ -519,9 +610,9 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
         slNewPre <- slSM_pre
         clNewPre <- clSM_pre
         
-        params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewPre, cl = clNewPre, 
+        params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewPre, cl = clNewPre,
                                                         ps = psM_pre, pc = pcM_pre, thetas = c(1,1), adj = 1)
-        
+
         MUtilde_pre <- params_mu_s_FMDProj[1]
         Stilde_pre <- params_mu_s_FMDProj[2]
         
@@ -556,7 +647,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           k9nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k9)
           clShnFMD <- 1
           cAvgFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Cull_avg)
-          clmFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(cl)
+          clmFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(clMedian)
           ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
           clNewFMD <-  ((k9nFMD + (1-delta) * k8nFMD + (1-delta) * k7nFMD) * clShnFMD +
                           (delta * (k8nFMD + k7nFMD + k6nFMD) - (k7nFMD + k8nFMD + k9nFMD)) )* (cAvgFMD/1000000000)
@@ -574,6 +665,9 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           k8m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k8)
           k7m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k7)
           fedAvgFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>%select(Slaughter_avg)
+          # sl1FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% mutate(sl1 = slMedian * (1000000000/Slaughter_avg))
+          # cl1FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% mutate(cl1 = clMedian * (1000000000/Cull_avg))
+          
           ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
           ## This might change if the imports are increased. I do not add imports in the analysis for now.
           slNewFMD <- ((g - 0.37 * g) * Km2FMD * slShmFMD +
@@ -598,38 +692,58 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
             slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
             clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
             
+            # slNewFMD <- slNewFMD + exportsBeef_2009 * 0.75
+            # clNewFMD <- clNewFMD + exportsBeef_2009 * 0.25
+            
             capAFMD_Dollars <- capAFMD * sh_pre * psM_pre + capAFMD * (1-sh_pre) * pcM_pre
             
             # exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
             # if(exprtsFMD < 0){
-            exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
+            exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric())
             # }
             mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+            
+            # imprtsFMD <- 0
+            # mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <- imprtsFMD
           }else if(i == 2){
             # i >= 4 && i <= 5
             # i == 2
             # capAFMD <- capAFMD
             slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
             clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
+            
+            # slNewFMD <- slNewFMD + exportsBeef_2009 * 0.75
+            # clNewFMD <- clNewFMD + exportsBeef_2009 * 0.25
+            
             # exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
             # if(exprtsFMD < 0){
-            exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
+            exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric())
             # }
             mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+            
+            # imprtsFMD <- 0
+            # mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <- imprtsFMD
           }else{
             # capAFMD <- capAFMD
             # if(dePopR==5){
+            
             slNewFMD <- slNewFMD - slNewFMD * (exports_percentK/100)
             clNewFMD <- clNewFMD - clNewFMD * (exports_percentK/100)
+            
+            # slNewFMD <- slNewFMD + exportsBeef_2009 * 0.75
+            # clNewFMD <- clNewFMD + exportsBeef_2009 * 0.25
             # }else{
             # slNewFMD <- slNewFMD
             # clNewFMD <- clNewFMD
             # }
             # exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric()
             # if(exprtsFMD < 0){
-            exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+            exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric()
             # }
             mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+            
+            imprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Imports) %>% as.numeric()
+            mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(imprtsFMD>0,imprtsFMD,0)
           }
           
           k <- 0
@@ -644,12 +758,23 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           # }
           
           slDemFMD <- ANewFMD  * sh_pre
+          
           slDemHeadFMD <- slDemFMD * (1000000000/slaughterAvgFMD)
           
           # Chad's suggestion: Use calf crop from 2009 and age distribution from 2009 to get a best estimate of K for 2010
           # So basically use mergedForecastFMD_Proj cap K to get the calf crop and then think creatively to get the K for 2010
           
-          k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+            # k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+            
+            if(dePopR == 20 | dePopR == 10){
+              if(i<3){
+                k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+              }else{
+                k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+              }
+            }else{
+              k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+            }
           
           #### Here after the export ban is lifted I check whether the replacement heifers are greater than the historical 
           #### maximum. If yes, then remove the animals and add them into the exports.
@@ -665,51 +790,50 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
             # i >= 3
             # slNewFMD_OG <- slNewFMD
             # clNewFMD_OG <- clNewFMD
-            
-            while(k_old_headFMD > k3HistMax){
-              k_old_headFMD <- k_old_headFMD - 10000
-              expUpdate[i] <- 1
-            }
-            
-            while(k_old_headFMD < k3HistMed){
+
+            # while(k_old_headFMD > k3HistMed){
+            #   k_old_headFMD <- k_old_headFMD - 10000
+            #   expUpdate[i] <- 1
+            # }
+
+            while(k_old_headFMD < k3HistMean){
               k_old_headFMD <- k_old_headFMD + 10000
               impUpdate[i] <- 1
             }
-            
+
             # while(slNewFMD > slHistMax){
             #   slNewFMD <- slNewFMD - 0.01
             #   slUpdate <- 1
             # }
-            # 
+            #
             # while(clNewFMD > clHistMax){
             #   clNewFMD <- clNewFMD - 0.01
             #   clUpdate <- 1
             # }
-            # 
+            #
             # while(slNewFMD < slHistMin){
             #   slNewFMD <- slNewFMD + 0.01
             #   slUpdate <- 1
             # }
-            # 
+            #
             # while(clNewFMD < clHistMin){
             #   clNewFMD <- clNewFMD + 0.05
             #   clUpdate <- 1
             # }
-            
-            if(expUpdate[i] == 1){
-              exprtsFMD <- (k_old_headFMD_OG - k_old_headFMD)
-              mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <-
-                if_else(exprtsFMD>0,exprtsFMD,0)
-            }
-            
+
+            # if(expUpdate[i] == 1){
+            #   exprtsFMD1 <- (k_old_headFMD_OG - k_old_headFMD)
+            #   mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <-
+            #     if_else((exprtsFMD + exprtsFMD1)>0,(exprtsFMD + exprtsFMD1),0)
+            # }
+
             if(impUpdate[i] == 1){
-              impFMD <- (k_old_headFMD - k_old_headFMD_OG)
+              impFMD1 <- (k_old_headFMD - k_old_headFMD_OG)
               mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <-
-                if_else(impFMD>0,impFMD,0)
+                if_else(impFMD1>0,impFMD1,0)
             }
-            
+
           }
-          
           
           mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD+1] <- k_old_headFMD
           
@@ -718,6 +842,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           #### Now only half of those will be heifers. An assumption made in the model. So two years from now
           #### half of the new born will be up for the decision.
           exprtsTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(Exports) %>% as.numeric()
+          
           if(is.na(exprtsTwo)){
             exprtsTwo <- 0
           }else{
@@ -727,7 +852,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           KTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% select(K) %>% as.numeric()
           clTwo <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-2) %>% 
             mutate(clH = cl * (1000000000/Cull_avg)) %>% select(clH) %>% as.numeric()
-          ccY1 <- g * (KTwo - clTwo - exprtsTwo)
+          ccY1 <- g * (KTwo - clTwo - exprtsTwo) 
           # ccY1 <- g * (KTwo - clTwo) 
           
           ### Now we must add the calf crop to the existing stocks and take away the fed cattle supplied for the 
@@ -740,11 +865,39 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           
           # approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) + 
           #   (delta * 0.5 * (ccY1)) - k_old_headFMD_OG
+          if(dePopR == 20){
+            if(i<3){
+              approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+                (0.5 * (ccY1)) - k_old_headFMD_OG - exprtsFMD
+            }else{
+              approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+                (0.5 * (ccY1)) - k_old_headFMD_OG + 
+                mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] - exprtsFMD + imprtsFMD
+            }
+          }else if(dePopR == 10){
+            if(i<3){
+              approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+                (0.5 * delta * (ccY1)) - k_old_headFMD_OG - exprtsFMD
+            }else{
+              approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+                (0.5 * delta * (ccY1)) - k_old_headFMD_OG + 
+                mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] - exprtsFMD
+            }
+          }
+          else{
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (delta * 0.5 * (ccY1)) - k_old_headFMD_OG - exprtsFMD
+          }
           
-          approxKFMD <- delta * (KOne - clDemHeadFMDOne) + 
-            (delta * 0.5 * (ccY1)) - k_old_headFMD_OG
-          
-          mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD 
+          # if(i >= 3){
+          #   
+          #   if(approxKFMD < mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD-1]){
+          #     approxKFMD <- approxKFMD + 1000000
+          #   }
+          # 
+          # }
+
+          mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD
           
           expectedValue_k9FMD <- 
             beta * EpcM_pre + g * (beta^3) * EpsM_pre - (1+g*beta*(gamma0+beta*gamma1)) * hcM_pre
@@ -784,6 +937,14 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
             
           }
           
+          # approxKFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% 
+          #   transmute(K = k3+k4+k5+k6+k7+k8+k9+k10) %>% select(K) %>% as.numeric()
+            
+            # delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) + 
+            # (delta * 0.5 * (ccY1)) - k_old_headFMD_OG - exprtsFMD
+          
+          mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD 
+          
           if(!is.integer(mergedForecastFMD_Proj$k4[mergedForecastFMD_Proj$Year == yearIFMD+1])){
             
             mergedForecastFMD_Proj$k4[mergedForecastFMD_Proj$Year == yearIFMD+1] <-
@@ -805,8 +966,8 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           beefINV_FORECAST_PostFMD[i,] <- 
             mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
           
-          mergedForecastFMD_Proj$cl[mergedForecastFMD_Proj$Year == yearIFMD] <- clNewFMD
-          mergedForecastFMD_Proj$sl[mergedForecastFMD_Proj$Year == yearIFMD] <- slNewFMD
+          mergedForecastFMD_Proj$clMedian[mergedForecastFMD_Proj$Year == yearIFMD] <- clNewFMD
+          mergedForecastFMD_Proj$slMedian[mergedForecastFMD_Proj$Year == yearIFMD] <- slNewFMD
           
           # if(i>2){
           #   capAFMD <- ANewFMD * adjF_pre
@@ -819,19 +980,19 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           psM_pre <- PsFMD[1]
           pcM_pre <- PsFMD[2]
           
-          params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewFMD, cl = clNewFMD,
-                                                          ps = psM_pre, pc = pcM_pre, 
-                                                          thetas = c(1,1), adj = 1)
-          MUtilde_pre <- params_mu_s_FMDProj[1]
-          Stilde_pre <- params_mu_s_FMDProj[2]
-          
-          if(MUtilde_pre < 0){
-            MUtilde_pre <- proj_Q_P_PostFMD$muTilde[i]
-          }
-          
-          if(Stilde_pre < 0){
-            Stilde_pre <- proj_Q_P_PostFMD$sTilde[i]
-          }
+          # params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewFMD, cl = clNewFMD,
+          #                                                 ps = psM_pre, pc = pcM_pre, 
+          #                                                 thetas = c(1,1), adj = 1)
+          # MUtilde_pre <- params_mu_s_FMDProj[1]
+          # Stilde_pre <- params_mu_s_FMDProj[2]
+          # 
+          # if(MUtilde_pre < 0){
+          #   MUtilde_pre <- proj_Q_P_PostFMD$muTilde[i]
+          # }
+          # 
+          # if(Stilde_pre < 0){
+          #   Stilde_pre <- proj_Q_P_PostFMD$sTilde[i]
+          # }
           
           ##### Here I am making sure the demand is decreased in the initial years of the disease outbreak
           ##### In order to do that, first I compute the demand under new prices. If the demand is greater than
@@ -847,24 +1008,29 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
               if(dePopR == 5){
                 
                 psM_pre <- psM_pre - 0.09
-                pcM_pre <- pcM_pre - 0.005
+                pcM_pre <- pcM_pre - 0.09
                 slNewFMD <- slNewFMD + 0.01
                 clNewFMD <- clNewFMD + 0.008
                 
               }else if(dePopR == 10){
                 
-                psM_pre <- psM_pre - 0.08
-                pcM_pre <- pcM_pre - 0.004
+                psM_pre <- psM_pre - 0.09
+                pcM_pre <- pcM_pre - 0.09
                 slNewFMD <- slNewFMD + 0.01
                 clNewFMD <- clNewFMD + 0.008
                 
               }else if(dePopR == 20){
                 
-                psM_pre <- psM_pre - 0.07
-                pcM_pre <- pcM_pre - 0.003
+                psM_pre <- psM_pre - 0.09
+                pcM_pre <- pcM_pre - 0.09
                 slNewFMD <- slNewFMD + 0.01
                 clNewFMD <- clNewFMD + 0.008
                 
+              }else{
+                psM_pre <- psM_pre - 0.09
+                pcM_pre <- pcM_pre - 0.09
+                slNewFMD <- slNewFMD + 0.01
+                clNewFMD <- clNewFMD + 0.008
               }
               
               # PsFMD <- getPsPcEpsEpc_FMD_EQ_OPT(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
@@ -942,7 +1108,9 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn,
           
           proj_Q_P_PostFMD$demDollarsAfter[i] <- capAFMD_DollarsAfter
           
-          capAFMD <- (slNewFMD + clNewFMD) 
+          # if(i>2){
+            capAFMD <- (slNewFMD_OG + clNewFMD_OG) * adjF_pre
+          # }
           
         }
         
@@ -960,6 +1128,10 @@ optimisticPostFMD_10 <- simOptimisticFMD(dePopR = 10, modelParamsEQ_PreFMD = mod
 optimisticPostFMD_20 <- simOptimisticFMD(dePopR = 20, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD,
                                          exports_percentK = exports_percentK, nn = 11, Stock = Stock)
 
+optimisticPostFMD_0 <- simOptimisticFMD(dePopR = 0, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD,
+                                         exports_percentK = exports_percentK, nn = 11, Stock = Stock)
+
+
 postFMD_P_Q_5_Opt <- optimisticPostFMD_5[[1]]
 postFMD_INV_5_Opt <- optimisticPostFMD_5[[2]]
 postFMD_MER_INV_5_Opt <- optimisticPostFMD_5[[3]]
@@ -971,6 +1143,10 @@ postFMD_MER_INV_10_Opt <- optimisticPostFMD_10[[3]]
 postFMD_P_Q_20_Opt <- optimisticPostFMD_20[[1]]
 postFMD_INV_20_Opt <- optimisticPostFMD_20[[2]]
 postFMD_MER_INV_20_Opt <- optimisticPostFMD_20[[3]]
+
+postFMD_P_Q_0_Opt <- optimisticPostFMD_0[[1]]
+postFMD_INV_0_Opt <- optimisticPostFMD_0[[2]]
+postFMD_MER_INV_0_Opt <- optimisticPostFMD_0[[3]]
 
 
 simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn, Stock){
@@ -996,8 +1172,8 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
       
       adjF_pre <- mean(tail(modelParamsEQ_PreFMD, n=1)$AdjFactor)
       
-      slShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$slShock)
-      clShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$clShock)
+      # slShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$slShock)
+      # clShock2009 <- mean(tail(allStockShocks %>% filter(Year<=2009),n=1)$clShock)
       
       slShock2009 <- 1
       clShock2009 <- 1
@@ -1006,7 +1182,7 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
                                               k4 =  NA, k5 =  NA, k6 =  NA, 
                                               k7 =  NA, k8 =  NA, k9 =  NA)
       
-      beefINV_FORECAST_PostFMD$Year <- seq(from=2010, to=2010+nn-1)
+      beefINV_FORECAST_PostFMD$Year <- seq(from=2021, to=2021+nn-1)
       
       proj_Q_P_PostFMD <- data.frame(Year = numeric(nn), Ps = numeric(nn), Pc = numeric(nn), 
                                      EPs = numeric(nn), EPc = numeric(nn), Hc = numeric(nn), 
@@ -1015,25 +1191,25 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
                                      muTilde = numeric(nn), sTilde = numeric(nn), sh = numeric(nn),
                                      demDollarsAfter = numeric(nn), Sl_OG = numeric(nn), Cl_OG = numeric(nn))
       
-      k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
-                                k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
-                                k07 = numeric(nn), k08 = numeric(nn))
+      # k0s_PostFMD <- data.frame(Year = numeric(nn), k02 = numeric(nn), k03 = numeric(nn), 
+      #                           k04 = numeric(nn), k05 = numeric(nn), k06 = numeric(nn), 
+      #                           k07 = numeric(nn), k08 = numeric(nn))
+      # 
+      # k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,], 
+      #                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
+      #                                       calfCrop = calf_crop_PostFMD)
       
-      k0s_PostFMD[1,] <- get_k0s_Global_FMD(proj_Q_P = proj_Q_P_PostFMD[1,], 
-                                            beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
-                                            calfCrop = calf_crop_PostFMD)
       
-      
-      stockForecastFMD <- Stock %>% filter(Year < 2010)
+      stockForecastFMD <- Stock %>% filter(Year < 2021)
       mergedForecastFMD <- merge(stockForecastFMD, beefINV_FORECAST_PostFMD, all=TRUE) %>% filter(Year >= 1995)
       
-      # mergedForecastFMD$k3[mergedForecastFMD$Year==2010] <- mergedForecastFMD$k3[mergedForecastFMD$Year==2009]
+      # quantitiesSLCLFMD <- quantities %>% select(Year, sl, cl) %>% filter(Year < 2021 & Year >= 1995)
       
-      quantitiesSLCLFMD <- quantities %>% select(Year, sl, cl) %>% filter(Year < 2010 & Year >= 1995)
-      wtAVGFMD <- allStockShocks %>% select(Year, Slaughter_avg, Cull_avg) %>% filter(Year < 2010 & Year >= 1995)
+      quantitiesSLCLFMD <- modelParamsEQ_PreFMD %>% select(Year, slMedian, clMedian) %>% filter(Year < 2021 & Year >= 1995)
+      wtAVGFMD <- allStockShocks %>% select(Year, Slaughter_avg, Cull_avg) %>% filter(Year < 2021 & Year >= 1995)
       quantsWeightsFMD <- merge(quantitiesSLCLFMD, wtAVGFMD)
       
-      impExpFMD <- stocksImportsExports %>% select(Year, Imports, Exports) %>% filter(Year < 2010 & Year >= 1995)
+      impExpFMD <- stocksImportsExports %>% select(Year, Imports, Exports) %>% filter(Year < 2021 & Year >= 1995)
       
       quantsWeightsFMD <- merge(quantsWeightsFMD, impExpFMD, all=TRUE)
       
@@ -1042,11 +1218,12 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
       mergedForecastFMD <- fill(mergedForecastFMD, Cull_avg, .direction = 'down')
       mergedForecastFMD <- fill(mergedForecastFMD, Slaughter_avg, .direction = 'down')
       
+      mergedForecastFMD$k3[mergedForecastFMD$Year==2021] <- mergedForecastFMD$k3[mergedForecastFMD$Year==2020]
+      
       mergedForecastFMD <- mergedForecastFMD %>% mutate(k4 = delta * lag(k3), k5 = delta * lag(k4), k6 = delta * lag(k5),
                                                         k7 = delta * lag(k6), k8 = delta * lag(k7), 
                                                         k9 = if_else((K - (k3+k4+k5+k6+k7+k8)) < 0, 0, (K - (k3+k4+k5+k6+k7+k8))),
                                                         k10 = 0) %>% filter(Year > 2000)
-      
       
       ##### Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US
       ##### December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S.
@@ -1064,7 +1241,7 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
       slNewPre <- slSM_pre
       clNewPre <- clSM_pre
       
-      params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewPre, cl = clNewPre, 
+      params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewPre, cl = clNewPre,
                                                       ps = psM_pre, pc = pcM_pre, thetas = c(1,1), adj = 1)
       
       MUtilde_pre <- params_mu_s_FMDProj[1]
@@ -1102,7 +1279,7 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         k9nFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(k9)
         clShnFMD <- 1
         cAvgFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Cull_avg)
-        clmFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(cl)
+        clmFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(clMedian)
         ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
         clNewFMD <-  ((k9nFMD + (1-delta) * k8nFMD + (1-delta) * k7nFMD) * clShnFMD +
                         (delta * (k8nFMD + k7nFMD + k6nFMD) - (k7nFMD + k8nFMD + k9nFMD)) )* (cAvgFMD/1000000000)
@@ -1120,6 +1297,9 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         k8m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k8)
         k7m2FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-3) %>% select(k7)
         fedAvgFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>%select(Slaughter_avg)
+        # sl1FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% mutate(sl1 = slMedian * (1000000000/Slaughter_avg))
+        # cl1FMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% mutate(cl1 = clMedian * (1000000000/Cull_avg))
+        
         ## This is because for the past years k9 is zero. So I assume the k9s are zero for next years as well.
         ## This might change if the imports are increased. I do not add imports in the analysis for now.
         slNewFMD <- ((g - 0.37 * g) * Km2FMD * slShmFMD +
@@ -1130,8 +1310,6 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         slNewFMDHead_OG <- as.numeric(slNewFMD * (1000000000/fedAvgFMD))
         slNewFMD_OG <- slNewFMD
         proj_Q_P_PostFMD$Sl_OG[i] <- slNewFMD_OG
-        
-        # capAFMD <- capA_pre
         
         ANewFMD <- (slNewFMD + clNewFMD)
         
@@ -1146,38 +1324,57 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
           slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
           clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
           
+          # slNewFMD <- slNewFMD + exportsBeef_2009 * 0.75
+          # clNewFMD <- clNewFMD + exportsBeef_2009 * 0.25
+          
           capAFMD_Dollars <- capAFMD * sh_pre * psM_pre + capAFMD * (1-sh_pre) * pcM_pre
           
           # exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
           # if(exprtsFMD < 0){
-          exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
+          exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric())
           # }
           mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+          
+          imprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Imports) %>% as.numeric()
+          mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(imprtsFMD>0,imprtsFMD,0)
+          
         }else if(i >= 4 && i <= 5){
           # i >= 4 && i <= 5
           # i == 2
           # capAFMD <- capAFMD
           slNewFMD <- slNewFMD + slNewFMD * (exports_percentK/100)
           clNewFMD <- clNewFMD + clNewFMD * (exports_percentK/100)
+          
+          # slNewFMD <- slNewFMD + exportsBeef_2009 * 0.75
+          # clNewFMD <- clNewFMD + exportsBeef_2009 * 0.25
+          
           # exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric())
           # if(exprtsFMD < 0){
-          exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric())
+          exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric())
           # }
           mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+          
+          imprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Imports) %>% as.numeric()
+          mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(imprtsFMD>0,imprtsFMD,0)
+          
         }else{
-          # capAFMD <- capAFMD
-          # if(dePopR==5){
           slNewFMD <- slNewFMD - slNewFMD * (exports_percentK/100)
           clNewFMD <- clNewFMD - clNewFMD * (exports_percentK/100)
+          
+          # slNewFMD <- slNewFMD + exportsBeef_2009 * 0.75
+          # clNewFMD <- clNewFMD + exportsBeef_2009 * 0.25
           # }else{
           # slNewFMD <- slNewFMD
           # clNewFMD <- clNewFMD
           # }
           # exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == yearIFMD-1) %>% select(Exports) %>% as.numeric()
           # if(exprtsFMD < 0){
-          exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2009) %>% select(Exports) %>% as.numeric()
+          exprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric()
           # }
           mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
+          
+          imprtsFMD <- mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Imports) %>% as.numeric()
+          mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(imprtsFMD>0,imprtsFMD,0)
         }
         
         k <- 0
@@ -1192,12 +1389,23 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         # }
         
         slDemFMD <- ANewFMD  * sh_pre
+        
         slDemHeadFMD <- slDemFMD * (1000000000/slaughterAvgFMD)
         
         # Chad's suggestion: Use calf crop from 2009 and age distribution from 2009 to get a best estimate of K for 2010
         # So basically use mergedForecastFMD_Proj cap K to get the calf crop and then think creatively to get the K for 2010
         
-        k_old_headFMD <- g * K1[i] - slDemHeadFMD  - exprtsFMD
+        # k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+        
+        if(dePopR == 20 | dePopR == 10){
+          if(i<3){
+            k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+          }else{
+            k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+          }
+        }else{
+          k_old_headFMD <- g * K1[i] - slDemHeadFMD - exprtsFMD
+        }
         
         #### Here after the export ban is lifted I check whether the replacement heifers are greater than the historical 
         #### maximum. If yes, then remove the animals and add them into the exports.
@@ -1205,21 +1413,21 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         slUpdate <- 0
         clUpdate <- 0
         impUpdate[i] <- 0
+        
         k_old_headFMD_OG <- k_old_headFMD
         
         if(i >= 3){
           # i > 5
           # i >= 3
-          
           # slNewFMD_OG <- slNewFMD
           # clNewFMD_OG <- clNewFMD
           
-          while(k_old_headFMD > k3HistMax){
-            k_old_headFMD <- k_old_headFMD - 10000
-            expUpdate[i] <- 1
-          }
+          # while(k_old_headFMD > k3HistMed){
+          #   k_old_headFMD <- k_old_headFMD - 10000
+          #   expUpdate[i] <- 1
+          # }
           
-          while(k_old_headFMD < k3HistMed){
+          while(k_old_headFMD < k3HistMean){
             k_old_headFMD <- k_old_headFMD + 10000
             impUpdate[i] <- 1
           }
@@ -1243,20 +1451,70 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
           #   clNewFMD <- clNewFMD + 0.05
           #   clUpdate <- 1
           # }
-          if(expUpdate[i] == 1){
-            exprtsFMD <- (k_old_headFMD_OG - k_old_headFMD)
-            mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <-
-              if_else(exprtsFMD>0,exprtsFMD,0)
-          }
+          
+          # if(expUpdate[i] == 1){
+          #   exprtsFMD1 <- (k_old_headFMD_OG - k_old_headFMD)
+          #   mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <-
+          #     if_else((exprtsFMD + exprtsFMD1)>0,(exprtsFMD + exprtsFMD1),0)
+          # }
           
           if(impUpdate[i] == 1){
-            impFMD <- (k_old_headFMD - k_old_headFMD_OG)
+            impFMD1 <- (k_old_headFMD - k_old_headFMD_OG)
             mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <-
-              if_else(impFMD>0,impFMD,0)
+              if_else(impFMD1>0,impFMD1,0)
           }
           
         }
         
+        if(i > 5){
+          # i > 5
+          # i >= 3
+          # slNewFMD_OG <- slNewFMD
+          # clNewFMD_OG <- clNewFMD
+
+          while(k_old_headFMD > k3HistMed){
+            k_old_headFMD <- k_old_headFMD - 10000
+            expUpdate[i] <- 1
+          }
+
+          # while(k_old_headFMD < k3HistMean){
+          #   k_old_headFMD <- k_old_headFMD + 10000
+          #   impUpdate[i] <- 1
+          # }
+
+          # while(slNewFMD > slHistMax){
+          #   slNewFMD <- slNewFMD - 0.01
+          #   slUpdate <- 1
+          # }
+          #
+          # while(clNewFMD > clHistMax){
+          #   clNewFMD <- clNewFMD - 0.01
+          #   clUpdate <- 1
+          # }
+          #
+          # while(slNewFMD < slHistMin){
+          #   slNewFMD <- slNewFMD + 0.01
+          #   slUpdate <- 1
+          # }
+          #
+          # while(clNewFMD < clHistMin){
+          #   clNewFMD <- clNewFMD + 0.05
+          #   clUpdate <- 1
+          # }
+
+          if(expUpdate[i] == 1){
+            exprtsFMD1 <- (k_old_headFMD_OG - k_old_headFMD)
+            mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <-
+              if_else(exprtsFMD1>0,exprtsFMD1,0)
+          }
+
+          # if(impUpdate[i] == 1){
+          #   impFMD1 <- (k_old_headFMD - k_old_headFMD_OG)
+          #   mergedForecastFMD_Proj$Imports[mergedForecastFMD_Proj$Year == yearIFMD] <-
+          #     if_else(impFMD1>0,impFMD1,0)
+          # }
+
+        }
         
         mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD] <- k_old_headFMD
         
@@ -1287,8 +1545,41 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         # approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) + 
         #   (delta * 0.5 * (ccY1)) - k_old_headFMD_OG
         
-        approxKFMD <- delta * (KOne - clDemHeadFMDOne) + 
-          (delta * 0.5 * (ccY1)) - k_old_headFMD_OG
+        # approxKFMD <- delta * (KOne - clDemHeadFMDOne) + 
+        #   (delta * 0.5 * (ccY1)) - k_old_headFMD_OG
+        
+        if(dePopR == 20){
+          if(i<5){
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (0.5 * (ccY1)) - k_old_headFMD_OG - exprtsFMD 
+          }else{
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (0.5 * (ccY1)) - k_old_headFMD_OG - exprtsFMD -
+              mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD]
+          }
+        }else if(dePopR == 10){
+          if(i<5){
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (0.5 * delta * (ccY1)) - k_old_headFMD_OG - exprtsFMD
+          }else{
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (0.5 * delta * (ccY1)) - k_old_headFMD_OG - exprtsFMD -
+              mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD]
+          }
+        }
+        else{
+          if(i<5){
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (0.5 * delta * (ccY1)) - k_old_headFMD_OG - exprtsFMD
+          }else{
+            approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+              (0.5 * delta * (ccY1)) - k_old_headFMD_OG - exprtsFMD -
+              mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD]
+          }
+          # approxKFMD <- delta * (KOne - clDemHeadFMDOne - exprtsFMDOne) +
+          #   (delta * 0.5 * (ccY1)) - k_old_headFMD_OG - exprtsFMD - 
+          #   mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD]
+        }
         
         
         mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD] <- approxKFMD 
@@ -1352,8 +1643,8 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         beefINV_FORECAST_PostFMD[i,] <- 
           mergedForecastFMD_Proj %>% filter(Year == yearIFMD) %>% select(Year, K, k3, k4, k5, k6, k7, k8, k9)
         
-        mergedForecastFMD_Proj$cl[mergedForecastFMD_Proj$Year == yearIFMD] <- clNewFMD
-        mergedForecastFMD_Proj$sl[mergedForecastFMD_Proj$Year == yearIFMD] <- slNewFMD
+        mergedForecastFMD_Proj$clMedian[mergedForecastFMD_Proj$Year == yearIFMD] <- clNewFMD
+        mergedForecastFMD_Proj$slMedian[mergedForecastFMD_Proj$Year == yearIFMD] <- slNewFMD
         
         # if(i>2){
         #   capAFMD <- ANewFMD * adjF_pre
@@ -1366,19 +1657,19 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         psM_pre <- PsFMD[1]
         pcM_pre <- PsFMD[2]
         
-        params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewFMD, cl = clNewFMD,
-                                                        ps = psM_pre, pc = pcM_pre, 
-                                                        thetas = c(1,1), adj = 1)
-        MUtilde_pre <- params_mu_s_FMDProj[1]
-        Stilde_pre <- params_mu_s_FMDProj[2]
-        
-        if(MUtilde_pre < 0){
-          MUtilde_pre <- proj_Q_P_PostFMD$muTilde[i]
-        }
-        
-        if(Stilde_pre < 0){
-          Stilde_pre <- proj_Q_P_PostFMD$sTilde[i]
-        }
+        # params_mu_s_FMDProj <- optParamFunction_FMDProj(sl = slNewFMD, cl = clNewFMD,
+        #                                                 ps = psM_pre, pc = pcM_pre, 
+        #                                                 thetas = c(1,1), adj = 1)
+        # MUtilde_pre <- params_mu_s_FMDProj[1]
+        # Stilde_pre <- params_mu_s_FMDProj[2]
+        # 
+        # if(MUtilde_pre < 0){
+        #   MUtilde_pre <- proj_Q_P_PostFMD$muTilde[i]
+        # }
+        # 
+        # if(Stilde_pre < 0){
+        #   Stilde_pre <- proj_Q_P_PostFMD$sTilde[i]
+        # }
         
         ##### Here I am making sure the demand is decreased in the initial years of the disease outbreak
         ##### In order to do that, first I compute the demand under new prices. If the demand is greater than
@@ -1393,48 +1684,53 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
             
             # if(dePopR == 5){
             #   
-            #   psM_pre <- psM_pre - 0.1
-            #   pcM_pre <- pcM_pre - 0.001
-            #   slNewFMD <- slNewFMD + 0.005
-            #   clNewFMD <- clNewFMD + 0.005
+            #   psM_pre <- psM_pre - 0.09
+            #   pcM_pre <- pcM_pre - 0.005
+            #   slNewFMD <- slNewFMD + 0.01
+            #   clNewFMD <- clNewFMD + 0.008
             #   
             # }else if(dePopR == 10){
             #   
-            #   psM_pre <- psM_pre - 0.1
-            #   pcM_pre <- pcM_pre - 0.001
-            #   slNewFMD <- slNewFMD + 0.005
-            #   clNewFMD <- clNewFMD + 0.005
+            #   psM_pre <- psM_pre - 0.08
+            #   pcM_pre <- pcM_pre - 0.004
+            #   slNewFMD <- slNewFMD + 0.01
+            #   clNewFMD <- clNewFMD + 0.008
             #   
             # }else if(dePopR == 20){
             #   
-            #   psM_pre <- psM_pre - 0.1
-            #   pcM_pre <- pcM_pre - 0.001
-            #   slNewFMD <- slNewFMD + 0.005
-            #   clNewFMD <- clNewFMD + 0.005
+            #   psM_pre <- psM_pre - 0.07
+            #   pcM_pre <- pcM_pre - 0.003
+            #   slNewFMD <- slNewFMD + 0.01
+            #   clNewFMD <- clNewFMD + 0.008
             #   
             # }
             
             if(dePopR == 5){
               
               psM_pre <- psM_pre - 0.09
-              pcM_pre <- pcM_pre - 0.005
+              pcM_pre <- pcM_pre - 0.09
               slNewFMD <- slNewFMD + 0.01
               clNewFMD <- clNewFMD + 0.008
               
             }else if(dePopR == 10){
               
-              psM_pre <- psM_pre - 0.08
-              pcM_pre <- pcM_pre - 0.004
+              psM_pre <- psM_pre - 0.09
+              pcM_pre <- pcM_pre - 0.09
               slNewFMD <- slNewFMD + 0.01
               clNewFMD <- clNewFMD + 0.008
               
             }else if(dePopR == 20){
               
-              psM_pre <- psM_pre - 0.07
-              pcM_pre <- pcM_pre - 0.003
+              psM_pre <- psM_pre - 0.09
+              pcM_pre <- pcM_pre - 0.09
               slNewFMD <- slNewFMD + 0.01
               clNewFMD <- clNewFMD + 0.008
               
+            }else{
+              psM_pre <- psM_pre - 0.09
+              pcM_pre <- pcM_pre - 0.09
+              slNewFMD <- slNewFMD + 0.01
+              clNewFMD <- clNewFMD + 0.008
             }
             
             # PsFMD <- getPsPcEpsEpc_FMD_EQ_PES(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
@@ -1512,7 +1808,7 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn
         
         proj_Q_P_PostFMD$demDollarsAfter[i] <- capAFMD_DollarsAfter
         
-        capAFMD <- (slNewFMD + clNewFMD)
+        capAFMD <- (slNewFMD_OG + clNewFMD_OG) * adjF_pre
         
       }
       
@@ -1531,6 +1827,11 @@ pessimisticPostFMD_10 <- simPessimisticFMD(dePopR = 10, modelParamsEQ_PreFMD = m
 pessimisticPostFMD_20 <- simPessimisticFMD(dePopR = 20, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD,
                                            exports_percentK = exports_percentK, nn = 11, Stock = Stock)
 
+pessimisticPostFMD_0 <- simPessimisticFMD(dePopR = 0, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD,
+                                        exports_percentK = exports_percentK, nn = 11, Stock = Stock)
+
+
+
 postFMD_P_Q_5_Pes <- pessimisticPostFMD_5[[1]]
 postFMD_INV_5_Pes <- pessimisticPostFMD_5[[2]]
 postFMD_MER_INV_5_Pes <- pessimisticPostFMD_5[[3]]
@@ -1542,6 +1843,11 @@ postFMD_MER_INV_10_Pes <- pessimisticPostFMD_10[[3]]
 postFMD_P_Q_20_Pes <- pessimisticPostFMD_20[[1]]
 postFMD_INV_20_Pes <- pessimisticPostFMD_20[[2]]
 postFMD_MER_INV_20_Pes <- pessimisticPostFMD_20[[3]]
+
+postFMD_P_Q_0_Pes <- pessimisticPostFMD_0[[1]]
+postFMD_INV_0_Pes <- pessimisticPostFMD_0[[2]]
+postFMD_MER_INV_0_Pes <- pessimisticPostFMD_0[[3]]
+
 
 ###################################################################################################################################################
 ###################################################################### PLOTS ######################################################################
@@ -1559,15 +1865,15 @@ beefINV_FORECAST_PostFMD_OPT_20 <- postFMD_INV_20_Opt
 
 ### Prices, Supplies and Quantity demanded
 proj_Q_P_PostFMD_OPT_5I <- proj_Q_P_PostFMD_OPT_5 %>% transmute(Year = Year, Ps5 = Ps, Pc5 = Pc, Sl5 = Sl,Cl5 = Cl,
-                                                                        Sl5_OG = Sl_OG, Cl5_OG = Cl_OG,
+                                                                Hc5 = Hc, Sl5_OG = Sl_OG, Cl5_OG = Cl_OG,
                                                                         mu5 = muTilde, sh5 = sh, D5 = demDollarsAfter)
 
 proj_Q_P_PostFMD_OPT_10I <- proj_Q_P_PostFMD_OPT_10 %>% transmute(Year = Year,Ps10 = Ps, Pc10 = Pc, Sl10 = Sl, Cl10 = Cl,
-                                                                          Sl10_OG = Sl_OG, Cl10_OG = Cl_OG,
+                                                                  Hc10 = Hc, Sl10_OG = Sl_OG, Cl10_OG = Cl_OG,
                                                                           mu10 = muTilde, sh10 = sh, D10 = demDollarsAfter) 
 
 proj_Q_P_PostFMD_OPT_20I <- proj_Q_P_PostFMD_OPT_20 %>% transmute(Year = Year,Ps20 = Ps, Pc20 = Pc, Sl20 = Sl, Cl20 = Cl,
-                                                                          Sl20_OG = Sl_OG, Cl20_OG = Cl_OG,
+                                                                  Hc20 = Hc, Sl20_OG = Sl_OG, Cl20_OG = Cl_OG,
                                                                           mu20 = muTilde, sh20 = sh, D20 = demDollarsAfter)
 
 ##### Merging all data frames 
@@ -1628,17 +1934,24 @@ beefINV_FORECAST_PostFMD_PESI <- Reduce(function(...) merge(...),
 ######################################################### OPTIMISTIC PLOTS ##########################################################
 #####################################################################################################################################
 
-proj_Q_P_PostFMD_OPTI_PS_PC <- proj_Q_P_PostFMD_OPTI %>% select(Year, Ps5, Pc5, Ps10, Pc10, Ps20, Pc20)
+proj_Q_P_PostFMD_OPTI_PS_PC <- proj_Q_P_PostFMD_OPTI %>% select(Year, Ps5, Pc5, Ps10, Pc10, Ps20, Pc20, Hc5, Hc10, Hc20)
 
 proj_Q_P_PostFMD_OPTI_PS_PC[,-1] <- proj_Q_P_PostFMD_OPTI_PS_PC[,-1] * 100
 
-EQ_PricesCosts_OPT <- EQ_PricesCosts %>% transmute(Year = Year, PsB = psMedian * 100, PcB = pcMedian * 100)
+# EQ_PricesCosts_OPT <- EQ_PricesCosts %>% transmute(Year = Year, PsB = psMedian * 100, PcB = pcMedian * 100)
+
+EQ_PricesCosts_OPT <- proj_Q_P %>% transmute(Year = Year, PsB = Ps * 100, PcB = Pc * 100, HcB = Hc * 100) %>% filter(PsB>0)
 
 proj_Q_P_PostFMD_OPTI_PS_PC_B <- merge(proj_Q_P_PostFMD_OPTI_PS_PC, EQ_PricesCosts_OPT)
+
+proj_Q_P_PostFMD_OPTI_PS_PC_B <- merge(proj_Q_P_PostFMD_OPTI_PS_PC, EQ_PricesCosts_OPT)
+
 
 proj_Q_P_PostFMD_OPTI_PS_B <- proj_Q_P_PostFMD_OPTI_PS_PC_B %>% select(Year, PsB, Ps5, Ps10, Ps20)
 
 proj_Q_P_PostFMD_OPTI_PC_B <- proj_Q_P_PostFMD_OPTI_PS_PC_B %>% select(Year, PcB, Pc5, Pc10, Pc20)
+
+proj_Q_P_PostFMD_OPTI_HC_B <- proj_Q_P_PostFMD_OPTI_PS_PC_B %>% select(Year, HcB, Hc5, Hc10, Hc20)
 
 #### The following has the percent change
 proj_Q_P_PostFMD_OPTI_PS_B_PercentChange <- proj_Q_P_PostFMD_OPTI_PS_B %>%
@@ -1649,22 +1962,136 @@ proj_Q_P_PostFMD_OPTI_PC_B_PercentChange <- proj_Q_P_PostFMD_OPTI_PC_B %>%
   transmute(Year, Pc5Percent = (((Pc5-PcB)/PcB) * 100), Pc10Percent = (((Pc10-PcB)/PcB) * 100),
             Pc20Percent =(((Pc20-PcB)/PcB) * 100)) %>% round(3)
 
+proj_Q_P_PostFMD_OPTI_HC_B_PercentChange <- proj_Q_P_PostFMD_OPTI_HC_B %>%
+  transmute(Year, Hc5Percent = (((Hc5-HcB)/HcB) * 100), Hc10Percent = (((Hc10-HcB)/HcB) * 100),
+            Hc20Percent =(((Hc20-HcB)/HcB) * 100)) %>% round(3)
+
+PostFMD_OPTI_HC_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_HC_B_PercentChange %>% ggplot(aes(x = Year))+
+  geom_line(aes(y = Hc5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Hc5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Hc10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Hc10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = Hc20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Hc20Percent, color="20% Depop"),size=2) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_HC_B_PercentChange$Year[1],
+                                  proj_Q_P_PostFMD_OPTI_HC_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPTI_HC_B_PercentChange)])))+
+  scale_y_continuous(name="Percent change from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) + 
+  geom_hline(yintercept=0, linetype="dashed", size=0.25)
+
+
 PostFMD_OPTI_PS_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_PS_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PsB, color="Baseline")) +
-  geom_point(aes(y = PsB, color = "Baseline")) +
-  geom_line(aes(y = Ps5, color="5% Depop")) +
-  geom_point(aes(y = Ps5, color = "5% Depop")) +
-  geom_line(aes(y = Ps10, color="10% Depop")) +
-  geom_point(aes(y = Ps10, color="10% Depop")) +
-  geom_line(aes(y = Ps20, color="20% Depop")) +
-  geom_point(aes(y = Ps20, color="20% Depop")) +
+  geom_line(aes(y = PsB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = PsB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Ps5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Ps5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Ps10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Ps10, color="10% Depop"),size=2) +
+  geom_line(aes(y = Ps20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Ps20, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_PS_B$Year[1],
                                   proj_Q_P_PostFMD_OPTI_PS_B$Year[nrow(proj_Q_P_PostFMD_OPTI_PS_B)])))+ 
-  scale_y_continuous(name="Change in the fed cattle prices from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  scale_y_continuous(name="Fed cattle price ($/CWT)")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
+
+# PostFMD_OPTI_PS_PlotPPT <- round(proj_Q_P_PostFMD_OPTI_PS_B,3) %>% ggplot(aes(x = Year))+
+#   geom_line(aes(y = PsB, color="Baseline"),size=2) +
+#   geom_point(aes(y = PsB, color = "Baseline"),size=2.5) +
+#   geom_line(aes(y = Ps10, color="10% Depop"),size=2) +
+#   geom_point(aes(y = Ps10, color="10% Depop"),size=2.5) +
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_PS_B$Year[1],
+#                                   proj_Q_P_PostFMD_OPTI_PS_B$Year[nrow(proj_Q_P_PostFMD_OPTI_PS_B)])))+
+#    scale_y_continuous(name="Fed cattle price ($/CWT)", limits = c(95,140,by=5) ) +
+#   theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 25,face = "bold"),
+#         legend.background = element_rect(color = NA)) +
+#   theme(legend.title=element_blank()) + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=25, face = "bold"), 
+#         axis.text.y = element_text(size=25, face = "bold"), 
+#         axis.title = element_text(size= 25, face = "bold")) +
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+#   scale_color_manual(breaks=c('10% Depop', 'Baseline'),
+#                      values=c('10% Depop'='#00BA38', 'Baseline'='#F8766D'))+theme(axis.ticks.length=unit(.35, "cm"))
+# 
+# 
+# PostFMD_OPTI_Sl_OG_PlotPPT <- round(proj_Q_P_PostFMD_OPTI_Sl_B,3) %>% ggplot(aes(x = Year))+
+#   geom_line(aes(y = SlB, color="Baseline"),size=2) +
+#   geom_point(aes(y = SlB, color = "Baseline"),size=2.5) +
+#   geom_line(aes(y = Sl10_OG, color="10% Depop"),size=2) +
+#   geom_point(aes(y = Sl10_OG, color="10% Depop"),size=2.5)+
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B$Year[1],
+#                                   proj_Q_P_PostFMD_OPTI_Sl_B$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B)])))+ 
+#   scale_y_continuous(name="Fed cattle supply (in billion pounds)", limits = c(20,28,by=1))  + theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 25,face = "bold"),
+#         legend.background = element_rect(color = NA)) +
+#   theme(legend.title=element_blank()) + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 25, face = "bold"), 
+#         axis.text.y = element_text(size = 25, face = "bold"), 
+#         axis.title=element_text(size = 25, face = "bold")) +
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+#   scale_color_manual(breaks=c('10% Depop', 'Baseline'),
+#                      values=c('10% Depop'='#F8766D', 'Baseline' = '#C77CFF')) + theme(axis.ticks.length=unit(.35, "cm"))
+# 
+# 
+# PostFMD_PESI_PS_PlotPPT <- round(proj_Q_P_PostFMD_PESI_PS_B,3) %>% ggplot(aes(x = Year))+
+#   geom_line(aes(y = PsB, color="Baseline"),size=2) +
+#   geom_point(aes(y = PsB, color = "Baseline"),size=2.5) +
+#   geom_line(aes(y = Ps10, color="10% Depop"),size=2) +
+#   geom_point(aes(y = Ps10, color="10% Depop"),size=2.5) +
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_PS_B$Year[1],
+#                                   proj_Q_P_PostFMD_OPTI_PS_B$Year[nrow(proj_Q_P_PostFMD_OPTI_PS_B)])))+
+#   scale_y_continuous(name="Fed cattle price ($/CWT)", limits = c(95,140,by=5) ) +
+#   theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 25,face = "bold"),
+#         legend.background = element_rect(color = NA)) +
+#   theme(legend.title=element_blank()) + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=25, face = "bold"), 
+#         axis.text.y = element_text(size=25, face = "bold"), 
+#         axis.title = element_text(size= 25, face = "bold")) +
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+#   scale_color_manual(breaks=c('10% Depop', 'Baseline'),
+#                      values=c('10% Depop'='#00BA38', 'Baseline'='#F8766D'))+theme(axis.ticks.length=unit(.35, "cm"))
+# 
+# 
+# PostFMD_OPTI_Sl_OG_PlotPPT <- round(proj_Q_P_PostFMD_OPTI_Sl_B,3) %>% ggplot(aes(x = Year))+
+#   geom_line(aes(y = SlB, color="Baseline"),size=2) +
+#   geom_point(aes(y = SlB, color = "Baseline"),size=2.5) +
+#   geom_line(aes(y = Sl10_OG, color="10% Depop"),size=2) +
+#   geom_point(aes(y = Sl10_OG, color="10% Depop"),size=2.5)+
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B$Year[1],
+#                                   proj_Q_P_PostFMD_OPTI_Sl_B$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B)])))+ 
+#   scale_y_continuous(name="Fed cattle supply (in billion pounds)", limits = c(20,28,by=1))  + theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 25,face = "bold"),
+#         legend.background = element_rect(color = NA)) +
+#   theme(legend.title=element_blank()) + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 25, face = "bold"), 
+#         axis.text.y = element_text(size = 25, face = "bold"), 
+#         axis.title=element_text(size = 25, face = "bold")) +
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+#   scale_color_manual(breaks=c('10% Depop', 'Baseline'),
+#                      values=c('10% Depop'='#F8766D', 'Baseline' = '#C77CFF')) + theme(axis.ticks.length=unit(.35, "cm"))
+
 
 PostFMD_OPTI_PS_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_PS_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = Ps5Percent, color="5% Depop"),size=1.1) +
@@ -1675,28 +2102,40 @@ PostFMD_OPTI_PS_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_PS_B_PercentChange %>
   geom_point(aes(y = Ps20Percent, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_PS_B_PercentChange$Year[1],
-                                  proj_Q_P_PostFMD_OPTI_PS_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPTI_PS_B_PercentChange)])))+ 
-  scale_y_continuous(name="Percent change in the fed cattle prices from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+                                  proj_Q_P_PostFMD_OPTI_PS_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPTI_PS_B_PercentChange)])))+
+  scale_y_continuous(name="Percent change from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) + 
+  geom_hline(yintercept=c(-20, -10, 0), linetype="dashed", size=0.25) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
+
 
 PostFMD_OPTI_PC_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_PC_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PcB, color="Baseline")) +
-  geom_point(aes(y = PcB, color = "Baseline")) +
-  geom_line(aes(y = Pc5, color="5% Depop")) +
-  geom_point(aes(y = Pc5, color = "5% Depop")) +
-  geom_line(aes(y = Pc10, color="10% Depop")) +
-  geom_point(aes(y = Pc10, color="10% Depop")) +
-  geom_line(aes(y = Pc20, color="20% Depop")) +
-  geom_point(aes(y = Pc20, color="20% Depop")) +
+  geom_line(aes(y = PcB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = PcB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Pc5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Pc5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Pc10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Pc10, color="10% Depop"),size=2) +
+  geom_line(aes(y = Pc20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Pc20, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_PC_B$Year[1],
                                   proj_Q_P_PostFMD_OPTI_PC_B$Year[nrow(proj_Q_P_PostFMD_OPTI_PC_B)])))+ 
   scale_y_continuous(name="Change in the cull cow prices from baseline")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))+
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
+
 
 PostFMD_OPTI_PC_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_PC_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = Pc5Percent, color="5% Depop"),size=1.1) +
@@ -1711,36 +2150,48 @@ PostFMD_OPTI_PC_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_PC_B_PercentChange %>
   scale_y_continuous(name="Percent change in the cull cow prices from baseline")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed") +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
 
 
 ####### Now I plot the stocks as well #####
 
-stocks_Baseline <- Stock %>% filter(Year >= 2010) %>% transmute(Year, KB = K)
+# stocks_Baseline <- Stock %>% filter(Year >= 2010) %>% transmute(Year, KB = K)
+
+stocks_Baseline <- mergedForecast_Proj %>% filter(Year >= 2020) %>% transmute(Year, KB = K)
+
 stocks_OPT_Baseline <- merge(beefINV_FORECAST_PostFMD_OPTI, stocks_Baseline)
 
 stocks_OPT_B_PercentChange <- stocks_OPT_Baseline %>% 
   transmute(Year, K5Percent = (((K5-KB)/KB) * 100), K10Percent = (((K10-KB)/KB) * 100),
             K20Percent = (((K20-KB)/KB) * 100)) %>% round(3)
 
-
 stocks_OPT_Baseline[,-1] <- stocks_OPT_Baseline[,-1]/1000000
+
 PostFMD_stocks_OPT_ChangePlot <- round(stocks_OPT_Baseline,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = KB, color="Baseline")) +
-  geom_point(aes(y = KB, color = "Baseline")) +
-  geom_line(aes(y = K5, color="5% Depop")) +
-  geom_point(aes(y = K5, color = "5% Depop")) +
-  geom_line(aes(y = K10, color="10% Depop")) +
-  geom_point(aes(y = K10, color="10% Depop")) +
-  geom_line(aes(y = K20, color="20% Depop")) +
-  geom_point(aes(y = K20, color="20% Depop")) +
+  geom_line(aes(y = KB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = KB, color = "Baseline"),size=2) +
+  geom_line(aes(y = K5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = K5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = K10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = K10, color="10% Depop"),size=2) +
+  geom_line(aes(y = K20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = K20, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_OPT_Baseline$Year[1],
                                   stocks_OPT_Baseline$Year[nrow(stocks_OPT_Baseline)])))+ 
-  scale_y_continuous(name="Change in the stocks from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  scale_y_continuous(name="Change in the stocks")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 PostFMD_stocks_OPT_PercentChangePlot <- stocks_OPT_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = K5Percent, color="5% Depop"),size=1.1) +
@@ -1752,10 +2203,17 @@ PostFMD_stocks_OPT_PercentChangePlot <- stocks_OPT_B_PercentChange %>% ggplot(ae
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_OPT_B_PercentChange$Year[1],
                                   stocks_OPT_B_PercentChange$Year[nrow(stocks_OPT_B_PercentChange)])))+ 
-  scale_y_continuous(name="Percent change in the stocks from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  scale_y_continuous(name="Percent change from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) + 
+  geom_hline(yintercept=0, linetype="dashed", size=0.25) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
 
 
 ######## Supplies
@@ -1763,7 +2221,11 @@ PostFMD_stocks_OPT_PercentChangePlot <- stocks_OPT_B_PercentChange %>% ggplot(ae
 proj_Q_P_PostFMD_OPTI_Sl_Cl <- proj_Q_P_PostFMD_OPTI %>% select(Year, Sl5, Cl5, Sl10, Cl10, Sl20, Cl20,
                                                                         Sl5_OG, Cl5_OG, Sl10_OG, Cl10_OG, Sl20_OG, Cl20_OG)
 
-EQ_Supplies_OPT <- EQ_Supplies %>% transmute(Year = Year, SlB = slMedian, ClB = clMedian)
+
+
+# EQ_Supplies_OPT <- EQ_Supplies %>% transmute(Year = Year, SlB = slMedian, ClB = clMedian)
+
+EQ_Supplies_OPT <- proj_Q_PIIV  %>% transmute(Year = Year, SlB = Sl, ClB = Cl)
 
 proj_Q_P_PostFMD_OPTI_Sl_Cl_B <- merge(proj_Q_P_PostFMD_OPTI_Sl_Cl, EQ_Supplies_OPT)
 
@@ -1772,6 +2234,11 @@ proj_Q_P_PostFMD_OPTI_Sl_B <- proj_Q_P_PostFMD_OPTI_Sl_Cl_B %>% select(Year, SlB
 
 proj_Q_P_PostFMD_OPTI_Cl_B <- proj_Q_P_PostFMD_OPTI_Sl_Cl_B %>% select(Year, ClB, Cl5, Cl10, Cl20,
                                                                                Cl5_OG, Cl10_OG, Cl20_OG)
+
+proj_Q_P_PostFMD_OPTI_TS_B <- merge(proj_Q_P_PostFMD_OPTI_Sl_B, proj_Q_P_PostFMD_OPTI_Cl_B) %>%
+  transmute(Year = Year, TSB = SlB + ClB, TS5_OG = Sl5_OG + Cl5_OG, TS10_OG = Sl10_OG + Cl10_OG,
+            TS20_OG = Sl20_OG + Cl20_OG)
+
 
 #### The following has the percent change of supplies
 proj_Q_P_PostFMD_OPTI_Sl_B_PercentChange <- proj_Q_P_PostFMD_OPTI_Sl_B %>%
@@ -1789,6 +2256,11 @@ proj_Q_P_PostFMD_OPTI_Sl_OG_B_PercentChange <- proj_Q_P_PostFMD_OPTI_Sl_B %>%
 proj_Q_P_PostFMD_OPTI_Cl_OG_B_PercentChange <- proj_Q_P_PostFMD_OPTI_Cl_B %>%
   transmute(Year, Cl5Percent = (((Cl5_OG-ClB)/ClB) * 100), Cl10Percent = (((Cl10_OG-ClB)/ClB) * 100),
             Cl20Percent =(((Cl20_OG-ClB)/ClB) * 100)) %>% round(3)
+
+proj_Q_P_PostFMD_OPTI_TS_B_PercentChange <- proj_Q_P_PostFMD_OPTI_TS_B %>%
+  transmute(Year, TS5Percent = (((TS5_OG-TSB)/TSB) * 100), TS10Percent = (((TS10_OG-TSB)/TSB) * 100),
+            TS20Percent =(((TS20_OG-TSB)/TSB) * 100)) %>% round(3)
+
 
 
 PostFMD_OPTI_Sl_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_Sl_B,3) %>% ggplot(aes(x = Year))+
@@ -1821,7 +2293,47 @@ PostFMD_OPTI_Sl_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_Sl_B_PercentChange %>
   scale_y_continuous(name="Percent change in the fed cattle supply from baseline")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed") +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
+
+PostFMD_OPTI_TS_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_TS_B,3) %>% ggplot(aes(x = Year))+
+  geom_line(aes(y = TSB, color="Baseline")) +
+  geom_point(aes(y = TSB, color = "Baseline")) +
+  geom_line(aes(y = TS5_OG, color="5% Depop")) +
+  geom_point(aes(y = TS5_OG, color = "5% Depop")) +
+  geom_line(aes(y = TS10_OG, color="10% Depop")) +
+  geom_point(aes(y = TS10_OG, color="10% Depop")) +
+  geom_line(aes(y = TS20_OG, color="20% Depop")) +
+  geom_point(aes(y = TS20_OG, color="20% Depop")) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_TS_B$Year[1],
+                                  proj_Q_P_PostFMD_OPTI_TS_B$Year[nrow(proj_Q_P_PostFMD_OPTI_TS_B)])))+ 
+  scale_y_continuous(name="Change in the total supply from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38', 
+                              'Baseline' = '#C77CFF'))
+
+PostFMD_OPTI_TS_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_TS_B_PercentChange %>% ggplot(aes(x = Year))+
+  geom_line(aes(y = TS5Percent, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = TS5Percent, color = "5% Depop"),size=2) +
+  geom_line(aes(y = TS10Percent, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = TS10Percent, color="10% Depop"),size=2) +
+  geom_line(aes(y = TS20Percent, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = TS20Percent, color="20% Depop"),size=2) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_TS_B_PercentChange$Year[1],
+                                  proj_Q_P_PostFMD_OPTI_TS_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_OPTI_TS_B_PercentChange)])))+ 
+  scale_y_continuous(name="Percent change in the total supply from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed") +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
+
 
 PostFMD_OPTI_Cl_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_Cl_B,3) %>% ggplot(aes(x = Year))+
   geom_line(aes(y = ClB, color="Baseline")) +
@@ -1853,25 +2365,37 @@ PostFMD_OPTI_Cl_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_Cl_B_PercentChange %>
   scale_y_continuous(name="Percent change in the cull cow supply from baseline")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed") +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
 
 
 PostFMD_OPTI_Sl_OG_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_Sl_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = SlB, color="Baseline")) +
-  geom_point(aes(y = SlB, color = "Baseline")) +
-  geom_line(aes(y = Sl5_OG, color="5% Depop")) +
-  geom_point(aes(y = Sl5_OG, color = "5% Depop")) +
-  geom_line(aes(y = Sl10_OG, color="10% Depop")) +
-  geom_point(aes(y = Sl10_OG, color="10% Depop")) +
-  geom_line(aes(y = Sl20_OG, color="20% Depop")) +
-  geom_point(aes(y = Sl20_OG, color="20% Depop")) +
+  geom_line(aes(y = SlB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = SlB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Sl5_OG, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Sl5_OG, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Sl10_OG, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Sl10_OG, color="10% Depop"),size=2) +
+  geom_line(aes(y = Sl20_OG, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Sl20_OG, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B$Year[1],
                                   proj_Q_P_PostFMD_OPTI_Sl_B$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B)])))+ 
   scale_y_continuous(name="Change in the fed cattle supply from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
+
+
+
 
 PostFMD_OPTI_Sl_OG_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_Sl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = Sl5Percent, color="5% Depop"),size=1.1) +
@@ -1886,24 +2410,34 @@ PostFMD_OPTI_Sl_OG_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_Sl_OG_B_PercentCha
   scale_y_continuous(name="Percent change in the fed cattle supply from baseline")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed") +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38'))
+
 
 PostFMD_OPTI_Cl_OG_ChangePlot <- round(proj_Q_P_PostFMD_OPTI_Cl_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = ClB, color="Baseline")) +
-  geom_point(aes(y = ClB, color = "Baseline")) +
-  geom_line(aes(y = Cl5_OG, color="5% Depop")) +
-  geom_point(aes(y = Cl5_OG, color = "5% Depop")) +
-  geom_line(aes(y = Cl10_OG, color="10% Depop")) +
-  geom_point(aes(y = Cl10_OG, color="10% Depop")) +
-  geom_line(aes(y = Cl20_OG, color="20% Depop")) +
-  geom_point(aes(y = Cl20_OG, color="20% Depop")) +
+  geom_line(aes(y = ClB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = ClB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Cl5_OG, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Cl5_OG, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Cl10_OG, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Cl10_OG, color="10% Depop"),size=2) +
+  geom_line(aes(y = Cl20_OG, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Cl20_OG, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_Cl_B$Year[1],
                                   proj_Q_P_PostFMD_OPTI_Cl_B$Year[nrow(proj_Q_P_PostFMD_OPTI_Cl_B)])))+ 
-  scale_y_continuous(name="Change in the cull cow supply from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  scale_y_continuous(name="Change in the cull cow supply")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 PostFMD_OPTI_Cl_OG_PercentChangePlot <- proj_Q_P_PostFMD_OPTI_Cl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = Cl5Percent, color="5% Depop"),size=1.1) +
@@ -1936,7 +2470,9 @@ proj_Q_P_PostFMD_OPT_MU_PercentChange <- proj_Q_P_PostFMD_OPT_MU_B %>%
 proj_Q_P_PostFMD_OPT_SHR <- proj_Q_P_PostFMD_OPTI %>% select(Year, sh5, sh10, sh20)
 Eq_OPT_Sh <- sharesEq_Median %>% transmute(Year = Year, shB = shareMedian)
 
-proj_Q_P_PostFMD_OPT_SHR_B <- merge(proj_Q_P_PostFMD_OPT_SHR, Eq_OPT_Sh)
+Eq_OPT_Sh <- proj_Q_P %>% transmute(Year = Year, shB = sh)
+
+proj_Q_P_PostFMD_OPT_SHR_B <- merge(proj_Q_P_PostFMD_OPT_SHR, Eq_OPT_Sh) %>% filter(shB>0)
 
 proj_Q_P_PostFMD_OPT_SHR_PercentChange <- proj_Q_P_PostFMD_OPT_SHR_B %>%
   transmute(Year, sh5Percent = (((sh5-shB)/shB) * 100), sh10Percent = (((sh10-shB)/shB) * 100),
@@ -1991,7 +2527,10 @@ PostFMD_OPTI_SHR_ChangePlot <- round(proj_Q_P_PostFMD_OPT_SHR_B,3) %>% ggplot(ae
   scale_y_continuous(name="Change in the share from baseline")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 PostFMD_OPTI_SHR_PercentChangePlot <- proj_Q_P_PostFMD_OPT_SHR_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = sh5Percent, color="5% Depop")) +
@@ -2017,7 +2556,9 @@ proj_Q_P_PostFMD_PESI_PS_PC <- proj_Q_P_PostFMD_PESI %>% select(Year, Ps5, Pc5, 
 
 proj_Q_P_PostFMD_PESI_PS_PC[,-1] <- proj_Q_P_PostFMD_PESI_PS_PC[,-1] * 100
 
-EQ_PricesCosts_PES <- EQ_PricesCosts %>% transmute(Year = Year, PsB = psMedian * 100, PcB = pcMedian * 100)
+# EQ_PricesCosts_PES <- EQ_PricesCosts %>% transmute(Year = Year, PsB = psMedian * 100, PcB = pcMedian * 100)
+
+EQ_PricesCosts_PES <- proj_Q_P %>% transmute(Year = Year, PsB = Ps * 100, PcB = Pc * 100, HcB = Hc * 100) %>% filter(PsB>0)
 
 proj_Q_P_PostFMD_PESI_PS_PC_B <- merge(proj_Q_P_PostFMD_PESI_PS_PC, EQ_PricesCosts_PES)
 
@@ -2035,21 +2576,28 @@ proj_Q_P_PostFMD_PESI_PC_B_PercentChange <- proj_Q_P_PostFMD_PESI_PC_B %>%
             Pc20Percent =(((Pc20-PcB)/PcB) * 100)) %>% round(3)
 
 PostFMD_PESI_PS_ChangePlot <- round(proj_Q_P_PostFMD_PESI_PS_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PsB, color="Baseline")) +
-  geom_point(aes(y = PsB, color = "Baseline")) +
-  geom_line(aes(y = Ps5, color="5% Depop")) +
-  geom_point(aes(y = Ps5, color = "5% Depop")) +
-  geom_line(aes(y = Ps10, color="10% Depop")) +
-  geom_point(aes(y = Ps10, color="10% Depop")) +
-  geom_line(aes(y = Ps20, color="20% Depop")) +
-  geom_point(aes(y = Ps20, color="20% Depop")) +
+  geom_line(aes(y = PsB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = PsB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Ps5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Ps5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Ps10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Ps10, color="10% Depop"),size=2) +
+  geom_line(aes(y = Ps20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Ps20, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PESI_PS_B$Year[1],
                                   proj_Q_P_PostFMD_PESI_PS_B$Year[nrow(proj_Q_P_PostFMD_PESI_PS_B)])))+ 
-  scale_y_continuous(name="Change in the fed cattle prices from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  scale_y_continuous(name="Change in the fed cattle prices")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 PostFMD_PESI_PS_PercentChangePlot <- proj_Q_P_PostFMD_PESI_PS_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = Ps5Percent, color="5% Depop"),size=1.1) +
@@ -2061,27 +2609,44 @@ PostFMD_PESI_PS_PercentChangePlot <- proj_Q_P_PostFMD_PESI_PS_B_PercentChange %>
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PESI_PS_B_PercentChange$Year[1],
                                   proj_Q_P_PostFMD_PESI_PS_B_PercentChange$Year[nrow(proj_Q_P_PostFMD_PESI_PS_B_PercentChange)])))+ 
-  scale_y_continuous(name="Percent change in the fed cattle prices from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  scale_y_continuous(name="Percent change from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) + 
+  geom_hline(yintercept=c(0,-20,-40), linetype="dashed", size=0.25)
+
+
 
 PostFMD_PESI_PC_ChangePlot <- round(proj_Q_P_PostFMD_PESI_PC_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PcB, color="Baseline")) +
-  geom_point(aes(y = PcB, color = "Baseline")) +
-  geom_line(aes(y = Pc5, color="5% Depop")) +
-  geom_point(aes(y = Pc5, color = "5% Depop")) +
-  geom_line(aes(y = Pc10, color="10% Depop")) +
-  geom_point(aes(y = Pc10, color="10% Depop")) +
-  geom_line(aes(y = Pc20, color="20% Depop")) +
-  geom_point(aes(y = Pc20, color="20% Depop")) +
+  geom_line(aes(y = PcB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = PcB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Pc5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Pc5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Pc10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Pc10, color="10% Depop"),size=2) +
+  geom_line(aes(y = Pc20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Pc20, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PESI_PC_B$Year[1],
                                   proj_Q_P_PostFMD_PESI_PC_B$Year[nrow(proj_Q_P_PostFMD_PESI_PC_B)])))+ 
-  scale_y_continuous(name="Change in the cull cow prices from baseline")  + theme_classic() + 
+  scale_y_continuous(name="Change in the cull cow prices")  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))+ theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 PostFMD_PESI_PC_PercentChangePlot <- proj_Q_P_PostFMD_PESI_PC_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = Pc5Percent, color="5% Depop"),size=1.1) +
@@ -2101,7 +2666,10 @@ PostFMD_PESI_PC_PercentChangePlot <- proj_Q_P_PostFMD_PESI_PC_B_PercentChange %>
 
 ####### Now I plot the stocks as well #####
 
-stocks_Baseline <- Stock %>% filter(Year >= 2010) %>% transmute(Year, KB = K)
+# stocks_Baseline <- Stock %>% filter(Year >= 2010) %>% transmute(Year, KB = K)
+
+stocks_Baseline <- mergedForecast_Proj %>% filter(Year >= 2020) %>% transmute(Year, KB = K)
+
 stocks_PES_Baseline <- merge(beefINV_FORECAST_PostFMD_PESI, stocks_Baseline)
 
 stocks_PES_B_PercentChange <- stocks_PES_Baseline %>% 
@@ -2109,22 +2677,32 @@ stocks_PES_B_PercentChange <- stocks_PES_Baseline %>%
             K20Percent = (((K20-KB)/KB) * 100)) %>% round(3)
 
 stocks_PES_Baseline[,-1] <- stocks_PES_Baseline[,-1]/1000000
+
 PostFMD_stocks_PES_ChangePlot <- round(stocks_PES_Baseline,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = KB, color="Baseline")) +
-  geom_point(aes(y = KB, color = "Baseline")) +
-  geom_line(aes(y = K5, color="5% Depop")) +
-  geom_point(aes(y = K5, color = "5% Depop")) +
-  geom_line(aes(y = K10, color="10% Depop")) +
-  geom_point(aes(y = K10, color="10% Depop")) +
-  geom_line(aes(y = K20, color="20% Depop")) +
-  geom_point(aes(y = K20, color="20% Depop")) +
+  geom_line(aes(y = KB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = KB, color = "Baseline"),size=2) +
+  geom_line(aes(y = K5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = K5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = K10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = K10, color="10% Depop"),size=2) +
+  geom_line(aes(y = K20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = K20, color="20% Depop"),size=1.1) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_PES_Baseline$Year[1],
                                   stocks_PES_Baseline$Year[nrow(stocks_PES_Baseline)])))+ 
   scale_y_continuous(name="Change in the stocks from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
+
+
 
 PostFMD_stocks_PES_PercentChangePlot <- stocks_PES_B_PercentChange %>% ggplot(aes(x = Year))+
   geom_line(aes(y = K5Percent, color="5% Depop"),size=1.1) +
@@ -2136,10 +2714,15 @@ PostFMD_stocks_PES_PercentChangePlot <- stocks_PES_B_PercentChange %>% ggplot(ae
   scale_x_continuous(name="Year", 
                      breaks=c(seq(stocks_PES_B_PercentChange$Year[1],
                                   stocks_PES_B_PercentChange$Year[nrow(stocks_PES_B_PercentChange)])))+ 
-  scale_y_continuous(name="Percent change in the stocks from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+  scale_y_continuous(name="Percent change from baseline")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) + 
+  geom_hline(yintercept=0, linetype="dashed", size=0.25)
 
 
 ######## Supplies
@@ -2147,7 +2730,9 @@ PostFMD_stocks_PES_PercentChangePlot <- stocks_PES_B_PercentChange %>% ggplot(ae
 proj_Q_P_PostFMD_PESI_Sl_Cl <- proj_Q_P_PostFMD_PESI %>% select(Year, Sl5, Cl5, Sl10, Cl10, Sl20, Cl20,
                                                                         Sl5_OG, Cl5_OG, Sl10_OG, Cl10_OG, Sl20_OG, Cl20_OG)
 
-EQ_Supplies_PES <- EQ_Supplies %>% transmute(Year = Year, SlB = slMedian, ClB = clMedian)
+# EQ_Supplies_PES <- EQ_Supplies %>% transmute(Year = Year, SlB = slMedian, ClB = clMedian)
+
+EQ_Supplies_PES <- proj_Q_P  %>% transmute(Year = Year, SlB = Sl, ClB = Cl) %>% filter(SlB>0)
 
 proj_Q_P_PostFMD_PESI_Sl_Cl_B <- merge(proj_Q_P_PostFMD_PESI_Sl_Cl, EQ_Supplies_PES)
 
@@ -2244,21 +2829,28 @@ PostFMD_PESI_Cl_PercentChangePlot <- proj_Q_P_PostFMD_PESI_Cl_B_PercentChange %>
 
 
 PostFMD_PESI_Sl_OG_ChangePlot <- round(proj_Q_P_PostFMD_PESI_Sl_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = SlB, color="Baseline")) +
-  geom_point(aes(y = SlB, color = "Baseline")) +
-  geom_line(aes(y = Sl5_OG, color="5% Depop")) +
-  geom_point(aes(y = Sl5_OG, color = "5% Depop")) +
-  geom_line(aes(y = Sl10_OG, color="10% Depop")) +
-  geom_point(aes(y = Sl10_OG, color="10% Depop")) +
-  geom_line(aes(y = Sl20_OG, color="20% Depop")) +
-  geom_point(aes(y = Sl20_OG, color="20% Depop")) +
+  geom_line(aes(y = SlB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = SlB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Sl5_OG, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = Sl5_OG, color = "5% Depop"),size=2) +
+  geom_line(aes(y = Sl10_OG, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = Sl10_OG, color="10% Depop"),size=2) +
+  geom_line(aes(y = Sl20_OG, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = Sl20_OG, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PESI_Sl_B$Year[1],
                                   proj_Q_P_PostFMD_PESI_Sl_B$Year[nrow(proj_Q_P_PostFMD_PESI_Sl_B)])))+ 
-  scale_y_continuous(name="Change in the fed cattle supply from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  scale_y_continuous(name="Change in the fed cattle supply")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 
 PostFMD_PESI_Sl_OG_PercentChangePlot <- proj_Q_P_PostFMD_PESI_Sl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
@@ -2278,21 +2870,28 @@ PostFMD_PESI_Sl_OG_PercentChangePlot <- proj_Q_P_PostFMD_PESI_Sl_OG_B_PercentCha
 
 
 PostFMD_PESI_Cl_OG_ChangePlot <- round(proj_Q_P_PostFMD_PESI_Cl_B,3) %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = ClB, color="Baseline")) +
-  geom_point(aes(y = ClB, color = "Baseline")) +
-  geom_line(aes(y = Cl5_OG, color="5% Depop")) +
-  geom_point(aes(y = Cl5_OG, color = "5% Depop")) +
-  geom_line(aes(y = Cl10_OG, color="10% Depop")) +
-  geom_point(aes(y = Cl10_OG, color="10% Depop")) +
-  geom_line(aes(y = Cl20_OG, color="20% Depop")) +
-  geom_point(aes(y = Cl20_OG, color="20% Depop")) +
+  geom_line(aes(y = ClB, color="Baseline"), size=1.1) +
+  geom_point(aes(y = ClB, color = "Baseline"), size=2) +
+  geom_line(aes(y = Cl5_OG, color="5% Depop"), size=1.1) +
+  geom_point(aes(y = Cl5_OG, color = "5% Depop"), size=2) +
+  geom_line(aes(y = Cl10_OG, color="10% Depop"), size=1.1) +
+  geom_point(aes(y = Cl10_OG, color="10% Depop"), size=2) +
+  geom_line(aes(y = Cl20_OG, color="20% Depop"), size=1.1) +
+  geom_point(aes(y = Cl20_OG, color="20% Depop"), size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PESI_Cl_B$Year[1],
                                   proj_Q_P_PostFMD_PESI_Cl_B$Year[nrow(proj_Q_P_PostFMD_PESI_Cl_B)])))+ 
   scale_y_continuous(name="Change in the cull cow supply from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 
 PostFMD_PESI_Cl_OG_PercentChangePlot <- proj_Q_P_PostFMD_PESI_Cl_OG_B_PercentChange %>% ggplot(aes(x = Year))+
@@ -2359,7 +2958,9 @@ PostFMD_PESI_MU_PercentChangePlot <- proj_Q_P_PostFMD_PES_MU_PercentChange %>% g
 proj_Q_P_PostFMD_PES_SHR <- proj_Q_P_PostFMD_PESI %>% select(Year, sh5, sh10, sh20)
 Eq_PES_Sh <- sharesEq_Median %>% transmute(Year = Year, shB = shareMedian)
 
-proj_Q_P_PostFMD_PES_SHR_B <- merge(proj_Q_P_PostFMD_PES_SHR, Eq_PES_Sh) %>% round(3) 
+Eq_PES_Sh <- proj_Q_P %>% transmute(Year = Year, shB = sh)
+
+proj_Q_P_PostFMD_PES_SHR_B <- merge(proj_Q_P_PostFMD_PES_SHR, Eq_PES_Sh) %>% round(3) %>% filter(shB>0)
 
 proj_Q_P_PostFMD_PES_SHR_PercentChange <- proj_Q_P_PostFMD_PES_SHR_B %>%
   transmute(Year, sh5Percent = (((sh5-shB)/shB) * 100), sh10Percent = (((sh10-shB)/shB) * 100),
@@ -2367,21 +2968,28 @@ proj_Q_P_PostFMD_PES_SHR_PercentChange <- proj_Q_P_PostFMD_PES_SHR_B %>%
 
 
 PostFMD_PESI_SHR_ChangePlot <- proj_Q_P_PostFMD_PES_SHR_B %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = shB, color="Baseline")) +
-  geom_point(aes(y = shB, color = "Baseline")) +
-  geom_line(aes(y = sh5, color="5% Depop")) +
-  geom_point(aes(y = sh5, color = "5% Depop")) +
-  geom_line(aes(y = sh10, color="10% Depop")) +
-  geom_point(aes(y = sh10, color="10% Depop")) +
-  geom_line(aes(y = sh20, color="20% Depop")) +
-  geom_point(aes(y = sh20, color="20% Depop")) +
+  geom_line(aes(y = shB, color="Baseline"),size=1.1) +
+  geom_point(aes(y = shB, color = "Baseline"),size=2) +
+  geom_line(aes(y = sh5, color="5% Depop"),size=1.1) +
+  geom_point(aes(y = sh5, color = "5% Depop"),size=2) +
+  geom_line(aes(y = sh10, color="10% Depop"),size=1.1) +
+  geom_point(aes(y = sh10, color="10% Depop"),size=2) +
+  geom_line(aes(y = sh20, color="20% Depop"),size=1.1) +
+  geom_point(aes(y = sh20, color="20% Depop"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_PES_SHR_B$Year[1],
                                   proj_Q_P_PostFMD_PES_SHR_B$Year[nrow(proj_Q_P_PostFMD_PES_SHR_B)])))+ 
-  scale_y_continuous(name="Change in the share from baseline")  + theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  scale_y_continuous(name="Change in the share") + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) +
+  scale_color_manual(breaks=c('5% Depop', '10% Depop', '20% Depop', 'Baseline'),
+                     values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D', '20% Depop'='#00BA38',
+                              'Baseline' = '#C77CFF'))
 
 
 PostFMD_PESI_SHR_PercentChangePlot <- proj_Q_P_PostFMD_PES_SHR_PercentChange %>% ggplot(aes(x = Year))+
@@ -2398,6 +3006,56 @@ PostFMD_PESI_SHR_PercentChangePlot <- proj_Q_P_PostFMD_PES_SHR_PercentChange %>%
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt"))) + geom_hline(yintercept=0, linetype="dashed")
+
+
+
+
+estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2018 & Year < 2031) %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=psMedian, color="Baseline"),size=1.1) +
+  geom_point(aes(y = psMedian, color = "Baseline"),size=2) +
+  geom_line(aes(y=Ps, color="Model Projection"),size=1.1) +
+  geom_point(aes(y=Ps, color="Model Projection"),size=2) +
+  geom_line(aes(y=FAPRI_Ps, color="FAPRI Projection"),size=1.1) +
+  geom_point(aes(y=FAPRI_Ps, color="FAPRI Projection"),size=2) +
+  geom_line(aes(y=USDA_Ps, color="USDA Projection"),size=1.1) +
+  geom_point(aes(y=USDA_Ps, color="USDA Projection"),size=2) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(estProj_PSIII_FAPRI$Year[1],
+                                  estProj_PSIII_FAPRI$Year[nrow(estProj_PSIII_FAPRI)])))+ 
+  scale_y_continuous(name="Fed Cattle Price ")  + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())
+
+CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII  %>% filter(Year >=2018 & Year < 2031) %>% ggplot(aes(x=Year))  + 
+  geom_line(aes(y=tsMedian, color="Baseline"),size=1.1) + 
+  geom_point(aes(y=tsMedian, color="Baseline"),size=2) + 
+  geom_line(aes(y=TS, color="Model Projection"),size=1.1) + 
+  geom_point(aes(y=TS, color="Model Projection"),size=2) + 
+  geom_line(aes(y=FAPRI_TS, color="FAPRI Projection"),size=1.1)  + 
+  geom_point(aes(y=FAPRI_TS, color="FAPRI Projection"),size=2) +
+  geom_line(aes(y=USDA_TS, color="USDA Projection"),size=1.1)  + 
+  geom_point(aes(y=USDA_TS, color="USDA Projection"),size=2)  + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(CARD_USDA_FAPRI_TS_ProjIII$Year[1],
+                                  CARD_USDA_FAPRI_TS_ProjIII$Year[nrow(CARD_USDA_FAPRI_TS_ProjIII)])))+ 
+  scale_y_continuous(name="Total Production Projections ") + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())
+
+
+
+
+
 
 
 
@@ -2466,20 +3124,69 @@ as.pdf(beefINV_FORECAST_PostFMD_PES_20_I_I)
 
 
 
+EQestObstotalInventory %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=K,color="Observed Inventory"),size=1.1) +
+  geom_point(aes(y=K,color="Observed Inventory"),size=2) + 
+  geom_line(aes(y=fitK,color="Fitted Inventory"),size=1.1) +
+  geom_point(aes(y=fitK,color="Fitted Inventory"),size=2) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObstotalInventory$Year[1],
+                                  EQestObstotalInventory$Year[nrow(EQestObstotalInventory)], by = 2))) + 
+  scale_y_continuous(name="Million Head") + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15)) +
+  theme(legend.title=element_blank())+ theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+                                             axis.text.y = element_text(size = 12)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 
 
+PostFMD_BaselineInventory <- EQestObstotalInventory %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=K,color="Observed Inventory"),size=1.1) +
+  geom_point(aes(y=K,color="Observed Inventory"),size=2) + 
+  geom_line(aes(y=fitK,color="Fitted Inventory"),size=1.1) +
+  geom_point(aes(y=fitK,color="Fitted Inventory"),size=2) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObstotalInventory$Year[1],
+                                  EQestObstotalInventory$Year[nrow(EQestObstotalInventory)], by = 2))) + 
+  scale_y_continuous(name="Million Head") + theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank()) 
 
 
+PostFMD_BaselineFedCattlePrices <- EQestObsPSNI_plots %>% ggplot(aes(x=Year))+ geom_line(aes(y=psMean, color="Mean fitted price"),size=1.1) +
+  geom_point(aes(y = psMean, color = "Mean fitted price"),size=2) + geom_line(aes(y=ps, color = "Observed price"),size=1.1) + 
+  geom_point(aes(y=ps, color = "Observed price"),size=2) + geom_line(aes(y=psMedian, color="Median Fitted price"),size=1.1) +
+  geom_point(aes(y = psMedian, color = "Median Fitted price"),size=2) + theme_classic() + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsPSNI_plots$Year[1],EQestObsPSNI_plots$Year[nrow(EQestObsPSNI_plots)], by = 2))) +
+  scale_y_continuous(name="Fed Cattle Price")+ theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
+        legend.background = element_rect(color = NA)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=15, face = "bold"), 
+        axis.text.y = element_text(size=15, face = "bold"), 
+        axis.title=element_text(size=14)) +
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())
 
 
+PostFMD_OPTI_PS_PercentChangePlot_Bar <- proj_Q_P_PostFMD_OPTI_PS_B_PercentChange %>% transmute(Year = Year, `5` = Ps5Percent,
+                                                                                                `10` = Ps10Percent, `20` = Ps20Percent)
 
+PostFMD_OPTI_PS_aggW <- 
+  gather(PostFMD_OPTI_PS_PercentChangePlot_Bar, depop, value, `5`:`20`, factor_key=TRUE)
 
-
-
-
-
-
+PostFMD_OPTI_PS_aggW_BarPlot <- PostFMD_OPTI_PS_aggW %>% ggplot(aes(fill=depop, y=value, x=Year)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_x_continuous(name = "Year", breaks=c(seq(PostFMD_OPTI_PS_aggW$Year[1],
+                                                 PostFMD_OPTI_PS_aggW$Year[nrow(PostFMD_OPTI_PS_aggW)]))) + 
+  scale_y_continuous(name="Percent Change") +
+  theme_test() + 
+  theme(legend.position="bottom", legend.box = "horizontal")
 
 
 

@@ -342,8 +342,8 @@ k0s_df_UP <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORE
 ### k_old is the replacement heifers. We start with zero (almost never true), but we let the program and data to give
 ### the optimal replacement heifers. This mostly depends on the demand.
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock upper 95%
-psM <- mean(tail(proj_AllDF_EQ, n=1)$psMedian)
-pcM <- mean(tail(proj_AllDF_EQ, n=1)$pcMedian)
+psM <- median(tail(proj_AllDF_EQ, n=3)$psMedian)
+pcM <- mean(tail(proj_AllDF_EQ, n=3)$pcMedian)
 hcM <- mean(tail(proj_AllDF_EQ, n=1)$hcMedian)
 
 EpsM <- mean(tail(proj_AllDF_EQ, n=1)$EpsMedian)
@@ -386,7 +386,7 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   psNew_lo <- psNew  - 0.05
   pcNew_lo <- pcNew - 0.08
   
-  psNew_up <- psNew + 0.08
+  psNew_up <- psNew + 0.75
   pcNew_up <- pcNew + 0.1
   
   #### Here we are making sure the lower bound for the prices isn't negative
@@ -490,6 +490,7 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   return(c(ps1N, pc1N, hc1N, ps_expected1N, pc_expected1N))
   
 }
+
 
 lossfn_Proj <- function(theta,e,ps,pc){
   mu <- theta[1]
@@ -732,10 +733,10 @@ for(i in 1:(nrow(proj_Q_P)-1)){
   
   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
   
-  params_mu_s_Proj <- optParamFunction_Proj(sl = slNew, cl = clNew, ps = psM, pc = pcM, 
-                                            thetas = c(1,1), adj = 1)
-  MUtilde <- params_mu_s_Proj[1]
-  Stilde <- params_mu_s_Proj[2]
+  # params_mu_s_Proj <- optParamFunction_Proj(sl = slNew, cl = clNew, ps = psM, pc = pcM, 
+  #                                           thetas = c(1,1), adj = 1)
+  # MUtilde <- params_mu_s_Proj[1]
+  # Stilde <- params_mu_s_Proj[2]
    
   if(i>1){
     proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1

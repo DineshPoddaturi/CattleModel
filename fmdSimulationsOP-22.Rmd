@@ -3,7 +3,7 @@ title: "FMD Simulations"
 output:
   pdf_document: default
   word_document: default
-date: "06-22-2022"
+date: "06-24-2022"
 ---
 
 <!-- 1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US. -->
@@ -30,8 +30,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/psChangePercentOPT.png}
-  \caption{Percentage change in the fed cattle price}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/psChangeOPT.png}
+  \caption{Change in the fed cattle price}
 \end{figure}
 
 <!-- \begin{figure} -->
@@ -40,8 +40,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/pcChangePercentOPT.png}
-  \caption{Percentage change in the cull cow price}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/pcChangeOPT.png}
+  \caption{Change in the cull cow price}
 \end{figure}
 
 
@@ -51,8 +51,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/stocksChangePercentOPT.png}
-  \caption{Percentage change in the stocks}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/stockChangeOPT.png}
+  \caption{Change in the inventory}
 \end{figure}
 
 
@@ -72,8 +72,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/slChangePercentOPT.png}
-  \caption{Percentage change in the fed cattle supply - Before adjusting for exports}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/slChangeOPT.png}
+  \caption{Change in the fed cattle supply - Before adjusting for exports}
 \end{figure}
 
 <!-- \begin{figure} -->
@@ -92,8 +92,13 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/clChangePercentOPT.png}
-  \caption{Percentage change in the cull cow supply - Before adjusting for exports}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/clChangeOPT.png}
+  \caption{Change in the cull cow supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/shChangeOPT.png}
+  \caption{Change in the share}
 \end{figure}
 
 
@@ -117,10 +122,10 @@ date: "06-22-2022"
 <!--   \caption{Percentage change in share} -->
 <!-- \end{figure} -->
 
-\begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/totalRevenueChangesPercentOPT.png}
-  \caption{Percentage change in the total revenue}
-\end{figure}
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/totalRevenueChangesPercentOPT.png} -->
+<!--   \caption{Percentage change in the total revenue} -->
+<!-- \end{figure} -->
 
 
 \clearpage
@@ -137,8 +142,8 @@ date: "06-22-2022"
 \end{itemize}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/psChangePercentPES.png}
-  \caption{Percentage change in the fed cattle price}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/psChangePES.png}
+  \caption{Change in the fed cattle price}
 \end{figure}
 
 <!-- \begin{figure} -->
@@ -147,8 +152,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/pcChangePercentPES.png}
-  \caption{Percentage change in the cull cow price}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/pcChangePES.png}
+  \caption{Change in the cull cow price}
 \end{figure}
 
 
@@ -158,8 +163,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/stocksChangePercentPES.png}
-  \caption{Percentage change in the stocks}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/stockChangesPES.png}
+  \caption{Change in inventory}
 \end{figure}
 
 
@@ -179,8 +184,8 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/slChangePercentPESOG.png}
-  \caption{Percentage change in the fed cattle supply - Before adjusting for exports}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/slChangesPES.png}
+  \caption{Change in the fed cattle supply - Before adjusting for exports}
 \end{figure}
 
 <!-- \begin{figure} -->
@@ -199,8 +204,13 @@ date: "06-22-2022"
 <!-- \end{figure} -->
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/clChangePercentPESOG.png}
-  \caption{Percentage change in the cull cow supply - Before adjusting for exports}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/clChangesPES.png}
+  \caption{Change in the cull cow supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-24/shChangePES.png}
+  \caption{Change in the share}
 \end{figure}
 
 
@@ -224,10 +234,10 @@ date: "06-22-2022"
 <!--   \caption{Percentage change in share} -->
 <!-- \end{figure} -->
 
-\begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/totalRevenueChangesPercentPES.png}
-  \caption{Percentage change in the total revenue}
-\end{figure}
+<!-- \begin{figure} -->
+<!--   \includegraphics[width=1.1\linewidth]{FMDSlideDeck/06-22/totalRevenueChangesPercentPES.png} -->
+<!--   \caption{Percentage change in the total revenue} -->
+<!-- \end{figure} -->
 
 
 

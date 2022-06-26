@@ -129,9 +129,13 @@ sharesEq_MedianPlot <- sharesEq_Median %>% ggplot(aes(x=Year))+geom_line(aes(y=s
 proj_Q_P1 <- proj_Q_P %>% select(Year, Ps) %>% mutate(Ps = Ps * 100) %>% filter(Ps>0)
 FAPRI_Proj1 <- FAPRI_Proj %>% select(FAPRI_Years, FAPRI_Ps) %>% mutate(Year = FAPRI_Years) %>% select(Year, FAPRI_Ps)
 
+proj_Q_P2 <- proj_Q_P %>% select(Year, Ps) %>% mutate(Ps = Ps * 100) %>% filter(Ps>0)
+
+
+
 USDA_Proj1 <- USDA_Proj %>% select(USDA_Years, USDA_Ps) %>% mutate(Year = USDA_Years) %>% select(Year, USDA_Ps)
 
-mergedPS <- merge(proj_Q_P1, FAPRI_Proj1)
+mergedPS <- merge(proj_Q_P2, FAPRI_Proj1)
 
 mergedPSPlot <- mergedPS %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=Ps, color="PS PROJECTION")) +
@@ -149,7 +153,9 @@ mergedPSPlot <- mergedPS %>% ggplot(aes(x=Year)) +
 
 proj_Q_PII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
-proj_Q_PII_FAPRI <- merge(proj_Q_PII, merge(FAPRI_Proj1, USDA_Proj1)) %>% select(Year, Ps, FAPRI_Ps, USDA_Ps)
+proj_Q_PIII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
+
+proj_Q_PII_FAPRI <- merge(proj_Q_PIII, merge(FAPRI_Proj1, USDA_Proj1)) %>% select(Year, Ps, FAPRI_Ps, USDA_Ps)
 
 proj_Q_PII_FAPRI_PS <- proj_Q_PII_FAPRI %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=Ps, color="PS PROJECTION")) +
@@ -162,12 +168,6 @@ proj_Q_PII_FAPRI_PS <- proj_Q_PII_FAPRI %>% ggplot(aes(x=Year)) +
   scale_y_continuous(name="Fed Cattle Price Projections ") +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-
-
-
-
 
 
 shPlot_III <- proj_Q_P %>% filter(Ps > 0) %>% ggplot(aes(x=Year))+geom_line(aes(y=sh, color="Proj Share")) +
@@ -191,9 +191,13 @@ muPlot_III <- proj_Q_P %>% filter(Ps > 0) %>% ggplot(aes(x=Year))+geom_line(aes(
 
 proj_Q_PIII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
+proj_Q_PIIV <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
+
 estProj_PSIII <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),proj_Q_PIII %>% select(Year, Ps), all=TRUE)
 
-estProj_PSIII_FAPRI <- merge(estProj_PSIII,merge(FAPRI_Proj1, USDA_Proj1), all=TRUE) %>% round(2)
+estProj_PSIIV <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),proj_Q_PIIV %>% select(Year, Ps), all=TRUE)
+
+estProj_PSIII_FAPRI <- merge(estProj_PSIIV,merge(FAPRI_Proj1, USDA_Proj1), all=TRUE) %>% round(2)
 
 estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year < 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=psMedian, color="PS Fitted")) +
@@ -212,7 +216,10 @@ estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year < 2031)
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
+
 estProj_PCIII <- merge(EQestObsPC_Medians %>% mutate(pcMedian = pcMedian*100),proj_Q_PIII %>% select(Year, Pc), all=TRUE) %>% round(2)
+
+estProj_PCIII <- merge(EQestObsPC_Medians %>% mutate(pcMedian = pcMedian*100),proj_Q_PIIV %>% select(Year, Pc), all=TRUE) %>% round(2)
 
 estProj_PCIII_plots <- estProj_PCIII %>% filter(Year >=2016 & Year < 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=pcMedian, color="PC Fitted")) +
@@ -227,6 +234,9 @@ estProj_PCIII_plots <- estProj_PCIII %>% filter(Year >=2016 & Year < 2031) %>% g
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 estProj_SLIII <- merge(EQestSl_Medians, proj_Q_PIII %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
+  filter(Year > 2015)
+
+estProj_SLIIV <- merge(EQestSl_Medians, proj_Q_PIIV %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
   filter(Year > 2015)
 
 estProj_SLIII_plots <- estProj_SLIII %>% ggplot(aes(x=Year)) +
@@ -244,17 +254,91 @@ estProj_SLIII_plots <- estProj_SLIII %>% ggplot(aes(x=Year)) +
 estProj_CLIII <- merge(EQestCl_Medians, proj_Q_PIII %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
   filter(Year > 2015)
 
-estProj_CLIII_plots <- estProj_CLIII %>% ggplot(aes(x=Year)) +
-  geom_line(aes(y=clMedian, color="SL Fitted")) +
-  geom_point(aes(y = clMedian, color = "SL Fitted")) +
-  geom_line(aes(y=Cl, color="SL PROJECTION")) +
-  geom_point(aes(y=Cl, color="SL PROJECTION"))+
+estProj_CLIIV <- merge(EQestCl_Medians, proj_Q_PIIV %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
+  filter(Year > 2015)
+
+
+estProj_CLIII_plots <- estProj_CLIIV %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=clMedian, color="CL Fitted")) +
+  geom_point(aes(y = clMedian, color = "CL Fitted")) +
+  geom_line(aes(y=Cl, color="CL PROJECTION")) +
+  geom_point(aes(y=Cl, color="CL PROJECTION"))+
   scale_x_continuous(name="Year", 
                      breaks=c(seq(estProj_CLIII$Year[1],
                                   estProj_CLIII$Year[nrow(estProj_CLIII)])))+ 
   scale_y_continuous(name="Cull Cow Production") +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+
+
+
+
+
+
+proj_Q_PIIV <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
+
+estProj_PSIIV <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),proj_Q_PIIV %>% select(Year, Ps), all=TRUE)
+
+estProj_PSIII_FAPRI <- merge(estProj_PSIIV,merge(FAPRI_Proj1, USDA_Proj1), all=TRUE) %>% round(2)
+
+estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year < 2031) %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=psMedian, color="PS Fitted")) +
+  geom_point(aes(y = psMedian, color = "PS Fitted")) +
+  geom_line(aes(y=Ps, color="PS PROJECTION")) +
+  geom_point(aes(y=Ps, color="PS PROJECTION")) +
+  geom_line(aes(y=FAPRI_Ps, color="FAPRI PROJECTION")) +
+  geom_point(aes(y=FAPRI_Ps, color="FAPRI PROJECTION")) +
+  geom_line(aes(y=USDA_Ps, color="USDA PROJECTION")) +
+  geom_point(aes(y=USDA_Ps, color="USDA PROJECTION")) +
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(estProj_PSIII_FAPRI$Year[1],
+                                  estProj_PSIII_FAPRI$Year[nrow(estProj_PSIII_FAPRI)])))+ 
+  scale_y_continuous(name="Fed Cattle Price ") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+
+FAPRI_Proj_TSIII <- FAPRI_Proj %>% select(-FAPRI_Ps) %>% transmute(Year = FAPRI_Years, FAPRI_TS = FAPRI_TS)
+USDA_Proj_TSIII <- USDA_Proj %>% select(-USDA_Ps) %>% transmute(Year = USDA_Years, USDA_TS = USDA_TS) %>% filter(Year >2020)
+
+estProj_SLIIV <- merge(EQestSl_Medians, proj_Q_PIIV %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
+  filter(Year > 2015)
+
+estProj_CLIIV <- merge(EQestCl_Medians, proj_Q_PIIV %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
+  filter(Year > 2015)
+
+EQestObsTS_MediansIIV <- merge(estProj_SLIIV %>% select(-errMean, -errmedian), 
+                                  estProj_CLIIV %>% select(-errMean, -errmedian)) %>%
+  transmute(Year = Year, tsMedian = slMedian + clMedian, 
+            TS = Sl + Cl) %>% round(3)
+
+CARD_USDA_FAPRI_TS_ProjIII <- left_join(left_join(EQestObsTS_MediansIIV, FAPRI_Proj_TSIII, by="Year"), 
+                                      USDA_Proj_TSIII, by="Year")
+CARD_USDA_FAPRI_TS_ProjIII
+
+CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% ggplot(aes(x=Year))  + 
+  geom_line(aes(y=tsMedian, color="Baseline")) + 
+  geom_point(aes(y=tsMedian, color="Baseline")) + 
+  geom_line(aes(y=TS, color="Projected")) + 
+  geom_point(aes(y=TS, color="Projected")) + 
+  geom_line(aes(y=FAPRI_TS, color="FAPRI Projection"))  + 
+  geom_point(aes(y=FAPRI_TS, color="FAPRI Projection")) +
+  geom_line(aes(y=USDA_TS, color="USDA Projection"))  + 
+  geom_point(aes(y=USDA_TS, color="USDA Projection"))  + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(CARD_USDA_FAPRI_TS_ProjIII$Year[1],
+                                  CARD_USDA_FAPRI_TS_ProjIII$Year[nrow(CARD_USDA_FAPRI_TS_ProjIII)])))+ 
+  scale_y_continuous(name="Total Production Projections ") +  theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal") +
+  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
+
+
+
+
 
 
 estProj_AIII <- merge(proj_AllDF_EQ %>% select(Year, A), proj_Q_PIII %>% mutate(A_proj = A) %>% select(Year, A_proj)
