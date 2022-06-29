@@ -518,6 +518,10 @@ k3HistMean <- mean(Stock$k3[Stock$Year <=2020])
 KHistMed <- median(Stock$K[Stock$Year <=2020])
 nn <- 11
 
+#### When adding the stocks or evolution of the stocks, keep in mind the calf crop must come from the breeding animals
+#### in the stock. Do not use the cap K to get the calf crop and then decide the replacement heifers.
+#### Making this change might not blow up the stock levels. This is crucial I think.
+
 simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, nn, Stock){
         
         slaughterAvg_pre <- mean(tail(modelParamsEQ_PreFMD, n=1)$Slaughter_avg)
