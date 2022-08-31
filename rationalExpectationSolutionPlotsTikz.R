@@ -3,7 +3,10 @@ require(tikzDevice)
 # # http://iltabiai.github.io/tips/latex/2015/09/15/latex-tikzdevice-r.html
 
 
-EQestObsPSNI_plots <- EQestObsPSNII  %>% select(Year, psMean, psMedian, ps) %>% 
+# EQestObsPSNI_plots <- EQestObsPSNII  %>% select(Year, psMean, psMedian, ps) %>% 
+#   transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100) %>% filter(Year>=1998)
+
+EQestObsPSNI_plots <- EQestObsPSNIII  %>% select(Year, psMean, psMedian, ps) %>% 
   transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100) %>% filter(Year>=1998)
 
 tikz(file="rationalExpectationsLatexPlots/Updated/FedCattlePricePlot.tex", width=6.2, height=3.5)
@@ -25,7 +28,10 @@ print(slaughter_plot)
 dev.off()
 
 
-EQestObsPCNI_plots <- EQestObsPCNII %>% select(Year, pcMean, pcMedian, pc) %>% 
+# EQestObsPCNI_plots <- EQestObsPCNII %>% select(Year, pcMean, pcMedian, pc) %>% 
+#   transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100) %>% filter(Year >= 1998)
+
+EQestObsPCNI_plots <- EQestObsPCNIII %>% select(Year, pcMean, pcMedian, pc) %>% 
   transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100) %>% filter(Year >= 1998)
 
 tikz(file="rationalExpectationsLatexPlots/Updated/CullCowPricePlot.tex", width=6.2, height=3.5)
@@ -50,7 +56,9 @@ dev.off()
 
 
 dressedWeights_cl <- dressedWeights_sl_cl %>% select(Year, Cull_avg)
-EQestObsCLNI_Plots <- EQestObsCLNII %>% select(Year, clMedian)
+# EQestObsCLNI_Plots <- EQestObsCLNII %>% select(Year, clMedian)
+EQestObsCLNI_Plots <- EQestObsCLNIII %>% select(Year, clMedian)
+
 EQestObsCLNI_Head <- merge(EQestObsCLNI_Plots, dressedWeights_cl) %>% mutate(clMedianHead = 
                                                                                clMedian * (1000000000/Cull_avg))
 

@@ -41,17 +41,17 @@ pc_ps_cwt <- merge(pcs_cwt, pss_cwt) %>% select(Year,pss_cwt, pcs_cwt)
 pc_ps <- merge(pcs,pss)
 
 ######################### Here we read the number of animals slaughtered steers, heifers, and cows ##################
-cowsSlaughtered <- read_excel("./Data/Latest-03-24/Slaughtered_Cows.xlsx") %>% as.data.frame()
+cowsSlaughtered <- read_excel("./Data/Latest-07-11-SlaughteredData/Slaughtered_Cows.xlsx") %>% as.data.frame()
 
 cowsSlaughtered <- cowsSlaughtered %>% select(Year, Value) %>% mutate(CowsHead=Value) %>% 
   select(Year, CowsHead) %>% arrange(Year)
 
-heifersSlaughtered <- read_excel("./Data/Latest-03-24/Slaughtered_Heifers.xlsx") %>% as.data.frame()
+heifersSlaughtered <- read_excel("./Data/Latest-07-11-SlaughteredData/Slaughtered_Heifers.xlsx") %>% as.data.frame()
 
 heifersSlaughtered <- heifersSlaughtered %>% select(Year, Value) %>% mutate(HeifersHead=Value) %>% 
   select(Year, HeifersHead) %>% arrange(Year)
 
-steersSlaughtered <- read_excel("./Data/Latest-03-24/Slaughtered_Steers.xlsx") %>% as.data.frame()
+steersSlaughtered <- read_excel("./Data/Latest-07-11-SlaughteredData/Slaughtered_Steers.xlsx") %>% as.data.frame()
 
 steersSlaughtered <- steersSlaughtered %>% select(Year, Value) %>% mutate(SteersHead=Value) %>% 
   select(Year, SteersHead) %>% arrange(Year)
@@ -267,7 +267,7 @@ summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>% 
 # 1st Qu.:0.1759  
 # Median :0.2063  
 # Mean   :0.2350  
-# 3rd Qu.:0.2908  
+# 3rd Qu.:0.2908 
 # Max.   :0.3727  
 # NA's   :2 
 
@@ -275,7 +275,7 @@ summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>% 
 
 #### Here I read corn price data. These are in $/bushel. 
 #### I am converting the price from $/bushel to $/pound
-corn_price <- read_excel("./Data/Latest-03-24/CornPriceReceived.xlsx") %>% as.data.frame()
+corn_price <- read_excel("./Data/Latest-07-11-SlaughteredData/CornPriceReceived.xlsx") %>% as.data.frame()
 names(corn_price)
 corn_price <- corn_price %>% select(Year, Period, Value)
 pcorn <- corn_price %>% group_by(Year) %>% mutate(pcorn = round(mean(Value),3)) %>% 
@@ -380,7 +380,6 @@ allStockShocks <- Reduce(function(...) merge(...), dataList) %>% as.data.frame()
 #### When I compare these numbers with the observed ones, these are a bit high. This comes from:
 #### 1. We incorporated a gaussian shock, 2. The storage approximation comes into play as well.
 #### 0.37 comes from the fact that approximately a maximum of 37% of the progeny is added to the breeding stock
-##### Here I add the imports and subtract the exports from the supply. This is to make sure we aligned with reality
 newSL_1 <- allStockShocks %>% 
   transmute(Year = Year+1, slt = ((g - 0.37 * g) * lag(K,2) * lag(slShock,1) + 
               (1 - 0.37 * g) * g * delta * (lag(K,2) - (g - 0.37 * g) * lag(K,3) - 
@@ -399,7 +398,7 @@ newSL_1 <- allStockShocks %>%
 #               (1 - 0.37 * g) * g * delta * (K - (g - 0.37 * g) * lag(K) - (k9 + (1-delta) * k8 + (1-delta) * k7)),
 #             slLbs = slt * Slaughter_avg/1000000000)
 
-#### Since the production of fed cattle is computed for three periods ahead, we construct the production of cull 
+#### Since the production of fed cattle is computed for one period ahead, we construct the production of cull 
 #### cows in the similar fashion
 
 newCL_1 <- allStockShocks %>%
@@ -423,7 +422,7 @@ fedCattleProd_1 <- newSL_1 %>% transmute(Year = Year, fedCattle = slLbs) %>% rou
 
 prod_CornP <- merge(merge(fedCattleProd_1, cullCowsProd_1),cornPrice) %>% drop_na() %>% round(3)
 
-### Here I am generating the shocks again such that when we merge all the dataframes we have enough data.
+### Here I am generating the shocks again so that when we merge all the data frames we have enough data.
 ### Note: Since these are independent random shocks we are okay by increasing the n.
 demandShockGaussian1 <- prod_CornP %>% transmute(Year = Year, Shock = 0)
 slSupplyShockGaussian1 <- prod_CornP %>% transmute(Year = Year, slShock = 0)
@@ -444,9 +443,9 @@ clSupplyShockgaussian1$clShock <- clSupply_Shock
 fedCattleProd <- fedCattleProd_1
 cullCowsProd <-  cullCowsProd_1
 
-#### NOTE: We constructed fed cattle supply and cull cow supply for three years ahead which 
+#### NOTE: We constructed fed cattle supply and cull cow supply for existing years ahead which 
 #### includes gaussian shocks as well. 
-#### Although we are using the data of three years ahead, since we are using all the nodes of both fed cattle, 
+#### Although we are using the data of existing years ahead, since we are using all the nodes of both fed cattle, 
 #### and cull cows supply the price is right. DO NOT GET CONFUSED!
 
 ##############################################################################################
@@ -543,6 +542,16 @@ fedCattleInterpolationMatrix <-  kron(kron(cornChebyshevMatrix, fedCattleChebysh
 ##### of the model solution. For more information regarding the system of equations please refer the dissertation
 ##### document
 
+########### We use the following loss function to estimate mu_tilde and s_tilde
+lossfn <- function(theta,e,ps,pc){
+  mu <- theta[1]
+  s <- theta[2]
+  
+  v <- sum((e - ((( mu - ((ps-pc)/phi)))/s)))^2
+  
+  return(v)
+}
+
 #### optParamFunction returns the parameters mu_tilde and s_tilde
 optParamFunction <- function(sl, cl, ps, pc, thetas){
   
@@ -605,6 +614,7 @@ optKFunction <- function(K, ps, pc, A, B){
   
   fed <- g * Stock_1t - K1 - A * 
     ((exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))/(1 + (exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde))))
+  
   cull <- k_9t + k_8t + k_7t - K2 - A * (1/(1+ exp((mu_Tilde - ((ps/phi) - (pc/phi)))/s_Tilde)))
   
   F = fed^2 + cull^2
@@ -744,7 +754,7 @@ checkTol <- matrix(data = 0, nrow = maxIter, ncol = 4)
 
 for(i in 1:nrow(quantities_prices_capK)){
   
-  # i <- 31
+  # i <- 1
   ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
   A <- quantities_prices_capK$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 

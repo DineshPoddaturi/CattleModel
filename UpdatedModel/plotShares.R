@@ -1,44 +1,44 @@
 # Plotting the shares
 
-mu_Tildes_eq[1:25,]
-s_Tildes_eq[1:25,]
-
-prices_ps_eq[1:25,]
-prices_pc_eq[1:25,]
-
-shares_eq <- ((exp((mu_Tildes_eq[1:25,] - ((prices_ps_eq[1:25,]/phi) - (prices_pc_eq[1:25,]/phi)))/s_Tildes_eq[1:25,]))/
-    (1 + (exp((mu_Tildes_eq[1:25,] - ((prices_ps_eq[1:25,]/phi) - (prices_pc_eq[1:25,]/phi)))/s_Tildes_eq[1:25,])))) 
-
-shares_eqMean <- apply(shares_eq, 2, mean) %>% as.data.frame()
-names(shares_eqMean) <- "shareMean"
-shares_eqMean <- shares_eqMean %>% mutate(Year = quantities_prices_capK$Year) %>%
-  select(Year, everything())
-
-shares_eqMeanPlot <- shares_eqMean %>% ggplot(aes(x=Year))+geom_line(aes(y=shareMean, color="Share Mean"),size=1.1) +
-  geom_point(aes(y = shareMean, color = "Share Mean"),size=2) + theme_classic() + 
-  scale_x_continuous(name="Year", 
-                     breaks=c(seq(shares_eqMean$Year[1],shares_eqMean$Year[nrow(shares_eqMean)]))) +
-  scale_y_continuous(name="Share Mean")+ theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
-                                              axis.text.y = element_text(size = 12)) + 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
-
-
-shares_eqMed <- apply(shares_eq, 2, median) %>% as.data.frame() %>% round(3)
-names(shares_eqMed) <- "shareMedian"
-shares_eqMed <- shares_eqMed %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-shares_eqMedPlot <- shares_eqMed %>% ggplot(aes(x=Year))+geom_line(aes(y=shareMedian, color="Share Median"),size=1.1) +
-  geom_point(aes(y = shareMedian, color = "Share Median"),size=2) + theme_classic() + 
-  scale_x_continuous(name="Year", 
-                     breaks=c(seq(shares_eqMed$Year[1],shares_eqMed$Year[nrow(shares_eqMed)]))) +
-  scale_y_continuous(name="Share Median")+ theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-  theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
-                                              axis.text.y = element_text(size = 12)) + 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+# mu_Tildes_eq[1:25,]
+# s_Tildes_eq[1:25,]
+# 
+# prices_ps_eq[1:25,]
+# prices_pc_eq[1:25,]
+# 
+# shares_eq <- ((exp((mu_Tildes_eq[1:25,] - ((prices_ps_eq[1:25,]/phi) - (prices_pc_eq[1:25,]/phi)))/s_Tildes_eq[1:25,]))/
+#     (1 + (exp((mu_Tildes_eq[1:25,] - ((prices_ps_eq[1:25,]/phi) - (prices_pc_eq[1:25,]/phi)))/s_Tildes_eq[1:25,])))) 
+# 
+# shares_eqMean <- apply(shares_eq, 2, mean) %>% as.data.frame()
+# names(shares_eqMean) <- "shareMean"
+# shares_eqMean <- shares_eqMean %>% mutate(Year = quantities_prices_capK$Year) %>%
+#   select(Year, everything())
+# 
+# shares_eqMeanPlot <- shares_eqMean %>% ggplot(aes(x=Year))+geom_line(aes(y=shareMean, color="Share Mean"),size=1.1) +
+#   geom_point(aes(y = shareMean, color = "Share Mean"),size=2) + theme_classic() + 
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(shares_eqMean$Year[1],shares_eqMean$Year[nrow(shares_eqMean)]))) +
+#   scale_y_continuous(name="Share Mean")+ theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+#   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+#                                               axis.text.y = element_text(size = 12)) + 
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+# 
+# 
+# shares_eqMed <- apply(shares_eq, 2, median) %>% as.data.frame() %>% round(3)
+# names(shares_eqMed) <- "shareMedian"
+# shares_eqMed <- shares_eqMed %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# shares_eqMedPlot <- shares_eqMed %>% ggplot(aes(x=Year))+geom_line(aes(y=shareMedian, color="Share Median"),size=1.1) +
+#   geom_point(aes(y = shareMedian, color = "Share Median"),size=2) + theme_classic() + 
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(shares_eqMed$Year[1],shares_eqMed$Year[nrow(shares_eqMed)]))) +
+#   scale_y_continuous(name="Share Median")+ theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
+#   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
+#                                               axis.text.y = element_text(size = 12)) + 
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 
 
@@ -49,8 +49,8 @@ EQestPSNII
 EQestPCNII
 
 
-sharesEq_Mean <- ((exp((mu_Tildes_MMNII$muMean - ((EQestPSNII$psMean/phi) - (EQestPCNII$pcMean/phi)))/s_Tildes_MMNII$sMean))/
-                    (1 + (exp((mu_Tildes_MMNII$muMean - ((EQestPSNII$psMean/phi) - (EQestPCNII$pcMean/phi)))/s_Tildes_MMNII$sMean))))
+sharesEq_Mean <- ((exp((mu_Tildes_MMNIII$muMean - ((EQestPSNIII$psMean/phi) - (EQestPCNIII$pcMean/phi)))/s_Tildes_MMNIII$sMean))/
+                    (1 + (exp((mu_Tildes_MMNIII$muMean - ((EQestPSNIII$psMean/phi) - (EQestPCNIII$pcMean/phi)))/s_Tildes_MMNIII$sMean))))
 
 sharesEq_Mean <- sharesEq_Mean %>% as.data.frame()
 names(sharesEq_Mean) <- "shareMean"
@@ -79,7 +79,7 @@ muMeanFittedPlot <- mu_Tildes_MMNII %>% ggplot(aes(x=Year))+geom_line(aes(y=muMe
                                               axis.text.y = element_text(size = 12)) + 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
-muMedianFittedPlot <- mu_Tildes_MMNII %>% ggplot(aes(x=Year))+geom_line(aes(y=muMedian, color="MU Median"),size=1.1) +
+muMedianFittedPlot <- mu_Tildes_MMNIII %>% ggplot(aes(x=Year))+geom_line(aes(y=muMedian, color="MU Median"),size=1.1) +
   geom_point(aes(y = muMedian, color = "MU Median"),size=2) + theme_classic() + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(mu_Tildes_MMNII$Year[1],mu_Tildes_MMNII$Year[nrow(mu_Tildes_MMNII)]))) +
@@ -91,9 +91,8 @@ muMedianFittedPlot <- mu_Tildes_MMNII %>% ggplot(aes(x=Year))+geom_line(aes(y=mu
 
 
 
-
-sharesEq_Median <- ((exp((mu_Tildes_MMNII$muMedian - ((EQestPSNII$psMedian/phi) - (EQestPCNII$pcMedian/phi)))/s_Tildes_MMNII$sMedian))/
-                    (1 + (exp((mu_Tildes_MMNII$muMedian - ((EQestPSNII$psMedian/phi) - (EQestPCNII$pcMedian/phi)))/s_Tildes_MMNII$sMedian))))
+sharesEq_Median <- ((exp((mu_Tildes_MMNIII$muMedian - ((EQestPSNIII$psMedian/phi) - (EQestPCNIII$pcMedian/phi)))/s_Tildes_MMNIII$sMedian))/
+                    (1 + (exp((mu_Tildes_MMNIII$muMedian - ((EQestPSNIII$psMedian/phi) - (EQestPCNIII$pcMedian/phi)))/s_Tildes_MMNIII$sMedian))))
 
 sharesEq_Median <- sharesEq_Median %>% as.data.frame()
 names(sharesEq_Median) <- "shareMedian"
@@ -272,18 +271,21 @@ estProj_CLIII_plots <- estProj_CLIIV %>% ggplot(aes(x=Year)) +
 
 
 
+# proj_Q_PIIV <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
+proj_Q_PIIVI <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
+proj_Q_PIIVII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
+EQestObsPS_Medians <- EQestObsPSNIII %>% select(Year, psMedian, ps) %>% filter(Year > 2015)
 
+estProj_PSIIV <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),proj_Q_PIIVII %>% select(Year, Ps), all=TRUE)
 
-proj_Q_PIIV <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
+estProj_PSIII_FAPRI <- merge(estProj_PSIIV,
+                             merge(FAPRI_Proj1, USDA_Proj1) %>% filter(Year > 2021),
+                             all=TRUE) %>% round(3)
 
-estProj_PSIIV <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),proj_Q_PIIV %>% select(Year, Ps), all=TRUE)
-
-estProj_PSIII_FAPRI <- merge(estProj_PSIIV,merge(FAPRI_Proj1, USDA_Proj1), all=TRUE) %>% round(2)
-
-estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year < 2031) %>% ggplot(aes(x=Year)) +
+estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year <= 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=psMedian, color="PS Fitted")) +
   geom_point(aes(y = psMedian, color = "PS Fitted")) +
   geom_line(aes(y=Ps, color="PS PROJECTION")) +
@@ -300,22 +302,35 @@ estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year < 2031)
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
-FAPRI_Proj_TSIII <- FAPRI_Proj %>% select(-FAPRI_Ps) %>% transmute(Year = FAPRI_Years, FAPRI_TS = FAPRI_TS)
-USDA_Proj_TSIII <- USDA_Proj %>% select(-USDA_Ps) %>% transmute(Year = USDA_Years, USDA_TS = USDA_TS) %>% filter(Year >2020)
+FAPRI_Proj_TSIII <- FAPRI_Proj %>% select(-FAPRI_Ps) %>% 
+  transmute(Year = FAPRI_Years, FAPRI_TS = FAPRI_TS)  %>% filter(Year >2021)
 
-estProj_SLIIV <- merge(EQestSl_Medians, proj_Q_PIIV %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
+USDA_Proj_TSIII <- USDA_Proj %>% select(-USDA_Ps) %>% 
+  transmute(Year = USDA_Years, USDA_TS = USDA_TS) %>% filter(Year >2020)
+
+# estProj_SLIIV <- merge(EQestSl_Medians, proj_Q_PIIV %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
+#   filter(Year > 2015)
+# 
+# estProj_CLIIV <- merge(EQestCl_Medians, proj_Q_PIIV %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
+#   filter(Year > 2015)
+
+EQestSl_Medians <- EQestObsSLNIII %>% filter(Year > 2015)
+
+EQestCl_Medians <- EQestObsCLNIII %>% filter(Year > 2015)
+
+estProj_SLIIVI <- merge(EQestSl_Medians, proj_Q_PIIVII %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
   filter(Year > 2015)
 
-estProj_CLIIV <- merge(EQestCl_Medians, proj_Q_PIIV %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
+estProj_CLIIVI <- merge(EQestCl_Medians, proj_Q_PIIVII %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
   filter(Year > 2015)
 
-EQestObsTS_MediansIIV <- merge(estProj_SLIIV %>% select(-errMean, -errmedian), 
-                                  estProj_CLIIV %>% select(-errMean, -errmedian)) %>%
+EQestObsTS_MediansIIV <- merge(estProj_SLIIVI %>% select(-errMean, -errmedian), 
+                                  estProj_CLIIVI %>% select(-errMean, -errmedian)) %>%
   transmute(Year = Year, tsMedian = slMedian + clMedian, 
             TS = Sl + Cl) %>% round(3)
 
 CARD_USDA_FAPRI_TS_ProjIII <- left_join(left_join(EQestObsTS_MediansIIV, FAPRI_Proj_TSIII, by="Year"), 
-                                      USDA_Proj_TSIII, by="Year")
+                                      USDA_Proj_TSIII %>% filter(Year > 2021), by="Year") %>% round(2)
 CARD_USDA_FAPRI_TS_ProjIII
 
 CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% ggplot(aes(x=Year))  + 
@@ -333,8 +348,6 @@ CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% ggplot(aes(x=Y
   scale_y_continuous(name="Total Production Projections ") +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
 
 
 
@@ -501,11 +514,14 @@ muPlot_V <- proj_Q_P %>% filter(Ps > 0) %>% ggplot(aes(x=Year))+geom_line(aes(y=
 
 proj_Q_PV <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100, Hc = Hc * 100) %>% round(3) %>% filter(Ps>0)
 
-estProj_PSV <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),proj_Q_PV %>% select(Year, Ps), all=TRUE)
+proj_Q_PIIVI
+
+estProj_PSV <- merge(EQestObsPS_Medians %>% mutate(psMedian = psMedian*100),
+                     proj_Q_PIIVI %>% select(Year, Ps), all=TRUE)
 
 estProj_PSV_FAPRI <- merge(estProj_PSV,merge(FAPRI_Proj1, USDA_Proj1), all=TRUE) %>% round(2)
 
-estProj_PSV_plots <- estProj_PSV_FAPRI %>% filter(Year >=2016 & Year < 2031) %>% ggplot(aes(x=Year)) +
+estProj_PSV_plots <- estProj_PSV_FAPRI %>% filter(Year >=2016 & Year <= 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=psMedian, color="PS Fitted")) +
   geom_point(aes(y = psMedian, color = "PS Fitted")) +
   geom_line(aes(y=Ps, color="PS PROJECTION")) +
@@ -522,9 +538,10 @@ estProj_PSV_plots <- estProj_PSV_FAPRI %>% filter(Year >=2016 & Year < 2031) %>%
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
-estProj_PCV <- merge(EQestObsPC_Medians %>% mutate(pcMedian = pcMedian*100),proj_Q_PV %>% select(Year, Pc), all=TRUE) %>% round(2)
+estProj_PCV <- merge(EQestObsPC_Medians %>% mutate(pcMedian = pcMedian*100),
+                     proj_Q_PIIVI %>% select(Year, Pc), all=TRUE) %>% round(2)
 
-estProj_PCV_plots <- estProj_PCV %>% filter(Year >=2016 & Year < 2031) %>% ggplot(aes(x=Year)) +
+estProj_PCV_plots <- estProj_PCV %>% filter(Year >=2016 & Year <= 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=pcMedian, color="PC Fitted")) +
   geom_point(aes(y = pcMedian, color = "PC Fitted")) +
   geom_line(aes(y=Pc, color="PC PROJECTION")) +
@@ -555,7 +572,7 @@ estProj_HCV_plots <- estProj_HCV %>% filter(Year >=2016 & Year < 2031) %>% ggplo
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
-estProj_SLV <- merge(EQestSl_Medians, proj_Q_PV %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
+estProj_SLV <- merge(EQestSl_Medians, proj_Q_PIIVI %>% select(Year, Sl), all=TRUE) %>% round(2) %>% 
   filter(Year > 2015)
 
 estProj_SLV_plots <- estProj_SLV %>% ggplot(aes(x=Year)) +
@@ -571,8 +588,9 @@ estProj_SLV_plots <- estProj_SLV %>% ggplot(aes(x=Year)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
-estProj_CLV <- merge(EQestCl_Medians, proj_Q_PV %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
+estProj_CLV <- merge(EQestCl_Medians, proj_Q_PIIVI %>% select(Year, Cl), all=TRUE) %>% round(2) %>% 
   filter(Year > 2015)
+
 estProj_CLV_plots <- estProj_CLV %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=clMedian, color="CL Fitted")) +
   geom_point(aes(y = clMedian, color = "CL Fitted")) +

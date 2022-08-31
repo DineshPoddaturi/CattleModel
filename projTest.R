@@ -1,13 +1,23 @@
+########## PROJECTIONS AGE DISTRIBUTION ARRANGEMENT
 
-invForecast <- beefINV_FORECAST %>% select(Year, K)
+invForecast <- beefINV_FORECAST %>% select(Year, K) %>% filter(Year > 2021)
 # k3_Proj <- k3 %>% filter(Year >= invForecast$Year[1] & Year <= invForecast$Year[1]+1) 
 slShock <- rnorm(n = nrow(invForecast), mean = 1, sd = std(obsEst_sl_Supply$slShock))
 clShock <- rnorm(n = nrow(invForecast), mean = 1, sd = std(obsEst_cl_Supply$clShock))
 
 invForecast <- cbind(invForecast, cbind(slShock, clShock))
 
-stockForecast <- Stock %>% filter(Year < 2021 & Year > 2000)
+stockForecast <- Stock %>% filter(Year <= 2021 & Year > 2000)
 mergedForecast <- merge(stockForecast, invForecast, all=TRUE)
+
+
+# invForecast1 <-  data.frame(Year = numeric(10), K = NA, k3 = NA,
+#                                         k4 =  NA, k5 =  NA, k6 =  NA, 
+#                                         k7 =  NA, k8 =  NA, k9 =  NA)
+# 
+# invForecast1$Year <- seq(from=2022, to=2031)
+# 
+# mergedForecast <- merge(stockForecast, invForecast1, all=TRUE)
 
 # suppShocks <- cbind(slShock, clShock) %>% as.data.frame()
 # 
@@ -45,6 +55,8 @@ mergedForecast <- fill(mergedForecast, Slaughter_avg, .direction = 'down')
 mergedForecast <- fill(mergedForecast, Imports, .direction = 'down')
 mergedForecast <- fill(mergedForecast, Exports, .direction = 'down')
 
+
+
 slFun <- function(stocksALL){
   stocks1 <- stocksALL %>%
   transmute(slt1 = lag(sl,1)* (1000000000/Slaughter_avg) * lag(slShock,1) +  (1 - 0.37 * g) * g * delta * (lag(K,2) 
@@ -81,15 +93,18 @@ mergedForecast_backCast <- mergedForecast %>% filter(Year < mergedForecast_Proj$
 
 mergedForecast_Proj_BackCast <- rbind(mergedForecast_backCast, mergedForecast_Proj)
 
-mergedForecast_Proj_BackCastBKP <- mergedForecast_Proj_BackCast
+# mergedForecast_Proj_BackCastBKP <- mergedForecast_Proj_BackCast
+
+
+##### In backcasting, change the shock from 1 to the shock in that specific year from the fitted model
 
 for (i in 1:nrow(mergedForecast_Proj_BackCast)) {
   
-  # i <- 6
+  # i <- 1
   
   yearBackCast <- mergedForecast_Proj_BackCast$Year[i]
   
-  if(yearBackCast == 2021){
+  if(yearBackCast == 2022){
     break
   }else{
     
@@ -140,7 +155,7 @@ for (i in 1:nrow(mergedForecast_Proj_BackCast)) {
 
 
 mergedForecast_Proj_BC <- mergedForecast_Proj_BackCast %>% filter(!is.na(sl)) %>% 
-  mutate(slBC = sl, clBC = cl) %>% select(Year, slBC, clBC) %>% filter(Year < 2021 & Year >=2018)
+  mutate(slBC = sl, clBC = cl) %>% select(Year, slBC, clBC) %>% filter(Year < 2022 & Year >=2018)
 
 mergedForecast_Proj_BC_SL <- merge(estProj_SLV, mergedForecast_Proj_BC, all=TRUE) %>%
   select(-errMean, -errmedian, -slMean, -clBC)

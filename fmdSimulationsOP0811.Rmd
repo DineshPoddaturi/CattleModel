@@ -1,0 +1,213 @@
+---
+title: "FMD Simulations"
+output:
+  pdf_document: default
+  word_document: default
+date: "08-24-2022"
+---
+
+<!-- 1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US. -->
+<!-- 2. December 2005, Japan agreed to remove the restriction on importing US beef. However, in January imports stopped again because inspectors found banned cattle parts in a veal shipment from the U.S. -->
+<!-- 3. South Korea resumed U.S. beef imports in July 2008.  -->
+<!-- 4. China lifted it's ban in 2016 -->
+
+# Optimistic Scenario:\newline
+
+\begin{itemize}
+\item Year1: $5\%$ decline in domestic demand and exports are banned
+\item Year2: Domestic demand is back up and exports are banned
+\item Year3: Everything goes back to pre FMD 
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedPriceOPT.png}
+  \caption{Fed cattle price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullPriceOPT.png}
+  \caption{Cull cow price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedSupplyOPT.png}
+  \caption{Fed Cattle Supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullSupplyOPT.png}
+  \caption{Cull cow supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/shareOPT.png}
+  \caption{Share}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=8in]{OPT5INV.pdf}
+  \caption{Age distribution under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{OPT10INV.pdf}
+  \caption{Age distribution under $10\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{OPT20INV.pdf}
+  \caption{Age distribution under $20\%$ percent depopulation}
+\end{figure}
+
+
+
+\begin{figure}
+  \includegraphics[width=8in]{OPT5TRADE.pdf}
+  \caption{Imports and Exports under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{OPT10TRADE.pdf}
+  \caption{Imports and Exports under $10\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{OPT20TRADE.pdf}
+  \caption{Imports and Exports under $20\%$ percent depopulation}
+\end{figure}
+
+\clearpage
+
+# Pessimistic Scenario:\newline
+
+\begin{itemize}
+\item Year1: $5\%$ decline in domestic demand and exports are banned
+\item Year2: $5\%$ decline in domestic demand and exports are banned
+\item Year3: $5\%$ decline in domestic demand and exports are banned
+\item Year4: Domestic demand goes back up, exports are still banned
+\item Year5: Exports are still banned
+\item Year6: Export band is lifted and everything goes back to pre FMD
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedPricePES.png}
+  \caption{Fed cattle price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullPricePES.png}
+  \caption{Cull cow price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedSupplyPES.png}
+  \caption{Fed Cattle Supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullSupplyPES.png}
+  \caption{Cull cow supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/sharePES.png}
+  \caption{Share}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=8in]{PES5INV.pdf}
+  \caption{Age distribution under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{PES10INV.pdf}
+  \caption{Age distribution under $10\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{PES20INV.pdf}
+  \caption{Age distribution under $20\%$ percent depopulation}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=8in]{PESTRADE5.pdf}
+  \caption{Imports and Exports under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{PESTRADE10.pdf}
+  \caption{Imports and Exports under $10\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{PESTRADE20.pdf}
+  \caption{Imports and Exports under $20\%$ percent depopulation}
+\end{figure}
+
+\newpage
+
+# Plots without 20% depopulation
+## Optimistic Scenario \newline
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedPriceOPT20N.png}
+  \caption{Fed cattle price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullPriceOPT20N.png}
+  \caption{Cull cow price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedSupplyOPT20N.png}
+  \caption{Fed Cattle Supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullSupplyOPT20N.png}
+  \caption{Cull cow supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/shareOPT20N.png}
+  \caption{Total supply - Before adjusting for exports}
+\end{figure}
+
+
+\clearpage
+
+## Pessimistic Scenario:\newline
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedPricePES20N.png}
+  \caption{Fed cattle price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullPricePES20N.png}
+  \caption{Cull cow price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/fedSupplyPES20N.png}
+  \caption{Fed Cattle Supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/cullSupplyPES20N.png}
+  \caption{Cull cow supply - Before adjusting for exports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/08-24/shareOPT20N.png}
+  \caption{Total supply - Before adjusting for exports}
+\end{figure}
+
+
+
+
+
+

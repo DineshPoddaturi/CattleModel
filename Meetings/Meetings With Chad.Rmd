@@ -370,6 +370,71 @@ However, when we observe the production projections, it is also going up. This i
 * For FMD cap K, use the calf crop from 2008 and the age distribution from that year to get the best estimate for K in 2009, and so on. This way we can get the entire age distribution and corresponding supplies. 
 
 
+07/14/2022:
+
+* Regarding the projections: build a trend from the futures prices. This will give me corn prices further along the way. Instead of using the USDA futures, use these price futures to get the projections. 
+
+
+
+#### Comments at WAEA meeting
+
+5% demand shock is not an evidence, it is an artifact. People assumed that and went on with it. It is much shallower.
+
+Amy Hagerman - Oklahoma State University. Look into Mu et. al. (2015) has accurate consumer response. 
+
+Pessimistic (1 Year), Optimistic (less than one year) for consumers response. Maybe discuss this with Chad and Lee to include. 
+
+
+
+
+##### Meeting with Lee and Chad:07/28/2022
+
+* Regarding demand changes: It is okay to work with 5% decline in demand. But cite Hagermans paper and also provide the impacts under their demand decrease as well (like sensitivity analysis). This will show the readers the beauty of the model. And how the model can take these different numbers and provide with some (approximate) estimate. 
+
+* Regarding Calf Crop: Check the beef cow calf crop with the USDA Calf Crop numbers. The beef cow calf crop should be approximately 75% of the USDA calf crop. Note: USDA calf crop contain the calf crop from dairy as well. That's why we are checking whether the calf crop is 75% of USDAs.
+
+* Also look into NAAHM surveys data. They will have the beef cow calf crops. They will even have the replacement rates as well. 
+
+* In general play off of historical averages. 
+
+* In regards to depop. Look at the U.K. depop ranges and see if you can extrapolate to the U.S. depop. Again this is an approximation. People are different in these countries (preferences, farmers and more).  Depop is crucial for robustness checks. 
+
+* Run the model by taking $0.50/bushel off of the corn futures to get the holding costs and then perform simulations.
+
+Scenario1: 5% demand decline, $0.50 corn decline
+Scenario2: 0.5% demand decline, $0.50 corn decline
+
+Now with different depopulation levels we must scale the corn prices as well. Assuming a simple linear relationship is a okay to do it. 
+
+20% depop ==> $0.50 corn decline
+10% depop ==> $0.25 corn decline
+5% depop ==> $0.125 corn decline
+
+
+##### Meeting with Lee and Chad:08/11/2022
+
+* Cull cow and fed cattle prices are somewhat correlated. So the price impacts must show that correlation. Look into it. 
+* U.S. meat export federation has data about exports. LMIC also has the exports data as well
+* Adjustment to the live inventory: The live animals which are supposed to be exported must be added to inventory. Not as meat.
+  Make that change. Feeder cattle to Canada and Fed Cattle to Mexico
+* Most of the imports are feeder cattle not fed cattle
+* Allow imports of live animals. Allow cattle imports as well as beef imports during the simulation period.
+* Also look at how BSE impacted imports and exports
+
+##### Meeting with Lee and Chad:08/24/2022
+
+* Cut off the cattle imports until it reaches the minimum necessary replacement heifers
+* Compare the beef imports to the historical imports and put a bound on that
+* Look at historical import percentage to the production and then use that number to determine the imports of cattle and 
+also the beef
+
+* Similarly look at the historical export percentage to the production and then use that number to determine the exports of cattle and also the beef
+
+* Also instead of fixing the birth rate, change it. If the fed cattle price is lower than the baseline then we breed less animals which means the breeding rate should go down
+
+* These should give me the right numbers. Work on it a lot
+
+* Use AJAE papers as references to write the model framework in the model framework section 
 
 
 
