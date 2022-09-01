@@ -1,0 +1,37 @@
+---
+title: "Notes"
+output:
+  pdf_document: default
+  word_document: default
+date: "09-01-2022"
+---
+
+I have $5\%$ and $10\%$ depopulation simulations. The $20\%$ depopulation scenario isn't giving me realistic inventories with the current trade assumptions. I tried to look up other papers who have done this but they don't really talk about the trade impacting inventories. It seems like they simulated only prices and let the inventory adjust. When I closely observe that paper the prices are too high (because their depopulation levels are high as well). And their inventories do not reach baseline until 20 years or so. So I think we are good with $5\%$ and $10\%$ depopulation levels. Paalbergs papers does the same. They only take $5\%$ and $10\%$. They also mention depopulating more than $10\%$ isn't realistic. So I think I want to stick with $5\%$ and $10\%$, not consider $20\%$.
+
+When the price is below baseline levels the producer has less incentives to grow the inventory as such less replacement heifers are added to the stock. As soon as the price reach the baseline and above, the producer has more incentives to grow the inventory in turn adds more replacement heifer eventually increasing the inventory. 
+
+One thing to notice here is that the fed cattle supply levels are low five years after the disease outbreak. This is due to the fact that the prices are low implying low inventory which reflects later in the years and also due to the fact that after the export markets are opened the inventory is leaving the country.
+
+The share metric reflects the fed cattle price changes. As the fed cattle price increase the share metric decrease. Intuitively this is due to the fact that since the price of high quality beef increase, the share of consumers quantity demanded decrease which also reflects in the inventory decisions as well. As the price increase above the base line the inventory increases. 
+
+Regarding cull cow price (which has less market share), we see declines in the prices in the initial years. This is due to the fact that fed cattle price decreased, the consumers move towards consuming high quality beef, in turn decreases the price of cull cow beef. The cull cow price declines and inclines are reflected in the inventories which also depends on the holding costs. Now the holding costs enter through expected value of 9-year old cows. If the expected value of 9 year old cows is less than the current cull cow price, the producer has less incentives to keep the cow in the herd and vice-versa. 
+
+
+Some of the assumptions about trade made in the simulations are as follows:
+
+1. For live animal imports, I take the historical imports relative to the inventory and use that ratio to get the live animal imports. For example lets say the historical rate of imports according to the existing inventory is $B$, then for year $t$ if the replacement heifers are lower than the historical minimum, I import $B*K_t$ feeder cattle. Where $K_t$ is the total inventory in year $t$.
+
+2. For live animal exports, I follow the same format mentioned in 1. I take the historical exports relative to the inventory and use that ratio to export the live animals. 
+
+3. For beef imports, I take the historical beef imports relative to the total production and use that ratio to get the beef imports. For example lets say the historical rate of exports according to the total production is $C$, then for year $t$ if the beef supplies are lower than the historical minimum, I import $C*TP_t$ beef. Where $TP_t$ is the total production in year $t$.
+
+4. For beef exports, I follow the same format mentioned in 2. I take the historical beef exports relative to the total production and use that ratio to export the beef. Note that the beef exported is primarily high quality beef. So I make sure I am exporting the high quality beef. This inherently implies I am removing the corresponding high quality beef from the domestic markets.
+
+
+
+
+
+
+
+
+
