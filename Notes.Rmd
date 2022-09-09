@@ -17,6 +17,8 @@ The share metric reflects the fed cattle price changes. As the fed cattle price 
 Regarding cull cow price (which has less market share), we see declines in the prices in the initial years. This is due to the fact that fed cattle price decreased, the consumers move towards consuming high quality beef, in turn decreases the price of cull cow beef. The cull cow price declines and inclines are reflected in the inventories which also depends on the holding costs. Now the holding costs enter through expected value of 9-year old cows. If the expected value of 9 year old cows is less than the current cull cow price, the producer has less incentives to keep the cow in the herd and vice-versa. 
 
 
+
+
 Some of the assumptions about trade made in the simulations are as follows:
 
 1. For live animal imports, I take the historical imports relative to the inventory and use that ratio to get the live animal imports. For example lets say the historical rate of imports according to the existing inventory is $B$, then for year $t$ if the replacement heifers are lower than the historical minimum, I import $B*K_t$ feeder cattle. Where $K_t$ is the total inventory in year $t$.

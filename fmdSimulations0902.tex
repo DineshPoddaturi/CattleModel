@@ -1,0 +1,217 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={FMD Simulations},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{FMD Simulations}
+\author{}
+\date{\vspace{-2.5em}09-02-2022}
+
+\begin{document}
+\maketitle
+
+\hypertarget{optimistic-scenario}{%
+\section{\texorpdfstring{Optimistic
+Scenario:\newline}{Optimistic Scenario:}}\label{optimistic-scenario}}
+
+\begin{itemize}
+\item Year1: $5\%$ decline in domestic demand and exports are banned
+\item Year2: Domestic demand is back up and exports are banned
+\item Year3: Everything goes back to pre FMD 
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/PsOPT.png}
+  \caption{Fed cattle price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/PcOPT.png}
+  \caption{Cull cow price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/TotSupplyOPTDOM.png}
+  \caption{Total Supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/SlSupplyOPTDOM.png}
+  \caption{Fed Cattle Supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/ClSupplyOPTDOM.png}
+  \caption{Cull cow supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/ShareOPT.png}
+  \caption{Share}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/DemQuantityOPTDOM.png}
+  \caption{Demand(Quantity)}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/DemandDollarsOPTDOM.png}
+  \caption{Demand(Dollars) - Optimistic}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/OPT_INV_5.pdf}
+  \caption{Inventory distribution under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/OPT_INV_10.pdf}
+  \caption{Inventory distribution under $10\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/OPT_TRADE_5.pdf}
+  \caption{Imports and Exports under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/OPT_TRADE_10.pdf}
+  \caption{Imports and Exports under $10\%$ percent depopulation}
+\end{figure}
+
+\clearpage
+
+\hypertarget{pessimistic-scenario}{%
+\section{\texorpdfstring{Pessimistic
+Scenario:\newline}{Pessimistic Scenario:}}\label{pessimistic-scenario}}
+
+\begin{itemize}
+\item Year1: $5\%$ decline in domestic demand and exports are banned
+\item Year2: $5\%$ decline in domestic demand and exports are banned
+\item Year3: $5\%$ decline in domestic demand and exports are banned
+\item Year4: Domestic demand goes back up, exports are still banned
+\item Year5: Exports are still banned
+\item Year6: Export band is lifted and everything goes back to pre FMD
+\end{itemize}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/PsPES.png}
+  \caption{Fed cattle price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/PcPES.png}
+  \caption{Cull cow price}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/TotSupplyPESDOM.png}
+  \caption{Total Supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/SlSupplyPESDom.png}
+  \caption{Fed Cattle Supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/ClSupplyPESDOM.png}
+  \caption{Cull cow supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/SharePES.png}
+  \caption{Share}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-01/DemandQuantityPES.png}
+  \caption{Demand(Quantity)}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-02/DemandDollarsPES.png}
+  \caption{Demand(Dollars) - Pessimistic}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/PES_INV_5.pdf}
+  \caption{Inventory distribution under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/PES_INV_10.pdf}
+  \caption{Inventory distribution under $10\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/PES_TRADE_5.pdf}
+  \caption{Imports and Exports under $5\%$ percent depopulation}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-02/PES_TRADE_10.pdf}
+  \caption{Imports and Exports under $10\%$ percent depopulation}
+\end{figure}
+
+\end{document}

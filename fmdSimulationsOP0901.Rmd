@@ -59,6 +59,20 @@ date: "09-01-2022"
   \caption{Share}
 \end{figure}
 
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-01/demandQuantityOPT.png}
+  \caption{Demand(Quantity)}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-01/demandDollarsOPT.png}
+  \caption{Demand(Dollars)}
+\end{figure}
+
+
+
+
+
 
 \begin{figure}
   \includegraphics[width=8in]{FMD-SimulationPlots/09-01/OPT_INV_5.pdf}
@@ -142,6 +156,16 @@ date: "09-01-2022"
 \begin{figure}
   \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-01/SharePES.png}
   \caption{Share}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-01/demandQuantityPES.png}
+  \caption{Demand(Quantity)}
+\end{figure} 
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-01/demandDollarsPES.png}
+  \caption{Demand(Dollars)}
 \end{figure}
 
 
