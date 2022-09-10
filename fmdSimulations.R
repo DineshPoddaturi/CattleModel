@@ -59,11 +59,11 @@ getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
       # psNew_up <- psNew + 0.07
       # pcNew_up <- pcNew + 0.8
       
-      psNew_lo <- psNew  - 0.045
-      pcNew_lo <- pcNew - 0.05
+      psNew_lo <- psNew  - 0.02
+      pcNew_lo <- pcNew - 0.03
       
-      psNew_up <- psNew + 0.095
-      pcNew_up <- pcNew + 0.045
+      psNew_up <- psNew + 0.08
+      pcNew_up <- pcNew + 0.04
       
       # psNew_up <- psNew + 0.08
       # pcNew_up <- pcNew + 0.05
@@ -99,11 +99,11 @@ getPsPcEpsEpc_FMD_EQ_OPT <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
       # psNew_up <- psNew + 0.07
       # pcNew_up <- pcNew + 0.8
       
-      psNew_lo <- psNew  - 0.05
-      pcNew_lo <- pcNew - 0.05
+      psNew_lo <- psNew  - 0.02
+      pcNew_lo <- pcNew - 0.03
       
-      psNew_up <- psNew + 0.09
-      pcNew_up <- pcNew + 0.05
+      psNew_up <- psNew + 0.08
+      pcNew_up <- pcNew + 0.04
       
       # PES
       # psNew_lo <- psNew  - 0.5
@@ -608,7 +608,7 @@ nn <- 10
 simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK, 
                              exports_LiveK, exports_percentMeat, nn, Stock, holdingCostsFuturesFMD){
   
-        dePopR <- 10
+        # dePopR <- 5
         
         slaughterAvg_pre <- mean(tail(modelParamsEQ_PreFMD, n=1)$Slaughter_avg)
         cullAvg_pre <-  mean(tail(modelParamsEQ_PreFMD, n=1)$Cull_avg)
@@ -731,7 +731,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
         gFMDCC <- gFMD
         repRatio <- 0.2554
         
-        holdingCostsFuturesFMD <- holdingCostsFuturesFMD10
+        holdingCostsFuturesFMD <- holdingCostsFuturesFMD
         
 
         for(i in 1: nrow(proj_Q_P_PostFMD)){
@@ -901,33 +901,10 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           impBeef[i] <- 0
           
           if(i>1){
-            
             proj_Q_P_PostFMD$SlDem[i] <- slDem
             proj_Q_P_PostFMD$ClDem[i] <- clDem
-            
           }
             
-          #   if(slNewFMD < slDem || clNewFMD < clDem){
-          #     
-          #     if(slNewFMD < slDem){
-          #       # slBeefImports <- (impBeefLM$coefficients[1] * slNewFMD) %>% as.numeric()
-          #       slBeefImports <- (impRatioBeefMax * (slNewFMD + clNewFMD)) %>% as.numeric()
-          #     }else{
-          #       slBeefImports <- 0
-          #     }
-          #     
-          #     if(clNewFMD < clDem){
-          #       # clBeefImports <- (impBeefLM$coefficients[1] * clNewFMD) %>% as.numeric()
-          #       clBeefImports <- (impRatioBeefMax * clNewFMD) %>% as.numeric()
-          #     }else{
-          #       clBeefImports <- 0
-          #     }
-          #     impBeef[i] <- slBeefImports + clBeefImports
-          #     
-          #     slNewFMD <- slNewFMD + slBeefImports
-          #     clNewFMD <- clNewFMD + clBeefImports
-          #   }
-          # }
           if(slNewFMD < slHistMin || clNewFMD < clHistMin){
 
             if(slNewFMD < slHistMin){
@@ -1212,14 +1189,14 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           
             if(dePopR==5){
               if(approxKFMD > KHistMed || k_old_headFMD > k3HistMed){
-                gFMDCC <- gFMDCC - 0.043
+                gFMDCC <- gFMDCC - 0.048
               } 
               # else if( k_old_headFMD < k3HistMed){
               #   gFMDCC <- gFMDCC + 0.01
               # }
             }else if(dePopR==10){
               if(approxKFMD > KHistMed || k_old_headFMD > k3HistMed){
-                gFMDCC <- gFMDCC - 0.02  
+                gFMDCC <- gFMDCC - 0.0228
               }
               # else if( k_old_headFMD < k3HistMed){
               #   gFMDCC <- gFMDCC + 0.005
@@ -1332,7 +1309,6 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           }
           
           if(i == 1){
-            
             # capAFMD_DollarsAfter <- capAFMD * sh_pre * psM_pre + capAFMD * (1-sh_pre) * pcM_pre
             
             #### Here I compute the demand in dollars. Basically multiply the supplied quantities with the 
@@ -1455,7 +1431,9 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           
           capK_pre <- beefINV_FORECAST_PostFMD[i,]$K
           
-          capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
+          if(i>=3){
+            capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
+          }
           
           proj_Q_P_PostFMD$demDollarsAfter[i] <- capAFMD_DollarsAfter
           
@@ -1612,17 +1590,13 @@ optimisticPostFMD_5_0904 <- simOptimisticFMD(
   exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
   holdingCostsFuturesFMD = holdingCostsFuturesFMD5)
 
-optimisticPostFMD_5_0902[[1]]$Sl
-
-optimisticPostFMD_5_0904[[1]]$Ps
-
 
 optimisticPostFMD_5_0909 <- simOptimisticFMD(
   dePopR = 5, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
   exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
   holdingCostsFuturesFMD = holdingCostsFuturesFMD5)
 
-
+optimisticPostFMD_5_0909[[1]]$Ps
 
 # optimisticPostFMD_10_0831 <- simOptimisticFMD(
 #   dePopR = 10, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
@@ -1635,6 +1609,11 @@ optimisticPostFMD_10_0902 <- simOptimisticFMD(
   holdingCostsFuturesFMD = holdingCostsFuturesFMD10)
 
 optimisticPostFMD_10_0904 <- simOptimisticFMD(
+  dePopR = 10, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
+  exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
+  holdingCostsFuturesFMD = holdingCostsFuturesFMD10)
+
+optimisticPostFMD_10_0909 <- simOptimisticFMD(
   dePopR = 10, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
   exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
   holdingCostsFuturesFMD = holdingCostsFuturesFMD10)

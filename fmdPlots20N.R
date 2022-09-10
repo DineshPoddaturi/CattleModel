@@ -16,8 +16,13 @@
 # proj_Q_P_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0902[[1]]
 
 
-proj_Q_P_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0904[[1]]
-proj_Q_P_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0904[[1]]
+# proj_Q_P_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0904[[1]]
+# proj_Q_P_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0904[[1]]
+
+
+proj_Q_P_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0909[[1]]
+proj_Q_P_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0909[[1]]
+
 
 
 proj_Q_P_PostFMD_OPT_5I_08 <- proj_Q_P_PostFMD_OPT_5_09 %>% transmute(Year = Year, Ps5 = Ps, Pc5 = Pc, Sl5 = Sl,Cl5 = Cl,
@@ -47,8 +52,12 @@ proj_Q_P_PostFMD_OPTI_08 <- Reduce(function(...) merge(...),
 # proj_Q_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0902[[3]]
 # proj_Q_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0902[[3]]
 
-proj_Q_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0904[[3]]
-proj_Q_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0904[[3]]
+# proj_Q_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0904[[3]]
+# proj_Q_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0904[[3]]
+
+proj_Q_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0909[[3]]
+proj_Q_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0909[[3]]
+
 
 proj_Q_PostFMD_OPT_5I_08 <- proj_Q_PostFMD_OPT_5_09 %>% filter(Year >= 2022) %>% 
   transmute(Year = Year, Sl5_OG = slMedian, Cl5_OG = clMedian)
@@ -85,11 +94,13 @@ proj_Q_PostFMD_OPTI_08 <- Reduce(function(...) merge(...),
 # 
 # beefINV_FORECAST_PostFMD_OPT_10I_08 <- optimisticPostFMD_10_0902[[2]] %>% transmute(Year = Year, K10 = K)
 
-beefINV_FORECAST_PostFMD_OPT_5I_08 <- optimisticPostFMD_5_0904[[2]] %>% transmute(Year = Year, K5 = K)
+# beefINV_FORECAST_PostFMD_OPT_5I_08 <- optimisticPostFMD_5_0904[[2]] %>% transmute(Year = Year, K5 = K)
+# 
+# beefINV_FORECAST_PostFMD_OPT_10I_08 <- optimisticPostFMD_10_0904[[2]] %>% transmute(Year = Year, K10 = K)
 
-beefINV_FORECAST_PostFMD_OPT_10I_08 <- optimisticPostFMD_10_0904[[2]] %>% transmute(Year = Year, K10 = K)
+beefINV_FORECAST_PostFMD_OPT_5I_08 <- optimisticPostFMD_5_0909[[2]] %>% transmute(Year = Year, K5 = K)
 
-
+beefINV_FORECAST_PostFMD_OPT_10I_08 <- optimisticPostFMD_10_0909[[2]] %>% transmute(Year = Year, K10 = K)
 
 beefINV_FORECAST_PostFMD_OPTI_08 <- Reduce(function(...) merge(...), 
                                            list(beefINV_FORECAST_PostFMD_OPT_5I_08, beefINV_FORECAST_PostFMD_OPT_10I_08))
@@ -103,11 +114,11 @@ beefINV_FORECAST_PostFMD_OPTI_08 <- Reduce(function(...) merge(...),
 #   transmute(Year = Year,Imports10 = round(Imports), Exports10 = round(Exports), ImportsBeef10 = ImportsBeef, ExportsBeef10 = ExportsBeef) %>% 
 #   mutate_all(~replace_na(.,0))
 
-trade_FORECAST_PostFMD_OPT_5I_08 <- optimisticPostFMD_5_0904[[3]] %>% filter(Year>=2022) %>%
+trade_FORECAST_PostFMD_OPT_5I_08 <- optimisticPostFMD_5_0909[[3]] %>% filter(Year>=2022) %>%
   transmute(Year = Year,Imports5 = round(Imports), Exports5 = round(Exports), ImportsBeef5 = ImportsBeef, ExportsBeef5 = ExportsBeef) %>% 
   mutate_all(~replace_na(.,0))
 
-trade_FORECAST_PostFMD_OPT_10I_08 <- optimisticPostFMD_10_0904[[3]] %>% filter(Year>=2022) %>%
+trade_FORECAST_PostFMD_OPT_10I_08 <- optimisticPostFMD_10_0909[[3]] %>% filter(Year>=2022) %>%
   transmute(Year = Year,Imports10 = round(Imports), Exports10 = round(Exports), ImportsBeef10 = ImportsBeef, ExportsBeef10 = ExportsBeef) %>% 
   mutate_all(~replace_na(.,0))
 
@@ -332,8 +343,8 @@ PostFMD_OPTI_Sl_ChangePlot_0820N <- round(proj_Q_P_PostFMD_OPTI_Sl_B_08,3) %>% g
   geom_line(aes(y = Sl10_OG, color="10% Depop"),size=1.1) +
   geom_point(aes(y = Sl10_OG, color="10% Depop"),size=2) +
   scale_x_continuous(name="Year", 
-                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B$Year[1],
-                                  proj_Q_P_PostFMD_OPTI_Sl_B$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B)])))+ 
+                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B_08$Year[1],
+                                  proj_Q_P_PostFMD_OPTI_Sl_B_08$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B_08)])))+ 
   scale_y_continuous(name="Fed cattle supply (in billion pounds)", limits = c(14,30,by=2))  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
         legend.background = element_rect(color = NA)) +
@@ -353,8 +364,8 @@ PostFMD_OPTI_Sl_ChangePlot_0820ND <- round(proj_Q_P_PostFMD_OPTI_Sl_B_08,3) %>% 
   geom_line(aes(y = Sl10_DOM, color="10% Depop"),size=1.1) +
   geom_point(aes(y = Sl10_DOM, color="10% Depop"),size=2) +
   scale_x_continuous(name="Year", 
-                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B$Year[1],
-                                  proj_Q_P_PostFMD_OPTI_Sl_B$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B)])))+ 
+                     breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B_08$Year[1],
+                                  proj_Q_P_PostFMD_OPTI_Sl_B_08$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B_08)])))+ 
   scale_y_continuous(name="Fed cattle supply (in billion pounds)", limits = c(14,30,by=2))  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
         legend.background = element_rect(color = NA)) +
