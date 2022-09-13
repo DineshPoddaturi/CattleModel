@@ -23,8 +23,6 @@
 proj_Q_P_PostFMD_OPT_5_09 <- optimisticPostFMD_5_0909[[1]]
 proj_Q_P_PostFMD_OPT_10_09 <- optimisticPostFMD_10_0909[[1]]
 
-
-
 proj_Q_P_PostFMD_OPT_5I_08 <- proj_Q_P_PostFMD_OPT_5_09 %>% transmute(Year = Year, Ps5 = Ps, Pc5 = Pc, Sl5 = Sl,Cl5 = Cl,
                                                                       Hc5 = Hc, Sl5_OG = Sl_OG, Cl5_OG = Cl_OG,
                                                                       mu5 = muTilde, sh5 = sh, D5 = demDollarsAfter,
@@ -139,8 +137,11 @@ trade_FORECAST_PostFMD_OPTI_08 <- Reduce(function(...) merge(...),
 # proj_Q_P_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0902[[1]]
 # proj_Q_P_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0902[[1]]
 
-proj_Q_P_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0904[[1]]
-proj_Q_P_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0904[[1]]
+# proj_Q_P_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0904[[1]]
+# proj_Q_P_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0904[[1]]
+
+proj_Q_P_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0909[[1]]
+proj_Q_P_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0909[[1]]
 
 
 proj_Q_P_PostFMD_PES_5I_08 <- proj_Q_P_PostFMD_PES_5_08 %>% transmute(Year = Year, Ps5 = Ps, Pc5 = Pc, Sl5 = Sl, Cl5 = Cl,
@@ -170,8 +171,11 @@ proj_Q_P_PostFMD_PESI_08 <- Reduce(function(...) merge(...),
 # proj_Q_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0902[[3]]
 # proj_Q_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0902[[3]]
 
-proj_Q_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0904[[3]]
-proj_Q_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0904[[3]]
+# proj_Q_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0904[[3]]
+# proj_Q_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0904[[3]]
+
+proj_Q_PostFMD_PES_5_08 <- pessimisticPostFMD_5_0909[[3]]
+proj_Q_PostFMD_PES_10_08 <- pessimisticPostFMD_10_0909[[3]]
 
 
 proj_Q_PostFMD_PES_5I_08 <- proj_Q_PostFMD_PES_5_08 %>% filter(Year >= 2022) %>% 
@@ -206,9 +210,14 @@ proj_Q_PostFMD_PESI_08 <- Reduce(function(...) merge(...),
 # 
 # beefINV_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0902[[2]] %>% transmute(Year = Year, K10 = K)
 
-beefINV_FORECAST_PostFMD_PES_5I_08 <- pessimisticPostFMD_5_0904[[2]] %>% transmute(Year = Year, K5 = K)
+# beefINV_FORECAST_PostFMD_PES_5I_08 <- pessimisticPostFMD_5_0904[[2]] %>% transmute(Year = Year, K5 = K)
+# 
+# beefINV_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0904[[2]] %>% transmute(Year = Year, K10 = K)
 
-beefINV_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0904[[2]] %>% transmute(Year = Year, K10 = K)
+beefINV_FORECAST_PostFMD_PES_5I_08 <- pessimisticPostFMD_5_0909[[2]] %>% transmute(Year = Year, K5 = K)
+
+beefINV_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0909[[2]] %>% transmute(Year = Year, K10 = K)
+
 
 
 beefINV_FORECAST_PostFMD_PESI_08 <- Reduce(function(...) merge(...), 
@@ -222,11 +231,19 @@ beefINV_FORECAST_PostFMD_PESI_08 <- Reduce(function(...) merge(...),
 #   transmute(Year = Year,Imports10 = round(Imports), Exports10 = round(Exports), ImportsBeef10 = ImportsBeef, ExportsBeef10 = ExportsBeef) %>% 
 #   mutate_all(~replace_na(.,0))
 
-trade_FORECAST_PostFMD_PES_5I_08 <- pessimisticPostFMD_5_0904[[3]] %>% filter(Year>=2022) %>%
+# trade_FORECAST_PostFMD_PES_5I_08 <- pessimisticPostFMD_5_0904[[3]] %>% filter(Year>=2022) %>%
+#   transmute(Year = Year,Imports5 = round(Imports), Exports5 = round(Exports), ImportsBeef5 = ImportsBeef, ExportsBeef5 = ExportsBeef) %>% 
+#   mutate_all(~replace_na(.,0))
+# 
+# trade_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0904[[3]] %>% filter(Year>=2022) %>%
+#   transmute(Year = Year,Imports10 = round(Imports), Exports10 = round(Exports), ImportsBeef10 = ImportsBeef, ExportsBeef10 = ExportsBeef) %>% 
+#   mutate_all(~replace_na(.,0))
+
+trade_FORECAST_PostFMD_PES_5I_08 <- pessimisticPostFMD_5_0909[[3]] %>% filter(Year>=2022) %>%
   transmute(Year = Year,Imports5 = round(Imports), Exports5 = round(Exports), ImportsBeef5 = ImportsBeef, ExportsBeef5 = ExportsBeef) %>% 
   mutate_all(~replace_na(.,0))
 
-trade_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0904[[3]] %>% filter(Year>=2022) %>%
+trade_FORECAST_PostFMD_PES_10I_08 <- pessimisticPostFMD_10_0909[[3]] %>% filter(Year>=2022) %>%
   transmute(Year = Year,Imports10 = round(Imports), Exports10 = round(Exports), ImportsBeef10 = ImportsBeef, ExportsBeef10 = ExportsBeef) %>% 
   mutate_all(~replace_na(.,0))
 
@@ -770,15 +787,15 @@ PostFMD_PESI_SH_ChangePlot_0820N <- round(proj_Q_P_PostFMD_PESI_SH_08,3) %>% ggp
                      values=c('5% Depop'='#619CFF', '10% Depop'='#F8766D','Baseline' = '#C77CFF'))
 
 
-optimisticPostFMD_5_08_INV <- optimisticPostFMD_5_0904[[3]] %>% filter(Year >= 2022) %>%
+optimisticPostFMD_5_08_INV <- optimisticPostFMD_5_0909[[3]] %>% filter(Year >= 2022) %>%
   select(Year, K, k3, k4, k5, k6, k7, k8, k9, k10)
 
-optimisticPostFMD_10_08_INV <- optimisticPostFMD_10_0904[[3]] %>% filter(Year >= 2022) %>%
+optimisticPostFMD_10_08_INV <- optimisticPostFMD_10_0909[[3]] %>% filter(Year >= 2022) %>%
   select(Year, K, k3, k4, k5, k6, k7, k8, k9, k10)
 
 library(latexpdf)
-as.pdf(x=optimisticPostFMD_5_08_INV, stem="OPT_INV_5", dir = "FMD-SimulationPlots/09-05")
-as.pdf(x=optimisticPostFMD_10_08_INV, stem="OPT_INV_10", dir = "FMD-SimulationPlots/09-05")
+as.pdf(x=optimisticPostFMD_5_08_INV, stem="OPT_INV_5", dir = "FMD-SimulationPlots/09-12")
+as.pdf(x=optimisticPostFMD_10_08_INV, stem="OPT_INV_10", dir = "FMD-SimulationPlots/09-12")
 
 optimisticPostFMD_5_08_TRADE <- trade_FORECAST_PostFMD_OPTI_08 %>%
   transmute(Year = Year, imports = round(Imports5), exports = round(Exports5), importsBeef = ImportsBeef5, exportsBeef = ExportsBeef5)
@@ -786,18 +803,18 @@ optimisticPostFMD_5_08_TRADE <- trade_FORECAST_PostFMD_OPTI_08 %>%
 optimisticPostFMD_10_08_TRADE <- trade_FORECAST_PostFMD_OPTI_08 %>%
   transmute(Year = Year, imports = round(Imports10), exports = round(Exports10), importsBeef = ImportsBeef10, exportsBeef = ExportsBeef10)
 
-as.pdf(x=optimisticPostFMD_5_08_TRADE, stem="OPT_TRADE_5", dir = "FMD-SimulationPlots/09-05")
-as.pdf(x=optimisticPostFMD_10_08_TRADE, stem="OPT_TRADE_10", dir = "FMD-SimulationPlots/09-05")
+as.pdf(x=optimisticPostFMD_5_08_TRADE, stem="OPT_TRADE_5", dir = "FMD-SimulationPlots/09-12")
+as.pdf(x=optimisticPostFMD_10_08_TRADE, stem="OPT_TRADE_10", dir = "FMD-SimulationPlots/09-12")
 
 
-pessimisticPostFMD_5_08_INV <- pessimisticPostFMD_5_0904[[3]] %>% filter(Year >= 2022) %>%
+pessimisticPostFMD_5_08_INV <- pessimisticPostFMD_5_0909[[3]] %>% filter(Year >= 2022) %>%
   select(Year, K, k3, k4, k5, k6, k7, k8, k9, k10)
 
-pessimisticPostFMD_10_08_INV <- pessimisticPostFMD_10_0904[[3]] %>% filter(Year >= 2022) %>%
+pessimisticPostFMD_10_08_INV <- pessimisticPostFMD_10_0909[[3]] %>% filter(Year >= 2022) %>%
   select(Year, K, k3, k4, k5, k6, k7, k8, k9, k10)
 
-as.pdf(x=pessimisticPostFMD_5_08_INV, stem="PES_INV_5", dir = "FMD-SimulationPlots/09-05")
-as.pdf(x=pessimisticPostFMD_10_08_INV, stem="PES_INV_10", dir = "FMD-SimulationPlots/09-05")
+as.pdf(x=pessimisticPostFMD_5_08_INV, stem="PES_INV_5", dir = "FMD-SimulationPlots/09-12")
+as.pdf(x=pessimisticPostFMD_10_08_INV, stem="PES_INV_10", dir = "FMD-SimulationPlots/09-12")
 
 
 pessimisticPostFMD_5_08_TRADE <- trade_FORECAST_PostFMD_PESI_08 %>%
@@ -806,8 +823,8 @@ pessimisticPostFMD_5_08_TRADE <- trade_FORECAST_PostFMD_PESI_08 %>%
 pessimisticPostFMD_10_08_TRADE <- trade_FORECAST_PostFMD_PESI_08 %>%
   transmute(Year = Year, imports = round(Imports10), exports = round(Exports10), importsBeef = ImportsBeef10, exportsBeef = ExportsBeef10)
 
-as.pdf(x=pessimisticPostFMD_5_08_TRADE, stem="PES_TRADE_5", dir = "FMD-SimulationPlots/09-05")
-as.pdf(x=pessimisticPostFMD_10_08_TRADE, stem="PES_TRADE_10", dir = "FMD-SimulationPlots/09-05")
+as.pdf(x=pessimisticPostFMD_5_08_TRADE, stem="PES_TRADE_5", dir = "FMD-SimulationPlots/09-12")
+as.pdf(x=pessimisticPostFMD_10_08_TRADE, stem="PES_TRADE_10", dir = "FMD-SimulationPlots/09-12")
 
 
 

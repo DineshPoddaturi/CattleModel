@@ -3,7 +3,7 @@ title: "FMD Simulations"
 output:
   pdf_document: default
   word_document: default
-date: "09-05-2022"
+date: "09-12-2022"
 ---
 
 <!-- 1. Japan lifted it's ban on the importation of US beef nearly 2 years after BSE in the US. -->
@@ -20,63 +20,77 @@ date: "09-05-2022"
 \end{itemize}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/PsOPT.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/PsOPT.png}
   \caption{Fed cattle price}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/PcOPT.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/PcOPT.png}
   \caption{Cull cow price}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/SlOPTDOM.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/SlDomOPT.png}
   \caption{Fed Cattle Supply - After adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/ClOPTDOM.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/ClDomOPT.png}
   \caption{Cull cow supply - After adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/TSOPTDOM.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/TsDomOPT.png}
   \caption{Total Supply - After adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/ShOPT.png}
-  \caption{Share}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/SlOPT.png}
+  \caption{Fed Cattle Supply - Before adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/DemQuantOPTDOM.png}
-  \caption{Demand(Quantity)}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/ClOPT.png}
+  \caption{Cull cow supply - Before adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/DemDollarOPTDOM.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/TsOPT.png}
+  \caption{Total Supply - Before adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/DemDollarOPT.png}
   \caption{Demand(Dollars)}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/OPT_INV_5.pdf}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/ShareOPT.png}
+  \caption{Share}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/DemQuantOPT.png}
+  \caption{Demand(Quantity)}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/OPT_INV_5.pdf}
   \caption{Inventory distribution under $5\%$ percent depopulation}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/OPT_INV_10.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/OPT_INV_10.pdf}
   \caption{Inventory distribution under $10\%$ percent depopulation}
 \end{figure}
 
-
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/OPT_TRADE_5.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/OPT_TRADE_5.pdf}
   \caption{Imports and Exports under $5\%$ percent depopulation}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/OPT_TRADE_10.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/OPT_TRADE_10.pdf}
   \caption{Imports and Exports under $10\%$ percent depopulation}
 \end{figure}
 
@@ -94,63 +108,78 @@ date: "09-05-2022"
 \end{itemize}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/PsPES.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/PsPES.png}
   \caption{Fed cattle price}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/PcPES.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/PcPES.png}
   \caption{Cull cow price}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/TSPESDOM.png}
-  \caption{Total Supply - After adjusting for exports and imports}
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/SlPESDom.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/SlDomPES.png}
   \caption{Fed Cattle Supply - After adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/ClPESDOM.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/ClDomPES.png}
   \caption{Cull cow supply - After adjusting for exports and imports}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/ShPES.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/TsDomPES.png}
+  \caption{Total Supply - After adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/SlPES.png}
+  \caption{Fed Cattle Supply - Before adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/ClPES.png}
+  \caption{Cull cow supply - Before adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/TsPES.png}
+  \caption{Total Supply - Before adjusting for exports and imports}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/DemDollarPES.png}
+  \caption{Demand(Dollars)}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/SharePES.png}
   \caption{Share}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/DemQuantPESDOM.png}
+  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-12/DemQuantPES.png}
   \caption{Demand(Quantity)}
-\end{figure} 
-
-\begin{figure}
-  \includegraphics[width=1.1\linewidth]{FMD-SimulationPlots/09-05/DemDollarPESDOM.png}
-  \caption{Demand(Dollars)}
 \end{figure}
 
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/PES_INV_5.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/PES_INV_5.pdf}
   \caption{Inventory distribution under $5\%$ percent depopulation}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/PES_INV_10.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/PES_INV_10.pdf}
   \caption{Inventory distribution under $10\%$ percent depopulation}
 \end{figure}
 
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/PES_TRADE_5.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/PES_TRADE_5.pdf}
   \caption{Imports and Exports under $5\%$ percent depopulation}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=8in]{FMD-SimulationPlots/09-05/PES_TRADE_10.pdf}
+  \includegraphics[width=8in]{FMD-SimulationPlots/09-12/PES_TRADE_10.pdf}
   \caption{Imports and Exports under $10\%$ percent depopulation}
 \end{figure}

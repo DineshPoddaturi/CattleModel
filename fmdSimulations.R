@@ -271,11 +271,11 @@ getPsPcEpsEpc_FMD_EQ_PES <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
         # psNew_up <- psNew + 0.07
         # pcNew_up <- pcNew + 0.8
         
-        psNew_lo <- psNew  - 0.07
+        psNew_lo <- psNew  - 0.02
         pcNew_lo <- pcNew - 0.03
         
-        psNew_up <- psNew + 0.09
-        pcNew_up <- pcNew + 0.05
+        psNew_up <- psNew + 0.08
+        pcNew_up <- pcNew + 0.04
         
         # psNew_up <- psNew + 0.08
         # pcNew_up <- pcNew + 0.05
@@ -311,11 +311,11 @@ getPsPcEpsEpc_FMD_EQ_PES <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew,
         # psNew_up <- psNew + 0.07
         # pcNew_up <- pcNew + 0.8
         
-        psNew_lo <- psNew  - 0.07
+        psNew_lo <- psNew  - 0.02
         pcNew_lo <- pcNew - 0.03
         
-        psNew_up <- psNew + 0.09
-        pcNew_up <- pcNew + 0.05
+        psNew_up <- psNew + 0.08
+        pcNew_up <- pcNew + 0.04
         
         # PES
         # psNew_lo <- psNew  - 0.5
@@ -1675,7 +1675,6 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
         #                                       beefINV_FORECAST = beefINV_FORECAST_PostFMD[1,], 
         #                                       calfCrop = calf_crop_PostFMD)
         
-        
         stockForecastFMD <- Stock %>% filter(Year < 2022)
         mergedForecastFMD <- merge(stockForecastFMD, beefINV_FORECAST_PostFMD, all=TRUE) %>% filter(Year >= 1995)
         
@@ -1858,8 +1857,6 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             clNewFMD <- clNewFMD
             # slNewFMD <- slNewFMD + slNewFMD * (exports_percentMeat/100)
             # clNewFMD <- clNewFMD + clNewFMD * (exports_percentMeat/100)
-            
-            
             exprtsFMD <- -(mergedForecastFMD_Proj %>% filter(Year == 2020) %>% select(Exports) %>% as.numeric())
             mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- if_else(exprtsFMD>0,exprtsFMD,0)
             
@@ -1867,13 +1864,13 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             
             # slExprtsLive <- slNewFMD * (exports_LiveK/100)
             # clExprtsLive <- clNewFMD * (exports_LiveK/100)
-            slExprtsLive <- expRatioMax * mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD-1]
+            slExprtsLive <- expRatioMed * mergedForecastFMD_Proj$K[mergedForecastFMD_Proj$Year == yearIFMD-1]
             exports_Live <- slExprtsLive
             
             # slExprtsMeat <- slNewFMD * (exports_percentMeat/100)
             # clExprtsMeat <- clNewFMD * (exports_percentMeat/100)
             totExprtsMeat <- (expRatioBeefMean * (slNewFMD + clNewFMD)) %>% as.numeric()
-            slExprtsMeat <- (expRatioBeefMean * slNewFMD ) %>% as.numeric()
+            slExprtsMeat <- (expRatioBeefMin * slNewFMD ) %>% as.numeric()
             
             slNewFMD <- slNewFMD - slExprtsMeat
             # clNewFMD <- clNewFMD - clExprtsMeat
@@ -1953,7 +1950,7 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] <- round(expTot)
             
             ### Here I populate the dataframe with the beef exported
-            mergedForecastFMD_Proj$ExportsBeef[mergedForecastFMD_Proj$Year == yearIFMD] <- round(slExprtsMeat + clExprtsMeat,3)
+            mergedForecastFMD_Proj$ExportsBeef[mergedForecastFMD_Proj$Year == yearIFMD] <- round(totExprtsMeat,3)
             
             #### Now I determine the total live animals that are exported. This include the live animals and beef exported
             #### So I convert the beef exported from pounds to live animals and add them to the live animals determined before
@@ -2158,7 +2155,12 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
               exprtsFMDK1 <- mergedForecastFMD_Proj$Exports[mergedForecastFMD_Proj$Year == yearIFMD] +  exprtsFMDK
             }else if (expUpdatek3[i] == 1){
               # exprtsFMDK <- (expLM$coefficients[1] * k_old_headFMD) %>% as.numeric()
-              exprtsFMDK <- (expRatioMax * k_old_headFMD) %>% as.numeric()
+              if(approxKFMD > KHistMin){
+                exprtsFMDK <- (expRatioMax * k_old_headFMD) %>% as.numeric()
+              }else{
+                exprtsFMDK <- 0
+              }
+              
             }else{
               exprtsFMDK <- 0
             }
@@ -2192,17 +2194,16 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             if(approxKFMD > KHistMed || k_old_headFMD > k3HistMed){
               gFMDCC <- gFMDCC - 0.05
             }else if( k_old_headFMD < k3HistMed){
-              gFMDCC <- gFMDCC + 0.04
+              gFMDCC <- gFMDCC + 0.025
             }
           }else if(dePopR==10){
             if(approxKFMD > KHistMed || k_old_headFMD > k3HistMed){
-              gFMDCC <- gFMDCC - 0.021
+              gFMDCC <- gFMDCC - 0.026
             }
             # else if( k_old_headFMD < k3HistMed){
             #   gFMDCC <- gFMDCC + 0.02
             # }
           } 
-          
           
           mergedForecastFMD_Proj$k3[mergedForecastFMD_Proj$Year == yearIFMD] <- k_old_headFMD
           
@@ -2307,23 +2308,9 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           mergedForecastFMD_Proj$slMedian[mergedForecastFMD_Proj$Year == yearIFMD] <- slNewFMD_OG
           
           if(i>1){
-            capAFMD_DollarsAfter <- slDem * (psM_pre/phi) + clDem * (pcM_pre/phi)
+            capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
           }
           
-          PsFMD <- getPsPcEpsEpc_FMD_EQ_PES(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
-                                            HcM = hcM_pre, SlNew = slNewFMD, ClNew = clNewFMD, ANew = capAFMD, 
-                                            params = c(MUtilde_pre, Stilde_pre), depops = dePopR)
-          
-          psM_pre <- PsFMD[1]
-          pcM_pre <- PsFMD[2]
-          hcM_pre <- PsFMD[3]
-          EpsM_pre <- PsFMD[4]
-          EpcM_pre <- PsFMD[5]
-          
-          ##### Here I am making sure the demand is decreased in the initial years of the disease outbreak
-          ##### In order to do that, first I compute the demand under new prices. If the demand is greater than
-          ##### 0.95 of the original demand, change the prices and supplies simultaneously and run the model
-          ##### until the demand reaches the 0.95 of the original
           if(i < 4){
             
             # capAFMD_DollarsAfter <- capAFMD * sh_pre * psM_pre + capAFMD * (1-sh_pre) * pcM_pre
@@ -2363,6 +2350,86 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             
           }
           
+          ##############################################################################################
+          ###################### INCREASE THE DEMAND HERE. ADJUST FOR QUANTITIES AS WELL ###############
+          
+          if(i==4){
+            
+            while(capAFMD_DollarsAfter < capAFMD_DollarsOG){
+              
+              if(dePopR == 5){
+                
+                psM_pre <- psM_pre + 0.01
+                pcM_pre <- pcM_pre + 0.01
+                
+              }else if(dePopR == 10){
+                
+                psM_pre <- psM_pre + 0.01
+                pcM_pre <- pcM_pre + 0.01
+                
+              }else{
+                psM_pre <- psM_pre + 0.01
+                pcM_pre <- pcM_pre + 0.01
+              }
+              
+              capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
+              
+            }
+          }
+          
+          PsFMD <- getPsPcEpsEpc_FMD_EQ_PES(PsM = psM_pre, PcM = pcM_pre, EPsM = EpsM_pre, EPcM = EpcM_pre,
+                                            HcM = hcM_pre, SlNew = slNewFMD, ClNew = clNewFMD, ANew = capAFMD, 
+                                            params = c(MUtilde_pre, Stilde_pre), depops = dePopR)
+          
+          psM_pre <- PsFMD[1]
+          pcM_pre <- PsFMD[2]
+          hcM_pre <- PsFMD[3]
+          EpsM_pre <- PsFMD[4]
+          EpcM_pre <- PsFMD[5]
+          
+          ##### Here I am making sure the demand is decreased in the initial years of the disease outbreak
+          ##### In order to do that, first I compute the demand under new prices. If the demand is greater than
+          ##### 0.95 of the original demand, change the prices and supplies simultaneously and run the model
+          ##### until the demand reaches the 0.95 of the original
+          if(i < 4){
+
+            # capAFMD_DollarsAfter <- capAFMD * sh_pre * psM_pre + capAFMD * (1-sh_pre) * pcM_pre
+
+            #### Here I compute the demand in dollars. Basically multiply the supplied quantities with the
+            #### price determined from the equilibrium conditions. Note: I don't have to use the markup parameter
+            #### to convert the price to retail price. It's constant and it's
+            capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
+
+            while(capAFMD_DollarsAfter > 0.95 * capAFMD_DollarsOG){
+
+              if(dePopR == 5){
+
+                psM_pre <- psM_pre - 0.01
+                pcM_pre <- pcM_pre - 0.01
+
+              }else if(dePopR == 10){
+
+                psM_pre <- psM_pre - 0.01
+                pcM_pre <- pcM_pre - 0.01
+
+              }else if(dePopR == 20){
+
+                psM_pre <- psM_pre - 0.01
+                pcM_pre <- pcM_pre - 0.01
+
+              }else{
+
+                psM_pre <- psM_pre - 0.01
+                pcM_pre <- pcM_pre - 0.01
+
+              }
+
+              capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
+
+            }
+
+          }
+          
           proj_Q_P_PostFMD$Ps[i] <- psM_pre
           proj_Q_P_PostFMD$Pc[i] <- pcM_pre
           proj_Q_P_PostFMD$Hc[i] <- hcM_pre
@@ -2381,10 +2448,10 @@ simPessimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           
           capK_pre <- beefINV_FORECAST_PostFMD[i,]$K
           
-          # capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
-          # if(i>1){
-          #   capAFMD_DollarsAfter <- slDem * (psM_pre/phi) + clDem * (pcM_pre/phi)
-          # }
+          if(i>=5){
+            capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
+          }
+          
           proj_Q_P_PostFMD$demDollarsAfter[i] <- capAFMD_DollarsAfter
           
           if(i>1){
@@ -2433,10 +2500,12 @@ pessimisticPostFMD_5_0904 <- simPessimisticFMD(
   exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
   holdingCostsFuturesFMD = holdingCostsFuturesFMD5)
 
-pessimisticPostFMD_5_0902[[1]]$Ps
+pessimisticPostFMD_5_0909 <- simPessimisticFMD(
+  dePopR = 5, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
+  exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
+  holdingCostsFuturesFMD = holdingCostsFuturesFMD5)
 
-pessimisticPostFMD_5_0904[[1]]$Ps
-
+pessimisticPostFMD_5_0909[[2]]
 
 pessimisticPostFMD_10_0902 <- simPessimisticFMD(
   dePopR = 10, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
@@ -2448,6 +2517,13 @@ pessimisticPostFMD_10_0904 <- simPessimisticFMD(
   exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
   holdingCostsFuturesFMD = holdingCostsFuturesFMD10)
 
+
+pessimisticPostFMD_10_0909 <- simPessimisticFMD(
+  dePopR = 10, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 
+  exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
+  holdingCostsFuturesFMD = holdingCostsFuturesFMD10)
+
+pessimisticPostFMD_10_0909[[2]]
 
 
 # pessimisticPostFMD_5 <- simPessimisticFMD(dePopR = 5, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD,
