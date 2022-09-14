@@ -188,7 +188,6 @@ holdingCostsFuturesFMD20 <- cornFuturesFMD20 %>%
   mutate(hc = fitCHCSummary$coefficients[1] + fitCHCSummary$coefficients[2] * pcorn) %>% round(3) %>% 
   select(Year, hc)
 
-
 cornFuturesFMD10 <- cornFutures %>% mutate(pcorn = pcorn - 0.10)
 
 holdingCostsFuturesFMD10 <- cornFuturesFMD10 %>% 
