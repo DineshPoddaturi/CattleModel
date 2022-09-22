@@ -3,6 +3,7 @@
 
 cornPrice_Bushel <- allPrices %>% select(Year, pcorn)
 
+
 EQestHCMedians <- EQestHCNIII %>% select(Year, hcMedian)
 
 cornHC <- merge(EQestHCMedians, cornPrice_Bushel) %>% round(3)

@@ -2505,7 +2505,7 @@ pessimisticPostFMD_5_0909 <- simPessimisticFMD(
   exports_LiveK = exports_LiveK, exports_percentMeat = exports_percentMeat, nn = nn, Stock = Stock,
   holdingCostsFuturesFMD = holdingCostsFuturesFMD5)
 
-pessimisticPostFMD_5_0909[[2]]
+pessimisticPostFMD_5_0909[[1]]$Hc
 
 pessimisticPostFMD_10_0902 <- simPessimisticFMD(
   dePopR = 10, modelParamsEQ_PreFMD = modelParamsEQ_PreFMD, exports_percentK = exports_percentK, 

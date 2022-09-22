@@ -273,7 +273,7 @@ estProj_CLIII_plots <- estProj_CLIIV %>% ggplot(aes(x=Year)) +
 
 # proj_Q_PIIV <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
-proj_Q_PIIVI <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
+# proj_Q_PIIVI <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
 proj_Q_PIIVII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 

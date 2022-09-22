@@ -905,9 +905,6 @@ parameter_s <- parameters_new %>% ggplot(aes(x=Year)) + geom_line(aes(y=s_tilde)
   labs(x="Year", y="s_tilde")+theme_classic()+
   scale_x_continuous(name="Year", breaks=c(seq(parameters_new$Year[1],parameters_new$Year[nrow(parameters_new)])))
 
-
-
-
 ######################################################
 ## Here we use the slaughter animals numbers
 Stock_temp <- Stock%>% filter(Year>=1994 & Year<=2017)

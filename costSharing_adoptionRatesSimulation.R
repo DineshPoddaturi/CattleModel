@@ -396,7 +396,6 @@ costs_sl <- costs_sl_2years %>% filter(Year>1994 & Year<2017) %>% select(Year, c
 
 costs_hc_cl <- prices_predict_co4_merge %>% mutate(hc_9years = (hc_hat/100)) %>% select(Year, hc_9years)
 
-
 costsSupply_sl_adopt <- demand_predict_co4_merge_adopt %>% mutate(costSupply_sl_obs = sl * costs_sl$cost_Lb_2years * adoption,
                                                                   costSupply_sl_model = sl_estY * costs_sl$cost_Lb_2years ) %>% select(
                                                                     Year, costSupply_sl_obs,  costSupply_sl_model)

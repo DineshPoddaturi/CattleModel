@@ -1,0 +1,43 @@
+---
+title: "Surplus Changes"
+author: ""
+date: '2022-09-22'
+output: pdf_document
+---
+
+All the below surplus calculations are not accounting for the value lost by depopulating the animals, assistance provided to the producers because of the depopulation of infected animals, or implementation of vaccination
+
+
+# Producer revenue
+
+The producer revenue lost is computed by taking the difference between the baseline revenue and the counterfactual revenue for both fed cattle and cull cows.
+
+## Optimistic scenario
+
+Under 5% depopulation level, the discounted value of revenue lost over the simulation period is $5.05$ billion dollars. \newline
+Under 10% depopulation level, the discounted value of revenue lost over the simulation period is $8.24$ billion dollars.
+
+## Pessimistic scenario
+
+Under 5% depopulation level, the discounted value of revenue lost over the simulation period is $18.18$ billion dollars. \newline
+Under 10% depopulation level, the discounted value of revenue lost over the simulation period is $21.1$ billion dollars.
+
+# Consumer surplus
+
+The consumer surplus lost is computed by taking the difference between the counterfactual expenditure and the baseline expenditure for both fed cattle beef and cull cow beef.
+
+## Optimistic scenario
+
+Under 5% depopulation level, the discounted value of consumer surplus over the simulation period is $14.57$ billion dollars. \newline
+Under 10% depopulation level, the discounted value of consumer surplus over the simulation period is $19.54$ billion dollars.
+
+## Pessimistic scenario
+
+Under 5% depopulation level, the discounted value of consumer surplus over the simulation period is $32.79$ billion dollars. \newline
+Under 10% depopulation level, the discounted value of consumer surplus over the simulation period is $37.32$ billion dollars.
+
+
+
+
+
+

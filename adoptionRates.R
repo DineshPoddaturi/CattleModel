@@ -317,8 +317,6 @@ rev_total_adopt <- merge(rev_sl_adopt, rev_cl_adopt) %>% mutate(
   totalRev_diff_model = totalRev_post - totalRev_model) %>% select(Year, totalRev_post, totalRev_model, 
                                                                    totalRev_obs, totalRev_diff_obs, totalRev_diff_model)
 
-
-
 costs_cl <- costs_cl_9years %>% filter(Year>1994 & Year<2017) %>% select(Year, cost_Lb_9years)
 costs_sl <- costs_sl_2years %>% filter(Year>1994 & Year<2017) %>% select(Year, cost_Lb_2years)
 
