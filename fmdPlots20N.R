@@ -383,7 +383,7 @@ PostFMD_OPTI_Sl_ChangePlot_0820ND <- round(proj_Q_P_PostFMD_OPTI_Sl_B_08,3) %>% 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(proj_Q_P_PostFMD_OPTI_Sl_B_08$Year[1],
                                   proj_Q_P_PostFMD_OPTI_Sl_B_08$Year[nrow(proj_Q_P_PostFMD_OPTI_Sl_B_08)])))+ 
-  scale_y_continuous(name="Fed cattle supply (in billion pounds)", limits = c(14,30,by=2))  + theme_classic() + 
+  scale_y_continuous(name="Fed cattle supply (in billion pounds)", limits = c(15,30,by=2))  + theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 15,face = "bold"),
         legend.background = element_rect(color = NA)) +
   theme(legend.title=element_blank()) + 
