@@ -195,7 +195,7 @@ supp_diss %>% ggplot(aes(x=Year))+ geom_line(aes(y=TotalDiss,color="Demand")) +
   geom_point(aes(y=TotalSupply, color="Supply")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(supp_diss$Year[1],
-                                  supp_diss$Year[nrow(supp_diss)],2))) + theme_classic() + 
+                                  supp_diss$Year[nrow(supp_diss)]))) + theme_classic() + 
   scale_y_continuous(name="Meat (in billion pounds)") +
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
