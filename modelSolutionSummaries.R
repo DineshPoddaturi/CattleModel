@@ -58,8 +58,8 @@ EQestObsPSNIII
 EQestObsPSNIII_Err <- EQestObsPSNIII %>% select(Year, psMedian, ps) %>% 
   mutate(eHat = ((ps-psMedian)/ps)* 100)
 
-EQestObsPSNIII_Err_Median <- median(EQestObsPSNIII_Err$eHat) %>% round(2)
-EQestObsPSNIII_Err_Max <- max(EQestObsPSNIII_Err$eHat) %>% round(2)
+EQestObsPSNIII_Err_Median <- median(abs(EQestObsPSNIII_Err$eHat)) %>% round(2)
+EQestObsPSNIII_Err_Max <- max(abs(EQestObsPSNIII_Err$eHat)) %>% round(2)
 
 ###### Fitted Cull Cow Equilibrium prices
 EQprices_pc_MeansNIII <- apply(unique(prices_pc_eq[1:25,]), 2, mean)
@@ -84,8 +84,8 @@ EQestObsPCNIII
 EQestObsPCNIII_Err <- EQestObsPCNIII %>% select(Year, pcMedian, pc) %>% 
   mutate(eHat = ((pc-pcMedian)/pc)*100)
 
-EQestObsPCNIII_Err_Median <- median(EQestObsPCNIII_Err$eHat) %>% round(2)
-EQestObsPCNIII_Err_Max <- max(EQestObsPCNIII_Err$eHat) %>% round(2)
+EQestObsPCNIII_Err_Median <- median(abs(EQestObsPCNIII_Err$eHat)) %>% round(2)
+EQestObsPCNIII_Err_Max <- max(abs(EQestObsPCNIII_Err$eHat)) %>% round(2)
 
 
 EQestObsPCNIII_R2 <- EQestObsPCNIII_Err %>% select(Year, pcMedian, pc) %>% 
@@ -177,8 +177,8 @@ EQestObsSLNIII
 EQestObsSLNIII_Err <- EQestObsSLNIII %>% select(Year, slMedian, slSM) %>% 
   mutate(eHat = ((slSM-slMedian)/slSM)*100)
 
-EQestObsSLNIII_Err_Median <- median(EQestObsSLNIII_Err$eHat) %>% round(2)
-EQestObsSLNIII_Err_Max <- max(EQestObsSLNIII_Err$eHat) %>% round(2)
+EQestObsSLNIII_Err_Median <- median(abs(EQestObsSLNIII_Err$eHat)) %>% round(2)
+EQestObsSLNIII_Err_Max <- max(abs(EQestObsSLNIII_Err$eHat)) %>% round(2)
 
 
 EQestObsSLNIII_R2 <- EQestObsSLNIII_Err %>% select(Year, slMedian, slSM) %>% 
@@ -219,8 +219,8 @@ EQestObsCLNIII
 EQestObsCLNIII_Err <- EQestObsCLNIII %>% select(Year, clMedian, clSM) %>% 
   mutate(eHat = ((clSM-clMedian)/clSM)*100)
 
-EQestObsCLNIII_Err_Median <- median(EQestObsCLNIII_Err$eHat) %>% round(2)
-EQestObsCLNIII_Err_Max <- max(EQestObsCLNII_Err$eHat) %>% round(2)
+EQestObsCLNIII_Err_Median <- median(abs(EQestObsCLNIII_Err$eHat)) %>% round(2)
+EQestObsCLNIII_Err_Max <- max(abs(EQestObsCLNII_Err$eHat)) %>% round(2)
 
 
 EQestObsCLNIII_R2 <- EQestObsCLNIII_Err %>% select(Year, clMedian, clSM) %>% filter(Year >= 1990) %>%

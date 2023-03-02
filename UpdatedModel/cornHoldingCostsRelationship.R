@@ -175,6 +175,11 @@ summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(gFMD*K)) %
 ### in determining the fed cattle supply
 
 
+
+
+
+
+
 ##### From Hayes et al. we saw the corn prices fall by 20 cents for the entire period of simulation. 
 ##### So I make the same assumption to change the corn prices during FMD. Now once I get these corn futures
 ##### I again use the linear model estimates to get new holding costs during FMD

@@ -2,7 +2,6 @@ require(librarian)
 
 librarian::shelf(tidyverse, reshape2, readxl, data.table, nleqslv, BB, Metrics, ggthemes, pracma)
 
-
 # Fixed Parameters
 beta <- 0.98
 delta <- 0.95
@@ -291,6 +290,8 @@ meat_bill <- supp_diss %>%
   select(Year, sl, cl, TS, TD)
 
 prices_quant <- merge(allPrices, meat_bill) %>% round(3)
+
+
 
 # In order to construct the shocks I need to estimate the quantities and see the observed ones. 
 

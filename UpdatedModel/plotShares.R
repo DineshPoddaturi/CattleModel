@@ -45,8 +45,8 @@
 mu_Tildes_MMNII
 s_Tildes_MMNII
 
-EQestPSNII
-EQestPCNII
+EQestPSNIII
+EQestPCNIII
 
 
 sharesEq_Mean <- ((exp((mu_Tildes_MMNIII$muMean - ((EQestPSNIII$psMean/phi) - (EQestPCNIII$pcMean/phi)))/s_Tildes_MMNIII$sMean))/
@@ -368,11 +368,6 @@ estProj_AIII_plots <- estProj_AIII %>% ggplot(aes(x=Year)) +
   scale_y_continuous(name="Demand for Meat") +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-
-
-
 
 
 proj_Q_PV <- proj_Q_P

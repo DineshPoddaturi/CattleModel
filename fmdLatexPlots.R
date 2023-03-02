@@ -53,19 +53,21 @@ demandPES <- proj_Q_P_PostFMD_PESI_Dem_08 %>% select(Year, D, D5, D10)  %>% roun
 
 #### Optimistic Scenario
 
-### Fed Cattle price changes
+### Fed Cattle price changes 
 
-tikz(file="fmdLatexPlots/FedCattlePricePlotOPT.tex", width=6.8, height=4, sanitize = TRUE)
+# width=6.2, height=3.5
+
+tikz(file="fmdLatexPlots/FedCattlePricePlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedPriceOPT_plot <- fedPricesOPT %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PsB, color="Baseline")) +
+  geom_line(aes(y = PsB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = PsB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = Ps5, color="5% Depopulation")) +
+  geom_point(aes(y = PsB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Ps5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = Ps5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = Ps10, color="10% Depopulation")) +
-  geom_point(aes(y = Ps10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = Ps5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = Ps10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = Ps10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(fedPricesOPT$Year[1],
                                   fedPricesOPT$Year[nrow(fedPricesOPT)])))+ 
@@ -86,17 +88,17 @@ dev.off()
 
 ### Cull cow price changes
 
-tikz(file="fmdLatexPlots/CullCowPricePlotOPT.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/CullCowPricePlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullPriceOPT_plot <- cullPricesOPT %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PcB, color="Baseline")) +
+  geom_line(aes(y = PcB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = PcB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = Pc5, color="5% Depopulation")) +
+  geom_point(aes(y = PcB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Pc5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = Pc5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = Pc10, color="10% Depopulation")) +
-  geom_point(aes(y = Pc10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = Pc5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = Pc10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = Pc10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(cullPricesOPT$Year[1],
                                   cullPricesOPT$Year[nrow(cullPricesOPT)])))+ 
@@ -116,17 +118,17 @@ print(cullPriceOPT_plot)
 dev.off()
 
 ### Changes in fed cattle supplies
-tikz(file="fmdLatexPlots/FedCattleSupplyPlotOPT.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/FedCattleSupplyPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedSupplyOPT_plot <- fedCattleSupplyOPT %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = SlCattleB, color="Baseline")) +
+  geom_line(aes(y = SlCattleB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = SlCattleB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = SlCattle5, color="5% Depopulation")) +
+  geom_point(aes(y = SlCattleB, color = "Baseline"),size=2) +
+  geom_line(aes(y = SlCattle5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = SlCattle5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = SlCattle10, color="10% Depopulation")) +
-  geom_point(aes(y = SlCattle10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = SlCattle5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = SlCattle10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = SlCattle10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(fedCattleSupplyOPT$Year[1],
                                   fedCattleSupplyOPT$Year[nrow(fedCattleSupplyOPT)])))+ 
@@ -146,17 +148,17 @@ print(fedSupplyOPT_plot)
 dev.off()
 
 ### Changes in cull cow supplies
-tikz(file="fmdLatexPlots/CullCowSupplyPlotOPT.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/CullCowSupplyPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullSupplyOPT_plot <- cullCattleSupplyOPT %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = ClCattleB, color="Baseline")) +
+  geom_line(aes(y = ClCattleB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = ClCattleB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = ClCattle5, color="5% Depopulation")) +
+  geom_point(aes(y = ClCattleB, color = "Baseline"),size=2) +
+  geom_line(aes(y = ClCattle5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = ClCattle5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = ClCattle10, color="10% Depopulation")) +
-  geom_point(aes(y = ClCattle10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = ClCattle5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = ClCattle10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = ClCattle10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(cullCattleSupplyOPT$Year[1],
                                   cullCattleSupplyOPT$Year[nrow(cullCattleSupplyOPT)])))+ 
@@ -176,17 +178,17 @@ print(cullSupplyOPT_plot)
 dev.off()
 
 ### Changes in demand
-tikz(file="fmdLatexPlots/DemandPlotOPT.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/DemandPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 demandOPT_plot <- demandOPT %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = D, color="Baseline")) +
+  geom_line(aes(y = D, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = D, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = D5, color="5% Depopulation")) +
+  geom_point(aes(y = D, color = "Baseline"),size=2) +
+  geom_line(aes(y = D5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = D5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = D10, color="10% Depopulation")) +
-  geom_point(aes(y = D10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = D5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = D10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = D10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(demandOPT$Year[1],
                                   demandOPT$Year[nrow(demandOPT)])))+ 
@@ -211,17 +213,17 @@ dev.off()
 
 ### Fed Cattle price changes
 
-tikz(file="fmdLatexPlots/FedCattlePricePlotPES.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/FedCattlePricePlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedPricePES_plot <- fedPricesPES %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PsB, color="Baseline")) +
+  geom_line(aes(y = PsB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = PsB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = Ps5, color="5% Depopulation")) +
+  geom_point(aes(y = PsB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Ps5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = Ps5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = Ps10, color="10% Depopulation")) +
-  geom_point(aes(y = Ps10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = Ps5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = Ps10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = Ps10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(fedPricesPES$Year[1],
                                   fedPricesPES$Year[nrow(fedPricesPES)])))+ 
@@ -242,17 +244,17 @@ dev.off()
 
 ### Cull cow price changes
 
-tikz(file="fmdLatexPlots/CullCowPricePlotPES.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/CullCowPricePlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullPricePES_plot <- cullPricesPES %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = PcB, color="Baseline")) +
+  geom_line(aes(y = PcB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = PcB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = Pc5, color="5% Depopulation")) +
+  geom_point(aes(y = PcB, color = "Baseline"),size=2) +
+  geom_line(aes(y = Pc5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = Pc5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = Pc10, color="10% Depopulation")) +
-  geom_point(aes(y = Pc10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = Pc5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = Pc10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = Pc10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(cullPricesPES$Year[1],
                                   cullPricesPES$Year[nrow(cullPricesPES)])))+ 
@@ -272,17 +274,17 @@ print(cullPricePES_plot)
 dev.off()
 
 ### Changes in fed cattle supplies
-tikz(file="fmdLatexPlots/FedCattleSupplyPlotPES.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/FedCattleSupplyPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedSupplyPES_plot <- fedCattleSupplyPES %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = SlCattleB, color="Baseline")) +
+  geom_line(aes(y = SlCattleB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = SlCattleB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = SlCattle5, color="5% Depopulation")) +
+  geom_point(aes(y = SlCattleB, color = "Baseline"),size=2) +
+  geom_line(aes(y = SlCattle5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = SlCattle5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = SlCattle10, color="10% Depopulation")) +
-  geom_point(aes(y = SlCattle10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = SlCattle5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = SlCattle10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = SlCattle10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(fedCattleSupplyPES$Year[1],
                                   fedCattleSupplyPES$Year[nrow(fedCattleSupplyPES)])))+ 
@@ -302,17 +304,17 @@ print(fedSupplyPES_plot)
 dev.off()
 
 ### Changes in cull cow supplies
-tikz(file="fmdLatexPlots/CullCowSupplyPlotPES.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/CullCowSupplyPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullSupplyPES_plot <- cullCattleSupplyPES %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = ClCattleB, color="Baseline")) +
+  geom_line(aes(y = ClCattleB, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = ClCattleB, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = ClCattle5, color="5% Depopulation")) +
+  geom_point(aes(y = ClCattleB, color = "Baseline"),size=2) +
+  geom_line(aes(y = ClCattle5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = ClCattle5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = ClCattle10, color="10% Depopulation")) +
-  geom_point(aes(y = ClCattle10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = ClCattle5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = ClCattle10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = ClCattle10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(cullCattleSupplyPES$Year[1],
                                   cullCattleSupplyPES$Year[nrow(cullCattleSupplyPES)])))+ 
@@ -332,17 +334,17 @@ print(cullSupplyPES_plot)
 dev.off()
 
 ### Changes in demand
-tikz(file="fmdLatexPlots/DemandPlotPES.tex", width=6.8, height=4, sanitize = TRUE)
+tikz(file="fmdLatexPlots/DemandPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 demandPES_plot <- demandPES %>% ggplot(aes(x = Year))+
-  geom_line(aes(y = D, color="Baseline")) +
+  geom_line(aes(y = D, color="Baseline"),size=0.75) +
   # stat_smooth(aes(y=PsB, color="Baseline"), method=lm, formula = y ~ poly(x,8.5), level=0.1) +
-  geom_point(aes(y = D, color = "Baseline"), size = 0.75) +
-  geom_line(aes(y = D5, color="5% Depopulation")) +
+  geom_point(aes(y = D, color = "Baseline"),size=2) +
+  geom_line(aes(y = D5, color="5% Depopulation"),size=0.75) +
   # stat_smooth(aes(y=Ps5, color="5% Depopulation"), method=lm, formula = y ~ poly(x,9), level=0.1) +
-  geom_point(aes(y = D5, color = "5% Depopulation"), size = 0.75) +
-  geom_line(aes(y = D10, color="10% Depopulation")) +
-  geom_point(aes(y = D10, color="10% Depopulation"), size = 0.75) +
+  geom_point(aes(y = D5, color = "5% Depopulation"),size=2) +
+  geom_line(aes(y = D10, color="10% Depopulation"),size=0.75) +
+  geom_point(aes(y = D10, color="10% Depopulation"),size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(demandPES$Year[1],
                                   demandPES$Year[nrow(demandPES)])))+ 

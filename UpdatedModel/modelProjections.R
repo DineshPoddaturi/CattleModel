@@ -1,4 +1,4 @@
-########## This contains the code for the mode projections
+########## This contains the code for the model projections
 
 
 #### First we fit a linear model with the total inventory in the United States
@@ -65,11 +65,6 @@ beefINV_FORECAST <- beefINV_FORECAST %>% transmute(Year =  as.double(row.names(b
 row.names(beefINV_FORECAST) <- NULL
 
 beefINV_FORECAST <- beefINV_FORECAST %>% select(Year, lo95, K, hi95)
-
-# beefInventoryData <- beefInventory %>% arrange(Year) %>% filter(Year >= 2021) %>% mutate(Year = Year, lo95 = K,
-#                                                                                          hi95 = K)
-# 
-# beefINV_FORECAST <- rbind(beefInventoryData, beefINV_FORECAST)
 
 #### Here we fit a linear model between the calf crop and the replacement heifers to get the relationship
 #### The relationship is shown in the model framework in dissertation document
@@ -307,15 +302,15 @@ proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(
                        Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj),
                        repHeif = numeric(nProj), repHeif_Head = numeric(nProj))
 
-proj_Q_P_up <- data.frame(Year = numeric(nProj), Ps_up = numeric(nProj), Pc_up = numeric(nProj),
-                          EPs_up = numeric(nProj), EPc_up = numeric(nProj), Hc_up = numeric(nProj),
-                          Sl_up = numeric(nProj), Cl_up = numeric(nProj), A_up = numeric(nProj),
-                          repHeif_up = numeric(nProj), repHeif_Head_up = numeric(nProj)) 
-
-proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo = numeric(nProj),
-                          EPs_lo = numeric(nProj), EPc_lo = numeric(nProj), Hc_lo = numeric(nProj),
-                          Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj),
-                          repHeif_lo = numeric(nProj), repHeif_Head_lo = numeric(nProj))
+# proj_Q_P_up <- data.frame(Year = numeric(nProj), Ps_up = numeric(nProj), Pc_up = numeric(nProj),
+#                           EPs_up = numeric(nProj), EPc_up = numeric(nProj), Hc_up = numeric(nProj),
+#                           Sl_up = numeric(nProj), Cl_up = numeric(nProj), A_up = numeric(nProj),
+#                           repHeif_up = numeric(nProj), repHeif_Head_up = numeric(nProj)) 
+# 
+# proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo = numeric(nProj),
+#                           EPs_lo = numeric(nProj), EPc_lo = numeric(nProj), Hc_lo = numeric(nProj),
+#                           Sl_lo = numeric(nProj), Cl_lo = numeric(nProj), A_lo = numeric(nProj),
+#                           repHeif_lo = numeric(nProj), repHeif_Head_lo = numeric(nProj))
 
 ##### Using the projected stock, I am generating the new born in each year. So basically multiply birth rate with the 
 ##### stock.
@@ -323,23 +318,23 @@ proj_Q_P_lo <- data.frame(Year = numeric(nProj), Ps_lo = numeric(nProj), Pc_lo =
 calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 =  K) %>% 
   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
-calf_crop_proj1_LO <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = lo95) %>% 
-  filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
-
-calf_crop_proj1_UP <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = hi95) %>% 
-  filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
+# calf_crop_proj1_LO <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = lo95) %>% 
+#   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
+# 
+# calf_crop_proj1_UP <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = hi95) %>% 
+#   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
 ##### Here I join the data and the projected 
 calf_crop_proj_N <- rbind(calf_crop_proj, calf_crop_proj1)
 
-calf_crop_proj_N_LO <- rbind(calf_crop_proj, calf_crop_proj1_LO)
-
-calf_crop_proj_N_UP <- rbind(calf_crop_proj, calf_crop_proj1_UP)
+# calf_crop_proj_N_LO <- rbind(calf_crop_proj, calf_crop_proj1_LO)
+# 
+# calf_crop_proj_N_UP <- rbind(calf_crop_proj, calf_crop_proj1_UP)
 
 k0s_df <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N)
 
-k0s_df_LO <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N_LO)
-k0s_df_UP <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N_UP)
+# k0s_df_LO <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N_LO)
+# k0s_df_UP <- get_k0s_Global(proj_Q_P = proj_Q_P, beefINV_FORECAST = beefINV_FORECAST, calfCrop = calf_crop_proj_N_UP)
 
 ####### Here we are projecting the prices and quantities from the forecasted capK or total stock and the calf crop
 
@@ -539,6 +534,8 @@ optParamFunction_Proj <- function(sl, cl, ps, pc, thetas, adj){
   
 }
 
+nProj <- 10
+
 proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
                        EPs = numeric(nProj), EPc = numeric(nProj), Hc = numeric(nProj), 
                        Sl = numeric(nProj), Cl = numeric(nProj), A = numeric(nProj),
@@ -565,7 +562,7 @@ k8Next <- 0
 
 for(i in 1:(nrow(proj_Q_P))){
   
-  # i <- 3
+  # i <- 1
   
   sh <- ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
   
@@ -897,235 +894,8 @@ proj_Q_P_MU <- proj_Q_P %>% filter(Ps > 0) %>% ggplot(aes(x=Year))+geom_line(aes
 
 proj_Q_PBKP <- proj_Q_P
 
-# for(i in 1:nrow(proj_Q_P)){
-#   
-#   # i <- 1
-#   
-#   k <- 0
-#   
-#   K1 <- capK
-#   
-#   k0s <- k0s_df[i,-1]
-#   
-#   int_k3 <- 0
-#   
-#   Qs <- getSlClA_Proj(params = c(MUtilde, Stilde), PsM = psM, PcM = pcM, K1 = K1,
-#                       k = k,CapA = capA, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-#                       int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, 
-#                       clAvg = cullAvg,dShock = shockD, sl = 0, cl = 0)
-#   
-#   slNew <- Qs[1]
-#   clNew <- Qs[2]
-#   ANew <- Qs[3]
-#   
-#   k_old <-  Qs[4]
-#   
-#   k_old_head <-  Qs[5]
-#   
-#   ANew <- (slNew + clNew) * shockD
-#   
-#   sh <- ((exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
-#   
-#   proj_Q_P$muTilde[i] <- MUtilde
-#   proj_Q_P$sTilde[i] <- Stilde
-#   proj_Q_P$sh[i] <- sh
-#   
-#   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
-#                            HcM = hcM, SlNew = slNew, ClNew = clNew, ANew = ANew,
-#                            params = c(MUtilde, Stilde))
-#   
-#   psM <- Ps[1]
-#   pcM <- Ps[2]
-#   hcM <- Ps[3]
-#   EpsM <- Ps[4]
-#   EpcM <- Ps[5]
-#   
-#   proj_Q_P$Ps[i] <- psM
-#   proj_Q_P$Pc[i] <- pcM
-#   proj_Q_P$Hc[i] <- hcM
-#   proj_Q_P$EPs[i] <- EpsM
-#   proj_Q_P$EPc[i] <- EpcM
-#   
-#   proj_Q_P$Sl[i] <- slNew
-#   proj_Q_P$Cl[i] <- clNew
-#   proj_Q_P$A[i] <- ANew
-#   proj_Q_P$repHeif[i] <- k_old
-#   proj_Q_P$repHeif_Head[i] <- k_old_head
-#   
-#   proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i]
-#   
-#   if(i>1){
-#     proj_Q_P$Year[i] <- beefINV_FORECAST$Year[i-1] + 1
-#   }
-#   
-#   capA <- ANew
-#   capK <- beefINV_FORECAST$K[i]
-#   # k3OLD <- k_old_head
-#   
-# }
 
 
-# shPlot_BeforePacket <- proj_Q_P %>% ggplot(aes(x=Year))+geom_line(aes(y=sh, color="Proj Share"),size=1.1) +
-#   geom_point(aes(y = sh, color = "Proj Share"),size=2) + theme_classic() + 
-#   scale_x_continuous(name="Year", 
-#                      breaks=c(seq(proj_Q_P$Year[1],proj_Q_P$Year[nrow(proj_Q_P)]))) +
-#   scale_y_continuous(name="Proj Share")+ theme_classic() + 
-#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-#   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
-#                                               axis.text.y = element_text(size = 12)) + 
-#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
-# 
-# proj_Q_P_BeforePacket <- proj_Q_P
-# 
-# 
-# shPlot_Before <- proj_Q_P %>% ggplot(aes(x=Year))+geom_line(aes(y=sh, color="Proj Share"),size=1.1) +
-#   geom_point(aes(y = sh, color = "Proj Share"),size=2) + theme_classic() + 
-#   scale_x_continuous(name="Year", 
-#                      breaks=c(seq(proj_Q_P$Year[1],proj_Q_P$Year[nrow(proj_Q_P)]))) +
-#   scale_y_continuous(name="Proj Share")+ theme_classic() + 
-#   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
-#   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
-#                                               axis.text.y = element_text(size = 12)) + 
-#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
-# proj_Q_P_Before <- proj_Q_P
-
-##### EQUILIBRIUM ITERATIONS
-# 
-# maxIt <- 500
-# 
-# slDi <- numeric(maxIt)
-# clDi <- numeric(maxIt)
-# 
-# prices_ps_eq <- numeric(maxIt)
-# prices_pc_eq <- numeric(maxIt)
-# expected_PS_eq <- numeric(maxIt)
-# expected_PC_eq <- numeric(maxIt)
-# prices_hc_eq <- numeric(maxIt)
-# mu_Tilde <- numeric(maxIt)
-# s_Tilde <- numeric(maxIt)
-# 
-# m <- 1
-# while((abs(slDiff_Proj) > 0.1) && (abs(clDiff_Proj) > 0.1)){
-#   
-#   if( slDiff_Proj < 0){
-#     ps_n <- psM + 0.001
-#   } else if( slDiff_Proj > 0){
-#     ps_n <- psM - 0.001
-#   }
-# 
-#   if(ps_n < 0){
-#     ps_n <- psM
-#   }
-# 
-#   if( clDiff_Proj < 0){
-#     pc_n <- pcM + 0.001
-#   } else if( clDiff_Proj > 0){
-#     pc_n <- pcM - 0.001
-#   }
-# 
-#   if(pc_n < 0){
-#     pc_n <- psM
-#   }
-#   
-#   hc_n <- (1/(1+ g * beta * (gamma0 + beta * gamma1))) * (beta * EpcM + g * (beta^3) * EpsM - pc_n)
-#   
-#   params_mu_s <- optParamFunction_Proj(sl = slNew, cl = clNew, 
-#                                   ps = ps_n, pc = pc_n, thetas = c(1,1), adj = adjF)
-#   
-#   mu_Tilde[m] <- params_mu_s[1]
-#   s_Tilde[m] <- params_mu_s[2]
-#   
-#   # mu_Tildes_eq[j,i] <- mu_Tilde
-#   # s_Tildes_eq[j,i] <- s_Tilde
-#   mu_Tilde1 <- mu_Tilde[m]
-#   s_Tilde1 <- s_Tilde[m]
-#   
-#   if(EpcM < pc_n){
-#     EpcM <- pc_n
-#   }
-#   
-#   estP_Proj <- getPsPcEpsEpc_Proj(PsM = ps_n, PcM = pc_n, EPsM = EpsM, EPcM = EpcM,
-#                              HcM = hc_n, SlNew = slNew, ClNew = clNew, ANew = ANew,
-#                              params = c(MUtilde, Stilde))
-#   
-#   ps1Proj <- estP_Proj[1]
-#   pc1Proj <- estP_Proj[2]
-#   hc1Proj <- estP_Proj[3]
-#   ps_expected1Proj <- estP_Proj[4]
-#   pc_expected1Proj <- estP_Proj[5]
-#   
-#   prices_ps_eq[m] <- ps1Proj
-#   prices_pc_eq[m] <- pc1Proj
-#   expected_PS_eq[m] <- ps_expected1Proj
-#   expected_PC_eq[m] <- pc_expected1Proj
-#   prices_hc_eq[m] <- hc1Proj
-#   
-#   ### Demand for fed cattle meat under the new prices
-#   D_slPsPc <- ANew *
-#     ((exp((MUtilde - ((ps1Proj/phi) - (pc1Proj/phi)))/Stilde))/
-#        (1 + (exp((MUtilde - ((ps1Proj/phi) - (pc1Proj/phi)))/Stilde))))
-#   
-#   ### Demand for cull cow meat under the new prices
-#   D_clPsPc <- ANew * (1/(1+ exp((MUtilde - ((ps1Proj/phi) - (pc1Proj/phi)))/Stilde)))
-#   
-#   slDiff_Proj <- slNew - D_slPsPc
-#   clDiff_Proj <- clNew - D_clPsPc
-#   
-#   slDi[m] <- slDiff_Proj
-#   clDi[m] <- clDiff_Proj
-#   
-#   psM <- prices_ps_eq[m]
-#   pcM <- prices_pc_eq[m]
-#   EpsM <- expected_PS_eq[m]
-#   EpcM <- expected_PC_eq[m]
-#   hcM <- prices_hc_eq[m]
-#   
-#   # MUtilde <- mu_Tilde
-#   # Stilde <- s_Tilde
-#   
-#   # sh <- ((exp((MUtilde1 - ((psM/phi) - (pcM/phi)))/Stilde1))/(1 + (exp((MUtilde - ((psM/phi) - (pcM/phi)))/Stilde))))
-#   
-#   if( (abs(slDiff_Proj) > 0.1) && (abs(clDiff_Proj) > 0.1) ){
-#     
-#     capA1 <- ANew
-#     Qs_eq <- getSlClA_Proj(params = c(mu_Tilde1, s_Tilde1), PsM = psM, PcM = pcM, K1 = K1,
-#                            k = k, CapA = capA1, gamma_k3 = gamma_k3, eta_k3 = eta_k3 ,
-#                            int_k3 = int_k3, adjF = adjF, k0s = k0s, slAvg = slaughterAvg, 
-#                            clAvg = cullAvg, dShock = shockD, sl = D_slPsPc, cl = D_clPsPc)
-#     
-#     slNew <- Qs_eq[1]
-#     clNew <- Qs_eq[2]
-#     # ANew <- (slNew + clNew) * shockD
-#     
-#   }
-#   
-#   # ANew <- (slNew + clNew) * shockD
-#   
-#   if( m > 3 ){
-#     if( (round(slDi[m-1],2) == round(slDi[m],2)) && (round(clDi[m-1],2) == round(clDi[m],2))) {
-#       if( (round(slDi[m-2],2) == round(slDi[m-1],2)) && (round(clDi[m-2],2) == round(clDi[m-1],2))){
-#         if( (round(slDi[m-3],2) == round(slDi[m-2],2)) && (round(clDi[m-3],2) == round(clDi[m-2],2))){
-#           break
-#         }
-#       }
-#     }
-#   }
-#   
-#   ### Here we use the share of the cattle meat under new price as the supply of the corresponding meat in the next iteration
-#   # if((m %% 2 == 0)){
-#   #   A <- (sl1 + cl1) * dShockNode
-#   # }else{
-#   #   sl_node <- sl1
-#   #   cl_node <- cl1 
-#   # }
-#   
-#   m <- m+1
-#   
-#   if(m >= maxIt){
-#     break
-#   }
-#   
-# }
 
 
 
