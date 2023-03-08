@@ -306,8 +306,8 @@ prices_quant <- merge(allPrices, meat_bill) %>% round(3)
 
 ################### Here I am retracing the steps by writing the code again
 
-# State variables: corn price, demand shock, cull cows production with gaussian shocks, and fed cattle production 
-# with gaussian shock.
+# State variables: corn price, demand shock, cull cows production with Gaussian shocks, and fed cattle production 
+# with Gaussian shock.
 ## NOTE: the demand shock is also gaussian.
 
 #### Here I am constructing the sl and cl quantities that includes shock (which is a gaussian random variable). 
@@ -378,9 +378,9 @@ dataList <- list(sl_stock, cl_stock, slSupplyShockGaussian,
 allStockShocks <- Reduce(function(...) merge(...), dataList) %>% as.data.frame()
 
 
-#### Here I am constructing the supply of fed cattle three periods ahead. Note that this is approximation. 
+#### Here I am constructing the supply of fed cattle ahead. Note that this is approximation. 
 #### When I compare these numbers with the observed ones, these are a bit high. This comes from:
-#### 1. We incorporated a gaussian shock, 2. The storage approximation comes into play as well.
+#### 1. We incorporated a Gaussian shock, 2. The storage approximation comes into play as well.
 #### 0.37 comes from the fact that approximately a maximum of 37% of the progeny is added to the breeding stock
 newSL_1 <- allStockShocks %>% 
   transmute(Year = Year+1, slt = ((g - 0.37 * g) * lag(K,2) * lag(slShock,1) + 
@@ -446,7 +446,7 @@ fedCattleProd <- fedCattleProd_1
 cullCowsProd <-  cullCowsProd_1
 
 #### NOTE: We constructed fed cattle supply and cull cow supply for existing years ahead which 
-#### includes gaussian shocks as well. 
+#### includes Gaussian shocks as well. 
 #### Although we are using the data of existing years ahead, since we are using all the nodes of both fed cattle, 
 #### and cull cows supply the price is right. DO NOT GET CONFUSED!
 
@@ -930,9 +930,10 @@ for(i in 1:nrow(quantities_prices_capK)){
           pc_o <- pc_old
         }
         
-        # I am giving upper and lower bounds by looking at the historical prices. Specifically for the lower bounds.
+        # I am giving upper and lower bounds by looking at the historical prices (I look at the summary of difference between prices and the lagged price and use the min of those differences). 
+        # Specifically for the lower bounds.
         # This is what my focus for setting the bounds for the prices. I don't want the program to choose some 
-        # random arbitary number which satisfies the system of equations. Note we can always find a number that
+        # random arbitrary number which satisfies the system of equations. Note we can always find a number that
         # satisfies the system of equations. Our goal is to find the realistic solution and as realistic as possible.
         ps_lo <- ps_o  - 0.276
         pc_lo <- pc_o - 0.292
