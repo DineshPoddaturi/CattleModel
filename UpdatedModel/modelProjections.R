@@ -4,7 +4,7 @@
 #### First we fit a linear model with the total inventory in the United States
 librarian::shelf(tseries, arfima, forecast, lmtest)
 
-stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2020)
+stock_K <- beefInventory %>% arrange(Year) %>% filter(Year <= 2022)
 
 stock_K_ts <- ts(stock_K$K, start = stock_K$Year[1], 
                  end = stock_K$Year[nrow(stock_K)], frequency = 1)
@@ -20,6 +20,13 @@ adf.test(stock_K_ts)
 # = 0.9799
 # alternative hypothesis: stationary
 
+# Augmented Dickey-Fuller Test
+# 
+# data:  stock_K_ts
+# Dickey-Fuller = -0.38103, Lag order = 4,
+# p-value = 0.9856
+# alternative hypothesis: stationary
+
 ##### I fit a linear model here. Note that I am using very extensive data from 1924 to 2020.
 
 seriesK <- auto.arima(stock_K_ts, trace=TRUE)
@@ -33,6 +40,12 @@ Kfit_Residuals <- ts(Kfit$res,
                      end = stock_K$Year[nrow(stock_K)], frequency = 1)
 
 Box.test(Kfit$residuals, type = "Ljung-Box")
+
+# Box-Ljung test
+# 
+# data:  Kfit$residuals
+# X-squared = 0.0030736, df = 1, p-value =
+#   0.9558
 
 # Box-Ljung test
 # 
@@ -272,7 +285,7 @@ proj_A <- A_quant
 
 proj_AllDF_EQ <- Reduce(function(...) merge(...), 
                         list(proj_K_t, proj_A, proj_adjFac, proj_muTildes, proj_sTildes, proj_PricesCosts, 
-                             dressedWeights_sl_cl, proj_demandShocks, proj_Quants)) %>% round(2)
+                             dressedWeights_sl_cl, proj_demandShocks, proj_Quants)) %>% round(4)
 
 modelParamsEQ <- tail(proj_AllDF_EQ, n=1)
 
@@ -315,7 +328,7 @@ proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(
 ##### Using the projected stock, I am generating the new born in each year. So basically multiply birth rate with the 
 ##### stock.
 
-calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 =  K) %>% 
+calf_crop_proj1 <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 =  g * K) %>% 
   filter(Year > calf_crop_proj$Year[nrow(calf_crop_proj)]) %>% select(Year, k0)
 
 # calf_crop_proj1_LO <- left_join(beefINV_FORECAST, calf_crop_proj) %>% mutate(k0 = lo95) %>% 
@@ -534,7 +547,7 @@ optParamFunction_Proj <- function(sl, cl, ps, pc, thetas, adj){
   
 }
 
-nProj <- 10
+nProj <- 11
 
 proj_Q_P <- data.frame(Year = numeric(nProj), Ps = numeric(nProj), Pc = numeric(nProj), 
                        EPs = numeric(nProj), EPc = numeric(nProj), Hc = numeric(nProj), 
@@ -550,9 +563,9 @@ params_mu_s_Proj <- optParamFunction_Proj(sl = slNew, cl = clNew, ps = psM, pc =
 MUtilde <- params_mu_s_Proj[1]
 Stilde <- params_mu_s_Proj[2]
 
-mergedForecast_Proj <- mergedForecast %>% filter(Year >= beefINV_FORECAST$Year[1]-5)
+mergedForecast_Proj <- mergedForecast %>% filter(Year >= beefINV_FORECAST$Year[1]-10)
 
-proj_Q_P$Year <- seq(beefINV_FORECAST$Year[1]+1, beefINV_FORECAST$Year[nrow(beefINV_FORECAST)], by = 1)
+proj_Q_P$Year <- seq(beefINV_FORECAST$Year[1], beefINV_FORECAST$Year[nrow(beefINV_FORECAST)], by = 1)
 
 # holdingCostsFutures
 

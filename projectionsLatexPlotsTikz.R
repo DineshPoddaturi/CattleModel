@@ -100,13 +100,13 @@ tikz(file="projectionsLatexPlots/UpdatedDissertation/CARD_USDA_FAPRI_PS.tex", wi
 
 CARD_USDA_FAPRI_PS_Plot <- estProj_PSIII_FAPRI %>% filter(Year >=2018 & Year <= 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=psMedian, color="Baseline"),size=0.75) +
-  geom_point(aes(y = psMedian, color = "Baseline"),size=2) +
+  geom_point(aes(y = psMedian, color = "Baseline"),shape=16,size=2) +
   geom_line(aes(y=Ps, color="Projected"),size=0.75) +
-  geom_point(aes(y=Ps, color="Projected"),size=2) +
+  geom_point(aes(y=Ps, color="Projected"),shape=16,size=2) +
   geom_line(aes(y=FAPRI_Ps, color="FAPRI"),size=0.75) +
-  geom_point(aes(y=FAPRI_Ps, color="FAPRI"),size=2) +
+  geom_point(aes(y=FAPRI_Ps, color="FAPRI"),shape=15,size=2) +
   geom_line(aes(y=USDA_Ps, color="USDA"),size=0.75) +
-  geom_point(aes(y=USDA_Ps, color="USDA"),size=2) +
+  geom_point(aes(y=USDA_Ps, color="USDA"),shape=17,size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(estProj_PSIII_FAPRI$Year[1],
                                   estProj_PSIII_FAPRI$Year[nrow(estProj_PSIII_FAPRI)])))+ 
@@ -115,7 +115,8 @@ CARD_USDA_FAPRI_PS_Plot <- estProj_PSIII_FAPRI %>% filter(Year >=2018 & Year <= 
   theme(legend.position="bottom", legend.box = "horizontal", text = element_text(size = 15)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
                                               axis.text.y = element_text(size = 12)) + 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15,16,17))))
 
 print(CARD_USDA_FAPRI_PS_Plot)
 
@@ -126,13 +127,13 @@ tikz(file="projectionsLatexPlots/UpdatedDissertation/CARD_USDA_FAPRI_TS.tex", wi
 
 CARD_USDA_FAPRI_TS_Plot <- CARD_USDA_FAPRI_TS_ProjIII %>% filter(Year >=2018 & Year <= 2031) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=tsMedian, color="Baseline"),size=0.75) +
-  geom_point(aes(y = tsMedian, color = "Baseline"),size=2) +
+  geom_point(aes(y = tsMedian, color = "Baseline"),shape=16,size=2) +
   geom_line(aes(y=TS, color="Projected"),size=0.75) +
-  geom_point(aes(y=TS, color="Projected"),size=2) +
+  geom_point(aes(y=TS, color="Projected"),shape=16,size=2) +
   geom_line(aes(y=FAPRI_TS, color="FAPRI"),size=0.75) +
-  geom_point(aes(y=FAPRI_TS, color="FAPRI"),size=2) +
+  geom_point(aes(y=FAPRI_TS, color="FAPRI"),shape=15,size=2) +
   geom_line(aes(y=USDA_TS, color="USDA"),size=0.75) +
-  geom_point(aes(y=USDA_TS, color="USDA"),size=2) +
+  geom_point(aes(y=USDA_TS, color="USDA"),shape=17,size=2) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(CARD_USDA_FAPRI_TS_ProjIII$Year[1],
                                   CARD_USDA_FAPRI_TS_ProjIII$Year[nrow(CARD_USDA_FAPRI_TS_ProjIII)])))+ 
@@ -141,7 +142,8 @@ CARD_USDA_FAPRI_TS_Plot <- CARD_USDA_FAPRI_TS_ProjIII %>% filter(Year >=2018 & Y
   theme(legend.position="bottom", legend.box = "horizontal", text = element_text(size = 15)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1,size = 12),
                                               axis.text.y = element_text(size = 12)) + 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15,16,17))))
 
 print(CARD_USDA_FAPRI_TS_Plot)
 

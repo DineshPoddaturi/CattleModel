@@ -8,11 +8,11 @@ replacementInventory_proj <- replacementInventory %>% arrange(Year)
 
 summary( lead(replacementInventory_proj$k3)-replacementInventory_proj$k3)
 #     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.     NA's 
-# -3073100  -158825    64200    17849   264575   849000        1 
+# -3073100  -194100    64200    14367   264575   849000        1
 
 summary(replacementInventory_proj$k3)
 #     Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 2569000 4636000 5588200 5544433 6363200 9503700 
+# 2569000 4859000 5623500 5591931 6363200 9503700  
 
 k3_lo_rep <- min(replacementInventory_proj$k3)
 
@@ -208,9 +208,10 @@ proj_adjFac <- adjFactor_New
 
 proj_adjFac <- adjFactor
 
-proj_muTildes <- mu_Tildes_MMN
-proj_sTildes <- s_Tildes_MMN
-proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPSN,EQestPCN,EQestHCN, EQestEPSN, EQestEPCN))
+proj_muTildes <- mu_Tildes_MMNIII
+proj_sTildes <- s_Tildes_MMNIII
+proj_PricesCosts <- Reduce(function(...) merge(...), list(EQestPSNIII,EQestPCNIII,
+                                                          EQestHCNIII, EQestEPSNIII, EQestEPCNIII))
 
 # proj_muTildes1 <- mu_Tildes_MM_itr
 # proj_sTildes1 <- s_Tildes_MM_itr

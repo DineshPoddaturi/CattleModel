@@ -39,15 +39,19 @@ fitCHCSummary <- summary(Corn_HC_Fit)
 #### linear model
 
 ### CME DATA : TRADED on THURSDAY 14 JULY 2022. I get the December contract month data
-# 2022 to 2025
-cornFuturesCME <- c(601, 568, 530, 509)
+# 2023 to 2026
+# cornFuturesCME <- c(601, 568, 530, 509) 2022 to 2025
+
+### CME DATA : TRADED on THURSDAY 27 APRIL 2023. I get the December contract month data
+# 2023 to 2026
+cornFuturesCME <- c(543, 528, 486, 473)
 cornFuturesCME <- (cornFuturesCME/100) %>% as.data.frame()
 names(cornFuturesCME) <- "pcorn"
-cornFuturesCME$Year <- seq(from = 2022, to=2025, by =1)
+cornFuturesCME$Year <- seq(from = 2023, to=2026, by =1)
 cornFuturesCME <- cornFuturesCME %>% select(Year, pcorn)
 
 ### Here I get the past 10 years data of corn prices. 
-pCornHC <- pcorn %>% filter(Year >= 2011 & Year <= 2021) %>% 
+pCornHC <- pcorn %>% filter(Year >= 2011 & Year <= 2022) %>% 
   select(Year, pcorn) %>% arrange(Year)
 
 ### Now I join both the futures from CME and the existing prices
@@ -61,7 +65,7 @@ adf.test(cornFutures_TS)
 # Augmented Dickey-Fuller Test
 # 
 # data:  cornFutures_TS
-# Dickey-Fuller = -2.9491, Lag order = 2, p-value = 0.2108
+# Dickey-Fuller = -2.7143, Lag order = 2, p-value = 0.3003
 # alternative hypothesis: stationary
 
 # Fit a simple linear time series model
@@ -77,7 +81,7 @@ Box.test(cornFit$residuals, type = "Ljung-Box")
 # Box-Ljung test
 # 
 # data:  cornFit$residuals
-# X-squared = 1.984, df = 1, p-value = 0.159
+# X-squared = 1.5264, df = 1, p-value = 0.2166
 
 # The following commented code is to check the diagnostics and make sure the linear model is fitted properly
 # qqnorm(cornFit_Residuals)
@@ -101,7 +105,7 @@ corn_FORECAST <- corn_FORECAST %>% transmute(Year =  as.double(row.names(corn_FO
                                pcorn = `Point Forecast`)
 row.names(corn_FORECAST) <- NULL
 
-cornFutures <- rbind(cornFuturesCME, corn_FORECAST) %>% round(2)
+cornFutures <- rbind(cornFuturesCME, corn_FORECAST) %>% round(5)
 
 # cornProjUSDA <- c(4.20,	4.20,	4.20,	4.20,	4.20,	4.20) %>% as.data.frame()
 # cornFutures <- rbind(cornFuturesCME, cornProjUSDA)

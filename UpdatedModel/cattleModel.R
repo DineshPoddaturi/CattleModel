@@ -13,7 +13,7 @@ g <- 0.97
 phi <- 0.63
 
 ############# Cattle totals (these are numbers of total cattle in any year not age dist.) in 1000 head. Downloaded from PSD ##########
-cattle_totals <- read_excel("./Data/Latest-03-24/CattleTotals.xlsx") %>% as.data.frame()
+cattle_totals <- read_excel("./Data/Latest-04-2023/CattleTotals.xlsx") %>% as.data.frame()
 
 cattle_tot <- cattle_totals %>% select(-Attribute, -Commodity, -Country, -`Unit Description`)
 cattle_tot <- data.frame(t(cattle_tot))
@@ -22,10 +22,10 @@ cattle_tot <- cattle_tot %>% mutate(Year = c(rownames(cattle_tot))) %>% select(Y
 cattle_tot[,-1] <- cattle_tot[,-1] * 1000
 
 ### Prices are in $/CWT
-cows_prices <- read_excel("./Data/Latest-03-24/PricesReceived_Cattle.xlsx") %>% as.data.frame()
+cows_prices <- read_excel("./Data/Latest-04-2023/PricesReceived_Cattle.xlsx") %>% as.data.frame()
 cows_prices <- cows_prices %>% select(Year, Period, Value)
 
-steersHeifers_Prices <- read_excel("./Data/Latest-03-24/PricesReceived_Steers_Heifers.xlsx") %>% as.data.frame()
+steersHeifers_Prices <- read_excel("./Data/Latest-04-2023/PricesReceived_Steers_Heifers.xlsx") %>% as.data.frame()
 steersHeifers_Prices <- steersHeifers_Prices %>% select(Year, Period, Value)
 
 ############################ converting the prices into yearly by taking the mean of the observed prices #########
@@ -41,17 +41,17 @@ pc_ps_cwt <- merge(pcs_cwt, pss_cwt) %>% select(Year,pss_cwt, pcs_cwt)
 pc_ps <- merge(pcs,pss)
 
 ######################### Here we read the number of animals slaughtered steers, heifers, and cows ##################
-cowsSlaughtered <- read_excel("./Data/Latest-07-11-SlaughteredData/Slaughtered_Cows.xlsx") %>% as.data.frame()
+cowsSlaughtered <- read_excel("./Data/Latest-04-2023/Slaughtered_Cows.xlsx") %>% as.data.frame()
 
 cowsSlaughtered <- cowsSlaughtered %>% select(Year, Value) %>% mutate(CowsHead=Value) %>% 
   select(Year, CowsHead) %>% arrange(Year)
 
-heifersSlaughtered <- read_excel("./Data/Latest-07-11-SlaughteredData/Slaughtered_Heifers.xlsx") %>% as.data.frame()
+heifersSlaughtered <- read_excel("./Data/Latest-04-2023/Slaughtered_Heifers.xlsx") %>% as.data.frame()
 
 heifersSlaughtered <- heifersSlaughtered %>% select(Year, Value) %>% mutate(HeifersHead=Value) %>% 
   select(Year, HeifersHead) %>% arrange(Year)
 
-steersSlaughtered <- read_excel("./Data/Latest-07-11-SlaughteredData/Slaughtered_Steers.xlsx") %>% as.data.frame()
+steersSlaughtered <- read_excel("./Data/Latest-04-2023/Slaughtered_Steers.xlsx") %>% as.data.frame()
 
 steersSlaughtered <- steersSlaughtered %>% select(Year, Value) %>% mutate(SteersHead=Value) %>% 
   select(Year, SteersHead) %>% arrange(Year)
@@ -59,7 +59,7 @@ steersSlaughtered <- steersSlaughtered %>% select(Year, Value) %>% mutate(Steers
 
 
 ################ dressed weights 
-dressedWeights <- read_excel("./Data/Latest-03-24/DressedWeights.xlsx") %>% as.data.frame()
+dressedWeights <- read_excel("./Data/Latest-04-2023/DressedWeights.xlsx") %>% as.data.frame()
 dressedWeights <- dressedWeights[-c(1:2),]
 row.names(dressedWeights) <- 1:nrow(dressedWeights)
 dressedWeights <- dressedWeights %>% separate(col = Date, into = c("Period", "Year")) %>% 
@@ -109,7 +109,7 @@ dressedWeights_sl_cl <- dressedWeights_sl_cl %>% select(Year, Slaughter_avg, Cul
 
 
 ################## reading beef inventory (This is K in our model)  This is beef cows inventory data (so basically sum(k3 to k10))##################
-beefInventory <- read_excel("./Data/Latest-03-24/BeefCowsInventory.xlsx") %>% as.data.frame()
+beefInventory <- read_excel("./Data/Latest-04-2023/BeefCowsInventory.xlsx") %>% as.data.frame()
 
 beefInventory <- beefInventory %>% select(Year, Period, Value) %>% mutate(K = Value) %>% select(Year,K)
 
@@ -117,7 +117,7 @@ K <- beefInventory
 K <- K %>% arrange(Year)
 
 #################### reading replacement heifers (this is k3 in our model) ##############
-replacementInventory <- read_excel("./Data/Latest-03-24/ReplacementHeifersInventory.xlsx") %>% as.data.frame()
+replacementInventory <- read_excel("./Data/Latest-04-2023/ReplacementHeifersInventory.xlsx") %>% as.data.frame()
 
 replacementInventory <- replacementInventory %>% select(Year, Period, Value) %>% mutate (k3 = Value) %>% 
   select(Year, k3)
@@ -211,7 +211,7 @@ adjFactor_Plot <- supp_diss %>% ggplot(aes(x=Year))+geom_line(aes(y=AdjFactor,co
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
-adjFactor_New <- supp_diss %>% mutate(Year = Year + 1) %>% select(Year, AdjFactor)
+adjFactor_New <- supp_diss %>% mutate(Year = Year+1) %>% select(Year, AdjFactor)
 
 supp_diss <- merge(adjFactor_New, supp_diss %>% select(-AdjFactor))
 
@@ -243,14 +243,14 @@ prices_costs <- pc_ps_hc %>% round(4)
 ##################################################################################################
 
 ####### I read calf crop data. These are in number of head
-calf_crop <- read_excel("./Data/Latest-03-24/CalfCrop.xlsx") %>% as.data.frame()
+calf_crop <- read_excel("./Data/Latest-04-2023/CalfCrop.xlsx") %>% as.data.frame()
 
 calf_crop <- calf_crop %>% select(Year, Value) %>% transmute(Year = Year, calfCrop = Value)
 
 calfCrop_replacementHeifers <- merge(calf_crop, replacementInventory) %>% transmute(Year = Year, calfCrop = calfCrop,
                                                                                     repHeifers = k3)
 
-##### Here I am computing the ratio of the replacement heifers to calf crop of prv year
+##### Here I am computing the ratio of the replacement heifers to calf crop of previous year
 calfCrop_replacementHeifers <- calfCrop_replacementHeifers %>% mutate(
   calfCrop_repHeifers_Ratio = repHeifers/lag(calfCrop),
   calfCrop_repHeifers_Percent = repHeifers/lag(calfCrop) * 100)
@@ -264,10 +264,10 @@ summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>% 
 
 # ratios      
 # Min.   :0.1457  
-# 1st Qu.:0.1759  
-# Median :0.2063  
-# Mean   :0.2350  
-# 3rd Qu.:0.2908 
+# 1st Qu.:0.1757  
+# Median :0.1975  
+# Mean   :0.2328 
+# 3rd Qu.:0.2903 
 # Max.   :0.3727  
 # NA's   :2 
 
@@ -275,7 +275,7 @@ summary(Stock %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>% 
 
 #### Here I read corn price data. These are in $/bushel. 
 #### I am converting the price from $/bushel to $/pound
-corn_price <- read_excel("./Data/Latest-07-11-SlaughteredData/CornPriceReceived.xlsx") %>% as.data.frame()
+corn_price <- read_excel("./Data/Latest-04-2023/CornPriceReceived.xlsx") %>% as.data.frame()
 names(corn_price)
 corn_price <- corn_price %>% select(Year, Period, Value)
 pcorn <- corn_price %>% group_by(Year) %>% mutate(pcorn = round(mean(Value),3)) %>% 
@@ -289,7 +289,7 @@ meat_bill <- supp_diss %>%
   mutate(TS = TotalSupply, TD = TotalDiss, sl = fedSlaughter_BillLb, cl = cowsCulled_BillLb) %>%
   select(Year, sl, cl, TS, TD)
 
-prices_quant <- merge(allPrices, meat_bill) %>% round(3)
+prices_quant <- merge(allPrices, meat_bill) %>% round(5)
 
 
 
@@ -360,8 +360,8 @@ demandShock <- merge(obsDemand, estD) %>% mutate(dShock = demandObs/demandEst)
 
 demandShockGaussian <- merge(prices_quant, demandShock) %>% transmute(Year = Year, Shock = 0)
 
-## Now i generate gaussian shock which is consistent with historical data.
-## I use the standard deviation of historical data to construct the gaussian random variables. Here the mean is 1
+## Now i generate Gaussian shock which is consistent with historical data.
+## I use the standard deviation of historical data to construct the Gaussian random variables. Here the mean is 1
 set.seed(1)
 demandShockG <- rnorm(n = nrow(demandShockGaussian), mean = 1, sd = std(demandShock$dShock))
 demandShockGaussian$Shock <- demandShockG
@@ -379,14 +379,17 @@ allStockShocks <- Reduce(function(...) merge(...), dataList) %>% as.data.frame()
 
 
 #### Here I am constructing the supply of fed cattle ahead. Note that this is approximation. 
-#### When I compare these numbers with the observed ones, these are a bit high. This comes from:
+#### When I compare these numbers with the observed ones, these are a bit High. This comes from:
 #### 1. We incorporated a Gaussian shock, 2. The storage approximation comes into play as well.
 #### 0.37 comes from the fact that approximately a maximum of 37% of the progeny is added to the breeding stock
 newSL_1 <- allStockShocks %>% 
   transmute(Year = Year+1, slt = ((g - 0.37 * g) * lag(K,2) * lag(slShock,1) + 
               (1 - 0.37 * g) * g * delta * (lag(K,2) - (g - 0.37 * g) * lag(K,3) - 
-                                              (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2)))),
+                                              (lag(k9,2) + (1-delta) * lag(k8,2) + (1-delta) * lag(k7,2)))) + Imports - Exports,
             slLbs = slt * Slaughter_avg/1000000000)
+
+
+# merge(allStockShocks, newSL_1) %>% select(Year, sl_est, slLbs) %>% mutate(diffSL = slLbs - sl_est)
 
 # newSL_1 <- allStockShocks %>% 
 #   transmute(Year = Year+1, slt = ((g - 0.37 * g) * lag(K,2) * lag(slShock,1) + 
@@ -408,6 +411,8 @@ newCL_1 <- allStockShocks %>%
               (delta * (k8 + k7 + k6) - (k7 + k8 + k9)),
             clLbs = clt * Cull_avg/1000000000)
 
+# merge(allStockShocks, newCL_1) %>% select(Year, cl_est, clLbs) %>% mutate(diffCL = clLbs - cl_est)
+
 # newCL_3 <- allStockShocks %>%
 #   transmute(Year = Year + 3, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock +
 #               (delta^2) * (delta * (k6 + k5 + k4) - (k5 + k6 + k7)),
@@ -418,11 +423,11 @@ cornPrice <- pcorn
 # cullCowsProd_3 <- newCL_3 %>% transmute(Year = Year, cullCows = clLbs)
 # fedCattleProd_3 <- newSL_3 %>% transmute(Year = Year, fedCattle = slLbs)
 
-cullCowsProd_1 <- newCL_1 %>% transmute(Year = Year, cullCows = clLbs) %>% round(3)
-fedCattleProd_1 <- newSL_1 %>% transmute(Year = Year, fedCattle = slLbs) %>% round(3)
+cullCowsProd_1 <- newCL_1 %>% transmute(Year = Year, cullCows = clLbs) %>% round(5)
+fedCattleProd_1 <- newSL_1 %>% transmute(Year = Year, fedCattle = slLbs) %>% round(5)
 
 
-prod_CornP <- merge(merge(fedCattleProd_1, cullCowsProd_1),cornPrice) %>% drop_na() %>% round(3)
+prod_CornP <- merge(merge(fedCattleProd_1, cullCowsProd_1),cornPrice) %>% drop_na() %>% round(5)
 
 ### Here I am generating the shocks again so that when we merge all the data frames we have enough data.
 ### Note: Since these are independent random shocks we are okay by increasing the n.
@@ -491,7 +496,7 @@ stateVarDemand <- supp_diss %>% transmute(Year = Year, demand = TotalDiss)
 stateVariablesList <- list(cornPrice, cullCowsProd, fedCattleProd, demandShockGaussian1,
                            slSupplyShockGaussian1, clSupplyShockgaussian1, stateVarDemand)
 
-stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na() %>% round(3)
+stateVars <- Reduce(function(...) merge(...), stateVariablesList) %>% drop_na() %>% round(5)
 
 
 cornNodes <- chebyshevNodes(d = stateVars$pcorn, n = chebNodesN)
@@ -657,7 +662,7 @@ adjFactor <- supp_diss %>% select(Year,AdjFactor)
 
 variablesList <- list(price_sl_cl_hc, capK, dressedWeights_sl_cl, imports_exports, quantities, adjFactor)
 
-quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% round(3)
+quantities_prices_capK <- Reduce(function(...) merge(...), variablesList) %>% drop_na() %>% round(6)
 
 ################################### IMPORTANT ##################################
 ####### We have the constructed quantities and shocks from 1982 to 2020 ########

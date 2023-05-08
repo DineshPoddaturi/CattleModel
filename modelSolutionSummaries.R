@@ -51,7 +51,7 @@ EQprices_ps_MediansNIII <- EQprices_ps_MediansNIII %>% mutate(Year = quantities_
 EQestPSNIII <- merge(EQprices_ps_MeansNIII, EQprices_ps_MediansNIII)
 
 EQestObsPSNIII <- left_join(EQestPSNIII,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
-  mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
+  mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(5)
 
 EQestObsPSNIII
 
@@ -77,7 +77,7 @@ EQprices_pc_MediansNIII <- EQprices_pc_MediansNIII %>% mutate(Year = quantities_
 EQestPCNIII <- merge(EQprices_pc_MeansNIII, EQprices_pc_MediansNIII)
 
 EQestObsPCNIII <- left_join(EQestPCNIII,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
-  mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
+  mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(5)
 
 EQestObsPCNIII
 
@@ -251,9 +251,6 @@ EQestObsTSNIII <- left_join(EQestTSNIII,totalSupply) %>% select(Year, TSmean, TS
 
 EQestObsTSNIII %>% select(Year, TSmedian, TS) %>% filter(Year >= 2010) %>%
   select(Year, TS, TSmedian) %>% round(2)
-
-
-
 
 
 

@@ -52,7 +52,7 @@ cows_pricesR1 <- cows_pricesR1 %>% group_by(Year) %>%
   mutate(PriceDressedYear = mean(PriceDressedMonth, na.rm=TRUE)) %>% ungroup() %>% as.data.frame() %>% mutate_all(~ifelse(is.nan(.), NA, .))
 
 cows_pricesR1 <- cows_pricesR1 %>% select(Year, PriceDressedYear) %>% group_by(Year) %>% 
-  distinct() %>% ungroup() %>% as.data.frame() %>% round(4) %>% transmute(Year = Year, DressedPrice = PriceDressedYear)
+  distinct() %>% ungroup() %>% as.data.frame() %>% round(5) %>% transmute(Year = Year, DressedPrice = PriceDressedYear)
 
 
 cows_pricesR2 <- read_excel("./RegionalData/CowBullPrices.xlsx", sheet='SouthCentralLiveDelivered') %>% as.data.frame()
@@ -83,7 +83,7 @@ cows_pricesR2 <- cows_pricesR2 %>% group_by(Year) %>%
   mutate(PriceLiveYear = mean(PriceLiveMonth, na.rm=TRUE)) %>% ungroup() %>% as.data.frame() %>% mutate_all(~ifelse(is.nan(.), NA, .))
 
 cows_pricesR2 <- cows_pricesR2 %>% select(Year, PriceLiveYear) %>% group_by(Year) %>% 
-  distinct() %>% ungroup() %>% as.data.frame() %>% round(4) %>% transmute(Year = Year, LivePrice = PriceLiveYear)
+  distinct() %>% ungroup() %>% as.data.frame() %>% round(5) %>% transmute(Year = Year, LivePrice = PriceLiveYear)
 
 cows_pricesR <- read_excel("./RegionalData/RegionalCowBullPrices.xlsx") %>% as.data.frame()
 
@@ -98,24 +98,24 @@ cows_pricesR <- cows_pricesR %>% group_by(Year,Month,Day) %>%
 cows_pricesR <- cows_pricesR %>%  fill(Ratio) %>% fill(Ratio, .direction="up") %>% 
   fill(Ratio, .direction="down")
 
-cows_pricesR <- cows_pricesR %>% mutate(LivePrice = round(`Dressed Wtd Avg Price` * Ratio,4))
+cows_pricesR <- cows_pricesR %>% mutate(LivePrice = round(`Dressed Wtd Avg Price` * Ratio,5))
 
 cows_pricesR <- cows_pricesR %>% select(Year, Month, Day, Grade, `Weight Range`, LivePrice) %>%
   filter(Grade!='Bull (92% lean)')
 
-cows_pricesR <- cows_pricesR %>% group_by(Year,Month,Day,Grade) %>% mutate(LivePriceM = round(mean(LivePrice),4)) %>% 
+cows_pricesR <- cows_pricesR %>% group_by(Year,Month,Day,Grade) %>% mutate(LivePriceM = round(mean(LivePrice),5)) %>% 
   ungroup() %>% as.data.frame()
 
 cows_pricesR <- cows_pricesR %>% select(Year, Month, Day, LivePriceM)
 
-cows_pricesR <- cows_pricesR %>% group_by(Year,Month,Day) %>% mutate(LivePriceDay = round(mean(LivePriceM),4)) %>% 
+cows_pricesR <- cows_pricesR %>% group_by(Year,Month,Day) %>% mutate(LivePriceDay = round(mean(LivePriceM),5)) %>% 
   ungroup() %>% as.data.frame()
 
-cows_pricesR <- cows_pricesR %>% group_by(Year,Month) %>% mutate(LivePriceMon = round(mean(LivePriceDay, na.rm=TRUE),4)) %>% 
+cows_pricesR <- cows_pricesR %>% group_by(Year,Month) %>% mutate(LivePriceMon = round(mean(LivePriceDay, na.rm=TRUE),5)) %>% 
   ungroup() %>% as.data.frame()
 
 cows_pricesR <- cows_pricesR %>% group_by(Year) %>% 
-  mutate(LivePriceYr = round(mean(LivePriceMon, na.rm=TRUE),4)) %>% 
+  mutate(LivePriceYr = round(mean(LivePriceMon, na.rm=TRUE),5)) %>% 
   ungroup() %>% as.data.frame()
 
 cows_pricesR <- cows_pricesR %>% select(Year, LivePriceYr) %>% group_by(Year) %>% 
@@ -145,7 +145,7 @@ steers_PricesR <- steers_PricesR %>% separate(col = DATE, into = c("Year", "Mont
 steers_PricesR$Year <- as.numeric(steers_PricesR$Year)
 
 steers_PricesR <- steers_PricesR %>% group_by(Year) %>% mutate(SteerPrice = mean(SteerPrice, na.rm=TRUE)) %>% 
-  select(Year, SteerPrice) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame() %>% round(4) %>% filter(Year<2024)
+  select(Year, SteerPrice) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame() %>% round(5) %>% filter(Year<2024)
 
 #### Here sheet 3 contains the regional heifer prices (Note: I edited the excel file to have readable column names)
 heifers_PricesR <- read_excel("./RegionalData/SlaughteredPrices_Steers_Heifers_TX-OK-Monthly.xlsx", sheet = 3) %>% 
@@ -155,12 +155,12 @@ heifers_PricesR <- heifers_PricesR %>% separate(col = DATE, into = c("Year", "Mo
   transmute(Year = Year, HeiferPrice = `Total all grades1-AVERAGE`)
 heifers_PricesR$Year <- as.numeric(heifers_PricesR$Year)
 heifers_PricesR <- heifers_PricesR %>% group_by(Year) %>% mutate(HeiferPrice = mean(HeiferPrice, na.rm=TRUE)) %>% 
-  select(Year, HeiferPrice) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame() %>% round(4) %>% filter(Year<2024)
+  select(Year, HeiferPrice) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame() %>% round(5) %>% filter(Year<2024)
 
 steersHeifers_PricesR <- merge(steers_PricesR, heifers_PricesR) 
 
 steersHeifers_PricesR <- steersHeifers_PricesR %>% 
-  mutate(ps = rowMeans(steersHeifers_PricesR %>% select(-Year))) %>% round(4)
+  mutate(ps = rowMeans(steersHeifers_PricesR %>% select(-Year))) %>% round(5)
 
 
 
@@ -176,10 +176,10 @@ pc_psR <- merge(pcsR,pssR)
 ##### Since I do not have data for 2006 and  2007. I used the national data for these two years. 
 ##### The following code snippet does that.
 pc_ps_cwt_I <- pc_ps_cwt %>% filter(Year>=2002&Year<=2022)
-pc_ps_cwtR <- pc_ps_cwtR %>% mutate(pcs_cwt= coalesce(pcs_cwt, pc_ps_cwt_I$pcs_cwt)) %>% round(4)
+pc_ps_cwtR <- pc_ps_cwtR %>% mutate(pcs_cwt= coalesce(pcs_cwt, pc_ps_cwt_I$pcs_cwt)) %>% round(5)
 
 pc_ps_I <- pc_ps %>% filter(Year>=2002&Year<=2022)
-pc_psR <- pc_psR %>% mutate(pc= coalesce(pc, pc_ps_I$pc)) %>% round(4)
+pc_psR <- pc_psR %>% mutate(pc= coalesce(pc, pc_ps_I$pc)) %>% round(5)
 
 ######################### Here we read the number of animals slaughtered steers, heifers, and cows ##################
 cowsSlaughteredR <- read_excel("./RegionalData/CowsSlaughtered-Region6.xlsx") %>% as.data.frame()
@@ -292,7 +292,7 @@ stockListR <- list(KR, k3R, k4R, k5R, k6R, k7R, k8R)
 StockR <- Reduce(function(...) merge(...), stockListR) %>% round()
 
 StockR <- StockR %>% mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% 
-  mutate(k9 = if_else(k9 < 0, 0, k9), k10 = 0)
+  mutate(k9 = if_else(k9 < delta*lag(k8), if_else(k9<0,0,k9), delta*lag(k8)), k10 = 0)
 
 # Determining the supply of fed cattle (in head)
 supp_slR <- StockR %>% select(Year, K, k3) %>% 
@@ -377,7 +377,7 @@ supp_diss_adjR %>% ggplot(aes(x=Year))+ geom_line(aes(y=TotalDiss,color="Dissape
 #### We are in the case where the farmers cull the 9 year old cows
 #### The holding costs will become. 
 pc_ps_hcR <- pc_psR %>% mutate( hc = (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1))))
-prices_costsR <- pc_ps_hcR %>% round(4)
+prices_costsR <- pc_ps_hcR %>% round(5)
 
 ####### I read calf crop data. These are in number of head
 calf_cropR <- read_excel("./RegionalData/CalfCrop-TX-OK-NM.xlsx") %>% as.data.frame()
@@ -417,7 +417,7 @@ summary(StockR %>% select(Year, K, k3) %>% mutate(ratios = lead(k3,2)/(g*K)) %>%
 corn_priceR <- read_excel("./RegionalData/CornPriceReceived-TX-OK-NM.xlsx") %>% as.data.frame()
 names(corn_priceR)
 corn_priceR <- corn_priceR %>% select(Year, Period, Value)
-pcornR <- corn_priceR %>% group_by(Year) %>% mutate(pcorn = round(mean(Value),3)) %>% 
+pcornR <- corn_priceR %>% group_by(Year) %>% mutate(pcorn = round(mean(Value),5)) %>% 
   select(Year,pcorn) %>% group_by(Year) %>% distinct() %>% ungroup() %>% as.data.frame()
 
 pcornR <- pcornR %>% mutate(pcornLb = pcorn/56)
@@ -429,7 +429,7 @@ meat_billR <- supp_dissR %>%
   mutate(TS = TotalSupply, TD = TotalDiss, sl = fedSlaughter_BillLb, cl = cowsCulled_BillLb) %>%
   select(Year, sl, cl, TS, TD)
 
-prices_quantR <- merge(allPricesR, meat_billR) %>% round(3)
+prices_quantR <- merge(allPricesR, meat_billR) %>% round(5)
 
 
 
@@ -557,11 +557,11 @@ newCL_1R <- allStockShocksR %>%
 
 cornPriceR <- pcornR
 
-cullCowsProd_1R <- newCL_1R %>% transmute(Year = Year, cullCows = clLbs) %>% round(3)
-fedCattleProd_1R <- newSL_1R %>% transmute(Year = Year, fedCattle = slLbs) %>% round(3)
+cullCowsProd_1R <- newCL_1R %>% transmute(Year = Year, cullCows = clLbs) %>% round(5)
+fedCattleProd_1R <- newSL_1R %>% transmute(Year = Year, fedCattle = slLbs) %>% round(5)
 
 
-prod_CornPR <- merge(merge(fedCattleProd_1R, cullCowsProd_1R),cornPriceR) %>% drop_na() %>% round(3)
+prod_CornPR <- merge(merge(fedCattleProd_1R, cullCowsProd_1R),cornPriceR) %>% drop_na() %>% round(5)
 
 ### Here I am generating the shocks again so that when we merge all the data frames we have enough data.
 ### Note: Since these are independent random shocks we are okay by increasing the n.
@@ -632,7 +632,7 @@ stateVarDemandR <- supp_dissR %>% transmute(Year = Year, demand = TotalDiss)
 stateVariablesListR <- list(cornPriceR, cullCowsProdR, fedCattleProdR, demandShockGaussian1R,
                            slSupplyShockGaussian1R, clSupplyShockgaussian1R, stateVarDemandR)
 
-stateVarsR <- Reduce(function(...) merge(...), stateVariablesListR) %>% drop_na() %>% round(3)
+stateVarsR <- Reduce(function(...) merge(...), stateVariablesListR) %>% drop_na() %>% round(5)
 
 
 cornNodesR <- chebyshevNodes(d = stateVarsR$pcorn, n = chebNodesNR)
@@ -794,7 +794,7 @@ adjFactorR <- supp_dissR %>% select(Year,AdjFactor)
 
 variablesListR <- list(price_sl_cl_hcR, capKR, dressedWeights_sl_clR, quantitiesR, adjFactorR)
 
-quantities_prices_capKR <- Reduce(function(...) merge(...), variablesListR) %>% drop_na() %>% round(3)
+quantities_prices_capKR <- Reduce(function(...) merge(...), variablesListR) %>% drop_na() %>% round(5)
 
 ################################### IMPORTANT ##################################
 ####### We have the constructed quantities and shocks from 1982 to 2020 ########
@@ -895,7 +895,7 @@ checkTolR <- matrix(data = 0, nrow = maxIterR, ncol = 4)
 
 for(i in 1:nrow(quantities_prices_capKR)){
   
-  i <- 1
+  # i <- 20
   ### Here we get the observed quantities. For fed production and cull production these are estimated production 3 years ahead
   AR <- quantities_prices_capKR$A[i] ## Note: Although I am assigning the total demand to variable here, I am using the
   #                                  ## fed cattle production node and cull cow production node with demand shock to get 
@@ -982,7 +982,7 @@ for(i in 1:nrow(quantities_prices_capKR)){
   
   for(k in 1:maxIterR){
     
-    # k <- 7
+    # k <- 1
     
     # if( norm(x = (c_cull - c_old_cull), type = "f") < 0.01 && norm(x = (c_fed - c_old_fed) , type = "f") < 0.01){
     #   if( (ps_m - ps_old)^2 < 0.001 && (pc_m - pc_old)^2 < 0.001){
@@ -1013,7 +1013,7 @@ for(i in 1:nrow(quantities_prices_capKR)){
     
     for(j in 1:nrow(cull_cartesianR)){
       
-      # j <- 7
+      # j <- 5
       
       if(k == 1){
         
@@ -1077,7 +1077,10 @@ for(i in 1:nrow(quantities_prices_capKR)){
         ps_loR <- ps_oR  - 0.269
         pc_loR <- pc_oR - 0.220
         
-        ps_upR <- ps_oR + 0.1
+        # ps_upR <- ps_oR + 0.1
+        # pc_upR <- pc_oR + 0.1
+        
+        ps_upR <- ps_oR + 0.2
         pc_upR <- pc_oR + 0.1
         
         #### Here we are making sure the lower bound for the prices isn't negative
@@ -1170,9 +1173,9 @@ for(i in 1:nrow(quantities_prices_capKR)){
         while(abs(round(fedDiffR[j,i],2))>0.01 || abs(round(cullDiffR[j,i],2))>0.01){
           
           if( fedDiffR[j,i] < 0){
-            ps_nR <- prices_psR[j,i] + 0.001
+            ps_nR <- prices_psR[j,i] + 0.1
           } else if( fedDiffR[j,i] > 0){
-            ps_nR <- prices_psR[j,i] - 0.001
+            ps_nR <- prices_psR[j,i] - 0.01
           }
           
           if(ps_nR < 0){
@@ -1180,9 +1183,9 @@ for(i in 1:nrow(quantities_prices_capKR)){
           }
           
           if( cullDiffR[j,i] < 0){
-            pc_nR <- prices_pcR[j,i] + 0.001
+            pc_nR <- prices_pcR[j,i] + 0.05
           } else if( cullDiff[j,i] > 0){
-            pc_nR <- prices_pcR[j,i] - 0.001
+            pc_nR <- prices_pcR[j,i] - 0.01
           }
           
           if(pc_nR < 0){
@@ -1312,8 +1315,8 @@ for(i in 1:nrow(quantities_prices_capKR)){
           #### Total supply of meat (this is by adding the results)
           S_psPCR <- as.matrix(sl1R + cl1R)
           
-          fedDiffR[j,i] <- sl_nodeR - D_slPsPcR[j,i]
-          cullDiffR[j,i] <- cl_nodeR - D_clPsPcR[j,i]
+          fedDiffR[j,i] <- (sl_nodeR - D_slPsPcR[j,i])
+          cullDiffR[j,i] <- (cl_nodeR - D_clPsPcR[j,i])
           
           equilibriumCheckR[[j]][m,1] <-  fedDiffR[j,i]
           equilibriumCheckR[[j]][m,2] <-  cullDiffR[j,i] 
@@ -1357,7 +1360,10 @@ for(i in 1:nrow(quantities_prices_capKR)){
         ps_loR <- ps_nR  - 0.269
         pc_loR <- pc_nR - 0.220
         
-        ps_upR <- ps_nR + 0.1
+        # ps_upR <- ps_nR + 0.1
+        # pc_upR <- pc_nR + 0.1
+        
+        ps_upR <- ps_nR + 0.2
         pc_upR <- pc_nR + 0.1
         
         if(ps_loR < 0){
@@ -1484,8 +1490,8 @@ for(i in 1:nrow(quantities_prices_capKR)){
       #### Total supply of meat (this is by adding the nodes)
       S_psPCR <- as.matrix(slNodesR[,i] + clNodesR[,i])
       
-      fedDiffR[,i] <- slNodesR[,i] - D_slPsPcR[,i]
-      cullDiffR[,i] <- clNodesR[,i] - D_clPsPcR[,i]
+      fedDiffR[,i] <- (slNodesR[,i] - D_slPsPcR[,i])
+      cullDiffR[,i] <- (clNodesR[,i] - D_clPsPcR[,i])
       
       # slNodes[,i] <- D_slPsPc[,i]
       # clNodes[,i] <- D_clPsPc[,i]
@@ -1537,6 +1543,420 @@ for(i in 1:nrow(quantities_prices_capKR)){
   }
   
 }
+
+
+
+
+
+# Estimated Equilibrium Parameters
+
+# mu tildes
+mu_Tildes_MeansR <- apply(unique(mu_Tildes_eqR[1:25,]), 2, mean)
+mu_Tildes_MeansR <- mu_Tildes_MeansR %>% as.data.frame()
+names(mu_Tildes_MeansR) <- "muMean"
+mu_Tildes_MeansR <- mu_Tildes_MeansR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+mu_Tildes_MediansR <- apply(unique(mu_Tildes_eqR[1:25,]), 2, median)
+mu_Tildes_MediansR <- mu_Tildes_MediansR %>% as.data.frame()
+names(mu_Tildes_MediansR) <- "muMedian"
+mu_Tildes_MediansR <- mu_Tildes_MediansR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+mu_Tildes_MMNR <- merge(mu_Tildes_MeansR, mu_Tildes_MediansR)
+
+# s tildes
+s_Tildes_MeansR <- apply(unique(s_Tildes_eqR[1:25,]), 2, mean)
+s_Tildes_MeansR <- s_Tildes_MeansR %>% as.data.frame()
+names(s_Tildes_MeansR) <- "sMean"
+s_Tildes_MeansR <- s_Tildes_MeansR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+s_Tildes_MediansR <- apply(unique(s_Tildes_eqR[1:25,]), 2, median)
+s_Tildes_MediansR <- s_Tildes_MediansR %>% as.data.frame()
+names(s_Tildes_MediansR) <- "sMedian"
+s_Tildes_MediansR <- s_Tildes_MediansR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+s_Tildes_MMNR <- merge(s_Tildes_MeansR, s_Tildes_MediansR)
+
+
+merge(mu_Tildes_MMNR,s_Tildes_MMNR) %>% select(Year, muMedian, sMedian) %>% round(3)
+
+
+###### Fitted Fed Cattle Equilibrium prices
+
+EQprices_ps_MeansR <- apply(unique(prices_ps_eqR[1:25,]), 2, mean)
+EQprices_ps_MeansR <- EQprices_ps_MeansR %>% as.data.frame()
+names(EQprices_ps_MeansR) <- "psMean"
+EQprices_ps_MeansR <- EQprices_ps_MeansR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQprices_ps_MediansR <- apply(unique(prices_ps_eqR[1:25,]), 2, median)
+EQprices_ps_MediansR <- EQprices_ps_MediansR %>% as.data.frame()
+names(EQprices_ps_MediansR) <- "psMedian"
+EQprices_ps_MediansR <- EQprices_ps_MediansR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQestPSNR <- merge(EQprices_ps_MeansR, EQprices_ps_MediansR)
+
+EQestObsPSNR <- left_join(EQestPSNR,quantities_prices_capKR) %>% select(Year,psMean, psMedian, ps) %>% 
+  mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(5)
+
+EQestObsPSNR
+
+EQestObsPSNR_Err <- EQestObsPSNR %>% select(Year, psMedian, ps) %>% 
+  mutate(eHat = ((ps-psMedian)/ps)* 100)
+
+EQestObsPSNR_Err_Median <- median(abs(EQestObsPSNR_Err$eHat)) %>% round(2)
+EQestObsPSNR_Err_Max <- max(abs(EQestObsPSNR_Err$eHat)) %>% round(2)
+
+
+###### Fitted Cull Cow Equilibrium prices
+EQprices_pc_MeansNR <- apply(unique(prices_pc_eqR[1:25,]), 2, mean)
+EQprices_pc_MeansNR <- EQprices_pc_MeansNR %>% as.data.frame()
+names(EQprices_pc_MeansNR) <- "pcMean"
+EQprices_pc_MeansNR <- EQprices_pc_MeansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQprices_pc_MediansNR <- apply(unique(prices_pc_eqR[1:25,]), 2, median)
+EQprices_pc_MediansNR <- EQprices_pc_MediansNR %>% as.data.frame()
+names(EQprices_pc_MediansNR) <- "pcMedian"
+EQprices_pc_MediansNR <- EQprices_pc_MediansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQestPCNR <- merge(EQprices_pc_MeansNR, EQprices_pc_MediansNR)
+
+EQestObsPCNR <- left_join(EQestPCNR,quantities_prices_capKR) %>% select(Year,pcMean, pcMedian, pc) %>% 
+  mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(5)
+
+EQestObsPCNR
+
+EQestObsPCNR_Err <- EQestObsPCNR %>% select(Year, pcMedian, pc) %>% 
+  mutate(eHat = ((pc-pcMedian)/pc)*100)
+
+EQestObsPCNR_Err_Median <- median(abs(EQestObsPCNR_Err$eHat)) %>% round(2)
+EQestObsPCNR_Err_Max <- max(abs(EQestObsPCNR_Err$eHat)) %>% round(2)
+
+
+EQestObsPCNR_R2 <- EQestObsPCNR_Err %>% select(Year, pcMedian, pc) %>% 
+  mutate(resSquared = (pcMedian-pc)^2, totSquared = (pc - mean(pc))^2)
+
+EQestObsPCNR_sumSquaredRes <- sum(EQestObsPCNR_R2$resSquared)
+EQestObsPCNR_sumSquaredTotal <- sum(EQestObsPCNR_R2$totSquared)
+
+EQestObsPCNR_RSquared <- 1 -  (EQestObsPCNR_sumSquaredRes/EQestObsPCNR_sumSquaredTotal)
+
+
+
+mergedPricesR <- merge(EQestObsPSNR %>% select(-errMean, -errmedian), 
+                      EQestObsPCNR %>% select(-errMean, -errmedian)) %>% select(Year, ps, psMedian, 
+                                                                                  pc, pcMedian)
+mergedPricesR[,-1] <- mergedPricesR[,-1] * 100
+
+
+
+
+###### Fitted Holding costs
+EQcosts_hc_MeansNR <- apply(unique(prices_hc_eqR[1:25,]), 2, mean)
+EQcosts_hc_MeansNR <- EQcosts_hc_MeansNR %>% as.data.frame()
+names(EQcosts_hc_MeansNR) <- "hcMean"
+EQcosts_hc_MeansNR <- EQcosts_hc_MeansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQcosts_hc_MediansNR <- apply(unique(prices_hc_eqR[1:25,]), 2, median)
+EQcosts_hc_MediansNR <- EQcosts_hc_MediansNR %>% as.data.frame()
+names(EQcosts_hc_MediansNR) <- "hcMedian"
+EQcosts_hc_MediansNR <- EQcosts_hc_MediansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQestHCNR <- merge(EQcosts_hc_MeansNR, EQcosts_hc_MediansNR)
+
+###### Fitted Expected Prices
+EQprices_Eps_MeansNR <- apply(unique(expected_PS_eqR[1:25,]), 2, mean)
+EQprices_Eps_MeansNR <- EQprices_Eps_MeansNR %>% as.data.frame()
+names(EQprices_Eps_MeansNR) <- "EpsMean"
+EQprices_Eps_MeansNR <- EQprices_Eps_MeansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQprices_Eps_MediansNR <- apply(unique(expected_PS_eqR[1:25,]), 2, median)
+EQprices_Eps_MediansNR <- EQprices_Eps_MediansNR %>% as.data.frame()
+names(EQprices_Eps_MediansNR) <- "EpsMedian"
+EQprices_Eps_MediansNR <- EQprices_Eps_MediansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% select(Year, everything())
+
+EQestEPSNR <- merge(EQprices_Eps_MeansNR, EQprices_Eps_MediansNR)
+
+
+EQprices_Epc_MeansNR <- apply(unique(expected_PC_eqR[1:25,]), 2, mean)
+EQprices_Epc_MeansNR <- EQprices_Epc_MeansNR %>% as.data.frame()
+names(EQprices_Epc_MeansNR) <- "EpcMean"
+EQprices_Epc_MeansNR <- EQprices_Epc_MeansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% select(Year, everything())
+
+EQprices_Epc_MediansNR <- apply(unique(expected_PC_eqR[1:25,]), 2, median)
+EQprices_Epc_MediansNR <- EQprices_Epc_MediansNR %>% as.data.frame()
+names(EQprices_Epc_MediansNR) <- "EpcMedian"
+EQprices_Epc_MediansNR <- EQprices_Epc_MediansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% select(Year, everything())
+
+EQestEPCNR <- merge(EQprices_Epc_MeansNR, EQprices_Epc_MediansNR)
+
+
+# Fitted Fed Cattle Equilibrium Supply
+EQquantities_sl_MeansNR <- apply(unique(slNodes_eqR[1:25,]), 2, mean)
+EQquantities_sl_MeansNR <- EQquantities_sl_MeansNR %>% as.data.frame()
+names(EQquantities_sl_MeansNR) <- "slMean"
+EQquantities_sl_MeansNR <- EQquantities_sl_MeansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQquantities_sl_MediansNR <- apply(unique(slNodes_eqR[1:25,]), 2, median)
+EQquantities_sl_MediansNR <- EQquantities_sl_MediansNR %>% as.data.frame()
+names(EQquantities_sl_MediansNR) <- "slMedian"
+EQquantities_sl_MediansNR <- EQquantities_sl_MediansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQestSLNR <- merge(EQquantities_sl_MeansNR, EQquantities_sl_MediansNR)
+
+supp_sl_MODELR <- supp_diss_adjR %>% select(Year, slSM = fedSlaughter_BillLb)
+
+
+
+# supp_sl_MODEL <- obsEst_sl_Supply %>% select(Year, slSM = sl_obs)
+# supp_sl_MODEL <- quantities_prices_capK %>% select(Year, slSM)
+
+EQestObsSLNR <- left_join(EQestSLNR, supp_sl_MODELR) %>% select(Year, slMean, slMedian, slSM) %>% 
+  mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
+
+EQestObsSLNR 
+
+
+EQestObsSLNR_Err <- EQestObsSLNR %>% select(Year, slMedian, slSM) %>% 
+  mutate(eHat = ((slSM-slMedian)/slSM)*100)
+
+EQestObsSLNR_Err_Median <- median(abs(EQestObsSLNR_Err$eHat)) %>% round(2)
+EQestObsSLNR_Err_Max <- max(abs(EQestObsSLNR_Err$eHat)) %>% round(2)
+
+
+EQestObsSLNR_R2 <- EQestObsSLNR_Err %>% select(Year, slMedian, slSM) %>% 
+  mutate(resSquared = (slMedian-slSM)^2, totSquared = (slSM - mean(slSM))^2)
+
+EQestObsSLNR_sumSquaredRes <- sum(EQestObsSLNR_R2$resSquared)
+EQestObsSLNR_sumSquaredTotal <- sum(EQestObsSLNR_R2$totSquared)
+
+EQestObsSLNR_RSquared <- 1 -  (EQestObsSLNR_sumSquaredRes/EQestObsSLNR_sumSquaredTotal)
+
+EQestObsSLNR_DiagResPlot <- plot(EQestObsSLNR$slMedian, EQestObsSLNR$errmedian)
+
+
+# Fitted Cull Cow Equilibrium Supply 
+EQquantities_cl_MeansNR <- apply(unique(clNodes_eqR[1:25,]), 2, mean)
+EQquantities_cl_MeansNR <- EQquantities_cl_MeansNR %>% as.data.frame()
+names(EQquantities_cl_MeansNR) <- "clMean"
+EQquantities_cl_MeansNR <- EQquantities_cl_MeansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQquantities_cl_MediansNR <- apply(unique(clNodes_eqR[1:25,]), 2, median)
+EQquantities_cl_MediansNR <- EQquantities_cl_MediansNR %>% as.data.frame()
+names(EQquantities_cl_MediansNR) <- "clMedian"
+EQquantities_cl_MediansNR <- EQquantities_cl_MediansNR %>% mutate(Year = quantities_prices_capKR$Year) %>% 
+  select(Year, everything())
+
+EQestCLNR <- merge(EQquantities_cl_MeansNR, EQquantities_cl_MediansNR)
+
+supp_cl_MODELR <- supp_diss_adjR %>% select(Year, clSM = cowsCulled_BillLb)
+
+# supp_cl_MODEL <- obsEst_cl_Supply %>% select(Year, clSM = cl_obs)
+# supp_cl_MODEL <- quantities_prices_capK %>% select(Year, clSM)
+
+EQestObsCLNR <- left_join(EQestCLNR, supp_cl_MODELR) %>% select(Year, clMean, clMedian, clSM) %>% 
+  mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
+EQestObsCLNR
+
+EQestObsCLNR_Err <- EQestObsCLNR %>% select(Year, clMedian, clSM) %>% 
+  mutate(eHat = ((clSM-clMedian)/clSM)*100)
+
+EQestObsCLNR_Err_Median <- median(abs(EQestObsCLNR_Err$eHat)) %>% round(2)
+EQestObsCLNR_Err_Max <- max(abs(EQestObsCLNR_Err$eHat)) %>% round(2)
+
+
+EQestObsCLNR_R2 <- EQestObsCLNR_Err %>% select(Year, clMedian, clSM) %>% filter(Year >= 1990) %>%
+  mutate(resSquared = (clMedian-clSM)^2, totSquared = (clSM - mean(clSM))^2)
+
+EQestObsCLNR_sumSquaredRes <- sum(EQestObsCLNR_R2$resSquared)
+EQestObsCLNR_sumSquaredTotal <- sum(EQestObsCLNR_R2$totSquared)
+
+EQestObsCLNR_RSquared <- 1 -  (EQestObsCLNR_sumSquaredRes/EQestObsCLNR_sumSquaredTotal)
+
+EQestObsCLNR_DiagResPlot <- plot(EQestObsCLNR$clMedian, EQestObsCLNR$errmedian)
+
+
+merge(EQestObsSLNR %>% select(-errMean, -errmedian), 
+      EQestObsCLNR %>% select(-errMean, -errmedian)) %>% 
+  select(Year, slSM, slMedian, clSM, clMedian) %>% round(4)
+
+
+#### Fitted Total Equilibrium Supply 
+
+EQestTSNR <- merge(EQestCLNR, EQestSLNR) %>% transmute(Year = Year, TSmean = slMean + clMean, 
+                                                             TSmedian = slMedian + clMedian)
+
+totalSupplyR <- supp_diss_adjR %>% transmute(Year = Year, TS = TotalSupply)
+
+EQestObsTSNR <- left_join(EQestTSNR,totalSupplyR) %>% select(Year, TSmean, TSmedian, TS) %>% 
+  mutate(errMean = (TS - TSmean), errmedian = (TS- TSmedian)) %>% round(4)
+
+EQestObsTSNR %>% select(Year, TSmedian, TS) %>%
+  select(Year, TS, TSmedian) %>% round(4)
+
+
+
+####### Plotting the equilibrium solutions
+
+
+EQestObsPSNR_plots <- EQestObsPSNR %>% select(Year, psMean, psMedian, ps) %>% 
+  transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100) %>% filter(Year>=1998) %>% round(2)
+
+
+slaughter_plotMedianR <- EQestObsPSNR_plots %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=ps, color = "Observed price"),size=0.75) + 
+  geom_point(aes(y=ps, color = "Observed price"),shape=15,size=2) + 
+  geom_line(aes(y=psMedian, color="Median fitted price"),size=0.75) +
+  geom_point(aes(y = psMedian, color = "Median fitted price"),shape=16,size=2) + 
+  theme_classic() + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsPSNR_plots$Year[1],EQestObsPSNR_plots$Year[nrow(EQestObsPSNR_plots)], by = 2))) +
+  scale_y_continuous(name="Fed cattle price")+ theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",
+        legend.background = element_rect(color = NA), text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
+
+
+
+EQestObsPCNR_plots <- EQestObsPCNR %>% select(Year, pcMean, pcMedian, pc) %>% 
+  transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100) %>% filter(Year>=1998) %>% round(2)
+
+cull_plotMedianR <- EQestObsPCNR_plots %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=pc, color = "Observed price"),size=0.75) + 
+  geom_point(aes(y=pc, color = "Observed price"),shape=15,size=2) + 
+  geom_line(aes(y=pcMedian, color="Median fitted price"),size=0.75) +
+  geom_point(aes(y = pcMedian, color = "Median fitted price"),shape=16,size=2) + 
+  theme_classic() + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsPCNR_plots$Year[1],EQestObsPCNR_plots$Year[nrow(EQestObsPCNR_plots)], by = 2))) +
+  scale_y_continuous(name="Cull Cow Price")+ theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",
+        legend.background = element_rect(color = NA), text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
+
+
+
+EQestObsSLNR_plots <- EQestObsSLNR %>% select(Year, slMean, slMedian, slSM) %>% filter(Year>=1998) %>% round(2)
+
+dressedWeights_slR <- dressedWeights_sl_clR %>% select(Year, Slaughter_avg)
+
+EQestObsSLNR_Head <- merge(EQestObsSLNR_plots, dressedWeights_slR) %>% mutate(slMedianHead = 
+                                                           slMedian * (1000000000/Slaughter_avg), 
+                                                           slSMHead = slSM * (1000000000/Slaughter_avg)) %>% select(Year, slMedianHead, slSMHead)
+
+EQestObsSLNR_Head <- EQestObsSLNR_Head %>% mutate(slMedianHeadMill = slMedianHead/1000000, 
+                                                  slSMHeadMill = slSMHead/1000000) %>% round(3) 
+
+slSupply_plotMedianR <- EQestObsSLNR_Head %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=slSMHeadMill, color = "Observed supply"),size=0.75) + 
+  geom_point(aes(y=slSMHeadMill, color = "Observed supply"),shape=15,size=2) + 
+  geom_line(aes(y=slMedianHeadMill, color="Median fitted supply"),size=0.75) +
+  geom_point(aes(y = slMedianHeadMill, color = "Median fitted supply"),shape=16,size=2) + 
+  theme_classic() + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsSLNR_Head$Year[1],EQestObsSLNR_Head$Year[nrow(EQestObsSLNR_Head)], by = 2))) +
+  scale_y_continuous(name="Fed cattle supply (million head)")+ theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",
+        legend.background = element_rect(color = NA), text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
+
+
+
+
+EQestObsCLNR_plots <- EQestObsCLNR %>% select(Year, clMean, clMedian, clSM) %>% filter(Year>=1998) %>% round(2)
+
+
+clSupply_plotMedianR <- EQestObsCLNR_plots %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y= clSM, color = "Observed supply"),size=0.75) + 
+  geom_point(aes(y= clSM, color = "Observed supply"),shape=15,size=2) + 
+  geom_line(aes(y= clMedian, color="Median fitted supply"),size=0.75) +
+  geom_point(aes(y = clMedian, color = "Median fitted supply"),shape=16,size=2) + 
+  theme_classic() + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObsPSNR_plots$Year[1],EQestObsPSNR_plots$Year[nrow(EQestObsPSNR_plots)], by = 2))) +
+  scale_y_continuous(name="Cull cow supply (billion pounds)")+ theme_classic() + 
+  theme(legend.position="bottom", legend.box = "horizontal",
+        legend.background = element_rect(color = NA), text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12)) + 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
+
+
+
+
+
+
+dressedWeights_clR <- dressedWeights_sl_clR %>% select(Year, Cull_avg)
+# EQestObsCLNI_Plots <- EQestObsCLNII %>% select(Year, clMedian)
+EQestObsCLNR_Plots <- EQestObsCLNR %>% select(Year, clMedian)
+
+EQestObsCLNR_Head <- merge(EQestObsCLNR_Plots, dressedWeights_clR) %>% mutate(clMedianHead = 
+                                                                               clMedian * (1000000000/Cull_avg))
+
+Stock_lessKR <- StockR %>% select(-K)
+
+EQestObsCLNR_Head_Inventory <- left_join(Stock_lessKR, EQestObsCLNR_Head) %>% select(-clMedian, 
+                                                                                    -Cull_avg, -k10)
+
+EQestObsCLNR_Head_Inventory1 <- EQestObsCLNR_Head_Inventory %>% mutate(CLk_987 = clMedianHead + lead(k9,1) + lead(k8,1))
+EQestObsCLNR_Head_Inventory1 <- EQestObsCLNR_Head_Inventory1 %>% na.exclude()
+EQestObsCLNR_Head_Inventory11 <- EQestObsCLNR_Head_Inventory1 %>% select(-clMedianHead)
+EQestObsCLNR_Head_Inventory11 <- EQestObsCLNR_Head_Inventory11 %>% 
+  mutate(fitK = k3 + k4 + k5 + k6 + CLk_987) %>% select(Year, fitK)
+totalInventoryR <- StockR %>% select(Year, K)
+EQestObstotalInventoryR <- merge(totalInventoryR, EQestObsCLNR_Head_Inventory11) %>% 
+  mutate(K = K/1000000, fitK = fitK/1000000) %>% filter(Year >= 1990)
+
+invReplication_plotR <- EQestObstotalInventoryR %>% ggplot(aes(x=Year)) + 
+  geom_line(aes(y=K,color="Observed Inventory"),size=0.75) +
+  geom_point(aes(y=K,color="Observed Inventory"),shape=15,size=2) + 
+  geom_line(aes(y=fitK,color="Fitted Inventory"),size=0.75) +
+  geom_point(aes(y=fitK,color="Fitted Inventory"),shape=16,size=2) + 
+  scale_x_continuous(name="Year", 
+                     breaks=c(seq(EQestObstotalInventory$Year[1],
+                                  EQestObstotalInventory$Year[nrow(EQestObstotalInventory)], by = 2))) + 
+  # geom_hline(yintercept=0, linetype="dashed", color = "black") +
+  scale_y_continuous(name="Million Head") + theme_classic() +
+  theme(legend.position="bottom", legend.box = "horizontal",
+        legend.background = element_rect(color = NA),text = element_text(size = 15)) +
+  theme(legend.title=element_blank()) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+        axis.text.y = element_text(size=12))+ 
+  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
+
+
 
 
 

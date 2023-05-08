@@ -706,7 +706,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
                                      beefINV_FORECAST_PostFMD$Year[nrow(beefINV_FORECAST_PostFMD)],  by = 1)
         mergedForecastFMD_Proj <- mergedForecastFMD %>% filter(Year >= beefINV_FORECAST_PostFMD$Year[1]-10)
         
-        #### Here I depop the stocks (5%, 10%, 20%)
+        #### Here I depop the stocks (5%, 10%)
         mergedForecastFMD_Proj[,1:10] <- 
           dePop(stock = mergedForecastFMD_Proj[,1:10], dePopRate = dePopR) 
         

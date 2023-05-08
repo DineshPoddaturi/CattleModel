@@ -57,7 +57,7 @@ demandPES <- proj_Q_P_PostFMD_PESI_Dem_08 %>% select(Year, D, D5, D10)  %>% roun
 
 # width=6.2, height=3.5
 
-tikz(file="fmdLatexPlots/FedCattlePricePlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/FedCattlePricePlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedPriceOPT_plot <- fedPricesOPT %>% ggplot(aes(x = Year))+
   geom_line(aes(y = PsB, color="Baseline"),size=0.75) +
@@ -88,7 +88,7 @@ dev.off()
 
 ### Cull cow price changes
 
-tikz(file="fmdLatexPlots/CullCowPricePlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/CullCowPricePlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullPriceOPT_plot <- cullPricesOPT %>% ggplot(aes(x = Year))+
   geom_line(aes(y = PcB, color="Baseline"),size=0.75) +
@@ -118,7 +118,7 @@ print(cullPriceOPT_plot)
 dev.off()
 
 ### Changes in fed cattle supplies
-tikz(file="fmdLatexPlots/FedCattleSupplyPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/FedCattleSupplyPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedSupplyOPT_plot <- fedCattleSupplyOPT %>% ggplot(aes(x = Year))+
   geom_line(aes(y = SlCattleB, color="Baseline"),size=0.75) +
@@ -148,7 +148,7 @@ print(fedSupplyOPT_plot)
 dev.off()
 
 ### Changes in cull cow supplies
-tikz(file="fmdLatexPlots/CullCowSupplyPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/CullCowSupplyPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullSupplyOPT_plot <- cullCattleSupplyOPT %>% ggplot(aes(x = Year))+
   geom_line(aes(y = ClCattleB, color="Baseline"),size=0.75) +
@@ -177,8 +177,11 @@ print(cullSupplyOPT_plot)
 
 dev.off()
 
+
+
+
 ### Changes in demand
-tikz(file="fmdLatexPlots/DemandPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/DemandPlotOPT.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 demandOPT_plot <- demandOPT %>% ggplot(aes(x = Year))+
   geom_line(aes(y = D, color="Baseline"),size=0.75) +
@@ -213,7 +216,7 @@ dev.off()
 
 ### Fed Cattle price changes
 
-tikz(file="fmdLatexPlots/FedCattlePricePlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/FedCattlePricePlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedPricePES_plot <- fedPricesPES %>% ggplot(aes(x = Year))+
   geom_line(aes(y = PsB, color="Baseline"),size=0.75) +
@@ -244,7 +247,7 @@ dev.off()
 
 ### Cull cow price changes
 
-tikz(file="fmdLatexPlots/CullCowPricePlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/CullCowPricePlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullPricePES_plot <- cullPricesPES %>% ggplot(aes(x = Year))+
   geom_line(aes(y = PcB, color="Baseline"),size=0.75) +
@@ -274,7 +277,7 @@ print(cullPricePES_plot)
 dev.off()
 
 ### Changes in fed cattle supplies
-tikz(file="fmdLatexPlots/FedCattleSupplyPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/FedCattleSupplyPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 fedSupplyPES_plot <- fedCattleSupplyPES %>% ggplot(aes(x = Year))+
   geom_line(aes(y = SlCattleB, color="Baseline"),size=0.75) +
@@ -304,7 +307,7 @@ print(fedSupplyPES_plot)
 dev.off()
 
 ### Changes in cull cow supplies
-tikz(file="fmdLatexPlots/CullCowSupplyPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/CullCowSupplyPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 cullSupplyPES_plot <- cullCattleSupplyPES %>% ggplot(aes(x = Year))+
   geom_line(aes(y = ClCattleB, color="Baseline"),size=0.75) +
@@ -334,7 +337,7 @@ print(cullSupplyPES_plot)
 dev.off()
 
 ### Changes in demand
-tikz(file="fmdLatexPlots/DemandPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
+tikz(file="fmdLatexPlots/Dissertation/DemandPlotPES.tex", width=6.2, height=3.5, sanitize = TRUE)
 
 demandPES_plot <- demandPES %>% ggplot(aes(x = Year))+
   geom_line(aes(y = D, color="Baseline"),size=0.75) +

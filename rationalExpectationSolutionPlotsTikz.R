@@ -9,6 +9,8 @@ require(tikzDevice)
 EQestObsPSNI_plots <- EQestObsPSNIII  %>% select(Year, psMean, psMedian, ps) %>% 
   transmute(Year = Year, psMean = psMean * 100, psMedian = psMedian * 100, ps = ps * 100) %>% filter(Year>=1998)
 
+# EQestObsPSNI_plots %>% filter(Year >2009) %>% select(Year, ps, psMedian)
+
 tikz(file="rationalExpectationsLatexPlots/Updated/FedCattlePricePlot.tex", width=6.2, height=3.5)
 
 slaughter_plot <- EQestObsPSNI_plots %>% ggplot(aes(x=Year))+geom_line(aes(y=psMean, color="Mean fitted price")) +
@@ -33,9 +35,9 @@ tikz(file="rationalExpectationsLatexPlots/Updated/FedCattlePricePlotMedian.tex",
 
 slaughter_plotMedian <- EQestObsPSNI_plots %>% ggplot(aes(x=Year)) + 
   geom_line(aes(y=ps, color = "Observed price"),size=0.75) + 
-  geom_point(aes(y=ps, color = "Observed price"),size=2) + 
+  geom_point(aes(y=ps, color = "Observed price"),shape=15,size=2) + 
   geom_line(aes(y=psMedian, color="Median fitted price"),size=0.75) +
-  geom_point(aes(y = psMedian, color = "Median fitted price"),size=2) + 
+  geom_point(aes(y = psMedian, color = "Median fitted price"),shape=16,size=2) + 
   theme_classic() + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPSNI_plots$Year[1],EQestObsPSNI_plots$Year[nrow(EQestObsPSNI_plots)], by = 2))) +
@@ -46,7 +48,8 @@ slaughter_plotMedian <- EQestObsPSNI_plots %>% ggplot(aes(x=Year)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
         axis.text.y = element_text(size=12)) + 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
-  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
 print(slaughter_plotMedian)
 
@@ -58,6 +61,8 @@ dev.off()
 
 EQestObsPCNI_plots <- EQestObsPCNIII %>% select(Year, pcMean, pcMedian, pc) %>% 
   transmute(Year = Year, pcMean = pcMean * 100, pcMedian = pcMedian * 100, pc = pc * 100) %>% filter(Year >= 1998)
+
+EQestObsPCNI_plots %>% filter(Year >2009) %>% select(Year, pc, pcMedian)
 
 tikz(file="rationalExpectationsLatexPlots/Updated/CullCowPricePlot.tex", width=6.2, height=3.5)
 
@@ -85,9 +90,9 @@ tikz(file="rationalExpectationsLatexPlots/Updated/CullCowPricePlotMedian.tex", w
 
 cull_plotMedian <- EQestObsPCNI_plots%>% ggplot(aes(x=Year))+ 
   geom_line(aes(y=pc, color = "Observed price"),size=0.75) + 
-  geom_point(aes(y=pc, color = "Observed price"),size=2) + 
+  geom_point(aes(y=pc, color = "Observed price"),shape=15,size=2) + 
   geom_line(aes(y=pcMedian, color="Median fitted price"),size=0.75) +
-  geom_point(aes(y = pcMedian, color = "Median fitted price"),size=2) + theme_classic() + 
+  geom_point(aes(y = pcMedian, color = "Median fitted price"),shape=16,size=2) + theme_classic() + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObsPCNI_plots$Year[1],EQestObsPCNI_plots$Year[nrow(EQestObsPCNI_plots)], by = 2))) +
   scale_y_continuous(name="Cull Cow Price") +theme_classic() + 
@@ -97,7 +102,8 @@ cull_plotMedian <- EQestObsPCNI_plots%>% ggplot(aes(x=Year))+
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
         axis.text.y = element_text(size=12)) + 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
-  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
 print(cull_plotMedian)
 
@@ -130,9 +136,9 @@ tikz(file="rationalExpectationsLatexPlots/Updated/CattleCyclesReplicationPlot.te
 
 invReplication_plot <- EQestObstotalInventory %>% ggplot(aes(x=Year)) + 
   geom_line(aes(y=K,color="Observed Inventory"),size=0.75) +
-  geom_point(aes(y=K,color="Observed Inventory"),size=2) + 
+  geom_point(aes(y=K,color="Observed Inventory"),shape=15,size=2) + 
   geom_line(aes(y=fitK,color="Fitted Inventory"),size=0.75) +
-  geom_point(aes(y=fitK,color="Fitted Inventory"),size=2) + 
+  geom_point(aes(y=fitK,color="Fitted Inventory"),shape=16,size=2) + 
   scale_x_continuous(name="Year", 
                      breaks=c(seq(EQestObstotalInventory$Year[1],
                                   EQestObstotalInventory$Year[nrow(EQestObstotalInventory)], by = 2))) + 
@@ -144,7 +150,8 @@ invReplication_plot <- EQestObstotalInventory %>% ggplot(aes(x=Year)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
         axis.text.y = element_text(size=12))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
-  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))
+  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
 print(invReplication_plot)
 
