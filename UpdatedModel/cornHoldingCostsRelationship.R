@@ -99,7 +99,7 @@ Box.test(cornFit$residuals, type = "Ljung-Box")
 #   labs(subtitle = '') +
 #   ggplot2::ggtitle("Non-Standardized Residuals")
 
-corn_FORECAST <- forecast(object = cornFit, h = 6, level = 95) %>% as.data.frame()
+corn_FORECAST <- forecast(object = cornFit, h = 7, level = 95) %>% as.data.frame()
 
 corn_FORECAST <- corn_FORECAST %>% transmute(Year =  as.double(row.names(corn_FORECAST)), 
                                pcorn = `Point Forecast`)

@@ -556,6 +556,7 @@ KHistMin <- Stock %>% filter(Year <= 2021 & Year >= 2000) %>% select(K) %>% min(
 
 k3HistMed <- median(Stock$k3[Stock$Year <=2021 & Stock$Year >=2000])
 k3HistMean <- mean(Stock$k3[Stock$Year <=2021 & Stock$Year >=2000])
+
 KHistMed <- median(Stock$K[Stock$Year <=2021 & Stock$Year >=2000])
 KHistMean <- mean(Stock$K[Stock$Year <=2021 & Stock$Year >=2000])
 
@@ -906,24 +907,23 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
           }
             
           if(slNewFMD < slHistMin || clNewFMD < clHistMin){
-
-            if(slNewFMD < slHistMin){
-              # slBeefImports <- (impBeefLM$coefficients[1] * slNewFMD) %>% as.numeric()
-              slBeefImports <- (impRatioBeefMax * (slNewFMD + clNewFMD)) %>% as.numeric()
-            }else{
-              slBeefImports <- 0
-            }
-
-            if(clNewFMD < clHistMin){
-              # clBeefImports <- (impBeefLM$coefficients[1] * clNewFMD) %>% as.numeric()
-              clBeefImports <- (impRatioBeefMax * clNewFMD) %>% as.numeric()
-            }else{
-              clBeefImports <- 0
-            }
-            impBeef[i] <- slBeefImports + clBeefImports
-
-            slNewFMD <- slNewFMD + slBeefImports
-            clNewFMD <- clNewFMD + clBeefImports
+              if(slNewFMD < slHistMin){
+                # slBeefImports <- (impBeefLM$coefficients[1] * slNewFMD) %>% as.numeric()
+                slBeefImports <- (impRatioBeefMax * (slNewFMD + clNewFMD)) %>% as.numeric()
+              }else{
+                slBeefImports <- 0
+              }
+  
+              if(clNewFMD < clHistMin){
+                # clBeefImports <- (impBeefLM$coefficients[1] * clNewFMD) %>% as.numeric()
+                clBeefImports <- (impRatioBeefMax * clNewFMD) %>% as.numeric()
+              }else{
+                clBeefImports <- 0
+              }
+              impBeef[i] <- slBeefImports + clBeefImports
+  
+              slNewFMD <- slNewFMD + slBeefImports
+              clNewFMD <- clNewFMD + clBeefImports
           }
           
           mergedForecastFMD_Proj$ImportsBeef[mergedForecastFMD_Proj$Year == yearIFMD] <- round(impBeef[i],2)
@@ -966,8 +966,8 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             
           }
           
-          # Chad's suggestion: Use calf crop from 2009 and age distribution from 2009 to get a best estimate of K for 2010
-          # So basically use mergedForecastFMD_Proj cap K to get the calf crop and then think creatively to get the K for 2010
+          # Chad's suggestion: Use calf crop from 2009 and age distribution from 2009 to get a best estimate of K for 2023
+          # So basically use mergedForecastFMD_Proj cap K to get the calf crop and then think creatively to get the K for 2023
           
           #### Here in order to determine K for this year I get the calf crop from two years ago.
           #### We get that by taking the cull cow supply off of the total inventory K and multiply with g
@@ -1313,7 +1313,7 @@ simOptimisticFMD <- function(dePopR, modelParamsEQ_PreFMD, exports_percentK,
             
             #### Here I compute the demand in dollars. Basically multiply the supplied quantities with the 
             #### price determined from the equilibrium conditions. Note: I don't have to use the markup parameter 
-            #### to convert the price to retail price. It's constant and it's 
+            #### to convert the price to retail price.
             capAFMD_DollarsAfter <- slNewFMD * (psM_pre/phi) + clNewFMD * (pcM_pre/phi)
             
             while(capAFMD_DollarsAfter > 0.95 * capAFMD_DollarsOG){
