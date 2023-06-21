@@ -1413,355 +1413,355 @@ for(i in 1:nrow(quantities_prices_capK)){
 # Estimated Equilibrium Parameters
 
 # mu tildes
-mu_Tildes_MeansNII <- apply(unique(mu_Tildes_eq[1:25,]), 2, mean)
-mu_Tildes_MeansNII <- mu_Tildes_MeansNII %>% as.data.frame()
-names(mu_Tildes_MeansNII) <- "muMean"
-mu_Tildes_MeansNII <- mu_Tildes_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-mu_Tildes_MediansNII <- apply(unique(mu_Tildes_eq[1:25,]), 2, median)
-mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% as.data.frame()
-names(mu_Tildes_MediansNII) <- "muMedian"
-mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-mu_Tildes_MMNII <- merge(mu_Tildes_MeansNII, mu_Tildes_MediansNII)
-
-# s tildes
-s_Tildes_MeansNII <- apply(unique(s_Tildes_eq[1:25,]), 2, mean)
-s_Tildes_MeansNII <- s_Tildes_MeansNII %>% as.data.frame()
-names(s_Tildes_MeansNII) <- "sMean"
-s_Tildes_MeansNII <- s_Tildes_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-s_Tildes_MediansNII <- apply(unique(s_Tildes_eq[1:25,]), 2, median)
-s_Tildes_MediansNII <- s_Tildes_MediansNII %>% as.data.frame()
-names(s_Tildes_MediansNII) <- "sMedian"
-s_Tildes_MediansNII <- s_Tildes_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-s_Tildes_MMNII <- merge(s_Tildes_MeansNII, s_Tildes_MediansNII)
-
-
-merge(mu_Tildes_MMNII,s_Tildes_MMNII) %>% select(Year, muMedian, sMedian) %>% filter(Year >2009) %>% round(3)
-
-
-###### Fitted Fed Cattle Equilibrium prices
-
-EQprices_ps_MeansNII <- apply(unique(prices_ps_eq[1:25,]), 2, mean)
-EQprices_ps_MeansNII <- EQprices_ps_MeansNII %>% as.data.frame()
-names(EQprices_ps_MeansNII) <- "psMean"
-EQprices_ps_MeansNII <- EQprices_ps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQprices_ps_MediansNII <- apply(unique(prices_ps_eq[1:25,]), 2, median)
-EQprices_ps_MediansNII <- EQprices_ps_MediansNII %>% as.data.frame()
-names(EQprices_ps_MediansNII) <- "psMedian"
-EQprices_ps_MediansNII <- EQprices_ps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQestPSNII <- merge(EQprices_ps_MeansNII, EQprices_ps_MediansNII)
-
-EQestObsPSNII <- left_join(EQestPSNII,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
-  mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
-
-EQestObsPSNII
-
-EQestObsPSNII_Err <- EQestObsPSNII %>% select(Year, psMedian, ps) %>% 
-  mutate(eHat = ((ps-psMedian)/ps)* 100)
-
-EQestObsPSNII_Err_Median <- median(EQestObsPSNII_Err$eHat) %>% round(2)
-EQestObsPSNII_Err_Max <- max(EQestObsPSNII_Err$eHat) %>% round(2)
-
-###### Fitted Cull Cow Equilibrium prices
-EQprices_pc_MeansNII <- apply(unique(prices_pc_eq[1:25,]), 2, mean)
-EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% as.data.frame()
-names(EQprices_pc_MeansNII) <- "pcMean"
-EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQprices_pc_MediansNII <- apply(unique(prices_pc_eq[1:25,]), 2, median)
-EQprices_pc_MediansNII <- EQprices_pc_MediansNII %>% as.data.frame()
-names(EQprices_pc_MediansNII) <- "pcMedian"
-EQprices_pc_MediansNII <- EQprices_pc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQestPCNII <- merge(EQprices_pc_MeansNII, EQprices_pc_MediansNII)
-
-EQestObsPCNII <- left_join(EQestPCNII,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
-  mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
-
-EQestObsPCNII
-
-EQestObsPCNII_Err <- EQestObsPCNII %>% select(Year, pcMedian, pc) %>% 
-  mutate(eHat = ((pc-pcMedian)/pc)*100)
-
-EQestObsPCNII_Err_Median <- median(EQestObsPCNII_Err$eHat) %>% round(2)
-EQestObsPCNII_Err_Max <- max(EQestObsPCNII_Err$eHat) %>% round(2)
-
-
-EQestObsPCNII_R2 <- EQestObsPCNII_Err %>% select(Year, pcMedian, pc) %>% 
-  mutate(resSquared = (pcMedian-pc)^2, totSquared = (pc - mean(pc))^2)
-
-EQestObsPCNII_sumSquaredRes <- sum(EQestObsPCNII_R2$resSquared)
-EQestObsPCNII_sumSquaredTotal <- sum(EQestObsPCNII_R2$totSquared)
-
-EQestObsPCNII_RSquared <- 1 -  (EQestObsPCNII_sumSquaredRes/EQestObsPCNII_sumSquaredTotal)
-
-
-
-mergedPrices <- merge(EQestObsPSNII %>% select(-errMean, -errmedian), 
-      EQestObsPCNII %>% select(-errMean, -errmedian)) %>% select(Year, ps, psMedian, 
-                                                                 pc, pcMedian) %>%
-  filter(Year >= 2010)
-mergedPrices[,-1] <- mergedPrices[,-1] * 100
-
-
-
-
-###### Fitted Holding costs
-EQcosts_hc_MeansNII <- apply(unique(prices_hc_eq[1:25,]), 2, mean)
-EQcosts_hc_MeansNII <- EQcosts_hc_MeansNII %>% as.data.frame()
-names(EQcosts_hc_MeansNII) <- "hcMean"
-EQcosts_hc_MeansNII <- EQcosts_hc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQcosts_hc_MediansNII <- apply(unique(prices_hc_eq[1:25,]), 2, median)
-EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% as.data.frame()
-names(EQcosts_hc_MediansNII) <- "hcMedian"
-EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQestHCNII <- merge(EQcosts_hc_MeansNII, EQcosts_hc_MediansNII)
-
-###### Fitted Expected Prices
-EQprices_Eps_MeansNII <- apply(unique(expected_PS_eq[1:25,]), 2, mean)
-EQprices_Eps_MeansNII <- EQprices_Eps_MeansNII %>% as.data.frame()
-names(EQprices_Eps_MeansNII) <- "EpsMean"
-EQprices_Eps_MeansNII <- EQprices_Eps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQprices_Eps_MediansNII <- apply(unique(expected_PS_eq[1:25,]), 2, median)
-EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% as.data.frame()
-names(EQprices_Eps_MediansNII) <- "EpsMedian"
-EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
-
-EQestEPSNII <- merge(EQprices_Eps_MeansNII, EQprices_Eps_MediansNII)
-
-
-EQprices_Epc_MeansNII <- apply(unique(expected_PC_eq[1:25,]), 2, mean)
-EQprices_Epc_MeansNII <- EQprices_Epc_MeansNII %>% as.data.frame()
-names(EQprices_Epc_MeansNII) <- "EpcMean"
-EQprices_Epc_MeansNII <- EQprices_Epc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
-
-EQprices_Epc_MediansNII <- apply(unique(expected_PC_eq[1:25,]), 2, median)
-EQprices_Epc_MediansNII <- EQprices_Epc_MediansNII %>% as.data.frame()
-names(EQprices_Epc_MediansNII) <- "EpcMedian"
-EQprices_Epc_MediansNII <- EQprices_Epc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
-
-EQestEPCNII <- merge(EQprices_Epc_MeansNII, EQprices_Epc_MediansNII)
-
-
-# Fitted Fed Cattle Equilibrium Supply
-EQquantities_sl_MeansNII <- apply(unique(slNodes_eq[1:25,]), 2, mean)
-EQquantities_sl_MeansNII <- EQquantities_sl_MeansNII %>% as.data.frame()
-names(EQquantities_sl_MeansNII) <- "slMean"
-EQquantities_sl_MeansNII <- EQquantities_sl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQquantities_sl_MediansNII <- apply(unique(slNodes_eq[1:25,]), 2, median)
-EQquantities_sl_MediansNII <- EQquantities_sl_MediansNII %>% as.data.frame()
-names(EQquantities_sl_MediansNII) <- "slMedian"
-EQquantities_sl_MediansNII <- EQquantities_sl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQestSLNII <- merge(EQquantities_sl_MeansNII, EQquantities_sl_MediansNII)
-
-supp_sl_MODEL <- supp_diss_adj %>% select(Year, slSM = fedSlaughter_BillLb)
-
-# supp_sl_MODEL <- obsEst_sl_Supply %>% select(Year, slSM = sl_obs)
-# supp_sl_MODEL <- quantities_prices_capK %>% select(Year, slSM)
-
-EQestObsSLNII <- left_join(EQestSLNII, supp_sl_MODEL) %>% select(Year, slMean, slMedian, slSM) %>% 
-  mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
-
-EQestObsSLNII 
-
-
-EQestObsSLNII_Err <- EQestObsSLNII %>% select(Year, slMedian, slSM) %>% 
-  mutate(eHat = ((slSM-slMedian)/slSM)*100)
-
-EQestObsSLNII_Err_Median <- median(EQestObsSLNII_Err$eHat) %>% round(2)
-EQestObsSLNII_Err_Max <- max(EQestObsSLNII_Err$eHat) %>% round(2)
-
-
-EQestObsSLNII_R2 <- EQestObsSLNII_Err %>% select(Year, slMedian, slSM) %>% 
-  mutate(resSquared = (slMedian-slSM)^2, totSquared = (slSM - mean(slSM))^2)
-
-EQestObsSLNII_sumSquaredRes <- sum(EQestObsSLNII_R2$resSquared)
-EQestObsSLNII_sumSquaredTotal <- sum(EQestObsSLNII_R2$totSquared)
-
-EQestObsSLNII_RSquared <- 1 -  (EQestObsSLNII_sumSquaredRes/EQestObsSLNII_sumSquaredTotal)
-
-EQestObsSLNII_DiagResPlot <- plot(EQestObsSLNII$slMedian, EQestObsSLNII$errmedian)
-
-
-# Fitted Cull Cow Equilibrium Supply 
-EQquantities_cl_MeansNII <- apply(unique(clNodes_eq[1:25,]), 2, mean)
-EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% as.data.frame()
-names(EQquantities_cl_MeansNII) <- "clMean"
-EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQquantities_cl_MediansNII <- apply(unique(clNodes_eq[1:25,]), 2, median)
-EQquantities_cl_MediansNII <- EQquantities_cl_MediansNII %>% as.data.frame()
-names(EQquantities_cl_MediansNII) <- "clMedian"
-EQquantities_cl_MediansNII <- EQquantities_cl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-EQestCLNII <- merge(EQquantities_cl_MeansNII, EQquantities_cl_MediansNII)
-
-supp_cl_MODEL <- supp_diss_adj %>% select(Year, clSM = cowsCulled_BillLb)
-
-# supp_cl_MODEL <- obsEst_cl_Supply %>% select(Year, clSM = cl_obs)
-# supp_cl_MODEL <- quantities_prices_capK %>% select(Year, clSM)
-
-EQestObsCLNII <- left_join(EQestCLNII, supp_cl_MODEL) %>% select(Year, clMean, clMedian, clSM) %>% 
-  mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
-EQestObsCLNII
-
-EQestObsCLNII_Err <- EQestObsCLNII %>% select(Year, clMedian, clSM) %>% 
-  mutate(eHat = ((clSM-clMedian)/clSM)*100)
-
-EQestObsCLNII_Err_Median <- median(EQestObsCLNII_Err$eHat) %>% round(2)
-EQestObsCLNII_Err_Max <- max(EQestObsCLNII_Err$eHat) %>% round(2)
-
-
-EQestObsCLNII_R2 <- EQestObsCLNII_Err %>% select(Year, clMedian, clSM) %>% filter(Year >= 1990) %>%
-  mutate(resSquared = (clMedian-clSM)^2, totSquared = (clSM - mean(clSM))^2)
-
-EQestObsCLNII_sumSquaredRes <- sum(EQestObsCLNII_R2$resSquared)
-EQestObsCLNII_sumSquaredTotal <- sum(EQestObsCLNII_R2$totSquared)
-
-EQestObsCLNII_RSquared <- 1 -  (EQestObsCLNII_sumSquaredRes/EQestObsCLNII_sumSquaredTotal)
-
-EQestObsCLNII_DiagResPlot <- plot(EQestObsCLNII$clMedian, EQestObsCLNII$errmedian)
-
-
-merge(EQestObsSLNII %>% select(-errMean, -errmedian), 
-      EQestObsCLNII %>% select(-errMean, -errmedian)) %>% 
-  select(Year, slSM, slMedian, clSM, clMedian) %>% round(2) %>% filter(Year >= 2010)
-
-
-#### Fitted Total Equilibrium Supply 
-
-EQestTSNII <- merge(EQestCLNII, EQestSLNII) %>% transmute(Year = Year, TSmean = slMean + clMean, 
-                                                          TSmedian = slMedian + clMedian)
-
-totalSupply <- supp_diss_adj %>% transmute(Year = Year, TS = TotalSupply)
-
-EQestObsTSNII <- left_join(EQestTSNII,totalSupply) %>% select(Year, TSmean, TSmedian, TS) %>% 
-  mutate(errMean = (TS - TSmean), errmedian = (TS- TSmedian)) %>% round(4)
-
-EQestObsTSNII %>% select(Year, TSmedian, TS) %>% filter(Year >= 2010) %>%
-  select(Year, TS, TSmedian) %>% round(2)
-
-
-
-#### Final iterations quantities
-# Fed Cattle Supply
-ITRquantities_sl_MeansNII <- apply(slNodes_itr[1:25,], 2, mean)
-ITRquantities_sl_MeansNII <- ITRquantities_sl_MeansNII %>% as.data.frame()
-names(ITRquantities_sl_MeansNII) <- "slMean"
-ITRquantities_sl_MeansNII <- ITRquantities_sl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRquantities_sl_MediansNII <- apply(slNodes_itr[1:25,], 2, median)
-ITRquantities_sl_MediansNII <- ITRquantities_sl_MediansNII %>% as.data.frame()
-names(ITRquantities_sl_MediansNII) <- "slMedian"
-ITRquantities_sl_MediansNII <- ITRquantities_sl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRestSLNII <- merge(ITRquantities_sl_MeansNII, ITRquantities_sl_MediansNII)
-
-supp_sl_MODEL <- supp_diss_adj %>% select(Year, slSM = fedSlaughter_BillLb)
-
-ITRestObsSLNII <- left_join(ITRestSLNII, supp_sl_MODEL) %>% select(Year, slMean, slMedian, slSM) %>% 
-  mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
-ITRestObsSLNII
-
-# Cull Cow Supply
-ITRquantities_cl_MeansNII <- apply(clNodes_itr[1:25,], 2, mean)
-ITRquantities_cl_MeansNII <- ITRquantities_cl_MeansNII %>% as.data.frame()
-names(ITRquantities_cl_MeansNII) <- "clMean"
-ITRquantities_cl_MeansNII <- ITRquantities_cl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRquantities_cl_MediansNII <- apply(clNodes_itr[1:25,], 2, median)
-ITRquantities_cl_MediansNII <- ITRquantities_cl_MediansNII %>% as.data.frame()
-names(ITRquantities_cl_MediansNII) <- "clMedian"
-ITRquantities_cl_MediansNII <- ITRquantities_cl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRestCLNII <- merge(ITRquantities_cl_MeansNII, ITRquantities_cl_MediansNII)
-
-supp_cl_MODEL <- supp_diss_adj %>% select(Year, clSM = cowsCulled_BillLb)
-
-ITRestObsCLNII <- left_join(ITRestCLNII, supp_cl_MODEL) %>% select(Year, clMean, clMedian, clSM) %>% 
-  mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
-ITRestObsCLNII
-
-merge(ITRestObsSLNII %>% select(-errMean, -errmedian), 
-      ITRestObsCLNII %>% select(-errMean, -errmedian)) %>% 
-  select(Year, slSM, slMedian, clSM, clMedian) %>% round(2) %>% filter(Year >= 2010)
-
-
-### Fitted fed cattle final iterated prices
-
-ITRprices_ps_MeansNII <- apply(prices_ps_itr[1:25,], 2, mean)
-ITRprices_ps_MeansNII <- ITRprices_ps_MeansNII %>% as.data.frame()
-names(ITRprices_ps_MeansNII) <- "psMean"
-ITRprices_ps_MeansNII <- ITRprices_ps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRprices_ps_MediansNII <- apply(prices_ps_itr[1:25,], 2, median)
-ITRprices_ps_MediansNII <- ITRprices_ps_MediansNII %>% as.data.frame()
-names(ITRprices_ps_MediansNII) <- "psMedian"
-ITRprices_ps_MediansNII <- ITRprices_ps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRestPSNII <- merge(ITRprices_ps_MeansNII, ITRprices_ps_MediansNII)
-
-ITRestObsPSNII <- left_join(ITRestPSNII,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
-  mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
-
-ITRestObsPSNII
-
-###### Fitted Cull Cow Equilibrium prices
-ITRprices_pc_MeansNII <- apply(prices_pc_itr[1:25,], 2, mean)
-ITRprices_pc_MeansNII <- ITRprices_pc_MeansNII %>% as.data.frame()
-names(ITRprices_pc_MeansNII) <- "pcMean"
-ITRprices_pc_MeansNII <- ITRprices_pc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRprices_pc_MediansNII <- apply(prices_pc_itr[1:25,], 2, median)
-ITRprices_pc_MediansNII <- ITRprices_pc_MediansNII %>% as.data.frame()
-names(ITRprices_pc_MediansNII) <- "pcMedian"
-ITRprices_pc_MediansNII <- ITRprices_pc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
-  select(Year, everything())
-
-ITRestPCNII <- merge(ITRprices_pc_MeansNII, ITRprices_pc_MediansNII)
-
-ITRestObsPCNII <- left_join(ITRestPCNII,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
-  mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
-
-ITRestObsPCNII
-
-mergedPricesITR <- merge(ITRestObsPSNII %>% select(-errMean, -errmedian), 
-                      ITRestObsPCNII %>% select(-errMean, -errmedian)) %>% select(Year, ps, psMedian, psMean, 
-                                                                                 pc, pcMedian, pcMean) %>%
-  filter(Year >= 2010)
-mergedPricesITR[,-1] <- mergedPricesITR[,-1] * 100
+# mu_Tildes_MeansNII <- apply(unique(mu_Tildes_eq[1:25,]), 2, mean)
+# mu_Tildes_MeansNII <- mu_Tildes_MeansNII %>% as.data.frame()
+# names(mu_Tildes_MeansNII) <- "muMean"
+# mu_Tildes_MeansNII <- mu_Tildes_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# mu_Tildes_MediansNII <- apply(unique(mu_Tildes_eq[1:25,]), 2, median)
+# mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% as.data.frame()
+# names(mu_Tildes_MediansNII) <- "muMedian"
+# mu_Tildes_MediansNII <- mu_Tildes_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# mu_Tildes_MMNII <- merge(mu_Tildes_MeansNII, mu_Tildes_MediansNII)
+# 
+# # s tildes
+# s_Tildes_MeansNII <- apply(unique(s_Tildes_eq[1:25,]), 2, mean)
+# s_Tildes_MeansNII <- s_Tildes_MeansNII %>% as.data.frame()
+# names(s_Tildes_MeansNII) <- "sMean"
+# s_Tildes_MeansNII <- s_Tildes_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# s_Tildes_MediansNII <- apply(unique(s_Tildes_eq[1:25,]), 2, median)
+# s_Tildes_MediansNII <- s_Tildes_MediansNII %>% as.data.frame()
+# names(s_Tildes_MediansNII) <- "sMedian"
+# s_Tildes_MediansNII <- s_Tildes_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# s_Tildes_MMNII <- merge(s_Tildes_MeansNII, s_Tildes_MediansNII)
+# 
+# 
+# merge(mu_Tildes_MMNII,s_Tildes_MMNII) %>% select(Year, muMedian, sMedian) %>% filter(Year >2009) %>% round(3)
+# 
+# 
+# ###### Fitted Fed Cattle Equilibrium prices
+# 
+# EQprices_ps_MeansNII <- apply(unique(prices_ps_eq[1:25,]), 2, mean)
+# EQprices_ps_MeansNII <- EQprices_ps_MeansNII %>% as.data.frame()
+# names(EQprices_ps_MeansNII) <- "psMean"
+# EQprices_ps_MeansNII <- EQprices_ps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQprices_ps_MediansNII <- apply(unique(prices_ps_eq[1:25,]), 2, median)
+# EQprices_ps_MediansNII <- EQprices_ps_MediansNII %>% as.data.frame()
+# names(EQprices_ps_MediansNII) <- "psMedian"
+# EQprices_ps_MediansNII <- EQprices_ps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQestPSNII <- merge(EQprices_ps_MeansNII, EQprices_ps_MediansNII)
+# 
+# EQestObsPSNII <- left_join(EQestPSNII,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
+#   mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
+# 
+# EQestObsPSNII
+# 
+# EQestObsPSNII_Err <- EQestObsPSNII %>% select(Year, psMedian, ps) %>% 
+#   mutate(eHat = ((ps-psMedian)/ps)* 100)
+# 
+# EQestObsPSNII_Err_Median <- median(EQestObsPSNII_Err$eHat) %>% round(2)
+# EQestObsPSNII_Err_Max <- max(EQestObsPSNII_Err$eHat) %>% round(2)
+# 
+# ###### Fitted Cull Cow Equilibrium prices
+# EQprices_pc_MeansNII <- apply(unique(prices_pc_eq[1:25,]), 2, mean)
+# EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% as.data.frame()
+# names(EQprices_pc_MeansNII) <- "pcMean"
+# EQprices_pc_MeansNII <- EQprices_pc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQprices_pc_MediansNII <- apply(unique(prices_pc_eq[1:25,]), 2, median)
+# EQprices_pc_MediansNII <- EQprices_pc_MediansNII %>% as.data.frame()
+# names(EQprices_pc_MediansNII) <- "pcMedian"
+# EQprices_pc_MediansNII <- EQprices_pc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQestPCNII <- merge(EQprices_pc_MeansNII, EQprices_pc_MediansNII)
+# 
+# EQestObsPCNII <- left_join(EQestPCNII,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
+#   mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
+# 
+# EQestObsPCNII
+# 
+# EQestObsPCNII_Err <- EQestObsPCNII %>% select(Year, pcMedian, pc) %>% 
+#   mutate(eHat = ((pc-pcMedian)/pc)*100)
+# 
+# EQestObsPCNII_Err_Median <- median(EQestObsPCNII_Err$eHat) %>% round(2)
+# EQestObsPCNII_Err_Max <- max(EQestObsPCNII_Err$eHat) %>% round(2)
+# 
+# 
+# EQestObsPCNII_R2 <- EQestObsPCNII_Err %>% select(Year, pcMedian, pc) %>% 
+#   mutate(resSquared = (pcMedian-pc)^2, totSquared = (pc - mean(pc))^2)
+# 
+# EQestObsPCNII_sumSquaredRes <- sum(EQestObsPCNII_R2$resSquared)
+# EQestObsPCNII_sumSquaredTotal <- sum(EQestObsPCNII_R2$totSquared)
+# 
+# EQestObsPCNII_RSquared <- 1 -  (EQestObsPCNII_sumSquaredRes/EQestObsPCNII_sumSquaredTotal)
+# 
+# 
+# 
+# mergedPrices <- merge(EQestObsPSNII %>% select(-errMean, -errmedian), 
+#       EQestObsPCNII %>% select(-errMean, -errmedian)) %>% select(Year, ps, psMedian, 
+#                                                                  pc, pcMedian) %>%
+#   filter(Year >= 2010)
+# mergedPrices[,-1] <- mergedPrices[,-1] * 100
+# 
+# 
+# 
+# 
+# ###### Fitted Holding costs
+# EQcosts_hc_MeansNII <- apply(unique(prices_hc_eq[1:25,]), 2, mean)
+# EQcosts_hc_MeansNII <- EQcosts_hc_MeansNII %>% as.data.frame()
+# names(EQcosts_hc_MeansNII) <- "hcMean"
+# EQcosts_hc_MeansNII <- EQcosts_hc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQcosts_hc_MediansNII <- apply(unique(prices_hc_eq[1:25,]), 2, median)
+# EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% as.data.frame()
+# names(EQcosts_hc_MediansNII) <- "hcMedian"
+# EQcosts_hc_MediansNII <- EQcosts_hc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQestHCNII <- merge(EQcosts_hc_MeansNII, EQcosts_hc_MediansNII)
+# 
+# ###### Fitted Expected Prices
+# EQprices_Eps_MeansNII <- apply(unique(expected_PS_eq[1:25,]), 2, mean)
+# EQprices_Eps_MeansNII <- EQprices_Eps_MeansNII %>% as.data.frame()
+# names(EQprices_Eps_MeansNII) <- "EpsMean"
+# EQprices_Eps_MeansNII <- EQprices_Eps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQprices_Eps_MediansNII <- apply(unique(expected_PS_eq[1:25,]), 2, median)
+# EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% as.data.frame()
+# names(EQprices_Eps_MediansNII) <- "EpsMedian"
+# EQprices_Eps_MediansNII <- EQprices_Eps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+# 
+# EQestEPSNII <- merge(EQprices_Eps_MeansNII, EQprices_Eps_MediansNII)
+# 
+# 
+# EQprices_Epc_MeansNII <- apply(unique(expected_PC_eq[1:25,]), 2, mean)
+# EQprices_Epc_MeansNII <- EQprices_Epc_MeansNII %>% as.data.frame()
+# names(EQprices_Epc_MeansNII) <- "EpcMean"
+# EQprices_Epc_MeansNII <- EQprices_Epc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+# 
+# EQprices_Epc_MediansNII <- apply(unique(expected_PC_eq[1:25,]), 2, median)
+# EQprices_Epc_MediansNII <- EQprices_Epc_MediansNII %>% as.data.frame()
+# names(EQprices_Epc_MediansNII) <- "EpcMedian"
+# EQprices_Epc_MediansNII <- EQprices_Epc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% select(Year, everything())
+# 
+# EQestEPCNII <- merge(EQprices_Epc_MeansNII, EQprices_Epc_MediansNII)
+# 
+# 
+# # Fitted Fed Cattle Equilibrium Supply
+# EQquantities_sl_MeansNII <- apply(unique(slNodes_eq[1:25,]), 2, mean)
+# EQquantities_sl_MeansNII <- EQquantities_sl_MeansNII %>% as.data.frame()
+# names(EQquantities_sl_MeansNII) <- "slMean"
+# EQquantities_sl_MeansNII <- EQquantities_sl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQquantities_sl_MediansNII <- apply(unique(slNodes_eq[1:25,]), 2, median)
+# EQquantities_sl_MediansNII <- EQquantities_sl_MediansNII %>% as.data.frame()
+# names(EQquantities_sl_MediansNII) <- "slMedian"
+# EQquantities_sl_MediansNII <- EQquantities_sl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQestSLNII <- merge(EQquantities_sl_MeansNII, EQquantities_sl_MediansNII)
+# 
+# supp_sl_MODEL <- supp_diss_adj %>% select(Year, slSM = fedSlaughter_BillLb)
+# 
+# # supp_sl_MODEL <- obsEst_sl_Supply %>% select(Year, slSM = sl_obs)
+# # supp_sl_MODEL <- quantities_prices_capK %>% select(Year, slSM)
+# 
+# EQestObsSLNII <- left_join(EQestSLNII, supp_sl_MODEL) %>% select(Year, slMean, slMedian, slSM) %>% 
+#   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
+# 
+# EQestObsSLNII 
+# 
+# 
+# EQestObsSLNII_Err <- EQestObsSLNII %>% select(Year, slMedian, slSM) %>% 
+#   mutate(eHat = ((slSM-slMedian)/slSM)*100)
+# 
+# EQestObsSLNII_Err_Median <- median(EQestObsSLNII_Err$eHat) %>% round(2)
+# EQestObsSLNII_Err_Max <- max(EQestObsSLNII_Err$eHat) %>% round(2)
+# 
+# 
+# EQestObsSLNII_R2 <- EQestObsSLNII_Err %>% select(Year, slMedian, slSM) %>% 
+#   mutate(resSquared = (slMedian-slSM)^2, totSquared = (slSM - mean(slSM))^2)
+# 
+# EQestObsSLNII_sumSquaredRes <- sum(EQestObsSLNII_R2$resSquared)
+# EQestObsSLNII_sumSquaredTotal <- sum(EQestObsSLNII_R2$totSquared)
+# 
+# EQestObsSLNII_RSquared <- 1 -  (EQestObsSLNII_sumSquaredRes/EQestObsSLNII_sumSquaredTotal)
+# 
+# EQestObsSLNII_DiagResPlot <- plot(EQestObsSLNII$slMedian, EQestObsSLNII$errmedian)
+# 
+# 
+# # Fitted Cull Cow Equilibrium Supply 
+# EQquantities_cl_MeansNII <- apply(unique(clNodes_eq[1:25,]), 2, mean)
+# EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% as.data.frame()
+# names(EQquantities_cl_MeansNII) <- "clMean"
+# EQquantities_cl_MeansNII <- EQquantities_cl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQquantities_cl_MediansNII <- apply(unique(clNodes_eq[1:25,]), 2, median)
+# EQquantities_cl_MediansNII <- EQquantities_cl_MediansNII %>% as.data.frame()
+# names(EQquantities_cl_MediansNII) <- "clMedian"
+# EQquantities_cl_MediansNII <- EQquantities_cl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# EQestCLNII <- merge(EQquantities_cl_MeansNII, EQquantities_cl_MediansNII)
+# 
+# supp_cl_MODEL <- supp_diss_adj %>% select(Year, clSM = cowsCulled_BillLb)
+# 
+# # supp_cl_MODEL <- obsEst_cl_Supply %>% select(Year, clSM = cl_obs)
+# # supp_cl_MODEL <- quantities_prices_capK %>% select(Year, clSM)
+# 
+# EQestObsCLNII <- left_join(EQestCLNII, supp_cl_MODEL) %>% select(Year, clMean, clMedian, clSM) %>% 
+#   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
+# EQestObsCLNII
+# 
+# EQestObsCLNII_Err <- EQestObsCLNII %>% select(Year, clMedian, clSM) %>% 
+#   mutate(eHat = ((clSM-clMedian)/clSM)*100)
+# 
+# EQestObsCLNII_Err_Median <- median(EQestObsCLNII_Err$eHat) %>% round(2)
+# EQestObsCLNII_Err_Max <- max(EQestObsCLNII_Err$eHat) %>% round(2)
+# 
+# 
+# EQestObsCLNII_R2 <- EQestObsCLNII_Err %>% select(Year, clMedian, clSM) %>% filter(Year >= 1990) %>%
+#   mutate(resSquared = (clMedian-clSM)^2, totSquared = (clSM - mean(clSM))^2)
+# 
+# EQestObsCLNII_sumSquaredRes <- sum(EQestObsCLNII_R2$resSquared)
+# EQestObsCLNII_sumSquaredTotal <- sum(EQestObsCLNII_R2$totSquared)
+# 
+# EQestObsCLNII_RSquared <- 1 -  (EQestObsCLNII_sumSquaredRes/EQestObsCLNII_sumSquaredTotal)
+# 
+# EQestObsCLNII_DiagResPlot <- plot(EQestObsCLNII$clMedian, EQestObsCLNII$errmedian)
+# 
+# 
+# merge(EQestObsSLNII %>% select(-errMean, -errmedian), 
+#       EQestObsCLNII %>% select(-errMean, -errmedian)) %>% 
+#   select(Year, slSM, slMedian, clSM, clMedian) %>% round(2) %>% filter(Year >= 2010)
+# 
+# 
+# #### Fitted Total Equilibrium Supply 
+# 
+# EQestTSNII <- merge(EQestCLNII, EQestSLNII) %>% transmute(Year = Year, TSmean = slMean + clMean, 
+#                                                           TSmedian = slMedian + clMedian)
+# 
+# totalSupply <- supp_diss_adj %>% transmute(Year = Year, TS = TotalSupply)
+# 
+# EQestObsTSNII <- left_join(EQestTSNII,totalSupply) %>% select(Year, TSmean, TSmedian, TS) %>% 
+#   mutate(errMean = (TS - TSmean), errmedian = (TS- TSmedian)) %>% round(4)
+# 
+# EQestObsTSNII %>% select(Year, TSmedian, TS) %>% filter(Year >= 2010) %>%
+#   select(Year, TS, TSmedian) %>% round(2)
+# 
+# 
+# 
+# #### Final iterations quantities
+# # Fed Cattle Supply
+# ITRquantities_sl_MeansNII <- apply(slNodes_itr[1:25,], 2, mean)
+# ITRquantities_sl_MeansNII <- ITRquantities_sl_MeansNII %>% as.data.frame()
+# names(ITRquantities_sl_MeansNII) <- "slMean"
+# ITRquantities_sl_MeansNII <- ITRquantities_sl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRquantities_sl_MediansNII <- apply(slNodes_itr[1:25,], 2, median)
+# ITRquantities_sl_MediansNII <- ITRquantities_sl_MediansNII %>% as.data.frame()
+# names(ITRquantities_sl_MediansNII) <- "slMedian"
+# ITRquantities_sl_MediansNII <- ITRquantities_sl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRestSLNII <- merge(ITRquantities_sl_MeansNII, ITRquantities_sl_MediansNII)
+# 
+# supp_sl_MODEL <- supp_diss_adj %>% select(Year, slSM = fedSlaughter_BillLb)
+# 
+# ITRestObsSLNII <- left_join(ITRestSLNII, supp_sl_MODEL) %>% select(Year, slMean, slMedian, slSM) %>% 
+#   mutate(errMean = (slSM - slMean), errmedian = (slSM - slMedian)) %>% round(4)
+# ITRestObsSLNII
+# 
+# # Cull Cow Supply
+# ITRquantities_cl_MeansNII <- apply(clNodes_itr[1:25,], 2, mean)
+# ITRquantities_cl_MeansNII <- ITRquantities_cl_MeansNII %>% as.data.frame()
+# names(ITRquantities_cl_MeansNII) <- "clMean"
+# ITRquantities_cl_MeansNII <- ITRquantities_cl_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRquantities_cl_MediansNII <- apply(clNodes_itr[1:25,], 2, median)
+# ITRquantities_cl_MediansNII <- ITRquantities_cl_MediansNII %>% as.data.frame()
+# names(ITRquantities_cl_MediansNII) <- "clMedian"
+# ITRquantities_cl_MediansNII <- ITRquantities_cl_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRestCLNII <- merge(ITRquantities_cl_MeansNII, ITRquantities_cl_MediansNII)
+# 
+# supp_cl_MODEL <- supp_diss_adj %>% select(Year, clSM = cowsCulled_BillLb)
+# 
+# ITRestObsCLNII <- left_join(ITRestCLNII, supp_cl_MODEL) %>% select(Year, clMean, clMedian, clSM) %>% 
+#   mutate(errMean = (clSM - clMean), errmedian = (clSM - clMedian)) %>% round(4)
+# ITRestObsCLNII
+# 
+# merge(ITRestObsSLNII %>% select(-errMean, -errmedian), 
+#       ITRestObsCLNII %>% select(-errMean, -errmedian)) %>% 
+#   select(Year, slSM, slMedian, clSM, clMedian) %>% round(2) %>% filter(Year >= 2010)
+# 
+# 
+# ### Fitted fed cattle final iterated prices
+# 
+# ITRprices_ps_MeansNII <- apply(prices_ps_itr[1:25,], 2, mean)
+# ITRprices_ps_MeansNII <- ITRprices_ps_MeansNII %>% as.data.frame()
+# names(ITRprices_ps_MeansNII) <- "psMean"
+# ITRprices_ps_MeansNII <- ITRprices_ps_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRprices_ps_MediansNII <- apply(prices_ps_itr[1:25,], 2, median)
+# ITRprices_ps_MediansNII <- ITRprices_ps_MediansNII %>% as.data.frame()
+# names(ITRprices_ps_MediansNII) <- "psMedian"
+# ITRprices_ps_MediansNII <- ITRprices_ps_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRestPSNII <- merge(ITRprices_ps_MeansNII, ITRprices_ps_MediansNII)
+# 
+# ITRestObsPSNII <- left_join(ITRestPSNII,quantities_prices_capK) %>% select(Year,psMean, psMedian, ps) %>% 
+#   mutate(errMean = (ps - psMean), errmedian = (ps - psMedian)) %>% round(4)
+# 
+# ITRestObsPSNII
+# 
+# ###### Fitted Cull Cow Equilibrium prices
+# ITRprices_pc_MeansNII <- apply(prices_pc_itr[1:25,], 2, mean)
+# ITRprices_pc_MeansNII <- ITRprices_pc_MeansNII %>% as.data.frame()
+# names(ITRprices_pc_MeansNII) <- "pcMean"
+# ITRprices_pc_MeansNII <- ITRprices_pc_MeansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRprices_pc_MediansNII <- apply(prices_pc_itr[1:25,], 2, median)
+# ITRprices_pc_MediansNII <- ITRprices_pc_MediansNII %>% as.data.frame()
+# names(ITRprices_pc_MediansNII) <- "pcMedian"
+# ITRprices_pc_MediansNII <- ITRprices_pc_MediansNII %>% mutate(Year = quantities_prices_capK$Year) %>% 
+#   select(Year, everything())
+# 
+# ITRestPCNII <- merge(ITRprices_pc_MeansNII, ITRprices_pc_MediansNII)
+# 
+# ITRestObsPCNII <- left_join(ITRestPCNII,quantities_prices_capK) %>% select(Year,pcMean, pcMedian, pc) %>% 
+#   mutate(errMean = (pc - pcMean), errmedian = (pc - pcMedian)) %>% round(4)
+# 
+# ITRestObsPCNII
+# 
+# mergedPricesITR <- merge(ITRestObsPSNII %>% select(-errMean, -errmedian), 
+#                       ITRestObsPCNII %>% select(-errMean, -errmedian)) %>% select(Year, ps, psMedian, psMean, 
+#                                                                                  pc, pcMedian, pcMean) %>%
+#   filter(Year >= 2010)
+# mergedPricesITR[,-1] <- mergedPricesITR[,-1] * 100
 
 
 

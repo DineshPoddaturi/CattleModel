@@ -175,10 +175,10 @@ pc_psR <- merge(pcsR,pssR)
 
 ##### Since I do not have data for 2006 and  2007. I used the national data for these two years. 
 ##### The following code snippet does that.
-pc_ps_cwt_I <- pc_ps_cwt %>% filter(Year>=2002&Year<=2022)
+pc_ps_cwt_I <- pc_ps_cwt %>% filter(Year>=2002&Year<=2023)
 pc_ps_cwtR <- pc_ps_cwtR %>% mutate(pcs_cwt= coalesce(pcs_cwt, pc_ps_cwt_I$pcs_cwt)) %>% round(5)
 
-pc_ps_I <- pc_ps %>% filter(Year>=2002&Year<=2022)
+pc_ps_I <- pc_ps %>% filter(Year>=2002&Year<=2023)
 pc_psR <- pc_psR %>% mutate(pc= coalesce(pc, pc_ps_I$pc)) %>% round(5)
 
 ######################### Here we read the number of animals slaughtered steers, heifers, and cows ##################
@@ -299,9 +299,125 @@ supp_slR <- StockR %>% select(Year, K, k3) %>%
   mutate(fedSlaughter = g * lag(K,1) - k3) %>% select(Year, fedSlaughter)
 
 # Determining the supply of cull cows (in head)
-supp_clR <-  StockR %>% select(Year, k7, k8, k9, k10) %>% 
-  mutate(cowsCulled = k10 + (k9 - lead(k10,1)) + (k8 - lead(k9,1)) + (k7 - lead(k8,1)) ) %>% 
-  select(Year, cowsCulled)
+# Before determining he supply of the cull cows, first I check the cull cow price and holding costs
+# To compute holding costs, first I assume the cows are culled when they are 9 years old. This is an approximation for now
+# Why? : Because I need to decide the age distribution of the older animals.
+#### We are in the case where the farmers cull the 9 year old cows
+#### The holding costs will become.
+pc_ps_hcR <- pc_psR %>% mutate( hc = (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1))))
+prices_costsR <- pc_ps_hcR %>% round(5)
+
+StockRc <- StockR %>% filter(Year >= prices_costsR$Year[1]-5 & Year <= prices_costsR$Year[nrow(prices_costsR)])
+clNew1R <- NULL
+
+for(i in 1:nrow(prices_costsR)){
+  
+  # i <- 9
+  
+  yearIR <- prices_costsR$Year[i]
+  
+  psRc <- prices_costsR$ps[i]
+  pcRc <- prices_costsR$pc[i]
+  hcRc <- prices_costsR$hc[i]
+  
+  ##### Here I compute the expected price using Gaussian Quadrature for Integration
+  EpsRc <- sum(as.numeric(psRc) * fedMeshCheb)
+  EpcRc <- sum(as.numeric(pcRc) * cullMeshCheb)
+  
+  expectedValue_k9R <- beta * EpcRc + g * (beta^3) * EpsRc - (1+g*beta*(gamma0+beta*gamma1)) * hcRc
+  
+  #If expectedValue_k9 is > pc then we have 9 year olds in the stock , else we cull all the 9 year olds.
+  # This mean no more 10 year olds. See pages 35 and so on in dissertation
+  if(round(expectedValue_k9R,3) > round(pcRc,3)){
+    # We should have 9-year olds in the stock. All 10-years are culled.
+    k9_OldR <- 1
+  }else if(round(expectedValue_k9R,3) == round(pcRc,3)){
+    # We should have 8-year olds in the stock. All 10-years and 9-years are culled
+    k9_OldR <- 0
+  } else if(round(expectedValue_k9R,3) < round(pcRc,3)){
+    # We should have 7-year olds in the stock, All the 10,9,8 year old cows are culled
+    k9_OldR <- 2
+  }
+  
+  k9_OldR
+  
+  if(k9_OldR == 1){
+    
+    # mergedForecast_Proj$k9[mergedForecast_Proj$Year == yearI] <- mergedForecast_Proj %>% filter(Year == yearI) %>%
+    #   mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% 
+    #   mutate(k9 = if_else(k9 < 0, 0, k9)) %>% select(k9) %>% as.numeric()
+    
+    StockRc$k9[StockRc$Year == yearIR] <- StockRc %>% filter(Year == yearIR) %>%
+        mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% 
+        mutate(k9 = if_else(k9 < 0, 0, delta * StockRc$k8[StockRc$Year == yearIR-1])) %>% select(k9) %>% as.numeric()
+    
+    # clNew1R[i] <- StockRc %>% filter(Year == yearIR) %>%
+    #   mutate(clSupp = (k10 + (1-delta) * k9 + (1-delta) * k8 + (1-delta) * k7)) %>%
+    #   select(clSupp) %>% as.numeric()
+    
+    clNew1R[i] <- StockRc %>% filter(Year == yearIR) %>%
+      mutate(clSupp = ((k9 + (1-delta) * k8 + (1-delta) * k7) * 1 +
+                         (delta * (k8 + k7 + k6) - (k7 + k8 + k9)))) %>%
+      select(clSupp) %>% as.numeric()
+    
+  }else if(k9_OldR == 0) {
+    
+    k9NextR <- StockRc %>% filter(Year == yearIR) %>%
+      mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% 
+      mutate(k9 = if_else(k9 < 0, 0, delta * StockRc$k8[StockRc$Year == yearIR-1])) %>% select(k9) %>% 
+      as.numeric()
+    
+    # clNew1R[i] <- StockRc %>% filter(Year == yearIR) %>%
+    #   mutate(clSupp = (k10 + k9NextR + k8 + (1-delta) * k7)) %>%
+    #   select(clSupp) %>%  as.numeric()
+    
+    clNew1R <- StockRc %>% filter(Year == yearIR) %>%
+      mutate(clSupp = ((k9NextR + (1-delta) * k8 + (1-delta) * k7) * 1 +
+                         (delta * (k8 + k7 + k6) - (k7 + k8 + k9NextR)))) %>%
+      select(clSupp) %>% as.numeric()
+    
+    StockRc$k9[StockRc$Year == yearIR] <- 0
+    
+  } else if(k9_OldR == 2){
+    
+    # k9Next <- mergedForecast_Proj %>% filter(Year == yearI) %>%
+    #   mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% mutate(k9 = if_else(k9 < 0, 0, k9)) %>% select(k9) %>% 
+    #   as.numeric()
+    
+    k9NextR <- StockRc %>% filter(Year == yearIR) %>%
+      mutate(k9 = K - (k3+k4+k5+k6+k7+k8)) %>% 
+      mutate(k9 = if_else(k9 < 0, 0, delta * StockRc$k8[StockRc$Year == yearIR-1])) %>% select(k9) %>% 
+      as.numeric()
+    
+    k8NextR <- StockRc$k8[StockRc$Year == yearIR]
+    
+    # clNew1R[i] <- StockRc %>% filter(Year == yearIR) %>%
+    #   mutate(clSupp = (k10 + k9NextR + k8NextR + (1-delta) * k7) * (Cull_avg/1000000000)) %>%
+    #   select(clSupp) %>% as.numeric()
+    
+    clNew1R[i] <- StockRc %>% filter(Year == yearIR) %>%
+      mutate(clSupp = ((k9NextR + (1-delta) * k8NextR + (1-delta) * k7) * 1 +
+                         (delta * (k8NextR + k7 + k6) - (k7 + k8 + k9NextR)))) %>%
+      select(clSupp) %>% as.numeric()
+    
+    StockRc$k9[StockRc$Year == yearIR] <- 0
+    StockRc$k8[StockRc$Year == yearIR] <- 0
+    StockRc$k7[StockRc$Year == yearIR] <- StockRc %>% filter(Year == yearIR-1) %>%
+      mutate(k7 = delta * k6) %>% select(k7) %>% as.numeric()
+  }
+  
+}
+
+clSuppR <- as.data.frame(clNew1R) %>% mutate(Year = prices_costsR$Year, 
+                                             cowsCulled = clNew1R) %>% select(Year, cowsCulled)
+
+supp_clR <- clSuppR
+
+# supp_clR <-  StockRc %>% select(Year, k7, k8, k9, k10) %>%
+#   mutate(cowsCulled = k10 + (k9 - lead(k10,1)) + (k8 - lead(k9,1)) + (k7 - lead(k8,1)) ) %>%
+#   select(Year, cowsCulled)
+
+
 
 #putting dressed weights and supply together
 supplyDressedWeightsListR <- list(dressedWeights_sl_clR, supp_slR, supp_clR)
@@ -374,10 +490,7 @@ supp_diss_adjR %>% ggplot(aes(x=Year))+ geom_line(aes(y=TotalDiss,color="Dissape
 
 
 
-#### We are in the case where the farmers cull the 9 year old cows
-#### The holding costs will become. 
-pc_ps_hcR <- pc_psR %>% mutate( hc = (((g * (beta^3) * ps) + (beta - 1) * pc)/(1 + g * beta * (gamma0 + beta * gamma1))))
-prices_costsR <- pc_ps_hcR %>% round(5)
+
 
 ####### I read calf crop data. These are in number of head
 calf_cropR <- read_excel("./RegionalData/CalfCrop-TX-OK-NM.xlsx") %>% as.data.frame()
@@ -513,7 +626,7 @@ sl_stockR <- supp_slR %>% transmute(Year = Year, sl_est = fedSlaughter_BillLb, s
 cl_stockR <- supp_clR %>% transmute(Year = Year, cl_est = cowsCulled_BillLb, clHead = cowsCulled)
 
 dataListR <- list(sl_stockR, cl_stockR, slSupplyShockGaussianR, 
-                 clSupplyShockgaussianR, dressedWeights_sl_clR, calf_cropR, StockR)
+                 clSupplyShockgaussianR, dressedWeights_sl_clR, calf_cropR, StockRc)
 
 allStockShocksR <- Reduce(function(...) merge(...), dataListR) %>% as.data.frame()
 
@@ -548,6 +661,9 @@ newCL_1R <- allStockShocksR %>%
   transmute(Year = Year + 1, clt = (k9 + (1-delta) * k8 + (1-delta) * k7) * clShock +
               (delta * (k8 + k7 + k6) - (k7 + k8 + k9)),
             clLbs = clt * Cull_avg/1000000000)
+
+# newCL_1R <- supp_clR %.% mutate(clLbs = cowsCulled_BillLb)
+
 
 # newCL_3 <- allStockShocks %>%
 #   transmute(Year = Year + 3, clt = (delta^2) * (k7 + (1-delta) * k6 + (1-delta) * k5) * clShock +
@@ -765,11 +881,11 @@ optKFunctionR <- function(K, ps, pc, A, B){
 
 ##### Here setting up the data frame for the quantities. Note: It contains K_{t-1} and K_{j,t} for j = {10,9,8,7}
 
-### The following dataframe contains the cows of age 7, 8, 9, 10 at time t.
-K_jtR <- StockR %>% select(Year, k7, k8, k9, k10)
+### The following data frame contains the cows of age 7, 8, 9, 10 at time t.
+K_jtR <- StockRc %>% select(Year, k7, k8, k9, k10)
 
-#### The followng dataframe has K_{t-1} i.e., the previous period stock
-K_1tR <- StockR %>% transmute(Year = Year+1, K = K)
+#### The following data frame has K_{t-1} i.e., the previous period stock
+K_1tR <- StockRc %>% transmute(Year = Year+1, K = K)
 
 capKR <- merge(K_1tR, K_jtR)
 
@@ -1546,8 +1662,6 @@ for(i in 1:nrow(quantities_prices_capKR)){
 
 
 
-
-
 # Estimated Equilibrium Parameters
 
 # mu tildes
@@ -1891,7 +2005,6 @@ slSupply_plotMedianR <- EQestObsSLNR_Head %>% ggplot(aes(x=Year)) +
 
 
 EQestObsCLNR_plots <- EQestObsCLNR %>% select(Year, clMean, clMedian, clSM) %>% filter(Year>=1998) %>% round(2)
-
 
 clSupply_plotMedianR <- EQestObsCLNR_plots %>% ggplot(aes(x=Year)) + 
   geom_line(aes(y= clSM, color = "Observed supply"),size=0.75) + 

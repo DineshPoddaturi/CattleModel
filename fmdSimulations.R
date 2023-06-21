@@ -570,6 +570,7 @@ expHistMin <- stocksImportsExports %>% filter(Year <= 2021 & Year >= 2000) %>% s
 expHistMed <- median(stocksImportsExports$Exports[stocksImportsExports$Year <=2021 & stocksImportsExports$Year >=2000])
 expHistMean <- mean(stocksImportsExports$Exports[stocksImportsExports$Year <=2021 & stocksImportsExports$Year >=2000])
 
+
 # Here I get the percentage of imports and exports (live animals) with respect to K
 expRatioK <- stocksImportsExports %>% transmute(Year = Year, expRatio = Exports/K) %>% filter(Year >= 1990)
 expLM <- stocksImportsExports %>% filter(Year >= 1990) %>% lm(formula=Exports~0+K) %>% summary()

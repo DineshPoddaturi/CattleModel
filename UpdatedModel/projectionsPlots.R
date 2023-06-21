@@ -30,7 +30,7 @@ estProj_CLIIV <- merge(EQestObsCL_Medians ,proj_Q_PIIVIII %>% select(Year, Cl), 
 
 
 
-estProj_PS_plots <- estProj_PSIIV %>% filter(Year >=2016 & Year <= 2033) %>% ggplot(aes(x=Year)) +
+estProj_PS_plots <- estProj_PSIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=psMedian, color="Baseline")) +
   geom_point(aes(y = psMedian, color = "Baseline")) +
   geom_line(aes(y=Ps, color="Projection")) +
@@ -45,7 +45,7 @@ estProj_PS_plots <- estProj_PSIIV %>% filter(Year >=2016 & Year <= 2033) %>% ggp
 
 
 
-estProj_PC_plots <- estProj_PCIIV %>% filter(Year >=2016 & Year <= 2033) %>% ggplot(aes(x=Year)) +
+estProj_PC_plots <- estProj_PCIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y=pcMedian, color="Baseline")) +
   geom_point(aes(y = pcMedian, color = "Baseline")) +
   geom_line(aes(y=Pc, color="Projection")) +
@@ -59,7 +59,7 @@ estProj_PC_plots <- estProj_PCIIV %>% filter(Year >=2016 & Year <= 2033) %>% ggp
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
 
-estProj_SL_plots <- estProj_SLIIV %>% filter(Year >=2016 & Year <= 2033) %>% ggplot(aes(x=Year)) +
+estProj_SL_plots <- estProj_SLIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y= slMedian, color="Baseline")) +
   geom_point(aes(y = slMedian, color = "Baseline")) +
   geom_line(aes(y=Sl, color="Projection")) +
@@ -131,19 +131,19 @@ estProj_PSIII_FAPRI <- merge(estProj_PSIIV,
                              merge(FAPRI_Proj_Ps, USDA_Proj_Ps) %>% filter(Year > 2021),
                              all=TRUE) %>% round(3)
 
-estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2016 & Year <= 2033) %>% ggplot(aes(x=Year)) +
-  geom_line(aes(y=psMedian, color="PS Fitted")) +
-  geom_point(aes(y = psMedian, color = "PS Fitted")) +
-  geom_line(aes(y=Ps, color="PS PROJECTION")) +
-  geom_point(aes(y=Ps, color="PS PROJECTION")) +
-  geom_line(aes(y=FAPRI_Ps, color="FAPRI PROJECTION")) +
-  geom_point(aes(y=FAPRI_Ps, color="FAPRI PROJECTION")) +
-  geom_line(aes(y=USDA_Ps, color="USDA PROJECTION")) +
-  geom_point(aes(y=USDA_Ps, color="USDA PROJECTION")) +
+estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
+  geom_line(aes(y=psMedian, color="Baseline")) +
+  geom_point(aes(y = psMedian, color = "Baseline")) +
+  geom_line(aes(y=Ps, color="Projected")) +
+  geom_point(aes(y=Ps, color="Projected")) +
+  geom_line(aes(y=FAPRI_Ps, color="FAPRI Projection")) +
+  geom_point(aes(y=FAPRI_Ps, color="FAPRI Projection")) +
+  geom_line(aes(y=USDA_Ps, color="USDA Projection")) +
+  geom_point(aes(y=USDA_Ps, color="USDA Projection")) +
   scale_x_continuous(name="Year", 
                      breaks=c(seq(estProj_PSIII_FAPRI$Year[1],
                                   estProj_PSIII_FAPRI$Year[nrow(estProj_PSIII_FAPRI)])))+ 
-  scale_y_continuous(name="Fed Cattle Price", limits = c(100,172,by=5)) +  theme_classic() + 
+  scale_y_continuous(name="Fed Cattle Price", limits = c(100,172,by=2)) +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
@@ -181,7 +181,7 @@ CARD_USDA_FAPRI_TS_ProjIII <- left_join(left_join(EQestObsTS_MediansIIV, FAPRI_P
 CARD_USDA_FAPRI_TS_ProjIII %>% mutate(diffFAPRI = TS - FAPRI_TS, diffUSDA = TS - USDA_TS)
 
 
-CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% filter(Year >=2016 & Year <= 2033) %>% ggplot(aes(x=Year))  + 
+CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year))  + 
   geom_line(aes(y=tsMedian, color="Baseline")) + 
   geom_point(aes(y=tsMedian, color="Baseline")) + 
   geom_line(aes(y=TS, color="Projected")) + 
@@ -193,7 +193,7 @@ CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% filter(Year >=
   scale_x_continuous(name="Year", 
                      breaks=c(seq(CARD_USDA_FAPRI_TS_ProjIII$Year[1],
                                   CARD_USDA_FAPRI_TS_ProjIII$Year[nrow(CARD_USDA_FAPRI_TS_ProjIII)])))+ 
-  scale_y_continuous(name="Total Production Projections", limits = c(20,30,by=5)) +  theme_classic() + 
+  scale_y_continuous(name="Total Production Projections", limits = c(22,30,by=2)) +  theme_classic() + 
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 

@@ -432,11 +432,11 @@ getPsPcEpsEpc_Proj <- function(PsM, PcM, EPsM, EPcM, HcM, SlNew, ClNew, ANew, pa
   psNew <- PsM
   pcNew <- PcM
   
-  psNew_lo <- psNew  - 0.7
-  pcNew_lo <- pcNew - 0.4
+  psNew_lo <- psNew  - 0.55
+  pcNew_lo <- pcNew - 0.55
   
-  psNew_up <- psNew + 0.35
-  pcNew_up <- pcNew + 0.25
+  psNew_up <- psNew + 0.15
+  pcNew_up <- pcNew + 0.15
   
   #### Here we are making sure the lower bound for the prices isn't negative
   if(psNew_lo < 0){
@@ -614,10 +614,6 @@ k8Next <- 0
 
 
 for(i in 1:(nrow(proj_Q_P))){
-  
-  # i <- 2
-  
-  # psM <- 1.670611
   
   # params_mu_s_Proj <- optParamFunction_Proj(sl = slNew, cl = clNew, ps = psM, pc = pcM, thetas = c(1,1), adj = 1)
   # 
@@ -874,7 +870,7 @@ for(i in 1:(nrow(proj_Q_P))){
   
   hcM <- holdingCostsFutures$hc[i]
   
-  # psM <- fedCattleFutures_Proj$futures[i]
+  psM <- fedCattleFutures_Proj$futures[i]
   
   Ps <- getPsPcEpsEpc_Proj(PsM = psM, PcM = pcM, EPsM = EpsM, EPcM = EpcM,
                            HcM = hcM, SlNew = as.numeric(slNew), ClNew = as.numeric(clNew), 
