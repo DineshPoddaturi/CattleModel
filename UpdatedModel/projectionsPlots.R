@@ -1,7 +1,5 @@
 
 ####### Projection Plots
-
-
 # proj_Q_PIIVII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
 
 proj_Q_PIIVIII <- proj_Q_P %>% mutate(Ps = Ps * 100, Pc = Pc * 100) %>% round(3) %>% filter(Ps>0)
@@ -43,6 +41,7 @@ estProj_PS_plots <- estProj_PSIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggp
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
+estProj_PS_plots
 
 
 estProj_PC_plots <- estProj_PCIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
@@ -58,6 +57,8 @@ estProj_PC_plots <- estProj_PCIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggp
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
+estProj_PC_plots
+
 
 estProj_SL_plots <- estProj_SLIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
   geom_line(aes(y= slMedian, color="Baseline")) +
@@ -71,6 +72,9 @@ estProj_SL_plots <- estProj_SLIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggp
   theme(legend.position="bottom", legend.box = "horizontal",text = element_text(size = 12)) +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
+
+estProj_SL_plots
+
 
 
 estProj_CL_plots <- estProj_CLIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggplot(aes(x=Year)) +
@@ -86,10 +90,10 @@ estProj_CL_plots <- estProj_CLIIV %>% filter(Year >=2018 & Year <= 2033) %>% ggp
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
+estProj_CL_plots
 
 #### USDA long term projections
 USDA_Years <- c(seq(from = 2023, to = 2032, by = 1))
-
 
 ## I am taking Steers, 5-area projections from the document. These are in $/CWT
 # USDA_Ps <- c(108.51, 121.06, 128.75, 134.94, 135.48, 137.24, 137.73, 138.08, 138.66, 139.63, 140.86, 142.55)
@@ -148,6 +152,8 @@ estProj_PSIII_plots <- estProj_PSIII_FAPRI %>% filter(Year >=2018 & Year <= 2033
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ 
   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")))
 
+estProj_PSIII_plots
+
 
 FAPRI_Proj_TSIII <- FAPRI_Proj %>% select(-FAPRI_Ps) %>% 
   transmute(Year = FAPRI_Years, FAPRI_TS = FAPRI_TS)  %>% filter(Year >2021)
@@ -169,11 +175,6 @@ EQestObsTS_MediansIIV <- merge(estProj_SLIIVI %>% select(-errMean, -errmedian),
                                estProj_CLIIVI %>% select(-errMean, -errmedian)) %>%
   transmute(Year = Year, tsMedian = slMedian + clMedian, 
             TS = Sl + Cl) %>% round(3)
-
-# EQestObsTS_MediansIIV <- merge(estProj_SLIIVI %>% select(-errMean, -errmedian),
-#                                estProj_CLIIVI %>% select(-errMean, -errmedian)) %>%
-#   transmute(Year = Year, tsMedian = slMedian + clMedian,
-#             TS = TP) %>% round(3)
 
 CARD_USDA_FAPRI_TS_ProjIII <- left_join(left_join(EQestObsTS_MediansIIV, FAPRI_Proj_TSIII, by="Year"), 
                                         USDA_Proj_TSIII %>% filter(Year > 2021), by="Year") %>% round(3)
@@ -197,7 +198,7 @@ CARD_USDA_FAPRI_TS_Proj_plotIII <- CARD_USDA_FAPRI_TS_ProjIII %>% filter(Year >=
   theme(legend.position="bottom", legend.box = "horizontal") +
   theme(legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
-
+CARD_USDA_FAPRI_TS_Proj_plotIII
 
 
 

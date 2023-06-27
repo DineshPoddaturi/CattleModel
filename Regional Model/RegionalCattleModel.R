@@ -1947,6 +1947,8 @@ slaughter_plotMedianR <- EQestObsPSNR_plots %>% ggplot(aes(x=Year)) +
   theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
   guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
+slaughter_plotMedianR
+
 
 
 EQestObsPCNR_plots <- EQestObsPCNR %>% select(Year, pcMean, pcMedian, pc) %>% 
@@ -1970,63 +1972,60 @@ cull_plotMedianR <- EQestObsPCNR_plots %>% ggplot(aes(x=Year)) +
   theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
   guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
+cull_plotMedianR
 
 
-EQestObsSLNR_plots <- EQestObsSLNR %>% select(Year, slMean, slMedian, slSM) %>% filter(Year>=1998) %>% round(2)
-
-dressedWeights_slR <- dressedWeights_sl_clR %>% select(Year, Slaughter_avg)
-
-EQestObsSLNR_Head <- merge(EQestObsSLNR_plots, dressedWeights_slR) %>% mutate(slMedianHead = 
-                                                           slMedian * (1000000000/Slaughter_avg), 
-                                                           slSMHead = slSM * (1000000000/Slaughter_avg)) %>% select(Year, slMedianHead, slSMHead)
-
-EQestObsSLNR_Head <- EQestObsSLNR_Head %>% mutate(slMedianHeadMill = slMedianHead/1000000, 
-                                                  slSMHeadMill = slSMHead/1000000) %>% round(3) 
-
-slSupply_plotMedianR <- EQestObsSLNR_Head %>% ggplot(aes(x=Year)) + 
-  geom_line(aes(y=slSMHeadMill, color = "Observed supply"),size=0.75) + 
-  geom_point(aes(y=slSMHeadMill, color = "Observed supply"),shape=15,size=2) + 
-  geom_line(aes(y=slMedianHeadMill, color="Median fitted supply"),size=0.75) +
-  geom_point(aes(y = slMedianHeadMill, color = "Median fitted supply"),shape=16,size=2) + 
-  theme_classic() + 
-  scale_x_continuous(name="Year", 
-                     breaks=c(seq(EQestObsSLNR_Head$Year[1],EQestObsSLNR_Head$Year[nrow(EQestObsSLNR_Head)], by = 2))) +
-  scale_y_continuous(name="Fed cattle supply (million head)")+ theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",
-        legend.background = element_rect(color = NA), text = element_text(size = 15)) +
-  theme(legend.title=element_blank()) + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
-        axis.text.y = element_text(size=12)) + 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
-  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
-  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
-
-
-
-
-EQestObsCLNR_plots <- EQestObsCLNR %>% select(Year, clMean, clMedian, clSM) %>% filter(Year>=1998) %>% round(2)
-
-clSupply_plotMedianR <- EQestObsCLNR_plots %>% ggplot(aes(x=Year)) + 
-  geom_line(aes(y= clSM, color = "Observed supply"),size=0.75) + 
-  geom_point(aes(y= clSM, color = "Observed supply"),shape=15,size=2) + 
-  geom_line(aes(y= clMedian, color="Median fitted supply"),size=0.75) +
-  geom_point(aes(y = clMedian, color = "Median fitted supply"),shape=16,size=2) + 
-  theme_classic() + 
-  scale_x_continuous(name="Year", 
-                     breaks=c(seq(EQestObsPSNR_plots$Year[1],EQestObsPSNR_plots$Year[nrow(EQestObsPSNR_plots)], by = 2))) +
-  scale_y_continuous(name="Cull cow supply (billion pounds)")+ theme_classic() + 
-  theme(legend.position="bottom", legend.box = "horizontal",
-        legend.background = element_rect(color = NA), text = element_text(size = 15)) +
-  theme(legend.title=element_blank()) + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
-        axis.text.y = element_text(size=12)) + 
-  theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
-  theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
-  guides(color = guide_legend(override.aes=list(shape = c(16,15))))
-
-
-
-
+# EQestObsSLNR_plots <- EQestObsSLNR %>% select(Year, slMean, slMedian, slSM) %>% filter(Year>=1998) %>% round(2)
+# 
+# dressedWeights_slR <- dressedWeights_sl_clR %>% select(Year, Slaughter_avg)
+# 
+# EQestObsSLNR_Head <- merge(EQestObsSLNR_plots, dressedWeights_slR) %>% mutate(slMedianHead = 
+#                                                            slMedian * (1000000000/Slaughter_avg), 
+#                                                            slSMHead = slSM * (1000000000/Slaughter_avg)) %>% select(Year, slMedianHead, slSMHead)
+# 
+# EQestObsSLNR_Head <- EQestObsSLNR_Head %>% mutate(slMedianHeadMill = slMedianHead/1000000, 
+#                                                   slSMHeadMill = slSMHead/1000000) %>% round(3) 
+# 
+# slSupply_plotMedianR <- EQestObsSLNR_Head %>% ggplot(aes(x=Year)) + 
+#   geom_line(aes(y=slSMHeadMill, color = "Observed supply"),size=0.75) + 
+#   geom_point(aes(y=slSMHeadMill, color = "Observed supply"),shape=15,size=2) + 
+#   geom_line(aes(y=slMedianHeadMill, color="Median fitted supply"),size=0.75) +
+#   geom_point(aes(y = slMedianHeadMill, color = "Median fitted supply"),shape=16,size=2) + 
+#   theme_classic() + 
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(EQestObsSLNR_Head$Year[1],EQestObsSLNR_Head$Year[nrow(EQestObsSLNR_Head)], by = 2))) +
+#   scale_y_continuous(name="Fed cattle supply (million head)")+ theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",
+#         legend.background = element_rect(color = NA), text = element_text(size = 15)) +
+#   theme(legend.title=element_blank()) + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+#         axis.text.y = element_text(size=12)) + 
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+#   theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+#   guides(color = guide_legend(override.aes=list(shape = c(16,15))))
+# 
+# 
+# 
+# 
+# EQestObsCLNR_plots <- EQestObsCLNR %>% select(Year, clMean, clMedian, clSM) %>% filter(Year>=1998) %>% round(2)
+# 
+# clSupply_plotMedianR <- EQestObsCLNR_plots %>% ggplot(aes(x=Year)) + 
+#   geom_line(aes(y= clSM, color = "Observed supply"),size=0.75) + 
+#   geom_point(aes(y= clSM, color = "Observed supply"),shape=15,size=2) + 
+#   geom_line(aes(y= clMedian, color="Median fitted supply"),size=0.75) +
+#   geom_point(aes(y = clMedian, color = "Median fitted supply"),shape=16,size=2) + 
+#   theme_classic() + 
+#   scale_x_continuous(name="Year", 
+#                      breaks=c(seq(EQestObsPSNR_plots$Year[1],EQestObsPSNR_plots$Year[nrow(EQestObsPSNR_plots)], by = 2))) +
+#   scale_y_continuous(name="Cull cow supply (billion pounds)")+ theme_classic() + 
+#   theme(legend.position="bottom", legend.box = "horizontal",
+#         legend.background = element_rect(color = NA), text = element_text(size = 15)) +
+#   theme(legend.title=element_blank()) + 
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size=12), 
+#         axis.text.y = element_text(size=12)) + 
+#   theme(legend.text = element_text(margin = margin(r = 30, unit = "pt")), panel.border = element_blank())+ 
+#   theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
+#   guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
 
 dressedWeights_clR <- dressedWeights_sl_clR %>% select(Year, Cull_avg)
@@ -2069,7 +2068,7 @@ invReplication_plotR <- EQestObstotalInventoryR %>% ggplot(aes(x=Year)) +
   theme(axis.title.x = element_text(vjust=-0.5)) + theme(axis.title.y = element_text(vjust=1.5))+
   guides(color = guide_legend(override.aes=list(shape = c(16,15))))
 
-
+invReplication_plotR
 
 
 
